@@ -1,0 +1,109 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'com.mikepenz.aboutlibraries.plugin'
+    id 'com.google.dagger.hilt.android'
+    id 'kotlin-kapt'
+}
+
+android {
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "chat.revolt"
+        minSdk 23
+        targetSdk 33
+        versionCode Integer.parseInt("000_001_000".replaceAll("_", ""), 10)
+        versionName "0.1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion compose_version
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+    namespace 'chat.revolt'
+}
+
+dependencies {
+    // Android/Kotlin Core
+    implementation 'androidx.core:core-ktx:1.9.0'
+
+    // JSON Serialization
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+
+    // Jetpack Compose
+    implementation "androidx.compose.ui:ui:$compose_libraries_version"
+    implementation 'androidx.compose.material3:material3:1.0.1'
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_libraries_version"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
+    implementation 'androidx.activity:activity-compose:1.6.1'
+
+    // Accompanist - Jetpack Compose Extensions
+    implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
+
+    // KTOR - HTTP+WebSocket Library
+    implementation "io.ktor:ktor-client-core:$ktor_version"
+    implementation "io.ktor:ktor-client-okhttp:$ktor_version"
+    implementation "io.ktor:ktor-client-logging:$ktor_version"
+    implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
+    implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
+
+    // Screen Navigation
+    implementation "androidx.navigation:navigation-compose:$nav_version"
+
+    // Jetpack Compose Tooling
+    debugImplementation "androidx.compose.ui:ui-tooling:$compose_libraries_version"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_libraries_version"
+
+    // Browser opening utility (used for legal links)
+    implementation "androidx.browser:browser:1.4.0"
+
+    // Hilt - Dependency Injection
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+
+    // Coil - Image Loading
+    implementation "io.coil-kt:coil:$coil_version"
+    implementation "io.coil-kt:coil-compose:$coil_version"
+    implementation "io.coil-kt:coil-svg:$coil_version"
+    implementation "io.coil-kt:coil-gif:$coil_version"
+
+    // AboutLibraries - automated OSS library attribution
+    implementation "com.mikepenz:aboutlibraries-compose:$aboutlibraries_version"
+
+    // Jetpack DataStore - persistent storage
+    implementation "androidx.datastore:datastore-preferences:1.1.0-alpha01"
+    implementation "androidx.datastore:datastore:1.1.0-alpha01"
+}
+
+kapt {
+    correctErrorTypes true
+}

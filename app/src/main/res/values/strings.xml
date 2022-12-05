@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name" translatable="false">Revolt</string>
+
+    <string name="back">← Back</string>
+    <string name="next">Next →</string>
+    <string name="cancel">Cancel</string>
+    <string name="lets_go">Let\'s go</string>
+    <string name="loading">Fetching some info, hang in there…</string>
+
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="community_guidelines">Community Guidelines</string>
+
+    <string name="login_onboarding_heading">Find your community, connect with the world.</string>
+    <string name="login_onboarding_body">Revolt is one of the best ways to stay connected with your friends and community, anywhere, anytime.</string>
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+
+    <string name="login">Log In</string>
+    <string name="signup">Sign Up</string>
+    <string name="resend">Resend</string>
+    <string name="send_email">Send email</string>
+
+    <string name="login_heading">Let\'s log you in</string>
+    <string name="password_forgot">Forgot password?</string>
+    <string name="resend_verification">Resend a verification email</string>
+    <string name="password_manager_hint">Using a password manager?</string>
+    <string name="password_forgot_heading">Forgot your password?</string>
+    <string name="password_forgot_instructions">Enter your email and we\'ll send you instructions on how to reset your password.</string>
+
+    <string name="register_heading">Let\'s get you started</string>
+    <string name="check_mail">Check your mail!</string>
+    <string name="instructions_at_mail">We\'ve sent further instructions to %1$s.</string>
+    <string name="verify_then_choose_username">Verify your email, and then we\'ll get on with choosing your username.</string>
+
+    <string name="welcome">Welcome!</string>
+    <string name="username_choose_lead">It\'s time to choose a username!</string>
+    <string name="username_choose_others">Others will find, recognise and mention you with this name.</string>
+    <string name="username_choose_changeable">But if you change your mind, you can change your username at any time in your User Settings.</string>
+
+    <string name="mfa_interstitial_header">One more thing</string>
+    <string name="mfa_interstitial_lead">You\'ve got 2FA enabled to keep your account extra-safe.</string>
+    <string name="mfa_type_otp">Use a one-time password</string>
+    <string name="mfa_type_recovery">Use a recovery code</string>
+
+    <string name="mfa_totp_header">Enter a six-digit code</string>
+    <string name="mfa_totp_lead">Enter the six-digit code from your authenticator app.</string>
+    <string name="mfa_totp_code">Code</string>
+
+    <string name="mfa_recovery_header">Enter a recovery code</string>
+    <string name="mfa_recovery_lead">Enter one of your recovery codes.</string>
+    <string name="mfa_recovery_code">Code</string>
+
+    <string name="mfa_password_header">Enter your password</string>
+    <string name="mfa_password_lead">Enter your password to continue.</string>
+
+    <string name="about">About</string>
+    <string name="app_full_name">Revolt on Android</string>
+    <string name="oss_attribution">OSS Attribution</string>
+
+    <string name="comingsoon_heading">Gah, you found me!</string>
+    <string name="comingsoon_body">The feature you are trying to access is not ready yet, but we are steadily working on polishing it to perfection..</string>
+</resources>
