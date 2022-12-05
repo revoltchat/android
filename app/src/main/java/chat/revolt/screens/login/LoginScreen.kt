@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,6 +23,7 @@ import chat.revolt.R
 import chat.revolt.api.REVOLT_SUPPORT
 import chat.revolt.api.routes.account.EmailPasswordAssessment
 import chat.revolt.api.routes.account.negotiateAuthentication
+import chat.revolt.api.routes.user.fetchSelfWithNewToken
 import chat.revolt.components.generic.AnyLink
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.Weblink
@@ -40,9 +42,9 @@ class LoginViewModel() : ViewModel() {
     val error: String?
         get() = _error
 
-    private var _navigateToMfa by mutableStateOf(false)
-    val navigateToMfa: Boolean
-        get() = _navigateToMfa
+    private var _navigateTo by mutableStateOf<String?>(null)
+    val navigateTo: String?
+        get() = _navigateTo
 
     private var _mfaResponse by mutableStateOf<EmailPasswordAssessment?>(null)
     val mfaResponse: EmailPasswordAssessment?
@@ -60,19 +62,21 @@ class LoginViewModel() : ViewModel() {
                 if (response.proceedMfa) {
                     Log.d("Login", "MFA required. Navigating to MFA screen")
                     _mfaResponse = response
-                    _navigateToMfa = true
+                    _navigateTo = "mfa"
                 } else {
                     Log.d(
                         "Login",
                         "No MFA required. Login is complete! We have a session token: ${response.firstUserHints!!.token}"
                     )
+                    fetchSelfWithNewToken(response.firstUserHints.token)
+                    _navigateTo = "home"
                 }
             }
         }
     }
 
-    fun mfaComplete() {
-        _navigateToMfa = false
+    fun navigationComplete() {
+        _navigateTo = null
     }
 
     fun setEmail(email: String) {
@@ -89,7 +93,7 @@ fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = viewModel()
 ) {
-    if (viewModel.navigateToMfa) {
+    if (viewModel.navigateTo == "mfa") {
         navController.navigate(
             "setup/mfa/${viewModel.mfaResponse!!.mfaSpec!!.ticket}/${
                 viewModel.mfaResponse!!.mfaSpec!!.allowedMethods.joinToString(
@@ -97,7 +101,12 @@ fun LoginScreen(
                 )
             }"
         )
-        viewModel.mfaComplete()
+        viewModel.navigationComplete()
+    } else if (viewModel.navigateTo == "home") {
+        navController.navigate("chat/home") {
+            popUpTo("setup/greeting") { inclusive = true }
+        }
+        viewModel.navigationComplete()
     }
 
     Column(
@@ -143,7 +152,7 @@ fun LoginScreen(
                 FormTextField(
                     value = viewModel.password,
                     label = stringResource(R.string.password),
-                    password = true,
+                    type = KeyboardType.Password,
                     onChange = { viewModel.setPassword(it) })
 
                 AnyLink(

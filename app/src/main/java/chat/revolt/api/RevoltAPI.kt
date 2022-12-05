@@ -54,7 +54,9 @@ val RevoltHttp = HttpClient(OkHttp) {
 object RevoltAPI {
     const val TOKEN_HEADER_NAME = "x-session-token"
 
-    val userCache = mutableMapOf<String, CompleteUser>()
+    // discount caching solution(/-s)! LRU would be better but this is fine for now, until it's not...
+    val userCache =
+        mutableMapOf<String, CompleteUser>()
 
     var selfId: String? = null
 
@@ -71,8 +73,22 @@ object RevoltAPI {
         }
     }
 
+    /**
+     * Returns true if the user is logged in and the current user has been fetched at least once.
+     * Call [initialize] to fetch the current user first, else this will return false.
+     */
     fun isLoggedIn(): Boolean {
         return selfId != null
+    }
+
+    /**
+     * Clears the API client's state completely.
+     */
+    fun logout() {
+        selfId = null
+        sessionToken = ""
+
+        userCache.clear()
     }
 }
 
