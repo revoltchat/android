@@ -60,7 +60,14 @@ fun HomeScreen(navController: NavController) {
             }
         }
         Button(
-            onClick = { RevoltAPI.logout(); navController.navigate("setup/greeting") },
+            onClick = {
+                RevoltAPI.logout()
+                navController.navigate("setup/greeting") {
+                    popUpTo("chat/home") {
+                        inclusive = true
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 30.dp, top = 5.dp, start = 20.dp, end = 20.dp)
