@@ -1,14 +1,18 @@
 package chat.revolt.screens.chat
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
@@ -19,14 +23,50 @@ fun HomeScreen(navController: NavController) {
     val user = RevoltAPI.userCache[RevoltAPI.selfId]
 
     Column() {
-        Text(text = "Logged in as " + user?.username + "!")
-        RemoteImage(
-            url = "$REVOLT_FILES/avatars/${user?.avatar?.id}/user.png",
-            description = "User Avatar",
+        Text(
+            text = "Home (placeholder)",
+            style = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Left,
+                fontSize = 24.sp
+            ),
             modifier = Modifier
-                .clip(CircleShape)
-                .width(70.dp)
-                .height(70.dp)
+                .padding(horizontal = 15.dp, vertical = 15.dp)
+                .fillMaxWidth(),
         )
+        Column(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxSize()
+                .weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            user?.let {
+                Row {
+                    RemoteImage(
+                        url = "${REVOLT_FILES}/avatars/${it.avatar?.id}/user.png",
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(CircleShape),
+                        description = "Avatar for ${it.username} (placeholder!)"
+                    )
+
+                    Column(modifier = Modifier.padding(start = 10.dp)) {
+                        it.username?.let { it1 -> Text(text = it1) }
+                        it.id?.let { it1 -> Text(text = it1) }
+                    }
+                }
+            }
+        }
+        Button(
+            onClick = { RevoltAPI.logout(); navController.navigate("setup/greeting") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 30.dp, top = 5.dp, start = 20.dp, end = 20.dp)
+        ) {
+            Text("Logout")
+        }
     }
+
 }
