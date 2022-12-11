@@ -19,16 +19,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.revolt.api.RevoltAPI
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.drawableResource
+import chat.revolt.persistence.KVStorage
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GreeterViewModel() : ViewModel() {
+@HiltViewModel
+class GreeterViewModel @Inject constructor(
+    private val kvStorage: KVStorage
+) : ViewModel() {
     private var _skipLogin by mutableStateOf(false)
     val skipLogin: Boolean
         get() = _skipLogin
@@ -47,17 +53,24 @@ class GreeterViewModel() : ViewModel() {
 
     init {
         viewModelScope.launch {
+            val token = kvStorage.get("sessionToken")
+            if (token != null) {
+                RevoltAPI.setSessionHeader(token)
+            }
+
             RevoltAPI.initialize()
+
             if (RevoltAPI.isLoggedIn()) {
                 _skipLogin = true
             }
+
             setFinishedLoading(true)
         }
     }
 }
 
 @Composable
-fun GreeterScreen(navController: NavController, viewModel: GreeterViewModel = viewModel()) {
+fun GreeterScreen(navController: NavController, viewModel: GreeterViewModel = hiltViewModel()) {
     if (viewModel.skipLogin) {
         navController.navigate("chat/home") {
             popUpTo("login/greeting") {

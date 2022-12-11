@@ -13,13 +13,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.components.generic.RemoteImage
+import chat.revolt.persistence.KVStorage
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
+
+@HiltViewModel
+class HomeScreenViewModel @Inject constructor(
+    private val kvStorage: KVStorage
+) : ViewModel() {
+    fun logout() {
+        runBlocking {
+            kvStorage.remove("sessionToken")
+            RevoltAPI.logout()
+        }
+    }
+}
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hiltViewModel()) {
     val user = RevoltAPI.userCache[RevoltAPI.selfId]
 
     Column() {
@@ -61,7 +79,7 @@ fun HomeScreen(navController: NavController) {
         }
         Button(
             onClick = {
-                RevoltAPI.logout()
+                viewModel.logout()
                 navController.navigate("login/greeting") {
                     popUpTo("chat/home") {
                         inclusive = true

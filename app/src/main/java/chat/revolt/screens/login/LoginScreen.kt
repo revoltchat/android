@@ -15,9 +15,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.REVOLT_SUPPORT
@@ -27,9 +27,15 @@ import chat.revolt.api.routes.user.fetchSelfWithNewToken
 import chat.revolt.components.generic.AnyLink
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.Weblink
+import chat.revolt.persistence.KVStorage
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel() : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val kvStorage: KVStorage,
+) : ViewModel() {
     private var _email by mutableStateOf("")
     val email: String
         get() = _email
@@ -68,7 +74,10 @@ class LoginViewModel() : ViewModel() {
                         "Login",
                         "No MFA required. Login is complete! We have a session token: ${response.firstUserHints!!.token}"
                     )
+
                     fetchSelfWithNewToken(response.firstUserHints.token)
+                    kvStorage.set("sessionToken", response.firstUserHints.token)
+
                     _navigateTo = "home"
                 }
             }
@@ -91,7 +100,7 @@ class LoginViewModel() : ViewModel() {
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: LoginViewModel = viewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     if (viewModel.navigateTo == "mfa") {
         navController.navigate(

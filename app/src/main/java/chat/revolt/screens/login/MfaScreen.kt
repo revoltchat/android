@@ -18,9 +18,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.routes.account.MfaResponseRecoveryCode
@@ -30,9 +30,15 @@ import chat.revolt.api.routes.account.authenticateWithMfaTotpCode
 import chat.revolt.api.routes.user.fetchSelfWithNewToken
 import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.FormTextField
+import chat.revolt.persistence.KVStorage
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MfaScreenViewModel : ViewModel() {
+@HiltViewModel
+class MfaScreenViewModel @Inject constructor(
+    private val kvStorage: KVStorage,
+) : ViewModel() {
     private var _totpCode by mutableStateOf("")
     val totpCode: String
         get() = _totpCode
@@ -72,8 +78,10 @@ class MfaScreenViewModel : ViewModel() {
                     "MFA",
                     "Successfully authorized TOTP. Token: ${response.firstUserHints!!.token}"
                 )
-                val self = fetchSelfWithNewToken(response.firstUserHints.token)
-                Log.d("MFA", "Self: ${self.username}")
+
+                fetchSelfWithNewToken(response.firstUserHints.token)
+                kvStorage.set("sessionToken", response.firstUserHints.token)
+
                 _navigateToHome = true
             }
         }
@@ -91,8 +99,10 @@ class MfaScreenViewModel : ViewModel() {
                     "MFA",
                     "Successfully authorized recovery code. Token: ${response.firstUserHints!!.token}"
                 )
-                val self = fetchSelfWithNewToken(response.firstUserHints.token)
-                Log.d("MFA", "Self: ${self.username}")
+
+                fetchSelfWithNewToken(response.firstUserHints.token)
+                kvStorage.set("sessionToken", response.firstUserHints.token)
+
                 _navigateToHome = true
             }
         }
@@ -104,7 +114,7 @@ fun MfaScreen(
     navController: NavController,
     allowedAuthTypesCommaSep: String,
     mfaTicket: String,
-    viewModel: MfaScreenViewModel = viewModel()
+    viewModel: MfaScreenViewModel = hiltViewModel()
 ) {
     val allowedAuthTypes = allowedAuthTypesCommaSep.split(",")
 

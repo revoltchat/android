@@ -4,6 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'com.mikepenz.aboutlibraries.plugin'
     id 'com.google.dagger.hilt.android'
+
     id 'kotlin-kapt'
 }
 
@@ -89,6 +90,7 @@ dependencies {
 
     // Hilt - Dependency Injection
     implementation "com.google.dagger:hilt-android:$hilt_version"
+    implementation "androidx.hilt:hilt-navigation-compose:1.1.0-alpha01"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
 
     // Coil - Image Loading

@@ -1,9 +1,5 @@
 package chat.revolt.api
 
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import chat.revolt.api.routes.user.fetchSelf
 import chat.revolt.api.schemas.CompleteUser
 import io.ktor.client.*
@@ -20,8 +16,6 @@ const val REVOLT_MARKETING = "https://revolt.chat"
 const val REVOLT_FILES = "https://autumn.revolt.chat"
 
 private const val BACKEND_IS_STABLE = false
-
-val Context.revoltKVStorage: DataStore<Preferences> by preferencesDataStore(name = "revolt_kv")
 
 val RevoltJson = Json { ignoreUnknownKeys = true }
 
@@ -50,6 +44,7 @@ val RevoltHttp = HttpClient(OkHttp) {
         url(REVOLT_BASE)
     }
 }
+
 
 object RevoltAPI {
     const val TOKEN_HEADER_NAME = "x-session-token"
