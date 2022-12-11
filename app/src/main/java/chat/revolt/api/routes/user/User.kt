@@ -1,6 +1,5 @@
 package chat.revolt.api.routes.user
 
-import android.util.Log
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
@@ -9,14 +8,10 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 
 suspend fun fetchSelf(): CompleteUser {
-    Log.d("fetchSelf", "Fetching self and logging object")
-
     val response = RevoltHttp.get("/users/@me") {
         headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
     }
         .bodyAsText()
-
-    Log.d("fetchSelf", response)
 
     val user = RevoltJson.decodeFromString(CompleteUser.serializer(), response)
 
