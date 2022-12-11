@@ -20,12 +20,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.revolt.api.RevoltAPI
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.drawableResource
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 class GreeterViewModel() : ViewModel() {
     private var _skipLogin by mutableStateOf(false)
@@ -45,9 +46,7 @@ class GreeterViewModel() : ViewModel() {
     }
 
     init {
-        // runBlocking prevents the greeter from showing up at all, if the user is already logged in
-        // (It is normally a bad idea to use runBlocking outside of a coroutine scope)
-        runBlocking {
+        viewModelScope.launch {
             RevoltAPI.initialize()
             if (RevoltAPI.isLoggedIn()) {
                 _skipLogin = true
@@ -66,6 +65,25 @@ fun GreeterScreen(navController: NavController, viewModel: GreeterViewModel = vi
             }
         }
         viewModel.setSkipLogin(false)
+    }
+
+    if (!viewModel.finishedLoading) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            RemoteImage(
+                url = drawableResource(R.drawable.revolt_logo_wide),
+                description = "Revolt Logo",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+            )
+        }
     }
 
     Column(
