@@ -61,7 +61,7 @@ class GreeterViewModel() : ViewModel() {
 fun GreeterScreen(navController: NavController, viewModel: GreeterViewModel = viewModel()) {
     if (viewModel.skipLogin) {
         navController.navigate("chat/home") {
-            popUpTo("setup/greeting") {
+            popUpTo("login/greeting") {
                 inclusive = true
             }
         }
@@ -131,7 +131,7 @@ fun GreeterScreen(navController: NavController, viewModel: GreeterViewModel = vi
             }
 
             Button(
-                onClick = { navController.navigate("setup/login") },
+                onClick = { navController.navigate("login/login") },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = stringResource(R.string.login))

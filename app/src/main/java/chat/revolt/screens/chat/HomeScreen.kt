@@ -62,7 +62,7 @@ fun HomeScreen(navController: NavController) {
         Button(
             onClick = {
                 RevoltAPI.logout()
-                navController.navigate("setup/greeting") {
+                navController.navigate("login/greeting") {
                     popUpTo("chat/home") {
                         inclusive = true
                     }

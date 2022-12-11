@@ -44,7 +44,7 @@ fun AppEntrypoint() {
 
     AnimatedNavHost(
         navController = navController,
-        startDestination = "setup/greeting",
+        startDestination = "login/greeting",
         enterTransition = {
             slideIntoContainer(
                 AnimatedContentScope.SlideDirection.Left,
@@ -70,9 +70,9 @@ fun AppEntrypoint() {
             ) + fadeOut(animationSpec = tween(400))
         }
     ) {
-        composable("setup/greeting") { GreeterScreen(navController) }
-        composable("setup/login") { LoginScreen(navController) }
-        composable("setup/mfa/{mfaTicket}/{allowedAuthTypes}") { backStackEntry ->
+        composable("login/greeting") { GreeterScreen(navController) }
+        composable("login/login") { LoginScreen(navController) }
+        composable("login/mfa/{mfaTicket}/{allowedAuthTypes}") { backStackEntry ->
             val mfaTicket = backStackEntry.arguments?.getString("mfaTicket") ?: ""
             val allowedAuthTypes =
                 backStackEntry.arguments?.getString("allowedAuthTypes") ?: ""

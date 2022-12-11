@@ -110,7 +110,7 @@ fun MfaScreen(
 
     if (viewModel.navigateToHome) {
         navController.navigate("chat/home") {
-            popUpTo("setup/greeting") { inclusive = true }
+            popUpTo("login/greeting") { inclusive = true }
         }
         viewModel.navigationComplete()
     }

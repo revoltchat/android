@@ -95,7 +95,7 @@ fun LoginScreen(
 ) {
     if (viewModel.navigateTo == "mfa") {
         navController.navigate(
-            "setup/mfa/${viewModel.mfaResponse!!.mfaSpec!!.ticket}/${
+            "login/mfa/${viewModel.mfaResponse!!.mfaSpec!!.ticket}/${
                 viewModel.mfaResponse!!.mfaSpec!!.allowedMethods.joinToString(
                     ","
                 )
@@ -104,7 +104,7 @@ fun LoginScreen(
         viewModel.navigationComplete()
     } else if (viewModel.navigateTo == "home") {
         navController.navigate("chat/home") {
-            popUpTo("setup/greeting") { inclusive = true }
+            popUpTo("login/greeting") { inclusive = true }
         }
         viewModel.navigationComplete()
     }
