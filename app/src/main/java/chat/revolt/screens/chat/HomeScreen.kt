@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,6 +33,15 @@ class HomeScreenViewModel @Inject constructor(
         runBlocking {
             kvStorage.remove("sessionToken")
             RevoltAPI.logout()
+        }
+    }
+
+    fun sendMessage() {
+        runBlocking {
+            chat.revolt.api.routes.channel.sendMessage(
+                "01FD4WDPDDPH5523ASF50ADSSN",
+                "this is technically the first message sent from revolt android"
+            )
         }
     }
 }
@@ -74,6 +84,12 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hi
                         it.username?.let { it1 -> Text(text = it1) }
                         it.id?.let { it1 -> Text(text = it1) }
                     }
+                }
+            }
+
+            CollapsibleCard(title = "Send a message") {
+                Button(onClick = { viewModel.sendMessage() }) {
+                    Text(text = "Send")
                 }
             }
         }

@@ -1,0 +1,70 @@
+package chat.revolt.api.routes.channel
+
+import chat.revolt.api.RevoltAPI
+import chat.revolt.api.RevoltHttp
+import chat.revolt.api.RevoltJson
+import chat.revolt.api.internals.ULID
+import chat.revolt.api.schemas.Embed
+import chat.revolt.api.schemas.MessagesInChannel
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+
+suspend fun fetchMessagesFromChannel(
+    channelId: String,
+    limit: Int = 50,
+    include_users: Boolean = false,
+    before: String? = null,
+    after: String? = null,
+    nearby: String? = null,
+    sort: String? = null
+): MessagesInChannel {
+    val response = RevoltHttp.get("/channels/$channelId/messages") {
+        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+
+        parameter("limit", limit)
+        parameter("include_users", include_users)
+
+        if (before != null) parameter("before", before)
+        if (after != null) parameter("after", after)
+        if (nearby != null) parameter("nearby", nearby)
+        if (sort != null) parameter("sort", sort)
+    }
+        .bodyAsText()
+
+    return RevoltJson.decodeFromString(
+        MessagesInChannel.serializer(),
+        response
+    )
+}
+
+@kotlinx.serialization.Serializable
+data class SendMessageReply(
+    val id: String,
+    val mention: Boolean
+)
+
+suspend fun sendMessage(
+    channelId: String,
+    content: String,
+    nonce: String? = ULID.makeNext(),
+    replies: List<SendMessageReply>? = null,
+    embed: Embed? = null
+): String {
+    val response = RevoltHttp.post("/channels/$channelId/messages") {
+        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+
+        contentType(ContentType.Application.Json)
+        setBody(
+            mapOf(
+                "content" to content,
+                "nonce" to nonce,
+                "replies" to replies,
+                "embed" to embed
+            )
+        )
+    }
+        .bodyAsText()
+
+    return response
+}

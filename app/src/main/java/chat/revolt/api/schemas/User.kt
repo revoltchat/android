@@ -54,7 +54,9 @@ data class Avatar(
 
 @Serializable
 data class Metadata(
-    val type: String? = null
+    val type: String? = null,
+    val width: Long? = null,
+    val height: Long? = null
 )
 
 @Serializable
