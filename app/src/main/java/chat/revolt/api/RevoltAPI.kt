@@ -1,6 +1,7 @@
 package chat.revolt.api
 
 import chat.revolt.api.routes.user.fetchSelf
+import chat.revolt.api.routes.user.fetchSelfWithNewToken
 import chat.revolt.api.schemas.CompleteUser
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -84,6 +85,18 @@ object RevoltAPI {
         sessionToken = ""
 
         userCache.clear()
+    }
+
+    /**
+     * Checks if a session token is valid.
+     */
+    suspend fun checkSessionToken(token: String): Boolean {
+        return try {
+            fetchSelfWithNewToken(token)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 }
 

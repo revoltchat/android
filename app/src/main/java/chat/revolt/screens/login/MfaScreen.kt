@@ -79,10 +79,14 @@ class MfaScreenViewModel @Inject constructor(
                     "Successfully authorized TOTP. Token: ${response.firstUserHints!!.token}"
                 )
 
-                fetchSelfWithNewToken(response.firstUserHints.token)
-                kvStorage.set("sessionToken", response.firstUserHints.token)
+                try {
+                    fetchSelfWithNewToken(response.firstUserHints.token)
+                    kvStorage.set("sessionToken", response.firstUserHints.token)
 
-                _navigateToHome = true
+                    _navigateToHome = true
+                } catch (e: Error) {
+                    _error = e.message ?: "Unknown error"
+                }
             }
         }
     }
@@ -100,10 +104,14 @@ class MfaScreenViewModel @Inject constructor(
                     "Successfully authorized recovery code. Token: ${response.firstUserHints!!.token}"
                 )
 
-                fetchSelfWithNewToken(response.firstUserHints.token)
-                kvStorage.set("sessionToken", response.firstUserHints.token)
+                try {
+                    fetchSelfWithNewToken(response.firstUserHints.token)
+                    kvStorage.set("sessionToken", response.firstUserHints.token)
 
-                _navigateToHome = true
+                    _navigateToHome = true
+                } catch (e: Error) {
+                    _error = e.message ?: "Unknown error"
+                }
             }
         }
     }

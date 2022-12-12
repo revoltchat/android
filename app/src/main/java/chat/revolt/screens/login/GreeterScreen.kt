@@ -55,7 +55,11 @@ class GreeterViewModel @Inject constructor(
         viewModelScope.launch {
             val token = kvStorage.get("sessionToken")
             if (token != null) {
-                RevoltAPI.setSessionHeader(token)
+                val valid = RevoltAPI.checkSessionToken(token)
+                if (!valid) {
+                    kvStorage.remove("sessionToken")
+                    RevoltAPI.setSessionHeader("")
+                }
             }
 
             RevoltAPI.initialize()

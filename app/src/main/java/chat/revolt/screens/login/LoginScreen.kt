@@ -75,10 +75,14 @@ class LoginViewModel @Inject constructor(
                         "No MFA required. Login is complete! We have a session token: ${response.firstUserHints!!.token}"
                     )
 
-                    fetchSelfWithNewToken(response.firstUserHints.token)
-                    kvStorage.set("sessionToken", response.firstUserHints.token)
+                    try {
+                        fetchSelfWithNewToken(response.firstUserHints.token)
+                        kvStorage.set("sessionToken", response.firstUserHints.token)
 
-                    _navigateTo = "home"
+                        _navigateTo = "home"
+                    } catch (e: Error) {
+                        _error = e.message ?: "Unknown error"
+                    }
                 }
             }
         }
