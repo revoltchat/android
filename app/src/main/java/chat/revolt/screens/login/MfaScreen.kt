@@ -215,7 +215,7 @@ fun MfaScreen(
 
                                 FormTextField(
                                     label = stringResource(R.string.mfa_totp_code),
-                                    onChange = { viewModel.setTotpCode(it) },
+                                    onChange = viewModel::setTotpCode,
                                     type = KeyboardType.Number,
                                     value = viewModel.totpCode,
                                 )
@@ -253,7 +253,7 @@ fun MfaScreen(
 
                                 FormTextField(
                                     label = stringResource(R.string.mfa_recovery_code),
-                                    onChange = { viewModel.setRecoveryCode(it) },
+                                    onChange = viewModel::setRecoveryCode,
                                     value = viewModel.recoveryCode,
                                 )
 

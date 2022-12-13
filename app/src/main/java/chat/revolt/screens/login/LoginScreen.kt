@@ -159,14 +159,15 @@ fun LoginScreen(
                 FormTextField(
                     value = viewModel.email,
                     label = stringResource(R.string.email),
-                    onChange = { viewModel.setEmail(it) },
+                    onChange = viewModel::setEmail,
                     modifier = Modifier.padding(vertical = 25.dp)
                 )
                 FormTextField(
                     value = viewModel.password,
                     label = stringResource(R.string.password),
                     type = KeyboardType.Password,
-                    onChange = { viewModel.setPassword(it) })
+                    onChange = viewModel::setPassword,
+                )
 
                 AnyLink(
                     text = stringResource(R.string.password_forgot),
