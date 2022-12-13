@@ -6,6 +6,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,13 +18,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.components.generic.CollapsibleCard
+import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -29,6 +35,14 @@ import javax.inject.Inject
 class HomeScreenViewModel @Inject constructor(
     private val kvStorage: KVStorage
 ) : ViewModel() {
+    private var _messageContent by mutableStateOf("")
+    val messageContent: String
+        get() = _messageContent
+
+    fun setMessageContent(value: String) {
+        _messageContent = value
+    }
+
     fun logout() {
         runBlocking {
             kvStorage.remove("sessionToken")
@@ -37,10 +51,10 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun sendMessage() {
-        runBlocking {
+        viewModelScope.launch {
             chat.revolt.api.routes.channel.sendMessage(
-                "01FD4WDPDDPH5523ASF50ADSSN",
-                "this is technically the first message sent from revolt android"
+                "01F7ZSBSFHCAAJQ92ZGTY67HMN",
+                messageContent
             )
         }
     }
@@ -88,8 +102,15 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hi
             }
 
             CollapsibleCard(title = "Send a message") {
-                Button(onClick = { viewModel.sendMessage() }) {
-                    Text(text = "Send")
+                Column() {
+                    FormTextField(
+                        value = viewModel.messageContent,
+                        label = "Content",
+                        onChange = viewModel::setMessageContent
+                    )
+                    Button(onClick = { viewModel.sendMessage() }) {
+                        Text(text = "Send")
+                    }
                 }
             }
         }
