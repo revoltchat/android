@@ -22,9 +22,9 @@ fun CollapsibleCard(
 
     Card(
         modifier = modifier.padding(10.dp),
-        shape = MaterialTheme.shapes.small
+        shape = MaterialTheme.shapes.large
     ) {
-        Column() {
+        Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

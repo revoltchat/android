@@ -4,11 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.*
+import androidx.compose.animation.core.EaseInOutExpo
+import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
 import chat.revolt.screens.about.PlaceholderScreen
@@ -39,6 +42,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+val RevoltTweenInt: FiniteAnimationSpec<IntOffset> = tween(400, easing = EaseInOutExpo)
+val RevoltTweenFloat: FiniteAnimationSpec<Float> = tween(400, easing = EaseInOutExpo)
+
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AppEntrypoint() {
@@ -50,26 +56,26 @@ fun AppEntrypoint() {
         enterTransition = {
             slideIntoContainer(
                 AnimatedContentScope.SlideDirection.Left,
-                animationSpec = tween(400)
-            ) + fadeIn(animationSpec = tween(400))
+                animationSpec = RevoltTweenInt
+            ) + fadeIn(animationSpec = RevoltTweenFloat)
         },
         exitTransition = {
             slideOutOfContainer(
                 AnimatedContentScope.SlideDirection.Left,
-                animationSpec = tween(400)
-            ) + fadeOut(animationSpec = tween(400))
+                animationSpec = RevoltTweenInt
+            ) + fadeOut(animationSpec = RevoltTweenFloat)
         },
         popEnterTransition = {
             slideIntoContainer(
                 AnimatedContentScope.SlideDirection.Right,
-                animationSpec = tween(400)
-            ) + fadeIn(animationSpec = tween(400))
+                animationSpec = RevoltTweenInt
+            ) + fadeIn(animationSpec = RevoltTweenFloat)
         },
         popExitTransition = {
             slideOutOfContainer(
                 AnimatedContentScope.SlideDirection.Right,
-                animationSpec = tween(400)
-            ) + fadeOut(animationSpec = tween(400))
+                animationSpec = RevoltTweenInt
+            ) + fadeOut(animationSpec = RevoltTweenFloat)
         }
     ) {
         composable("login/greeting") { GreeterScreen(navController) }

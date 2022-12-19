@@ -2,6 +2,8 @@ package chat.revolt.screens.chat
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,9 +24,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
-import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.RemoteImage
+import chat.revolt.components.screens.home.LinkOnHome
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -101,17 +103,18 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hi
                 }
             }
 
-            CollapsibleCard(title = "Send a message") {
-                Column() {
-                    FormTextField(
-                        value = viewModel.messageContent,
-                        label = "Content",
-                        onChange = viewModel::setMessageContent
-                    )
-                    Button(onClick = { viewModel.sendMessage() }) {
-                        Text(text = "Send")
-                    }
-                }
+            Column() {
+                FormTextField(
+                    value = viewModel.messageContent,
+                    label = "Content",
+                    modifier = Modifier.fillMaxWidth(),
+                    onChange = viewModel::setMessageContent
+                )
+                LinkOnHome(
+                    heading = "Send",
+                    icon = Icons.Filled.Send,
+                    onClick = viewModel::sendMessage
+                )
             }
         }
         Button(
@@ -130,5 +133,4 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hi
             Text("Logout")
         }
     }
-
 }
