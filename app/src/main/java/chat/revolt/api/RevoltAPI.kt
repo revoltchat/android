@@ -144,6 +144,7 @@ object RevoltAPI {
         serverCache.clear()
         channelCache.clear()
         emojiCache.clear()
+        messageCache.clear()
 
         socketThread?.interrupt()
     }
