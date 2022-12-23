@@ -7,17 +7,17 @@ import kotlinx.serialization.Serializable
 data class Message(
     @SerialName("_id")
     val id: String? = null,
-
     val nonce: String? = null,
     val channel: String? = null,
     val author: String? = null,
     val content: String? = null,
     val reactions: Map<String, List<String>>? = null,
     val replies: List<String>? = null,
-    val attachments: List<Avatar>? = null,
+    val attachments: List<AutumnResource>? = null,
     val edited: String? = null,
     val embeds: List<Embed>? = null,
-    val mentions: List<String>? = null
+    val mentions: List<String>? = null,
+    val type: String? = null, // this is _only_ used for websocket events!
 )
 
 @Serializable

@@ -21,9 +21,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.REVOLT_SUPPORT
+import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.account.EmailPasswordAssessment
 import chat.revolt.api.routes.account.negotiateAuthentication
-import chat.revolt.api.routes.user.fetchSelfWithNewToken
 import chat.revolt.components.generic.AnyLink
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.Weblink
@@ -76,7 +76,7 @@ class LoginViewModel @Inject constructor(
                     )
 
                     try {
-                        fetchSelfWithNewToken(response.firstUserHints.token)
+                        RevoltAPI.loginAs(response.firstUserHints.token)
                         kvStorage.set("sessionToken", response.firstUserHints.token)
 
                         _navigateTo = "home"

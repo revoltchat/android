@@ -62,9 +62,8 @@ class GreeterViewModel @Inject constructor(
                 }
             }
 
-            RevoltAPI.initialize()
-
             if (RevoltAPI.isLoggedIn()) {
+                RevoltAPI.loginAs(token ?: "")
                 _skipLogin = true
             }
 
@@ -101,6 +100,7 @@ fun GreeterScreen(navController: NavController, viewModel: GreeterViewModel = hi
                     .height(60.dp)
             )
         }
+        return
     }
 
     Column(

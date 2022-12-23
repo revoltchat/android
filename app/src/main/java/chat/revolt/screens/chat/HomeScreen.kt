@@ -1,7 +1,9 @@
 package chat.revolt.screens.chat
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
@@ -55,7 +57,7 @@ class HomeScreenViewModel @Inject constructor(
     fun sendMessage() {
         viewModelScope.launch {
             chat.revolt.api.routes.channel.sendMessage(
-                "01F7ZSBSFHCAAJQ92ZGTY67HMN",
+                "01F7ZSBSFHCAAJQ92ZGTY67HMN", // revolt lounge #general (temporarily hardcoded) FIXME
                 messageContent
             )
         }
@@ -100,6 +102,28 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hi
                         it.username?.let { it1 -> Text(text = it1) }
                         it.id?.let { it1 -> Text(text = it1) }
                     }
+                }
+            }
+
+            // a scrollable list of all users in user cache
+            Text(
+                text = "User cache",
+                style = MaterialTheme.typography.displaySmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Left,
+                    fontSize = 24.sp
+                ),
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 15.dp)
+                    .fillMaxWidth(),
+            )
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .height(200.dp)
+            ) {
+                RevoltAPI.userCache.forEach { (_, user) ->
+                    Text(text = user.username ?: user.id ?: "null")
                 }
             }
 

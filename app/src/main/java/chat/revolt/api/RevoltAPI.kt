@@ -1,20 +1,27 @@
 package chat.revolt.api
 
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.user.fetchSelf
-import chat.revolt.api.routes.user.fetchSelfWithNewToken
-import chat.revolt.api.schemas.CompleteUser
+import chat.revolt.api.schemas.*
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.Serializable
 
 const val REVOLT_BASE = "https://api.revolt.chat"
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
 const val REVOLT_MARKETING = "https://revolt.chat"
 const val REVOLT_FILES = "https://autumn.revolt.chat"
+const val REVOLT_WEBSOCKET = "wss://ws.revolt.chat"
 
 private const val BACKEND_IS_STABLE = false
 
@@ -25,6 +32,8 @@ val RevoltHttp = HttpClient(OkHttp) {
     install(ContentNegotiation) {
         json(RevoltJson)
     }
+
+    install(WebSockets)
 
     if (BACKEND_IS_STABLE) {
         install(HttpRequestRetry) {
@@ -46,21 +55,68 @@ val RevoltHttp = HttpClient(OkHttp) {
     }
 }
 
+val mainHandler = Handler(Looper.getMainLooper())
 
 object RevoltAPI {
     const val TOKEN_HEADER_NAME = "x-session-token"
 
-    // discount caching solution(/-s)! LRU would be better but this is fine for now, until it's not...
-    val userCache =
-        mutableMapOf<String, CompleteUser>()
+    // FIXME discount caching solutions! LRU would be better but this is fine for now
+    val userCache = mutableMapOf<String, User>()
+    val serverCache = mutableMapOf<String, Server>()
+    val channelCache = mutableMapOf<String, Channel>()
+    val emojiCache = mutableMapOf<String, Emoji>()
+    val messageCache = mutableMapOf<String, Message>()
 
     var selfId: String? = null
 
     var sessionToken: String = ""
         private set
 
+    private var socketThread: Thread? = null
+
     fun setSessionHeader(token: String) {
         sessionToken = token
+    }
+
+    suspend fun loginAs(token: String) {
+        setSessionHeader(token)
+        fetchSelf()
+
+        startSocketOps()
+    }
+
+    suspend fun connectWS() {
+        socketThread = Thread {
+            try {
+                runBlocking {
+                    RealtimeSocket.connect(sessionToken)
+                }
+            } catch (e: Exception) {
+                if (e is InterruptedException) {
+                    Log.d("RevoltAPI", "Socket interrupted")
+                } else {
+                    Log.e("RevoltAPI", "WebSocket error", e)
+                }
+                RealtimeSocket.open = false
+            }
+        }
+        socketThread!!.start()
+    }
+
+    private suspend fun startSocketOps() {
+        connectWS()
+
+        // Send a ping every roughly 30 seconds else the socket dies
+        // Same interval as the web clients (/revolt.js)
+        // Note: This will run even if the socket is closed (sendPing will just exit early)
+        mainHandler.post(object : Runnable {
+            override fun run() {
+                runBlocking {
+                    RealtimeSocket.sendPing()
+                }
+                mainHandler.postDelayed(this, 30 * 1000)
+            }
+        })
     }
 
     suspend fun initialize() {
@@ -85,6 +141,11 @@ object RevoltAPI {
         sessionToken = ""
 
         userCache.clear()
+        serverCache.clear()
+        channelCache.clear()
+        emojiCache.clear()
+
+        socketThread?.interrupt()
     }
 
     /**
@@ -92,7 +153,8 @@ object RevoltAPI {
      */
     suspend fun checkSessionToken(token: String): Boolean {
         return try {
-            fetchSelfWithNewToken(token)
+            setSessionHeader(token)
+            fetchSelf()
             true
         } catch (e: Exception) {
             false
@@ -100,5 +162,5 @@ object RevoltAPI {
     }
 }
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class RevoltError(val type: String)

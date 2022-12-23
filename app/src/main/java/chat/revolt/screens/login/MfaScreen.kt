@@ -23,11 +23,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
+import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.account.MfaResponseRecoveryCode
 import chat.revolt.api.routes.account.MfaResponseTotpCode
 import chat.revolt.api.routes.account.authenticateWithMfaRecoveryCode
 import chat.revolt.api.routes.account.authenticateWithMfaTotpCode
-import chat.revolt.api.routes.user.fetchSelfWithNewToken
 import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.persistence.KVStorage
@@ -80,7 +80,7 @@ class MfaScreenViewModel @Inject constructor(
                 )
 
                 try {
-                    fetchSelfWithNewToken(response.firstUserHints.token)
+                    RevoltAPI.loginAs(response.firstUserHints.token)
                     kvStorage.set("sessionToken", response.firstUserHints.token)
 
                     _navigateToHome = true
@@ -105,7 +105,7 @@ class MfaScreenViewModel @Inject constructor(
                 )
 
                 try {
-                    fetchSelfWithNewToken(response.firstUserHints.token)
+                    RevoltAPI.loginAs(response.firstUserHints.token)
                     kvStorage.set("sessionToken", response.firstUserHints.token)
 
                     _navigateToHome = true
