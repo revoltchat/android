@@ -7,9 +7,6 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,90 +16,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import chat.revolt.api.RevoltAPI
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.drawableResource
-import chat.revolt.persistence.KVStorage
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-@HiltViewModel
-class GreeterViewModel @Inject constructor(
-    private val kvStorage: KVStorage
-) : ViewModel() {
-    private var _skipLogin by mutableStateOf(false)
-    val skipLogin: Boolean
-        get() = _skipLogin
-
-    private var _finishedLoading by mutableStateOf(false)
-    val finishedLoading: Boolean
-        get() = _finishedLoading
-
-    fun setSkipLogin(value: Boolean) {
-        _skipLogin = value
-    }
-
-    fun setFinishedLoading(value: Boolean) {
-        _finishedLoading = value
-    }
-
-    init {
-        viewModelScope.launch {
-            val token = kvStorage.get("sessionToken")
-            if (token != null) {
-                val valid = RevoltAPI.checkSessionToken(token)
-                if (!valid) {
-                    kvStorage.remove("sessionToken")
-                    RevoltAPI.setSessionHeader("")
-                }
-            }
-
-            if (RevoltAPI.isLoggedIn()) {
-                RevoltAPI.loginAs(token ?: "")
-                _skipLogin = true
-            }
-
-            setFinishedLoading(true)
-        }
-    }
-}
 
 @Composable
-fun GreeterScreen(navController: NavController, viewModel: GreeterViewModel = hiltViewModel()) {
-    if (viewModel.skipLogin) {
-        navController.navigate("chat/home") {
-            popUpTo("login/greeting") {
-                inclusive = true
-            }
-        }
-        viewModel.setSkipLogin(false)
-    }
-
-    if (!viewModel.finishedLoading) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            RemoteImage(
-                url = drawableResource(R.drawable.revolt_logo_wide),
-                description = "Revolt Logo",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-            )
-        }
-        return
-    }
-
+fun GreeterScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()

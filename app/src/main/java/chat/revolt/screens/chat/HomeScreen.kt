@@ -105,7 +105,6 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hi
                 }
             }
 
-            // a scrollable list of all users in user cache
             Text(
                 text = "User cache",
                 style = MaterialTheme.typography.displaySmall.copy(

@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
+import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
 import chat.revolt.screens.about.PlaceholderScreen
@@ -52,7 +53,7 @@ fun AppEntrypoint() {
 
     AnimatedNavHost(
         navController = navController,
-        startDestination = "login/greeting",
+        startDestination = "splash",
         enterTransition = {
             slideIntoContainer(
                 AnimatedContentScope.SlideDirection.Left,
@@ -78,6 +79,8 @@ fun AppEntrypoint() {
             ) + fadeOut(animationSpec = RevoltTweenFloat)
         }
     ) {
+        composable("splash") { SplashScreen(navController) }
+
         composable("login/greeting") { GreeterScreen(navController) }
         composable("login/login") { LoginScreen(navController) }
         composable("login/mfa/{mfaTicket}/{allowedAuthTypes}") { backStackEntry ->

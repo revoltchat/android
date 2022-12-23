@@ -3,6 +3,7 @@ package chat.revolt.api
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.compose.runtime.mutableStateMapOf
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.user.fetchSelf
 import chat.revolt.api.schemas.*
@@ -61,11 +62,11 @@ object RevoltAPI {
     const val TOKEN_HEADER_NAME = "x-session-token"
 
     // FIXME discount caching solutions! LRU would be better but this is fine for now
-    val userCache = mutableMapOf<String, User>()
-    val serverCache = mutableMapOf<String, Server>()
-    val channelCache = mutableMapOf<String, Channel>()
-    val emojiCache = mutableMapOf<String, Emoji>()
-    val messageCache = mutableMapOf<String, Message>()
+    val userCache = mutableStateMapOf<String, User>()
+    val serverCache = mutableStateMapOf<String, Server>()
+    val channelCache = mutableStateMapOf<String, Channel>()
+    val emojiCache = mutableStateMapOf<String, Emoji>()
+    val messageCache = mutableStateMapOf<String, Message>()
 
     var selfId: String? = null
 
