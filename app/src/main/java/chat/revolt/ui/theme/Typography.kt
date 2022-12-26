@@ -5,7 +5,6 @@ import androidx.compose.ui.text.TextStyle
 import chat.revolt.R
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
@@ -19,23 +18,6 @@ private val Inter = FontFamily(
     Font(R.font.inter_bold, FontWeight.Bold),
     Font(R.font.inter_extrabold, FontWeight.ExtraBold),
     Font(R.font.inter_black, FontWeight.Black),
-)
-
-const val ALL_INTER = true
-
-private val OpenSans = if (ALL_INTER) Inter else FontFamily(
-    Font(R.font.opensans_light, FontWeight.Light, FontStyle.Normal),
-    Font(R.font.opensans_lightitalic, FontWeight.Light, FontStyle.Italic),
-    Font(R.font.opensans_regular, FontWeight.Normal, FontStyle.Normal),
-    Font(R.font.opensans_regularitalic, FontWeight.Normal, FontStyle.Italic),
-    Font(R.font.opensans_medium, FontWeight.Medium, FontStyle.Normal),
-    Font(R.font.opensans_mediumitalic, FontWeight.Medium, FontStyle.Italic),
-    Font(R.font.opensans_semibold, FontWeight.SemiBold, FontStyle.Normal),
-    Font(R.font.opensans_semibolditalic, FontWeight.SemiBold, FontStyle.Italic),
-    Font(R.font.opensans_bold, FontWeight.Bold, FontStyle.Normal),
-    Font(R.font.opensans_bolditalic, FontWeight.Bold, FontStyle.Italic),
-    Font(R.font.opensans_extrabold, FontWeight.ExtraBold, FontStyle.Normal),
-    Font(R.font.opensans_extrabolditalic, FontWeight.ExtraBold, FontStyle.Italic),
 )
 
 val RevoltTypography = Typography(
@@ -56,65 +38,65 @@ val RevoltTypography = Typography(
     ),
 
     headlineLarge = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.SemiBold,
         fontSize = 32.sp
     ),
     headlineMedium = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.SemiBold,
         fontSize = 28.sp
     ),
     headlineSmall = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 24.sp
     ),
 
     titleLarge = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 22.sp
     ),
     titleMedium = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp
     ),
     titleSmall = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp
     ),
 
     labelLarge = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp
     ),
     labelMedium = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp
     ),
     labelSmall = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp
     ),
 
     bodyLarge = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp
     ),
     bodySmall = TextStyle(
-        fontFamily = OpenSans,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp
     )
