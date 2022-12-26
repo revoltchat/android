@@ -40,7 +40,9 @@ data class Channel(
     val active: Boolean? = null,
     val permissions: Long? = null,
     val server: String? = null,
+    @SerialName("role_permissions")
     val rolePermissions: Map<String, DefaultPermissions>? = null,
+    @SerialName("default_permissions")
     val defaultPermissions: DefaultPermissions? = null,
     val nsfw: Boolean? = null,
     val type: String? = null, // this is _only_ used for websocket events!

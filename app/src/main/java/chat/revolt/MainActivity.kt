@@ -16,6 +16,7 @@ import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
 import chat.revolt.screens.about.PlaceholderScreen
+import chat.revolt.screens.chat.ChannelScreen
 import chat.revolt.screens.chat.HomeScreen
 import chat.revolt.screens.login.GreeterScreen
 import chat.revolt.screens.login.LoginScreen
@@ -92,6 +93,11 @@ fun AppEntrypoint() {
         }
 
         composable("chat/home") { HomeScreen(navController) }
+        composable("chat/channel/{channelId}") { backStackEntry ->
+            val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
+
+            ChannelScreen(navController, channelId)
+        }
 
         composable("about") { AboutScreen(navController) }
         composable("about/oss") { AttributionScreen(navController) }

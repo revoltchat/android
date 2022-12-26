@@ -6,13 +6,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,52 +56,52 @@ class HomeScreenViewModel @Inject constructor(
                 messageContent
             )
         }
+        setMessageContent("")
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hiltViewModel()) {
     val user = RevoltAPI.userCache[RevoltAPI.selfId]
 
-    Column() {
-        Text(
-            text = "Home (placeholder)",
-            style = MaterialTheme.typography.displaySmall.copy(
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Left,
-                fontSize = 24.sp
-            ),
-            modifier = Modifier
-                .padding(horizontal = 15.dp, vertical = 15.dp)
-                .fillMaxWidth(),
-        )
-        Column(
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxSize()
-                .weight(1f),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            user?.let {
-                Row {
-                    RemoteImage(
-                        url = "${REVOLT_FILES}/avatars/${it.avatar?.id}/user.png",
-                        modifier = Modifier
-                            .size(50.dp)
-                            .clip(CircleShape),
-                        description = "Avatar for ${it.username} (placeholder!)"
-                    )
+    val channelDrawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-                    Column(modifier = Modifier.padding(start = 10.dp)) {
-                        it.username?.let { it1 -> Text(text = it1) }
-                        it.id?.let { it1 -> Text(text = it1) }
-                    }
-                }
-            }
-
+    DismissibleNavigationDrawer(drawerState = channelDrawerState, drawerContent = {
+        ModalDrawerSheet {
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "User cache",
+                text = "Revolt Lounge",
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black)
+            )
+            Divider()
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                RevoltAPI.channelCache.values
+                    .filter { channel ->
+                        channel.server == "01F7ZSBSFHQ8TA81725KQCSDDP"
+                    }
+                    .forEach { channel ->
+                        NavigationDrawerItem(
+                            selected = false,
+                            label = { Text(text = "#" + channel.name) },
+                            onClick = {
+                                scope.launch {
+                                    channelDrawerState.close()
+                                    navController.navigate("chat/channel/${channel.id}")
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                        )
+                    }
+            }
+        }
+    }) {
+        Column() {
+            Text(
+                text = "Home (placeholder)",
                 style = MaterialTheme.typography.displaySmall.copy(
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Left,
@@ -118,42 +113,80 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hi
             )
             Column(
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .height(200.dp)
+                    .padding(10.dp)
+                    .fillMaxSize()
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                RevoltAPI.userCache.forEach { (_, user) ->
-                    Text(text = user.username ?: user.id ?: "null")
-                }
-            }
+                user?.let {
+                    Row {
+                        RemoteImage(
+                            url = "${REVOLT_FILES}/avatars/${it.avatar?.id}/user.png",
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(CircleShape),
+                            description = "Avatar for ${it.username} (placeholder!)"
+                        )
 
-            Column() {
-                FormTextField(
-                    value = viewModel.messageContent,
-                    label = "Content",
-                    modifier = Modifier.fillMaxWidth(),
-                    onChange = viewModel::setMessageContent
-                )
-                LinkOnHome(
-                    heading = "Send",
-                    icon = Icons.Filled.Send,
-                    onClick = viewModel::sendMessage
-                )
-            }
-        }
-        Button(
-            onClick = {
-                viewModel.logout()
-                navController.navigate("login/greeting") {
-                    popUpTo("chat/home") {
-                        inclusive = true
+                        Column(modifier = Modifier.padding(start = 10.dp)) {
+                            it.username?.let { it1 -> Text(text = it1) }
+                            it.id?.let { it1 -> Text(text = it1) }
+                        }
                     }
                 }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 30.dp, top = 5.dp, start = 20.dp, end = 20.dp)
-        ) {
-            Text("Logout")
+
+                Text(
+                    text = "User cache",
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Left,
+                        fontSize = 24.sp
+                    ),
+                    modifier = Modifier
+                        .padding(horizontal = 15.dp, vertical = 15.dp)
+                        .fillMaxWidth(),
+                )
+                Column(modifier = Modifier.height(200.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        RevoltAPI.userCache.forEach { (_, user) ->
+                            Text(text = user.username ?: user.id ?: "null")
+                        }
+                    }
+                }
+
+                Column() {
+                    FormTextField(
+                        value = viewModel.messageContent,
+                        label = "Content",
+                        modifier = Modifier.fillMaxWidth(),
+                        onChange = viewModel::setMessageContent
+                    )
+                    LinkOnHome(
+                        heading = "Send",
+                        icon = Icons.Filled.Send,
+                        onClick = viewModel::sendMessage
+                    )
+                }
+            }
+            Button(
+                onClick = {
+                    viewModel.logout()
+                    navController.navigate("login/greeting") {
+                        popUpTo("chat/home") {
+                            inclusive = true
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 30.dp, top = 5.dp, start = 20.dp, end = 20.dp)
+            ) {
+                Text("Logout")
+            }
         }
     }
 }

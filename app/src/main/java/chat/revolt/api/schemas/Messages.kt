@@ -1,5 +1,6 @@
 package chat.revolt.api.schemas
 
+import chat.revolt.api.RevoltAPI
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -18,7 +19,11 @@ data class Message(
     val embeds: List<Embed>? = null,
     val mentions: List<String>? = null,
     val type: String? = null, // this is _only_ used for websocket events!
-)
+) {
+    fun getAuthor(): User? {
+        return author?.let { RevoltAPI.userCache[it] }
+    }
+}
 
 @Serializable
 data class Embed(

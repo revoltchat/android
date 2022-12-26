@@ -1,6 +1,7 @@
 package chat.revolt.api.realtime
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateMapOf
 import chat.revolt.api.REVOLT_WEBSOCKET
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
@@ -94,6 +95,43 @@ object RealtimeSocket {
                     RevoltAPI.emojiCache[emoji.id!!] = emoji
                 }
             }
+            "Message" -> {
+                val messageFrame = RevoltJson.decodeFromString(MessageFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received message frame for ${messageFrame.id} in channel ${messageFrame.channel}."
+                )
+
+                RevoltAPI.messageCache[messageFrame.id!!] = messageFrame
+
+                channelCallbacks[messageFrame.channel]?.forEach { callback ->
+                    callback.onMessage(messageFrame)
+                }
+            }
+            "ChannelStartTyping" -> {
+                val typingFrame =
+                    RevoltJson.decodeFromString(ChannelStartTypingFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received channel start typing frame for ${typingFrame.id} from ${typingFrame.user}."
+                )
+
+                channelCallbacks[typingFrame.id]?.forEach { callback ->
+                    callback.onStartTyping(typingFrame)
+                }
+            }
+            "ChannelStopTyping" -> {
+                val typingFrame =
+                    RevoltJson.decodeFromString(ChannelStopTypingFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received channel stop typing frame for ${typingFrame.id} from ${typingFrame.user}."
+                )
+
+                channelCallbacks[typingFrame.id]?.forEach { callback ->
+                    callback.onStopTyping(typingFrame)
+                }
+            }
             "UserUpdate" -> {
                 val userUpdateFrame =
                     RevoltJson.decodeFromString(UserUpdateFrame.serializer(), rawFrame)
@@ -104,5 +142,27 @@ object RealtimeSocket {
                 Log.i("RealtimeSocket", "Unknown frame: $rawFrame")
             }
         }
+    }
+
+    interface ChannelCallback {
+        fun onStartTyping(typing: ChannelStartTypingFrame)
+        fun onStopTyping(typing: ChannelStopTypingFrame)
+        fun onMessage(message: MessageFrame)
+    }
+
+    private val channelCallbacks: MutableMap<String, List<ChannelCallback>> = mutableStateMapOf()
+
+    fun registerChannelCallback(channelId: String, callback: ChannelCallback) {
+        val callbacks = channelCallbacks[channelId] ?: emptyList()
+        channelCallbacks[channelId] = callbacks + callback
+
+        Log.d("RealtimeSocket", "Registered channel callback for $channelId.")
+    }
+
+    fun unregisterChannelCallback(channelId: String, callback: ChannelCallback) {
+        val callbacks = channelCallbacks[channelId] ?: emptyList()
+        channelCallbacks[channelId] = callbacks - callback
+
+        Log.d("RealtimeSocket", "Unregistered channel callback for $channelId")
     }
 }
