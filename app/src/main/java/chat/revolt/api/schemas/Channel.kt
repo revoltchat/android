@@ -27,9 +27,10 @@ data class Member(
 
 @Serializable
 data class Channel(
-    val channelType: ChannelType? = null,
     @SerialName("_id")
     val id: String? = null,
+    @SerialName("channel_type")
+    val channelType: ChannelType? = null,
     val user: String? = null,
     val name: String? = null,
     val owner: String? = null,
@@ -46,7 +47,28 @@ data class Channel(
     val defaultPermissions: DefaultPermissions? = null,
     val nsfw: Boolean? = null,
     val type: String? = null, // this is _only_ used for websocket events!
-)
+) {
+    fun mergeWithPartial(partial: Channel): Channel {
+        return Channel(
+            channelType = partial.channelType ?: channelType,
+            id = partial.id ?: id,
+            user = partial.user ?: user,
+            name = partial.name ?: name,
+            owner = partial.owner ?: owner,
+            description = partial.description ?: description,
+            recipients = partial.recipients ?: recipients,
+            icon = partial.icon ?: icon,
+            lastMessageID = partial.lastMessageID ?: lastMessageID,
+            active = partial.active ?: active,
+            permissions = partial.permissions ?: permissions,
+            server = partial.server ?: server,
+            rolePermissions = partial.rolePermissions ?: rolePermissions,
+            defaultPermissions = partial.defaultPermissions ?: defaultPermissions,
+            nsfw = partial.nsfw ?: nsfw,
+            type = partial.type ?: type
+        )
+    }
+}
 
 @Serializable
 enum class ChannelType(val value: String) {

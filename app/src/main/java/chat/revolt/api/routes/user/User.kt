@@ -29,3 +29,33 @@ suspend fun fetchSelf(): User {
 
     return user
 }
+
+suspend fun fetchUser(id: String): User {
+    val response = RevoltHttp.get("/users/$id") {
+        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+    }
+        .bodyAsText()
+
+    try {
+        val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
+        throw Error(error.type)
+    } catch (e: SerializationException) {
+        // Not an error
+    }
+
+    val user = RevoltJson.decodeFromString(User.serializer(), response)
+
+    RevoltAPI.userCache[user.id!!] = user
+
+    return user
+}
+
+suspend fun getOrFetchUser(id: String): User {
+    return RevoltAPI.userCache[id] ?: fetchUser(id)
+}
+
+suspend fun addUserIfUnknown(id: String) {
+    if (RevoltAPI.userCache[id] == null) {
+        RevoltAPI.userCache[id] = fetchUser(id)
+    }
+}

@@ -23,6 +23,23 @@ data class Message(
     fun getAuthor(): User? {
         return author?.let { RevoltAPI.userCache[it] }
     }
+
+    fun mergeWithPartial(partial: Message): Message {
+        return Message(
+            id = partial.id ?: id,
+            nonce = partial.nonce ?: nonce,
+            channel = partial.channel ?: channel,
+            author = partial.author ?: author,
+            content = partial.content ?: content,
+            reactions = partial.reactions ?: reactions,
+            replies = partial.replies ?: replies,
+            attachments = partial.attachments ?: attachments,
+            edited = partial.edited ?: edited,
+            embeds = partial.embeds ?: embeds,
+            mentions = partial.mentions ?: mentions,
+            type = partial.type ?: type
+        )
+    }
 }
 
 @Serializable

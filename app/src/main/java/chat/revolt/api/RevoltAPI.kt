@@ -99,6 +99,12 @@ object RevoltAPI {
                     Log.e("RevoltAPI", "WebSocket error", e)
                 }
                 RealtimeSocket.open = false
+
+                Log.i("RevoltAPI", "Reconnecting in 2.5 seconds...")
+                Thread.sleep(2500)
+                runBlocking {
+                    connectWS()
+                } // FIXME ASAP move this to ChatRouting (whenever that's a thing) and do it properly
             }
         }
         socketThread!!.start()

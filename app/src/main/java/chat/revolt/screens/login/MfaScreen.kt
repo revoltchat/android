@@ -76,11 +76,11 @@ class MfaScreenViewModel @Inject constructor(
             } else {
                 Log.d(
                     "MFA",
-                    "Successfully authorized TOTP. Token: ${response.firstUserHints!!.token}"
+                    "Successfully authorized with TOTP."
                 )
 
                 try {
-                    RevoltAPI.loginAs(response.firstUserHints.token)
+                    RevoltAPI.loginAs(response.firstUserHints!!.token)
                     kvStorage.set("sessionToken", response.firstUserHints.token)
 
                     _navigateToHome = true
@@ -101,11 +101,11 @@ class MfaScreenViewModel @Inject constructor(
             } else {
                 Log.d(
                     "MFA",
-                    "Successfully authorized recovery code. Token: ${response.firstUserHints!!.token}"
+                    "Successfully authorized with a recovery code."
                 )
 
                 try {
-                    RevoltAPI.loginAs(response.firstUserHints.token)
+                    RevoltAPI.loginAs(response.firstUserHints!!.token)
                     kvStorage.set("sessionToken", response.firstUserHints.token)
 
                     _navigateToHome = true

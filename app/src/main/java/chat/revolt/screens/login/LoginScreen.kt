@@ -72,11 +72,11 @@ class LoginViewModel @Inject constructor(
                 } else {
                     Log.d(
                         "Login",
-                        "No MFA required. Login is complete! We have a session token: ${response.firstUserHints!!.token}"
+                        "No MFA required. Login is complete! We should have a session token"
                     )
 
                     try {
-                        RevoltAPI.loginAs(response.firstUserHints.token)
+                        RevoltAPI.loginAs(response.firstUserHints!!.token)
                         kvStorage.set("sessionToken", response.firstUserHints.token)
 
                         _navigateTo = "home"

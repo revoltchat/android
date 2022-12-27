@@ -61,4 +61,26 @@
 
     <string name="comingsoon_heading">Gah, you found me!</string>
     <string name="comingsoon_body">The feature you are trying to access is not ready yet, but we are steadily working on polishing it to perfection..</string>
+
+    <string name="typing_blank"><!-- this is a hack to prevent the typing indicator from showing typing_several when it's animating away --></string>
+    <string name="typing_one">%1$s is typing…</string>
+    <string name="typing_many">%1$s are typing…</string>
+    <string name="typing_several">Several people are typing</string>
+
+    <string name="send_alt">Send</string>
+    <string name="add_attachment_alt">Add attachment</string>
+    <string name="show_more_alt">Show more</string>
+
+    <string name="tutorial">Welcome to Revolt\'s in-progress Android experience!</string>
+    <string name="select_channel">Select a server and channel by swiping from the left.</string>
+
+    <string name="avatar_alt">%1$s\'s avatar</string>
+
+    <string name="message_field_placeholder_dm">Message @%1$s</string>
+    <string name="message_field_placeholder_text">Message #%1$s</string>
+    <string name="message_field_placeholder_voice">Message #%1$s</string>
+    <string name="message_field_placeholder_group">Message %1$s</string>
+    <string name="message_field_placeholder_notes">Add a note</string>
+
+    <string name="reply_message_not_cached">Unknown message, tap to jump</string>
 </resources>

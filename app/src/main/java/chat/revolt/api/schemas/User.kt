@@ -20,7 +20,24 @@ data class User(
     val bot: Bot? = null,
     val relationship: String? = null,
     val online: Boolean? = null
-)
+) {
+    fun mergeWithPartial(partial: User): User {
+        return User(
+            id = partial.id ?: id,
+            username = partial.username ?: username,
+            avatar = partial.avatar ?: avatar,
+            relations = partial.relations ?: relations,
+            badges = partial.badges ?: badges,
+            status = partial.status ?: status,
+            profile = partial.profile ?: profile,
+            flags = partial.flags ?: flags,
+            privileged = partial.privileged ?: privileged,
+            bot = partial.bot ?: bot,
+            relationship = partial.relationship ?: relationship,
+            online = partial.online ?: online
+        )
+    }
+}
 
 @Serializable
 data class Bot(

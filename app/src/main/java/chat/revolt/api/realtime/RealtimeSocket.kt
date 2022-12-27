@@ -135,8 +135,12 @@ object RealtimeSocket {
             "UserUpdate" -> {
                 val userUpdateFrame =
                     RevoltJson.decodeFromString(UserUpdateFrame.serializer(), rawFrame)
-                // We will genuinely just ignore this frame for now, but it gets really spammy in the logs
-                // FIXME handle this frame
+
+                val existing = RevoltAPI.userCache[userUpdateFrame.id]
+                    ?: return // if we don't have the user no point in updating it
+
+                RevoltAPI.userCache[userUpdateFrame.id] =
+                    existing.mergeWithPartial(userUpdateFrame.data)
             }
             else -> {
                 Log.i("RealtimeSocket", "Unknown frame: $rawFrame")
