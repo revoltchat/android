@@ -127,7 +127,7 @@ fun MfaScreen(
     val allowedAuthTypes = allowedAuthTypesCommaSep.split(",")
 
     if (viewModel.navigateToHome) {
-        navController.navigate("chat/home") {
+        navController.navigate("chat") {
             popUpTo("login/greeting") { inclusive = true }
         }
         viewModel.navigationComplete()

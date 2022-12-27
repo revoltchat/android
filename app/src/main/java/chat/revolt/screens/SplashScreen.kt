@@ -80,7 +80,7 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel 
                 }
             }
             "home" -> {
-                navController.navigate("chat/home") {
+                navController.navigate("chat") {
                     popUpTo("splash") {
                         inclusive = true
                     }

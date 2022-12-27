@@ -1,4 +1,4 @@
-package chat.revolt.screens.chat
+package chat.revolt.screens.chat.views
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility

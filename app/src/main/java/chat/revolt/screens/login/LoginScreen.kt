@@ -116,7 +116,7 @@ fun LoginScreen(
         )
         viewModel.navigationComplete()
     } else if (viewModel.navigateTo == "home") {
-        navController.navigate("chat/home") {
+        navController.navigate("chat") {
             popUpTo("login/greeting") { inclusive = true }
         }
         viewModel.navigationComplete()
