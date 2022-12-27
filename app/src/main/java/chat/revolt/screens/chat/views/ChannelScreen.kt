@@ -27,6 +27,7 @@ import chat.revolt.api.schemas.Message as MessageSchema
 import chat.revolt.components.chat.Message
 import kotlinx.coroutines.launch
 import chat.revolt.R
+import chat.revolt.api.routes.channel.fetchMessagesFromChannel
 import chat.revolt.components.chat.MessageField
 
 class ChannelScreenViewModel : ViewModel() {
@@ -99,6 +100,24 @@ class ChannelScreenViewModel : ViewModel() {
         RealtimeSocket.registerChannelCallback(channel!!.id!!, callbacks!!)
     }
 
+    fun fetchMessages() {
+        if (channel == null) {
+            return
+        }
+
+        viewModelScope.launch {
+            fetchMessagesFromChannel(channel!!.id!!, limit = 50, false).let {
+                it.messages!!.reversed().forEach { message ->
+                    addUserIfUnknown(message.author!!)
+                    if (!RevoltAPI.messageCache.containsKey(message.id)) {
+                        RevoltAPI.messageCache[message.id!!] = message
+                    }
+                    _renderableMessages.add(message)
+                }
+            }
+        }
+    }
+
     fun fetchChannel(id: String) {
         if (id in RevoltAPI.channelCache) {
             _channel = RevoltAPI.channelCache[id]
@@ -107,6 +126,7 @@ class ChannelScreenViewModel : ViewModel() {
         }
 
         registerCallback()
+        fetchMessages()
     }
 
     fun sendPendingMessage() {

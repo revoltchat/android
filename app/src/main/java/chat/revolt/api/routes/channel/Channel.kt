@@ -5,10 +5,12 @@ import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.schemas.Embed
+import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.MessagesInChannel
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.serialization.builtins.ListSerializer
 
 suspend fun fetchMessagesFromChannel(
     channelId: String,
@@ -32,10 +34,23 @@ suspend fun fetchMessagesFromChannel(
     }
         .bodyAsText()
 
-    return RevoltJson.decodeFromString(
-        MessagesInChannel.serializer(),
-        response
-    )
+    if (include_users) {
+        return RevoltJson.decodeFromString(
+            MessagesInChannel.serializer(),
+            response
+        )
+    } else {
+        val messages = RevoltJson.decodeFromString(
+            ListSerializer(Message.serializer()),
+            response
+        )
+
+        return MessagesInChannel(
+            messages = messages,
+            users = emptyList(),
+            members = emptyList()
+        )
+    }
 }
 
 @kotlinx.serialization.Serializable
