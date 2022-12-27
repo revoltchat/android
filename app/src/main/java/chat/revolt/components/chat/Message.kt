@@ -24,7 +24,7 @@ fun Message(
 ) {
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
 
-    Row() {
+    Row(modifier = Modifier.padding(8.dp)) {
         if (author.avatar != null) {
             RemoteImage(
                 url = "$REVOLT_FILES/avatars/${author.avatar.id!!}/user.png",
