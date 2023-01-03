@@ -74,7 +74,16 @@
     <string name="tutorial">Welcome to Revolt\'s in-progress Android experience!</string>
     <string name="select_channel">Select a server and channel by swiping from the left.</string>
 
+    <string name="unknown">Unknown</string>
+    <string name="home">Home</string>
+
     <string name="avatar_alt">%1$s\'s avatar</string>
+
+    <string name="channel_dm">Direct Message</string>
+    <string name="channel_text">Text Channel</string>
+    <string name="channel_voice">Voice Channel</string>
+    <string name="channel_group">Group</string>
+    <string name="channel_notes">Notes</string>
 
     <string name="message_field_placeholder_dm">Message @%1$s</string>
     <string name="message_field_placeholder_text">Message #%1$s</string>

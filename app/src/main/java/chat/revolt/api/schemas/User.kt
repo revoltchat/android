@@ -37,6 +37,22 @@ data class User(
             online = partial.online ?: online
         )
     }
+
+    companion object {
+        fun getPlaceholder(forId: String) = User(
+            id = forId,
+            username = "Unknown User",
+            avatar = null,
+            badges = 0,
+            status = null,
+            profile = null,
+            flags = 0,
+            privileged = false,
+            bot = null,
+            relationship = null,
+            online = false
+        )
+    }
 }
 
 @Serializable

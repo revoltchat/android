@@ -8,7 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -75,7 +75,7 @@ fun MessageField(
                 modifier = Modifier.height(56.dp)
             ) {
                 Icon(
-                    Icons.Default.KeyboardArrowLeft,
+                    Icons.Default.KeyboardArrowRight,
                     contentDescription = stringResource(id = R.string.show_more_alt),
                     modifier = Modifier
                         .size(24.dp + 8.dp)

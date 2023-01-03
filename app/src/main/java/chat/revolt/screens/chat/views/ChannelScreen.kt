@@ -1,15 +1,17 @@
 package chat.revolt.screens.chat.views
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,6 +29,8 @@ import chat.revolt.api.schemas.Message as MessageSchema
 import chat.revolt.components.chat.Message
 import kotlinx.coroutines.launch
 import chat.revolt.R
+import chat.revolt.RevoltTweenFloat
+import chat.revolt.RevoltTweenInt
 import chat.revolt.api.routes.channel.fetchMessagesFromChannel
 import chat.revolt.components.chat.MessageField
 
@@ -181,30 +185,48 @@ fun ChannelScreen(
     }
 
     Column {
-        Text(text = "#" + channel.name!!)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+            Text(
+                text = channel.name ?: channel.id!!,
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
 
-        Divider()
-
-        // Column nesting is needed to make the vertical scroll work properly
-        Column(Modifier.weight(1f)) {
-            Column(Modifier.verticalScroll(scrollState)) {
-                viewModel.renderableMessages.forEach {
-                    Message(message = it)
-                }
+        LazyColumn(Modifier.weight(1f)) {
+            items(viewModel.renderableMessages) { message ->
+                Message(message)
             }
         }
 
-        AnimatedVisibility(visible = viewModel.typingUsers.isNotEmpty()) {
+        AnimatedVisibility(
+            visible = viewModel.typingUsers.isNotEmpty(),
+            enter = slideInVertically(
+                animationSpec = RevoltTweenInt,
+                initialOffsetY = { it }
+            ) + fadeIn(animationSpec = RevoltTweenFloat),
+            exit = slideOutVertically(
+                animationSpec = RevoltTweenInt,
+                targetOffsetY = { it }
+            ) + fadeOut(animationSpec = RevoltTweenFloat)
+        ) {
             Row(
                 Modifier
-                    .padding(all = 4.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .fillMaxWidth()
+                    .padding(all = 4.dp)
             ) {
                 Text(
                     text = stringResource(
                         id = viewModel.typingMessageResource(),
                         viewModel.getTypingUsernames()
-                    )
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -218,7 +240,7 @@ fun ChannelScreen(
                 onMessageContentChange = viewModel::setMessageContent,
                 onSendMessage = viewModel::sendPendingMessage,
                 channelType = it,
-                channelName = channel.name
+                channelName = channel.name ?: channel.id!!
             )
         }
     }

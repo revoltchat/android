@@ -31,10 +31,15 @@ suspend fun fetchSelf(): User {
 }
 
 suspend fun fetchUser(id: String): User {
-    val response = RevoltHttp.get("/users/$id") {
+    val res = RevoltHttp.get("/users/$id") {
         headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
     }
-        .bodyAsText()
+
+    if (res.status.value == 404) {
+        return User.getPlaceholder(id)
+    }
+
+    val response = res.bodyAsText()
 
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
