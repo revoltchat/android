@@ -4,6 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
+import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.user.fetchSelf
 import chat.revolt.api.schemas.*
@@ -98,13 +99,7 @@ object RevoltAPI {
                 } else {
                     Log.e("RevoltAPI", "WebSocket error", e)
                 }
-                RealtimeSocket.open = false
-
-                Log.i("RevoltAPI", "Reconnecting in 2.5 seconds...")
-                Thread.sleep(2500)
-                runBlocking {
-                    connectWS()
-                } // FIXME ASAP move this to ChatRouting (whenever that's a thing) and do it properly
+                RealtimeSocket.updateDisconnectionState(DisconnectionState.Disconnected)
             }
         }
         socketThread!!.start()

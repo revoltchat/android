@@ -2,6 +2,7 @@ package chat.revolt.api.realtime
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import chat.revolt.api.REVOLT_WEBSOCKET
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
@@ -14,16 +15,29 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.channels.consumeEach
 import java.util.Calendar
 
+enum class DisconnectionState {
+    Disconnected,
+    Reconnecting,
+    Connected
+}
+
 object RealtimeSocket {
     var socket: WebSocketSession? = null
-    var open: Boolean = false
+
+    private var _disconnectionState = mutableStateOf(DisconnectionState.Disconnected)
+    val disconnectionState: DisconnectionState
+        get() = _disconnectionState.value
+
+    fun updateDisconnectionState(state: DisconnectionState) {
+        _disconnectionState.value = state
+    }
 
     suspend fun connect(token: String) {
         RevoltHttp.ws(REVOLT_WEBSOCKET) {
             socket = this
 
             Log.d("RealtimeSocket", "Connected to websocket.")
-            open = true
+            updateDisconnectionState(DisconnectionState.Connected)
 
             // Send authorization frame
             val authFrame = AuthorizationFrame("Authenticate", token)
@@ -46,7 +60,7 @@ object RealtimeSocket {
     }
 
     suspend fun sendPing() {
-        if (!open) return
+        if (disconnectionState != DisconnectionState.Connected) return
 
         val pingPacket = PingFrame("Ping", Calendar.getInstance().timeInMillis.toInt())
         socket?.send(RevoltJson.encodeToString(PingFrame.serializer(), pingPacket))

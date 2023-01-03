@@ -75,7 +75,9 @@
     <string name="select_channel">Select a server and channel by swiping from the left.</string>
 
     <string name="unknown">Unknown</string>
+
     <string name="home">Home</string>
+    <string name="logout">Log out</string>
 
     <string name="avatar_alt">%1$s\'s avatar</string>
 
@@ -92,4 +94,13 @@
     <string name="message_field_placeholder_notes">Add a note</string>
 
     <string name="reply_message_not_cached">Unknown message, tap to jump</string>
+
+    <string name="disconnected">Disconnected</string>
+    <string name="tap_to_reconnect">Tap to reconnect</string>
+    <string name="reconnecting">Reconnecting…</string>
+    <string name="reconnected">Reconnected</string>
+
+    <string name="no_connection">No connection</string>
+    <string name="no_connection_message">You are not connected to the internet. Please check your connection and try again.</string>
+    <string name="tap_to_retry">Tap to retry</string>
 </resources>
