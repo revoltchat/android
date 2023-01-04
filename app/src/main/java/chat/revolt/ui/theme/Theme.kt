@@ -15,6 +15,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
+const val FORCE_ANDROID_DEFAULTS = false
+
 const val FOREGROUND = 0xffffffff
 
 val DarkColorScheme = darkColorScheme(
@@ -60,9 +62,15 @@ fun RevoltTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = RevoltTypography,
-        content = content
-    )
+    if (FORCE_ANDROID_DEFAULTS) {
+        MaterialTheme(
+            content = content
+        )
+    } else {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = RevoltTypography,
+            content = content
+        )
+    }
 }

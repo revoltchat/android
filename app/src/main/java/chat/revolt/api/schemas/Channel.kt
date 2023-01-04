@@ -13,9 +13,15 @@ data class MessagesInChannel(
 )
 
 @Serializable
+data class ServerUserChoice(
+    val server: String,
+    val user: String,
+)
+
+@Serializable
 data class Member(
     @SerialName("_id")
-    val id: String? = null,
+    val id: ServerUserChoice? = null,
 
     @SerialName("joined_at")
     val joinedAt: String? = null,

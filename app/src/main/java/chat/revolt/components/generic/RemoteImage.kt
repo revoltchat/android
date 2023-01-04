@@ -19,15 +19,26 @@ fun RemoteImage(
     url: String,
     description: String,
     modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Crop
+    contentScale: ContentScale = ContentScale.Crop,
+    width: Int = 0,
+    height: Int = 0,
 ) {
     val context = LocalContext.current
 
-    AsyncImage(
-        model = ImageRequest.Builder(context)
-            .data(url)
+    fun imageRequest() = run {
+        val builder = ImageRequest.Builder(context)
             .crossfade(true)
-            .build(),
+            .data(url)
+
+        if (width != 0 && height != 0) {
+            builder.size(width, height)
+        }
+
+        builder.build()
+    }
+
+    AsyncImage(
+        model = imageRequest(),
         imageLoader = ImageLoader.Builder(context)
             .components {
                 if (Build.VERSION.SDK_INT >= 28) {
@@ -45,7 +56,7 @@ fun RemoteImage(
             .build(),
         contentDescription = description,
         contentScale = contentScale,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

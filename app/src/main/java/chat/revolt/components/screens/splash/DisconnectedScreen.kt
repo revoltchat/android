@@ -34,7 +34,6 @@ fun DisconnectedScreen(
                 textAlign = TextAlign.Center
             ),
             modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = 10.dp)
                 .fillMaxWidth(),
         )
 
@@ -46,7 +45,7 @@ fun DisconnectedScreen(
                 fontWeight = FontWeight.Normal,
             ),
             modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = 10.dp)
+                .padding(vertical = 10.dp, horizontal = 20.dp)
                 .fillMaxWidth()
         )
 

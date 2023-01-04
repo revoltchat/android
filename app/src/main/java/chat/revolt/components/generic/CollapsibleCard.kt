@@ -28,9 +28,9 @@ fun CollapsibleCard(
         Column {
             Row(
                 modifier = Modifier
+                    .clickable { expanded = !expanded }
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .clickable { expanded = !expanded },
+                    .padding(16.dp),
             ) {
                 Text(
                     text = title,

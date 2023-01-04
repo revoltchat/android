@@ -156,6 +156,16 @@ object RealtimeSocket {
                 RevoltAPI.userCache[userUpdateFrame.id] =
                     existing.mergeWithPartial(userUpdateFrame.data)
             }
+            "ChannelUpdate" -> {
+                val channelUpdateFrame =
+                    RevoltJson.decodeFromString(ChannelUpdateFrame.serializer(), rawFrame)
+
+                val existing = RevoltAPI.channelCache[channelUpdateFrame.id]
+                    ?: return // if we don't have the channel no point in updating it
+
+                RevoltAPI.channelCache[channelUpdateFrame.id] =
+                    existing.mergeWithPartial(channelUpdateFrame.data)
+            }
             else -> {
                 Log.i("RealtimeSocket", "Unknown frame: $rawFrame")
             }

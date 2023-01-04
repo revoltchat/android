@@ -169,12 +169,6 @@ data class ServerDeleteFrame(
 )
 
 @Serializable
-data class ServerUserChoice(
-    val server: String,
-    val user: String,
-)
-
-@Serializable
 data class ServerMemberUpdateFrame(
     val type: String = "ServerMemberUpdate",
     val id: ServerUserChoice,

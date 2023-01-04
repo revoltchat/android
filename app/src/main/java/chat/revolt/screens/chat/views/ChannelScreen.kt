@@ -1,18 +1,29 @@
 package chat.revolt.screens.chat.views
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,6 +44,9 @@ import chat.revolt.RevoltTweenFloat
 import chat.revolt.RevoltTweenInt
 import chat.revolt.api.routes.channel.fetchMessagesFromChannel
 import chat.revolt.components.chat.MessageField
+import chat.revolt.components.generic.CollapsibleCard
+import chat.revolt.components.generic.PageHeader
+import chat.revolt.components.screens.chat.ChannelIcon
 
 class ChannelScreenViewModel : ViewModel() {
     private var _channel by mutableStateOf<Channel?>(null)
@@ -109,6 +123,8 @@ class ChannelScreenViewModel : ViewModel() {
             return
         }
 
+        _renderableMessages.clear()
+
         viewModelScope.launch {
             fetchMessagesFromChannel(channel!!.id!!, limit = 50, false).let {
                 it.messages!!.reversed().forEach { message ->
@@ -117,6 +133,29 @@ class ChannelScreenViewModel : ViewModel() {
                         RevoltAPI.messageCache[message.id!!] = message
                     }
                     _renderableMessages.add(message)
+                }
+            }
+        }
+    }
+
+    fun fetchOlderMessages() {
+        if (channel == null) {
+            return
+        }
+
+        viewModelScope.launch {
+            fetchMessagesFromChannel(
+                channel!!.id!!,
+                limit = 20,
+                true,
+                before = renderableMessages.first().id
+            ).let {
+                it.messages!!.forEach { message ->
+                    addUserIfUnknown(message.author!!)
+                    if (!RevoltAPI.messageCache.containsKey(message.id)) {
+                        RevoltAPI.messageCache[message.id!!] = message
+                    }
+                    _renderableMessages.add(0, message)
                 }
             }
         }
@@ -159,6 +198,79 @@ class ChannelScreenViewModel : ViewModel() {
 }
 
 @Composable
+fun ChannelInfoScreen(
+    channel: Channel,
+    viewModel: ChannelScreenViewModel,
+    onClosed: () -> Unit,
+) {
+    val context = LocalContext.current
+    val clipboardManager: ClipboardManager =
+        LocalClipboardManager.current
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp)
+            .fillMaxSize()
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ChannelIcon(
+                channelType = channel.channelType!!,
+                modifier = Modifier.size(32.dp)
+            )
+            PageHeader(text = channel.name ?: channel.id!!)
+        }
+
+        Column(modifier = Modifier.weight(1f)) {
+            CollapsibleCard(title = "Advanced") {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text("Channel ID: ${channel.id}")
+
+                    Button(onClick = {
+                        clipboardManager.setText(AnnotatedString(channel.id!!))
+                        Toast.makeText(
+                            context,
+                            "Copied",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }) {
+                        Text("Copy ID")
+                    }
+
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                viewModel.fetchMessages()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text("Refetch messages")
+                    }
+                }
+            }
+        }
+
+        Button(
+            onClick = onClosed,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text("Close")
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
 fun ChannelScreen(
     navController: NavController,
     channelId: String,
@@ -166,6 +278,8 @@ fun ChannelScreen(
 ) {
     val channel = viewModel.channel
     val scrollState = rememberScrollState()
+    val channelInfoOpen = remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(channelId) {
         viewModel.fetchChannel(channelId)
@@ -184,20 +298,61 @@ fun ChannelScreen(
         return
     }
 
+    if (channelInfoOpen.value) {
+        Dialog(
+            onDismissRequest = {
+                channelInfoOpen.value = false
+            },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+            )
+        ) {
+            ChannelInfoScreen(channel, viewModel) {
+                channelInfoOpen.value = false
+            }
+        }
+    }
+
     Column {
         Row(
             modifier = Modifier
+                .clickable {
+                    coroutineScope.launch {
+                        channelInfoOpen.value = true
+                    }
+                }
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            ChannelIcon(
+                channelType = channel.channelType!!,
+                modifier = Modifier.padding(end = 8.dp)
+            )
             Text(
                 text = channel.name ?: channel.id!!,
                 style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.padding(16.dp)
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
             )
         }
 
         LazyColumn(Modifier.weight(1f)) {
+            item {
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            viewModel.fetchOlderMessages()
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp, horizontal = 8.dp)
+                ) {
+                    Text("Load older")
+                }
+            }
             items(viewModel.renderableMessages) { message ->
                 Message(message)
             }

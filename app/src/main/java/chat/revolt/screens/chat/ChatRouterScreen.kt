@@ -51,8 +51,24 @@ class ChatRouterViewModel : ViewModel() {
         _currentServer.value = serverId
     }
 
-    fun goToHome() {
-        _currentServer.value = "home"
+    fun navigateToServer(serverId: String, navController: NavController) {
+        setCurrentServer(serverId)
+
+        if (serverId == "home") {
+            navController.navigate("home") {
+                popUpTo("home") {
+                    inclusive = true
+                }
+            }
+            return
+        }
+
+        val channelId = RevoltAPI.serverCache[serverId]?.channels?.firstOrNull()
+        navController.navigate("channel/$channelId") {
+            popUpTo("home") {
+                inclusive = true
+            }
+        }
     }
 }
 
@@ -85,7 +101,9 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                     .background(MaterialTheme.colorScheme.surface)
                             ) {
                                 IconButton(
-                                    onClick = { viewModel.goToHome() },
+                                    onClick = {
+                                        viewModel.navigateToServer("home", navController)
+                                    },
                                     modifier = Modifier
                                         .padding(8.dp)
                                         .size(48.dp)
@@ -107,7 +125,12 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                                 .padding(8.dp)
                                                 .size(48.dp)
                                                 .clip(CircleShape)
-                                                .clickable { viewModel.setCurrentServer(server.id!!) },
+                                                .clickable {
+                                                    viewModel.navigateToServer(
+                                                        server.id!!,
+                                                        navController
+                                                    )
+                                                },
                                             description = "${server.name}"
                                         )
                                     } else {
@@ -119,7 +142,12 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                                 .size(48.dp)
                                                 .clip(CircleShape)
                                                 .background(MaterialTheme.colorScheme.surfaceVariant)
-                                                .clickable { viewModel.setCurrentServer(server.id!!) }
+                                                .clickable {
+                                                    viewModel.navigateToServer(
+                                                        server.id!!,
+                                                        navController
+                                                    )
+                                                }
                                         ) {
                                             Text(
                                                 text = server.name.first().toString(),
@@ -143,11 +171,11 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                                 .weight(1f)
                                                 .verticalScroll(rememberScrollState())
                                         ) {
-                                            RevoltAPI.channelCache.values.filter { it.channelType == ChannelType.DirectMessage }
+                                            RevoltAPI.channelCache.values.filter { it.channelType == ChannelType.Group }
                                                 .forEach { channel ->
                                                     DrawerChannel(
-                                                        name = "DM #${channel.id}", // TODO get user or group name
-                                                        channelType = ChannelType.DirectMessage,
+                                                        name = channel.name ?: "GDM #${channel.id}",
+                                                        channelType = ChannelType.Group,
                                                         selected = channel.id == (navBackStackEntry?.arguments?.getString(
                                                             "channelId"
                                                         ) ?: false),
@@ -185,7 +213,11 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                                         ) == ch.id,
                                                         onClick = {
                                                             scope.launch { channelDrawerState.close() }
-                                                            navController.navigate("channel/${ch.id}")
+                                                            navController.navigate("channel/${ch.id}") {
+                                                                popUpTo("home") {
+                                                                    inclusive = true
+                                                                }
+                                                            }
                                                         })
                                                 }
                                             }
