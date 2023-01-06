@@ -21,7 +21,7 @@ data class ServerUserChoice(
 @Serializable
 data class Member(
     @SerialName("_id")
-    val id: ServerUserChoice? = null,
+    val id: ServerUserChoice,
 
     @SerialName("joined_at")
     val joinedAt: String? = null,

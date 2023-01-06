@@ -10,15 +10,19 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import chat.revolt.api.REVOLT_BASE
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.ULID
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.api.schemas.Message as MessageSchema
@@ -31,6 +35,15 @@ fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnReso
         ctx,
         Uri.parse("$REVOLT_FILES/attachments/${attachment.id}/${attachment.filename}")
     )
+}
+
+
+fun formatLongAsTime(time: Long): String {
+    // TODO: look into using a library like kotlinx.datetime
+    val date = java.util.Date(time)
+    val format =
+        java.text.SimpleDateFormat("dd.MM.yyyy HH:mm:ss", java.util.Locale.getDefault())
+    return format.format(date)
 }
 
 @Composable
@@ -47,6 +60,7 @@ fun Message(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape),
+                crossfade = false,
                 description = "Avatar for ${author.username}"
             )
         } else {
@@ -55,17 +69,31 @@ fun Message(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape),
+                crossfade = false,
                 description = "Avatar for ${author.username}"
             )
         }
 
         Column(modifier = Modifier.padding(start = 10.dp)) {
-            author.username?.let {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                author.username?.let {
+                    Text(
+                        text = it,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Spacer(modifier = Modifier.width(5.dp))
                 Text(
-                    text = it,
-                    fontWeight = FontWeight.Bold
+                    text = formatLongAsTime(ULID.asTimestamp(message.id!!)),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
+
             message.content?.let {
                 Text(
                     text = it
@@ -86,6 +114,7 @@ fun Message(
                                 width = attachment.metadata.width?.toInt() ?: 0,
                                 height = attachment.metadata.height?.toInt() ?: 0,
                                 contentScale = ContentScale.Fit,
+                                crossfade = true,
                                 description = "Attached image ${attachment.filename}"
                             )
                         } else {

@@ -88,4 +88,25 @@ object ULID {
     fun makeNext(): String {
         return makeSpecial(System.currentTimeMillis(), fetchEntropy())
     }
+
+    fun asTimestamp(ulid: String): Long {
+        if (ulid.length != len) {
+            throw IllegalArgumentException("ULID must be exactly $len characters")
+        }
+
+        var timestamp = 0L
+
+        for (i in 0..9) {
+            val char = ulid[i]
+            val value = b32chars.indexOf(char)
+
+            if (value == -1) {
+                throw IllegalArgumentException("Invalid character '$char' at position $i")
+            }
+
+            timestamp = timestamp or (value.toLong() shl (9 - i) * 5)
+        }
+
+        return timestamp
+    }
 }
