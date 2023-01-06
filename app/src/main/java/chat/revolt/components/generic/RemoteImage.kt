@@ -22,12 +22,13 @@ fun RemoteImage(
     contentScale: ContentScale = ContentScale.Crop,
     width: Int = 0,
     height: Int = 0,
+    crossfade: Boolean = true,
 ) {
     val context = LocalContext.current
 
     fun imageRequest() = run {
         val builder = ImageRequest.Builder(context)
-            .crossfade(true)
+            .crossfade(crossfade)
             .data(url)
 
         if (width != 0 && height != 0) {
