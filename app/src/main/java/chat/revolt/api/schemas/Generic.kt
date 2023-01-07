@@ -38,3 +38,13 @@ data class Metadata(
     val width: Long? = null,
     val height: Long? = null
 )
+
+@Serializable
+data class AutumnId(
+    val id: String
+)
+
+@Serializable
+data class AutumnError(
+    val type: String,
+)

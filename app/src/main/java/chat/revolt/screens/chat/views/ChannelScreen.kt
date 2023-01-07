@@ -2,6 +2,8 @@ package chat.revolt.screens.chat.views
 
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,10 +46,17 @@ import chat.revolt.R
 import chat.revolt.RevoltTweenFloat
 import chat.revolt.RevoltTweenInt
 import chat.revolt.api.routes.channel.fetchMessagesFromChannel
+import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.components.chat.MessageField
 import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.screens.chat.ChannelIcon
+import androidx.compose.runtime.getValue
+import chat.revolt.api.routes.microservices.autumn.MAX_ATTACHMENTS_PER_MESSAGE
+import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
+import chat.revolt.components.screens.chat.AttachmentManager
+import io.ktor.http.*
+import java.io.File
 
 class ChannelScreenViewModel : ViewModel() {
     private var _channel by mutableStateOf<Channel?>(null)
@@ -85,6 +95,35 @@ class ChannelScreenViewModel : ViewModel() {
 
     fun setShowButtons(show: Boolean) {
         _showButtons = show
+    }
+
+    private var _attachments = mutableStateListOf<FileArgs>()
+    val attachments: List<FileArgs>
+        get() = _attachments
+
+    fun setAttachments(attachments: List<FileArgs>) {
+        _attachments.clear()
+        _attachments.addAll(attachments)
+    }
+
+    fun addAttachment(fileArgs: FileArgs) {
+        _attachments.add(fileArgs)
+    }
+
+    fun removeAttachment(fileArgs: FileArgs) {
+        _attachments.remove(fileArgs)
+    }
+
+    private fun popAttachmentBatch() {
+        setAttachments(_attachments.drop(MAX_ATTACHMENTS_PER_MESSAGE))
+    }
+
+    private var _sendingMessage by mutableStateOf(false)
+    val sendingMessage: Boolean
+        get() = _sendingMessage
+
+    private fun setSendingMessage(sending: Boolean) {
+        _sendingMessage = sending
     }
 
     inner class ChannelScreenCallback : RealtimeSocket.ChannelCallback {
@@ -173,10 +212,37 @@ class ChannelScreenViewModel : ViewModel() {
     }
 
     fun sendPendingMessage() {
+
+        setSendingMessage(true)
         viewModelScope.launch {
-            sendMessage(channel!!.id!!, messageContent)
+            val attachmentIds = arrayListOf<String>()
+
+            attachments.take(MAX_ATTACHMENTS_PER_MESSAGE).forEach {
+                try {
+                    val id = uploadToAutumn(
+                        it.file,
+                        it.filename,
+                        "attachments",
+                        ContentType.parse(it.contentType)
+                    )
+                    Log.d("ChannelScreen", "Uploaded attachment with id $id")
+                    attachmentIds.add(id)
+                } catch (e: Exception) {
+                    Log.e("ChannelScreen", "Failed to upload attachment", e)
+                    return@launch
+                }
+            }
+
+            sendMessage(
+                channel!!.id!!,
+                messageContent,
+                attachments = if (attachmentIds.isEmpty()) null else attachmentIds
+            )
+
+            _messageContent = ""
+            popAttachmentBatch()
+            setSendingMessage(false)
         }
-        _messageContent = ""
     }
 
     fun typingMessageResource(): Int {
@@ -221,7 +287,10 @@ fun ChannelInfoScreen(
                 channelType = channel.channelType!!,
                 modifier = Modifier.size(32.dp)
             )
-            PageHeader(text = channel.name ?: channel.id!!)
+            PageHeader(
+                text = channel.name ?: channel.id!!,
+                modifier = Modifier.offset((-8).dp, 0.dp)
+            )
         }
 
         Column(modifier = Modifier.weight(1f)) {
@@ -277,9 +346,38 @@ fun ChannelScreen(
     viewModel: ChannelScreenViewModel = viewModel()
 ) {
     val channel = viewModel.channel
+
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
-    val channelInfoOpen = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+
+    val channelInfoOpen = remember { mutableStateOf(false) }
+
+    val pickFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenMultipleDocuments()
+    ) { uriList ->
+        uriList.let { uris ->
+            uris.forEach {
+                DocumentFile.fromSingleUri(context, it)?.let docfile@{ file ->
+                    val mFile = File(context.cacheDir, file.name ?: "attachment")
+
+                    mFile.outputStream().use { output ->
+                        @Suppress("Recycle")
+                        context.contentResolver.openInputStream(it)?.copyTo(output)
+                    }
+
+                    viewModel.addAttachment(
+                        FileArgs(
+                            file = mFile,
+                            contentType = file.type ?: "application/octet-stream",
+                            filename = file.name ?: "attachment"
+                        )
+                    )
+                }
+            }
+
+        }
+    }
 
     LaunchedEffect(channelId) {
         viewModel.fetchChannel(channelId)
@@ -386,17 +484,27 @@ fun ChannelScreen(
             }
         }
 
-
-        channel.channelType?.let {
-            MessageField(
-                showButtons = viewModel.showButtons,
-                onToggleButtons = viewModel::setShowButtons,
-                messageContent = viewModel.messageContent,
-                onMessageContentChange = viewModel::setMessageContent,
-                onSendMessage = viewModel::sendPendingMessage,
-                channelType = it,
-                channelName = channel.name ?: channel.id!!
+        AnimatedVisibility(visible = viewModel.attachments.isNotEmpty()) {
+            AttachmentManager(
+                attachments = viewModel.attachments,
+                uploading = viewModel.sendingMessage,
+                onRemove = viewModel::removeAttachment
             )
         }
+
+        MessageField(
+            showButtons = viewModel.showButtons,
+            onToggleButtons = viewModel::setShowButtons,
+            messageContent = viewModel.messageContent,
+            onMessageContentChange = viewModel::setMessageContent,
+            onSendMessage = viewModel::sendPendingMessage,
+            onAddAttachment = {
+                pickFileLauncher.launch(arrayOf("*/*"))
+            },
+            channelType = channel.channelType!!,
+            channelName = channel.name ?: channel.id!!,
+            forceSendButton = viewModel.attachments.isNotEmpty(),
+            disabled = viewModel.sendingMessage
+        )
     }
 }

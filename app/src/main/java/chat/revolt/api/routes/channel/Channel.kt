@@ -4,7 +4,6 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ULID
-import chat.revolt.api.schemas.Embed
 import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.MessagesInChannel
 import io.ktor.client.request.*
@@ -59,23 +58,31 @@ data class SendMessageReply(
     val mention: Boolean
 )
 
+@kotlinx.serialization.Serializable
+data class SendMessageBody(
+    val content: String,
+    val nonce: String = ULID.makeNext(),
+    val replies: List<SendMessageReply> = emptyList(),
+    val attachments: List<String>?,
+)
+
 suspend fun sendMessage(
     channelId: String,
     content: String,
     nonce: String? = ULID.makeNext(),
     replies: List<SendMessageReply>? = null,
-    embed: Embed? = null
+    attachments: List<String>? = null,
 ): String {
     val response = RevoltHttp.post("/channels/$channelId/messages") {
         headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
 
         contentType(ContentType.Application.Json)
         setBody(
-            mapOf(
-                "content" to content,
-                "nonce" to nonce,
-                "replies" to replies,
-                "embed" to embed
+            SendMessageBody(
+                content = content,
+                nonce = nonce ?: ULID.makeNext(),
+                replies = replies ?: emptyList(),
+                attachments = attachments
             )
         )
     }

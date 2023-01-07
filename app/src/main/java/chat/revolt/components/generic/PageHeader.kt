@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun PageHeader(
     text: String,
+    modifier: Modifier = Modifier,
 ) {
     Text(
         text = text,
@@ -23,7 +24,7 @@ fun PageHeader(
             textAlign = TextAlign.Left,
             fontSize = 24.sp
         ),
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 15.dp, vertical = 15.dp)
             .fillMaxWidth(),
     )

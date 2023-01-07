@@ -87,9 +87,6 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_libraries_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_libraries_version"
 
-    // Browser opening utility (used for legal links)
-    implementation "androidx.browser:browser:1.4.0"
-
     // Hilt - Dependency Injection
     implementation "com.google.dagger:hilt-android:$hilt_version"
     implementation "androidx.hilt:hilt-navigation-compose:1.1.0-alpha01"
@@ -104,7 +101,9 @@ dependencies {
     // AboutLibraries - automated OSS library attribution
     implementation "com.mikepenz:aboutlibraries-compose:$aboutlibraries_version"
 
-    // Jetpack DataStore - persistent storage
+    // Other AndroidX libraries - used for various things and never seem to have a consistent version
+    implementation 'androidx.documentfile:documentfile:1.0.1'
+    implementation "androidx.browser:browser:1.4.0"
     implementation "androidx.datastore:datastore-preferences:1.1.0-alpha01"
     implementation "androidx.datastore:datastore:1.1.0-alpha01"
 }

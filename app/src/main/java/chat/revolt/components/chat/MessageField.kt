@@ -1,21 +1,21 @@
 package chat.revolt.components.chat
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,12 +29,15 @@ fun MessageField(
     onToggleButtons: (Boolean) -> Unit,
     messageContent: String,
     onMessageContentChange: (String) -> Unit,
+    onAddAttachment: () -> Unit,
     onSendMessage: () -> Unit,
     channelType: ChannelType,
     channelName: String,
     modifier: Modifier = Modifier,
+    forceSendButton: Boolean = false,
+    disabled: Boolean = false,
 ) {
-    val context = LocalContext.current
+    val focusRequester = remember { FocusRequester() }
     val placeholderResource = when (channelType) {
         ChannelType.DirectMessage -> R.string.message_field_placeholder_dm
         ChannelType.Group -> R.string.message_field_placeholder_group
@@ -49,11 +52,8 @@ fun MessageField(
             Row(Modifier.weight(1f)) {
                 ElevatedButton(
                     onClick = {
-                        Toast.makeText(
-                            context,
-                            "Placeholder for adding an attachment",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        focusRequester.freeFocus() // hide keyboard because it's annoying
+                        onAddAttachment()
                     },
                     modifier = Modifier.size(56.dp),
                     contentPadding = PaddingValues(0.dp),
@@ -78,11 +78,11 @@ fun MessageField(
                     Icons.Default.KeyboardArrowRight,
                     contentDescription = stringResource(id = R.string.show_more_alt),
                     modifier = Modifier
-                        .size(24.dp + 8.dp)
-                        .padding(vertical = 4.dp)
                         .clickable(onClick = {
                             onToggleButtons(true)
                         })
+                        .size(24.dp + 8.dp)
+                        .padding(vertical = 4.dp)
                 )
             }
         }
@@ -91,7 +91,8 @@ fun MessageField(
             value = messageContent,
             onValueChange = onMessageContentChange,
             singleLine = false,
-            shape = RoundedCornerShape(100),
+            shape = MaterialTheme.shapes.extraLarge,
+            enabled = !disabled,
             placeholder = {
                 Text(
                     stringResource(
@@ -109,14 +110,16 @@ fun MessageField(
             ),
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 8.dp)
+                .padding(start = 8.dp)
+                .focusRequester(focusRequester)
         )
 
-        // Send button (visible when text is entered)
-        AnimatedVisibility(visible = messageContent.isNotBlank()) {
+        // Send button (visible when text is entered or when forceSendButton is true)
+        AnimatedVisibility(visible = (messageContent.isNotBlank() || forceSendButton) && !disabled) {
             Button(
                 onClick = onSendMessage,
                 modifier = Modifier
+                    .padding(start = 8.dp)
                     .size(56.dp),
                 contentPadding = PaddingValues(0.dp),
                 shape = CircleShape
@@ -136,9 +139,10 @@ fun MessageFieldPreview() {
     MessageField(
         showButtons = true,
         onToggleButtons = {},
-        messageContent = "",
+        messageContent = "Hello world!",
         onMessageContentChange = {},
         onSendMessage = {},
+        onAddAttachment = {},
         channelType = ChannelType.TextChannel,
         channelName = "general"
     )

@@ -69,6 +69,7 @@
 
     <string name="send_alt">Send</string>
     <string name="add_attachment_alt">Add attachment</string>
+    <string name="remove_attachment_alt">Remove attachment</string>
     <string name="show_more_alt">Show more</string>
 
     <string name="tutorial">Welcome to Revolt\'s in-progress Android experience!</string>
