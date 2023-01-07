@@ -60,7 +60,6 @@ fun Message(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape),
-                crossfade = false,
                 description = "Avatar for ${author.username}"
             )
         } else {
@@ -69,7 +68,6 @@ fun Message(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape),
-                crossfade = false,
                 description = "Avatar for ${author.username}"
             )
         }
@@ -114,7 +112,6 @@ fun Message(
                                 width = attachment.metadata.width?.toInt() ?: 0,
                                 height = attachment.metadata.height?.toInt() ?: 0,
                                 contentScale = ContentScale.Fit,
-                                crossfade = true,
                                 description = "Attached image ${attachment.filename}"
                             )
                         } else {

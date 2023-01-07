@@ -212,8 +212,8 @@ class ChannelScreenViewModel : ViewModel() {
     }
 
     fun sendPendingMessage() {
-
         setSendingMessage(true)
+
         viewModelScope.launch {
             val attachmentIds = arrayListOf<String>()
 

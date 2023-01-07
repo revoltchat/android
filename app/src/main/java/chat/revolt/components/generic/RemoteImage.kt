@@ -1,19 +1,19 @@
 package chat.revolt.components.generic
 
-import android.os.Build
+import android.util.DisplayMetrics
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import chat.revolt.BuildConfig
-import coil.ImageLoader
-import coil.compose.AsyncImage
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.decode.SvgDecoder
-import coil.memory.MemoryCache
-import coil.request.ImageRequest
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun RemoteImage(
     url: String,
@@ -22,42 +22,21 @@ fun RemoteImage(
     contentScale: ContentScale = ContentScale.Crop,
     width: Int = 0,
     height: Int = 0,
-    crossfade: Boolean = true,
 ) {
     val context = LocalContext.current
 
-    fun imageRequest() = run {
-        val builder = ImageRequest.Builder(context)
-            .crossfade(crossfade)
-            .data(url)
-
-        if (width != 0 && height != 0) {
-            builder.size(width, height)
-        }
-
-        builder.build()
+    fun pxAsDp(px: Int): Dp {
+        return (px / (context.resources
+            .displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).dp
     }
 
-    AsyncImage(
-        model = imageRequest(),
-        imageLoader = ImageLoader.Builder(context)
-            .components {
-                if (Build.VERSION.SDK_INT >= 28) {
-                    add(ImageDecoderDecoder.Factory())
-                } else {
-                    add(GifDecoder.Factory())
-                }
-                add(SvgDecoder.Factory())
-            }
-            .memoryCache {
-                MemoryCache.Builder(context)
-                    .maxSizePercent(.25)
-                    .build()
-            }
-            .build(),
+    GlideImage(
+        model = url,
         contentDescription = description,
         contentScale = contentScale,
-        modifier = modifier,
+        modifier = modifier
+            .width(pxAsDp(width))
+            .height(pxAsDp(height)),
     )
 }
 
