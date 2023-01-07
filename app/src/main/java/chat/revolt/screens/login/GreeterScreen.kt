@@ -1,5 +1,6 @@
 package chat.revolt.screens.login
 
+import androidx.compose.foundation.Image
 import chat.revolt.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -11,14 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import chat.revolt.components.generic.RemoteImage
-import chat.revolt.components.generic.drawableResource
 
 @Composable
 fun GreeterScreen(navController: NavController) {
@@ -37,9 +37,9 @@ fun GreeterScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            RemoteImage(
-                url = drawableResource(R.drawable.revolt_logo_wide),
-                description = "Revolt Logo",
+            Image(
+                painter = painterResource(id = R.drawable.revolt_logo_wide),
+                contentDescription = "Revolt Logo",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth()

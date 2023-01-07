@@ -10,7 +10,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -70,6 +72,11 @@ class ChannelScreenViewModel : ViewModel() {
     private var _renderableMessages = mutableStateListOf<MessageSchema>()
     val renderableMessages: List<MessageSchema>
         get() = _renderableMessages
+
+    fun setRenderableMessages(messages: List<MessageSchema>) {
+        _renderableMessages.clear()
+        _renderableMessages.addAll(messages)
+    }
 
     private var _typingUsers = mutableStateListOf<String>()
     val typingUsers: List<String>
@@ -165,15 +172,17 @@ class ChannelScreenViewModel : ViewModel() {
         _renderableMessages.clear()
 
         viewModelScope.launch {
+            val messages = arrayListOf<MessageSchema>()
             fetchMessagesFromChannel(channel!!.id!!, limit = 50, false).let {
                 it.messages!!.reversed().forEach { message ->
-                    addUserIfUnknown(message.author!!)
+                    addUserIfUnknown(message.author ?: return@forEach)
                     if (!RevoltAPI.messageCache.containsKey(message.id)) {
                         RevoltAPI.messageCache[message.id!!] = message
                     }
-                    _renderableMessages.add(message)
+                    messages.add(message)
                 }
             }
+            setRenderableMessages(renderableMessages + messages)
         }
     }
 
@@ -183,6 +192,7 @@ class ChannelScreenViewModel : ViewModel() {
         }
 
         viewModelScope.launch {
+            val messages = arrayListOf<MessageSchema>()
             fetchMessagesFromChannel(
                 channel!!.id!!,
                 limit = 20,
@@ -190,13 +200,14 @@ class ChannelScreenViewModel : ViewModel() {
                 before = renderableMessages.first().id
             ).let {
                 it.messages!!.forEach { message ->
-                    addUserIfUnknown(message.author!!)
+                    addUserIfUnknown(message.author ?: return@forEach)
                     if (!RevoltAPI.messageCache.containsKey(message.id)) {
                         RevoltAPI.messageCache[message.id!!] = message
                     }
-                    _renderableMessages.add(0, message)
+                    messages.add(message)
                 }
             }
+            setRenderableMessages(messages + renderableMessages)
         }
     }
 
@@ -348,7 +359,7 @@ fun ChannelScreen(
     val channel = viewModel.channel
 
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
+    val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
     val channelInfoOpen = remember { mutableStateOf(false) }
@@ -375,7 +386,6 @@ fun ChannelScreen(
                     )
                 }
             }
-
         }
     }
 
@@ -436,23 +446,65 @@ fun ChannelScreen(
             )
         }
 
-        LazyColumn(Modifier.weight(1f)) {
-            item {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            viewModel.fetchOlderMessages()
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 8.dp)
-                ) {
-                    Text("Load older")
+
+        val isScrolledToBottom = remember(lazyListState) {
+            derivedStateOf {
+                (lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                    ?: 0) >= viewModel.renderableMessages.size - 5
+            }
+        }
+
+        LaunchedEffect(viewModel.renderableMessages.size) {
+            if (isScrolledToBottom.value) {
+                coroutineScope.launch {
+                    lazyListState.scrollToItem(viewModel.renderableMessages.size)
                 }
             }
-            items(viewModel.renderableMessages) { message ->
-                Message(message)
+        }
+
+        Box(modifier = Modifier.weight(1f)) {
+            LazyColumn(state = lazyListState) {
+                item {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                viewModel.fetchOlderMessages()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp, horizontal = 8.dp)
+                    ) {
+                        Text("Load older")
+                    }
+                }
+                items(viewModel.renderableMessages) { message ->
+                    Message(message)
+                }
+            }
+
+            androidx.compose.animation.AnimatedVisibility(!isScrolledToBottom.value) {
+                ExtendedFloatingActionButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp),
+                    text = {
+                        Text(stringResource(R.string.scroll_to_bottom))
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = stringResource(R.string.scroll_to_bottom)
+                        )
+                    },
+                    onClick = {
+                        coroutineScope.launch {
+                            lazyListState.animateScrollToItem(viewModel.renderableMessages.size)
+                        }
+                    },
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
             }
         }
 
@@ -504,7 +556,7 @@ fun ChannelScreen(
             channelType = channel.channelType!!,
             channelName = channel.name ?: channel.id!!,
             forceSendButton = viewModel.attachments.isNotEmpty(),
-            disabled = viewModel.sendingMessage
+            disabled = viewModel.attachments.isNotEmpty() && viewModel.sendingMessage
         )
     }
 }

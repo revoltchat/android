@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -19,8 +21,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
-import chat.revolt.components.generic.RemoteImage
-import chat.revolt.components.generic.drawableResource
 import chat.revolt.components.screens.splash.DisconnectedScreen
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -110,9 +110,9 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel 
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        RemoteImage(
-            url = drawableResource(R.drawable.revolt_logo_wide),
-            description = "Revolt Logo",
+        Image(
+            painter = painterResource(id = R.drawable.revolt_logo_wide),
+            contentDescription = "Revolt Logo",
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxWidth()

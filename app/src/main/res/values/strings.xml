@@ -104,4 +104,6 @@
     <string name="no_connection">No connection</string>
     <string name="no_connection_message">You are not connected to the internet. Please check your connection and try again.</string>
     <string name="tap_to_retry">Tap to retry</string>
+
+    <string name="scroll_to_bottom">Scroll to bottom</string>
 </resources>

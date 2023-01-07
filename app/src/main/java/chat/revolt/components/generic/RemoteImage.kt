@@ -9,7 +9,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import chat.revolt.BuildConfig
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 
@@ -38,8 +37,4 @@ fun RemoteImage(
             .width(pxAsDp(width))
             .height(pxAsDp(height)),
     )
-}
-
-fun drawableResource(id: Int): String {
-    return "android.resource://" + BuildConfig.APPLICATION_ID + "/" + id
 }
