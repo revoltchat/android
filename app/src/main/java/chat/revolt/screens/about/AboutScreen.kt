@@ -2,8 +2,10 @@ package chat.revolt.screens.about
 
 import android.os.Build
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import chat.revolt.R
+import androidx.compose.material3.Button
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.revolt.BuildConfig
+import chat.revolt.R
 import chat.revolt.api.REVOLT_BASE
 import chat.revolt.api.routes.misc.Root
 import chat.revolt.api.routes.misc.getRootRoute

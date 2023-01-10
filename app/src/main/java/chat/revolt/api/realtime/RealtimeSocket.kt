@@ -13,7 +13,7 @@ import chat.revolt.api.realtime.frames.sendable.PingFrame
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.consumeEach
-import java.util.Calendar
+import java.util.*
 
 enum class DisconnectionState {
     Disconnected,

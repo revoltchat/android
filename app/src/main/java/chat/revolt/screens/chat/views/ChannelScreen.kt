@@ -33,32 +33,31 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import chat.revolt.R
+import chat.revolt.RevoltTweenFloat
+import chat.revolt.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
 import chat.revolt.api.realtime.frames.receivable.MessageFrame
+import chat.revolt.api.routes.channel.fetchMessagesFromChannel
 import chat.revolt.api.routes.channel.sendMessage
+import chat.revolt.api.routes.microservices.autumn.FileArgs
+import chat.revolt.api.routes.microservices.autumn.MAX_ATTACHMENTS_PER_MESSAGE
+import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
 import chat.revolt.api.routes.user.addUserIfUnknown
 import chat.revolt.api.schemas.Channel
-import chat.revolt.api.schemas.Message as MessageSchema
 import chat.revolt.components.chat.Message
-import kotlinx.coroutines.launch
-import chat.revolt.R
-import chat.revolt.RevoltTweenFloat
-import chat.revolt.RevoltTweenInt
-import chat.revolt.api.routes.channel.fetchMessagesFromChannel
-import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.components.chat.MessageField
 import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.PageHeader
-import chat.revolt.components.screens.chat.ChannelIcon
-import androidx.compose.runtime.getValue
-import chat.revolt.api.routes.microservices.autumn.MAX_ATTACHMENTS_PER_MESSAGE
-import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
 import chat.revolt.components.screens.chat.AttachmentManager
+import chat.revolt.components.screens.chat.ChannelIcon
 import io.ktor.http.*
+import kotlinx.coroutines.launch
 import java.io.File
+import chat.revolt.api.schemas.Message as MessageSchema
 
 class ChannelScreenViewModel : ViewModel() {
     private var _channel by mutableStateOf<Channel?>(null)

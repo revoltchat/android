@@ -1,19 +1,19 @@
 package chat.revolt.screens.chat.views
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
+import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.screens.home.LinkOnHome
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import chat.revolt.R
-import chat.revolt.components.generic.PageHeader
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 

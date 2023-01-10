@@ -22,8 +22,8 @@ import chat.revolt.screens.login.LoginScreen
 import chat.revolt.screens.login.MfaScreen
 import chat.revolt.ui.theme.RevoltTheme
 import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

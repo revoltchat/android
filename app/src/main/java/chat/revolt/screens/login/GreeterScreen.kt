@@ -1,7 +1,6 @@
 package chat.revolt.screens.login
 
 import androidx.compose.foundation.Image
-import chat.revolt.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
@@ -19,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import chat.revolt.R
 
 @Composable
 fun GreeterScreen(navController: NavController) {

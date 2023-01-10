@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import chat.revolt.api.schemas.ChannelType
 import chat.revolt.R
+import chat.revolt.api.schemas.ChannelType
 
 @Composable
 fun ChannelIcon(

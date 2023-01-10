@@ -29,17 +29,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
-import chat.revolt.components.generic.RemoteImage
-import chat.revolt.screens.chat.views.HomeScreen
-import chat.revolt.R
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.chat.DisconnectedNotice
+import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.screens.chat.DrawerChannel
 import chat.revolt.screens.chat.views.ChannelScreen
+import chat.revolt.screens.chat.views.HomeScreen
 import kotlinx.coroutines.launch
 
 class ChatRouterViewModel : ViewModel() {

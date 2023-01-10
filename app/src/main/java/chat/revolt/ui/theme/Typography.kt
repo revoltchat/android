@@ -2,11 +2,11 @@ package chat.revolt.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
-import chat.revolt.R
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import chat.revolt.R
 
 private val Inter = FontFamily(
     Font(R.font.inter_thin, FontWeight.Thin),

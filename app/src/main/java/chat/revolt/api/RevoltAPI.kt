@@ -16,8 +16,8 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 const val REVOLT_BASE = "https://api.revolt.chat"
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
