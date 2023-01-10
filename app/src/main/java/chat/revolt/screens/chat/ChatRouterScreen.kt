@@ -234,7 +234,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
             Column(Modifier.fillMaxSize()) {
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") {
-                        HomeScreen(navController = navController)
+                        HomeScreen(navController = topNav)
                     }
                     composable("channel/{channelId}") { backStackEntry ->
                         val channelId = backStackEntry.arguments?.getString("channelId")
