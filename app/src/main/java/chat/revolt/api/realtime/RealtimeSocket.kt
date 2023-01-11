@@ -3,6 +3,7 @@ package chat.revolt.api.realtime
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import chat.revolt.api.REVOLT_WEBSOCKET
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
@@ -118,9 +119,7 @@ object RealtimeSocket {
 
                 RevoltAPI.messageCache[messageFrame.id!!] = messageFrame
 
-                channelCallbacks[messageFrame.channel]?.forEach { callback ->
-                    callback.onMessage(messageFrame)
-                }
+                channelCallbacks[messageFrame.channel]?.onMessage(messageFrame)
             }
             "ChannelStartTyping" -> {
                 val typingFrame =
@@ -130,9 +129,7 @@ object RealtimeSocket {
                     "Received channel start typing frame for ${typingFrame.id} from ${typingFrame.user}."
                 )
 
-                channelCallbacks[typingFrame.id]?.forEach { callback ->
-                    callback.onStartTyping(typingFrame)
-                }
+                channelCallbacks[typingFrame.id]?.onStartTyping(typingFrame)
             }
             "ChannelStopTyping" -> {
                 val typingFrame =
@@ -142,9 +139,7 @@ object RealtimeSocket {
                     "Received channel stop typing frame for ${typingFrame.id} from ${typingFrame.user}."
                 )
 
-                channelCallbacks[typingFrame.id]?.forEach { callback ->
-                    callback.onStopTyping(typingFrame)
-                }
+                channelCallbacks[typingFrame.id]?.onStopTyping(typingFrame)
             }
             "UserUpdate" -> {
                 val userUpdateFrame =
@@ -178,18 +173,16 @@ object RealtimeSocket {
         fun onMessage(message: MessageFrame)
     }
 
-    private val channelCallbacks: MutableMap<String, List<ChannelCallback>> = mutableStateMapOf()
+    private val channelCallbacks: SnapshotStateMap<String, ChannelCallback> = mutableStateMapOf()
 
     fun registerChannelCallback(channelId: String, callback: ChannelCallback) {
-        val callbacks = channelCallbacks[channelId] ?: emptyList()
-        channelCallbacks[channelId] = callbacks + callback
+        channelCallbacks[channelId] = callback
 
         Log.d("RealtimeSocket", "Registered channel callback for $channelId.")
     }
 
     fun unregisterChannelCallback(channelId: String, callback: ChannelCallback) {
-        val callbacks = channelCallbacks[channelId] ?: emptyList()
-        channelCallbacks[channelId] = callbacks - callback
+        channelCallbacks.remove(channelId, callback)
 
         Log.d("RealtimeSocket", "Unregistered channel callback for $channelId")
     }

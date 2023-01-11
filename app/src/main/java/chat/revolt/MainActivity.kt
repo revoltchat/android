@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
@@ -20,6 +21,7 @@ import chat.revolt.screens.chat.ChatRouterScreen
 import chat.revolt.screens.login.GreeterScreen
 import chat.revolt.screens.login.LoginScreen
 import chat.revolt.screens.login.MfaScreen
+import chat.revolt.screens.settings.SettingsScreen
 import chat.revolt.ui.theme.RevoltTheme
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -44,6 +46,7 @@ class MainActivity : ComponentActivity() {
 }
 
 val RevoltTweenInt: FiniteAnimationSpec<IntOffset> = tween(400, easing = EaseInOutExpo)
+val RevoltTweenIntSize: FiniteAnimationSpec<IntSize> = tween(400, easing = EaseInOutExpo)
 val RevoltTweenFloat: FiniteAnimationSpec<Float> = tween(400, easing = EaseInOutExpo)
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -92,6 +95,8 @@ fun AppEntrypoint() {
         }
 
         composable("chat") { ChatRouterScreen(navController) }
+
+        composable("settings") { SettingsScreen(navController) }
 
         composable("about") { AboutScreen(navController) }
         composable("about/oss") { AttributionScreen(navController) }

@@ -106,4 +106,5 @@
     <string name="tap_to_retry">Tap to retry</string>
 
     <string name="scroll_to_bottom">Scroll to bottom</string>
+    <string name="settings">Settings</string>
 </resources>

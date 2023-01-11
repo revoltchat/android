@@ -1,7 +1,6 @@
 package chat.revolt.screens.chat
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -37,6 +36,7 @@ import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.chat.DisconnectedNotice
 import chat.revolt.components.generic.RemoteImage
+import chat.revolt.components.screens.chat.BottomNavigation
 import chat.revolt.components.screens.chat.DrawerChannel
 import chat.revolt.screens.chat.views.ChannelScreen
 import chat.revolt.screens.chat.views.HomeScreen
@@ -80,7 +80,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    Column() {
+    Column {
         AnimatedVisibility(visible = RealtimeSocket.disconnectionState != DisconnectionState.Connected) {
             DisconnectedNotice(
                 state = RealtimeSocket.disconnectionState,
@@ -174,7 +174,8 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                             RevoltAPI.channelCache.values.filter { it.channelType == ChannelType.Group }
                                                 .forEach { channel ->
                                                     DrawerChannel(
-                                                        name = channel.name ?: "GDM #${channel.id}",
+                                                        name = channel.name
+                                                            ?: "GDM #${channel.id}",
                                                         channelType = ChannelType.Group,
                                                         selected = channel.id == (navBackStackEntry?.arguments?.getString(
                                                             "channelId"
@@ -192,7 +193,8 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                         val server = RevoltAPI.serverCache[it]
 
                                         Text(
-                                            text = server?.name ?: stringResource(R.string.unknown),
+                                            text = server?.name
+                                                ?: stringResource(R.string.unknown),
                                             fontWeight = FontWeight.Black,
                                             fontSize = 24.sp,
                                             modifier = Modifier.padding(16.dp)
@@ -245,5 +247,10 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                 }
             }
         }
+
+        BottomNavigation(
+            navController = topNav,
+            show = channelDrawerState.currentValue == DrawerValue.Open,
+        )
     }
 }

@@ -78,10 +78,10 @@ fun GreeterScreen(navController: NavController) {
                 .padding(horizontal = 20.dp, vertical = 30.dp)
         ) {
             ElevatedButton(
-                onClick = { navController.navigate("about") },
+                onClick = { navController.navigate("about/placeholder") },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = stringResource(R.string.about))
+                Text(text = stringResource(R.string.signup))
             }
 
             Button(
