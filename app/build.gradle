@@ -104,6 +104,9 @@ dependencies {
     implementation "androidx.browser:browser:1.4.0"
     implementation "androidx.datastore:datastore-preferences:1.1.0-alpha01"
     implementation "androidx.datastore:datastore:1.1.0-alpha01"
+
+    // Lettertrees
+    implementation project(':lettertrees')
 }
 
 kapt {
