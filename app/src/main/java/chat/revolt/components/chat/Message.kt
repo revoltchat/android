@@ -25,6 +25,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.components.generic.RemoteImage
+import chat.revolt.lettertrees.Renderer
 import chat.revolt.api.schemas.Message as MessageSchema
 
 fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnResource) {
@@ -94,7 +95,7 @@ fun Message(
 
             message.content?.let {
                 Text(
-                    text = it
+                    text = Renderer.annotateMarkdown(it),
                 )
             }
 
