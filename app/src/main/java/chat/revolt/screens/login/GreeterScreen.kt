@@ -1,16 +1,20 @@
 package chat.revolt.screens.login
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,6 +26,9 @@ import chat.revolt.R
 
 @Composable
 fun GreeterScreen(navController: NavController) {
+    val context = LocalContext.current
+    var catTaps by remember { mutableStateOf(0) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -42,9 +49,25 @@ fun GreeterScreen(navController: NavController) {
                 contentDescription = "Revolt Logo",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .fillMaxWidth()
                     .height(60.dp)
                     .padding(bottom = 30.dp)
+                    .clickable(
+                        interactionSource = remember(::MutableInteractionSource),
+                        indication = null
+                    ) {
+                        if (catTaps < 9) {
+                            catTaps++
+                        } else {
+                            Toast
+                                .makeText(
+                                    context,
+                                    "🐈",
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+                            catTaps = 0
+                        }
+                    }
             )
 
             Text(
