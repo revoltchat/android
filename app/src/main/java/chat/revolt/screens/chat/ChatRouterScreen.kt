@@ -115,49 +115,51 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                     )
                                 }
 
-                                RevoltAPI.serverCache.values.forEach { server ->
-                                    if (server.name == null) return@forEach
+                                RevoltAPI.serverCache.values
+                                    .sortedBy { it.id }
+                                    .forEach { server ->
+                                        if (server.name == null) return@forEach
 
-                                    if (server.icon != null) {
-                                        RemoteImage(
-                                            url = "$REVOLT_FILES/icons/${server.icon.id!!}/server.png?max_side=256",
-                                            modifier = Modifier
-                                                .padding(8.dp)
-                                                .size(48.dp)
-                                                .clip(CircleShape)
-                                                .clickable {
-                                                    viewModel.navigateToServer(
-                                                        server.id!!,
-                                                        navController
-                                                    )
-                                                },
-                                            description = "${server.name}"
-                                        )
-                                    } else {
-                                        // return a placeholder icon, currently the first letter of the server name in a circle
-                                        Box(
-                                            contentAlignment = Alignment.Center,
-                                            modifier = Modifier
-                                                .padding(8.dp)
-                                                .size(48.dp)
-                                                .clip(CircleShape)
-                                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                                                .clickable {
-                                                    viewModel.navigateToServer(
-                                                        server.id!!,
-                                                        navController
-                                                    )
-                                                }
-                                        ) {
-                                            Text(
-                                                text = server.name.first().toString(),
-                                                fontSize = 20.sp,
-                                                fontWeight = FontWeight.SemiBold,
-                                                color = MaterialTheme.colorScheme.onSurface
+                                        if (server.icon != null) {
+                                            RemoteImage(
+                                                url = "$REVOLT_FILES/icons/${server.icon.id!!}/server.png?max_side=256",
+                                                modifier = Modifier
+                                                    .padding(8.dp)
+                                                    .size(48.dp)
+                                                    .clip(CircleShape)
+                                                    .clickable {
+                                                        viewModel.navigateToServer(
+                                                            server.id!!,
+                                                            navController
+                                                        )
+                                                    },
+                                                description = "${server.name}"
                                             )
+                                        } else {
+                                            // return a placeholder icon, currently the first letter of the server name in a circle
+                                            Box(
+                                                contentAlignment = Alignment.Center,
+                                                modifier = Modifier
+                                                    .padding(8.dp)
+                                                    .size(48.dp)
+                                                    .clip(CircleShape)
+                                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                                    .clickable {
+                                                        viewModel.navigateToServer(
+                                                            server.id!!,
+                                                            navController
+                                                        )
+                                                    }
+                                            ) {
+                                                Text(
+                                                    text = server.name.first().toString(),
+                                                    fontSize = 20.sp,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                            }
                                         }
                                     }
-                                }
                             }
 
                             Crossfade(targetState = viewModel.currentServer) {
