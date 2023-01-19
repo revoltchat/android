@@ -39,6 +39,7 @@ object RealtimeSocket {
 
             Log.d("RealtimeSocket", "Connected to websocket.")
             updateDisconnectionState(DisconnectionState.Connected)
+            invalidateAllChannelStates()
 
             // Send authorization frame
             val authFrame = AuthorizationFrame("Authenticate", token)
@@ -166,11 +167,18 @@ object RealtimeSocket {
             }
         }
     }
+    
+    private fun invalidateAllChannelStates() {
+        channelCallbacks.forEach { (_, callback) ->
+            callback.onStateInvalidate()
+        }
+    }
 
     interface ChannelCallback {
         fun onStartTyping(typing: ChannelStartTypingFrame)
         fun onStopTyping(typing: ChannelStopTypingFrame)
         fun onMessage(message: MessageFrame)
+        fun onStateInvalidate()
     }
 
     private val channelCallbacks: SnapshotStateMap<String, ChannelCallback> = mutableStateMapOf()

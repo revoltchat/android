@@ -156,6 +156,11 @@ class ChannelScreenViewModel : ViewModel() {
                 _typingUsers.remove(typing.user)
             }
         }
+
+        override fun onStateInvalidate() {
+            fetchMessages()
+            _typingUsers.clear()
+        }
     }
 
     private fun registerCallback() {
