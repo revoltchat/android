@@ -1,4 +1,4 @@
-package chat.revolt.lettertrees.ast
+package chat.revolt.markdown.ast
 
 /*
  * SPECS:

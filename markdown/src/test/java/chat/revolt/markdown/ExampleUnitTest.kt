@@ -1,4 +1,4 @@
-package chat.revolt.lettertrees
+package chat.revolt.markdown
 
 import org.junit.Test
 

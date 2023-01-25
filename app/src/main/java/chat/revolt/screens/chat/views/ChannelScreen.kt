@@ -487,7 +487,17 @@ fun ChannelScreen(
                 }
             }
 
-            androidx.compose.animation.AnimatedVisibility(!isScrolledToBottom.value) {
+            androidx.compose.animation.AnimatedVisibility(
+                !isScrolledToBottom.value,
+                enter = slideInHorizontally(
+                    animationSpec = RevoltTweenInt,
+                    initialOffsetX = { -it },
+                ) + fadeIn(animationSpec = RevoltTweenFloat),
+                exit = slideOutHorizontally(
+                    animationSpec = RevoltTweenInt,
+                    targetOffsetX = { -it },
+                ) + fadeOut(animationSpec = RevoltTweenFloat)
+            ) {
                 ExtendedFloatingActionButton(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -506,8 +516,8 @@ fun ChannelScreen(
                             lazyListState.animateScrollToItem(viewModel.renderableMessages.size)
                         }
                     },
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                    containerColor = MaterialTheme.colorScheme.secondary
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             }
         }

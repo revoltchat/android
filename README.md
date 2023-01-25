@@ -6,10 +6,10 @@ This is the official Android app for the [Revolt](https://revolt.chat) chat plat
 The codebase includes the app itself, as well as an internal library for interacting with the Revolt
 API.
 
-| Module         | Description                             |
-|----------------|-----------------------------------------|
-| `:app`         | The main app module.                    |
-| `:lettertrees` | A library for parsing text into an AST. |
+| Module      | Package                | Description          |
+|-------------|------------------------|----------------------|
+| `:app`      | `chat.revolt`          | The main app module. |
+| `:markdown` | `chat.revolt.markdown` | Markdown library.    |
 
 The API library is part of the `app` module, and is not intended to be used as a standalone library,
 as it makes liberal use of Android-specific APIs for reactivity.
