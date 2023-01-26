@@ -138,7 +138,7 @@ class ChannelScreenViewModel : ViewModel() {
                 addUserIfUnknown(message.author!!)
             }
 
-            _renderableMessages.add(message)
+            _renderableMessages.add(0, message)
         }
 
         override fun onStartTyping(typing: ChannelStartTypingFrame) {
@@ -178,7 +178,7 @@ class ChannelScreenViewModel : ViewModel() {
         viewModelScope.launch {
             val messages = arrayListOf<MessageSchema>()
             fetchMessagesFromChannel(channel!!.id!!, limit = 50, false).let {
-                it.messages!!.reversed().forEach { message ->
+                it.messages!!.forEach { message ->
                     addUserIfUnknown(message.author ?: return@forEach)
                     if (!RevoltAPI.messageCache.containsKey(message.id)) {
                         RevoltAPI.messageCache[message.id!!] = message
@@ -201,7 +201,7 @@ class ChannelScreenViewModel : ViewModel() {
                 channel!!.id!!,
                 limit = 20,
                 true,
-                before = renderableMessages.first().id
+                before = renderableMessages.last().id
             ).let {
                 it.messages!!.forEach { message ->
                     addUserIfUnknown(message.author ?: return@forEach)
@@ -211,7 +211,7 @@ class ChannelScreenViewModel : ViewModel() {
                     messages.add(message)
                 }
             }
-            setRenderableMessages(messages + renderableMessages)
+            setRenderableMessages(renderableMessages + messages)
         }
     }
 
@@ -453,21 +453,27 @@ fun ChannelScreen(
 
         val isScrolledToBottom = remember(lazyListState) {
             derivedStateOf {
-                (lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-                    ?: 0) >= viewModel.renderableMessages.size - 5
+                lazyListState.firstVisibleItemIndex <= 5
             }
         }
 
         LaunchedEffect(viewModel.renderableMessages.size) {
             if (isScrolledToBottom.value) {
                 coroutineScope.launch {
-                    lazyListState.scrollToItem(viewModel.renderableMessages.size)
+                    lazyListState.animateScrollToItem(0)
                 }
             }
         }
 
-        Box(modifier = Modifier.weight(1f)) {
-            LazyColumn(state = lazyListState) {
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            LazyColumn(state = lazyListState, reverseLayout = true) {
+                items(viewModel.renderableMessages) { message ->
+                    Message(message)
+                }
+
                 item {
                     Button(
                         onClick = {
@@ -482,21 +488,20 @@ fun ChannelScreen(
                         Text("Load older")
                     }
                 }
-                items(viewModel.renderableMessages) { message ->
-                    Message(message)
-                }
             }
 
             androidx.compose.animation.AnimatedVisibility(
                 !isScrolledToBottom.value,
                 enter = slideInHorizontally(
                     animationSpec = RevoltTweenInt,
-                    initialOffsetX = { -it },
+                    initialOffsetX = { it },
                 ) + fadeIn(animationSpec = RevoltTweenFloat),
                 exit = slideOutHorizontally(
                     animationSpec = RevoltTweenInt,
-                    targetOffsetX = { -it },
-                ) + fadeOut(animationSpec = RevoltTweenFloat)
+                    targetOffsetX = { it },
+                ) + fadeOut(animationSpec = RevoltTweenFloat),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
             ) {
                 ExtendedFloatingActionButton(
                     modifier = Modifier
@@ -513,7 +518,7 @@ fun ChannelScreen(
                     },
                     onClick = {
                         coroutineScope.launch {
-                            lazyListState.animateScrollToItem(viewModel.renderableMessages.size)
+                            lazyListState.animateScrollToItem(0)
                         }
                     },
                     contentColor = MaterialTheme.colorScheme.onPrimary,
