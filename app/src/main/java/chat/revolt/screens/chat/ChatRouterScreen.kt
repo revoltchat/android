@@ -90,6 +90,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                         Row {
                             Column(
                                 modifier = Modifier
+                                    .fillMaxHeight()
                                     .verticalScroll(rememberScrollState())
                                     .background(MaterialTheme.colorScheme.surface)
                             ) {
