@@ -2,10 +2,8 @@ package chat.revolt.screens.chat
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -14,9 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,15 +25,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import chat.revolt.R
-import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.chat.DisconnectedNotice
-import chat.revolt.components.generic.RemoteImage
-import chat.revolt.components.screens.chat.BottomNavigation
-import chat.revolt.components.screens.chat.DrawerChannel
+import chat.revolt.components.screens.chat.*
 import chat.revolt.screens.chat.views.ChannelScreen
 import chat.revolt.screens.chat.views.HomeScreen
 import kotlinx.coroutines.launch
@@ -100,13 +93,10 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                     .verticalScroll(rememberScrollState())
                                     .background(MaterialTheme.colorScheme.surface)
                             ) {
-                                IconButton(
+                                DrawerServerlikeIcon(
                                     onClick = {
                                         viewModel.navigateToServer("home", navController)
-                                    },
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .size(48.dp)
+                                    }
                                 ) {
                                     Icon(
                                         Icons.Default.Home,
@@ -115,49 +105,21 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                     )
                                 }
 
+                                ServerDrawerSeparator()
+
                                 RevoltAPI.serverCache.values
                                     .sortedBy { it.id }
                                     .forEach { server ->
                                         if (server.name == null) return@forEach
 
-                                        if (server.icon != null) {
-                                            RemoteImage(
-                                                url = "$REVOLT_FILES/icons/${server.icon.id!!}/server.png?max_side=256",
-                                                modifier = Modifier
-                                                    .padding(8.dp)
-                                                    .size(48.dp)
-                                                    .clip(CircleShape)
-                                                    .clickable {
-                                                        viewModel.navigateToServer(
-                                                            server.id!!,
-                                                            navController
-                                                        )
-                                                    },
-                                                description = "${server.name}"
+                                        DrawerServer(
+                                            iconId = server.icon?.id,
+                                            serverName = server.name
+                                        ) {
+                                            viewModel.navigateToServer(
+                                                server.id!!,
+                                                navController
                                             )
-                                        } else {
-                                            // return a placeholder icon, currently the first letter of the server name in a circle
-                                            Box(
-                                                contentAlignment = Alignment.Center,
-                                                modifier = Modifier
-                                                    .padding(8.dp)
-                                                    .size(48.dp)
-                                                    .clip(CircleShape)
-                                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                                                    .clickable {
-                                                        viewModel.navigateToServer(
-                                                            server.id!!,
-                                                            navController
-                                                        )
-                                                    }
-                                            ) {
-                                                Text(
-                                                    text = server.name.first().toString(),
-                                                    fontSize = 20.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
                                         }
                                     }
                             }
