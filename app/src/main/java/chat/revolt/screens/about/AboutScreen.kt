@@ -11,7 +11,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,7 +49,9 @@ fun VersionItem(
     Row(modifier) {
         Text(
             text = key,
-            color = Color(0xccffffff),
+            color = MaterialTheme.colorScheme.onBackground.copy(
+                alpha = 0.5f
+            ),
             style = MaterialTheme.typography.titleMedium.copy(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
@@ -60,7 +61,9 @@ fun VersionItem(
         )
         Text(
             text = value,
-            color = Color(0xccffffff),
+            color = MaterialTheme.colorScheme.onBackground.copy(
+                alpha = 0.5f
+            ),
             style = MaterialTheme.typography.titleMedium.copy(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Normal
@@ -117,7 +120,9 @@ fun AboutScreen(
             if (viewModel.root.value == null) {
                 Text(
                     text = stringResource(R.string.loading),
-                    color = Color(0xaaffffff),
+                    color = MaterialTheme.colorScheme.onBackground.copy(
+                        alpha = 0.5f
+                    ),
                     style = MaterialTheme.typography.titleMedium.copy(
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Normal

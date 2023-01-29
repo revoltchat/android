@@ -25,7 +25,7 @@ data class BulkFrame(
 @Serializable
 data class PongFrame(
     val type: String = "Pong",
-    val data: Int
+    val data: Long
 )
 
 @Serializable

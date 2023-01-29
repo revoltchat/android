@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import chat.revolt.R
-import chat.revolt.ui.theme.DarkColorScheme
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 
@@ -39,10 +38,10 @@ fun AttributionScreen(navController: NavController) {
                 .fillMaxSize()
                 .weight(1f),
             colors = LibraryDefaults.libraryColors(
-                backgroundColor = DarkColorScheme.background,
-                contentColor = DarkColorScheme.onBackground,
-                badgeBackgroundColor = DarkColorScheme.primary,
-                badgeContentColor = DarkColorScheme.onPrimary
+                backgroundColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground,
+                badgeBackgroundColor = MaterialTheme.colorScheme.primary,
+                badgeContentColor = MaterialTheme.colorScheme.onPrimary
             )
         )
         Button(

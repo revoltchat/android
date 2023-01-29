@@ -8,7 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,7 +31,9 @@ fun Weblink(text: String, url: String, modifier: Modifier = Modifier) {
 fun AnyLink(text: String, action: () -> Unit, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        color = Color(0xaaffffff),
+        color = MaterialTheme.colorScheme.onBackground.copy(
+            alpha = 0.5f
+        ),
         style = MaterialTheme.typography.titleMedium.copy(
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Normal,

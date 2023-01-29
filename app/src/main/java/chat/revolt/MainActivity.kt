@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import chat.revolt.api.settings.GlobalState
 import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
@@ -21,6 +22,7 @@ import chat.revolt.screens.chat.ChatRouterScreen
 import chat.revolt.screens.login.GreeterScreen
 import chat.revolt.screens.login.LoginScreen
 import chat.revolt.screens.login.MfaScreen
+import chat.revolt.screens.settings.AppearanceSettingsScreen
 import chat.revolt.screens.settings.SettingsScreen
 import chat.revolt.ui.theme.RevoltTheme
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -33,14 +35,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RevoltTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    AppEntrypoint()
-                }
-            }
+            AppEntrypoint()
         }
     }
 }
@@ -54,52 +49,62 @@ val RevoltTweenFloat: FiniteAnimationSpec<Float> = tween(400, easing = EaseInOut
 fun AppEntrypoint() {
     val navController = rememberAnimatedNavController()
 
-    AnimatedNavHost(
-        navController = navController,
-        startDestination = "splash",
-        enterTransition = {
-            slideIntoContainer(
-                AnimatedContentScope.SlideDirection.Left,
-                animationSpec = RevoltTweenInt
-            ) + fadeIn(animationSpec = RevoltTweenFloat)
-        },
-        exitTransition = {
-            slideOutOfContainer(
-                AnimatedContentScope.SlideDirection.Left,
-                animationSpec = RevoltTweenInt
-            ) + fadeOut(animationSpec = RevoltTweenFloat)
-        },
-        popEnterTransition = {
-            slideIntoContainer(
-                AnimatedContentScope.SlideDirection.Right,
-                animationSpec = RevoltTweenInt
-            ) + fadeIn(animationSpec = RevoltTweenFloat)
-        },
-        popExitTransition = {
-            slideOutOfContainer(
-                AnimatedContentScope.SlideDirection.Right,
-                animationSpec = RevoltTweenInt
-            ) + fadeOut(animationSpec = RevoltTweenFloat)
-        }
+    RevoltTheme(
+        requestedTheme = GlobalState.theme,
     ) {
-        composable("splash") { SplashScreen(navController) }
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            AnimatedNavHost(
+                navController = navController,
+                startDestination = "splash",
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentScope.SlideDirection.Left,
+                        animationSpec = RevoltTweenInt
+                    ) + fadeIn(animationSpec = RevoltTweenFloat)
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentScope.SlideDirection.Left,
+                        animationSpec = RevoltTweenInt
+                    ) + fadeOut(animationSpec = RevoltTweenFloat)
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentScope.SlideDirection.Right,
+                        animationSpec = RevoltTweenInt
+                    ) + fadeIn(animationSpec = RevoltTweenFloat)
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentScope.SlideDirection.Right,
+                        animationSpec = RevoltTweenInt
+                    ) + fadeOut(animationSpec = RevoltTweenFloat)
+                }
+            ) {
+                composable("splash") { SplashScreen(navController) }
 
-        composable("login/greeting") { GreeterScreen(navController) }
-        composable("login/login") { LoginScreen(navController) }
-        composable("login/mfa/{mfaTicket}/{allowedAuthTypes}") { backStackEntry ->
-            val mfaTicket = backStackEntry.arguments?.getString("mfaTicket") ?: ""
-            val allowedAuthTypes =
-                backStackEntry.arguments?.getString("allowedAuthTypes") ?: ""
+                composable("login/greeting") { GreeterScreen(navController) }
+                composable("login/login") { LoginScreen(navController) }
+                composable("login/mfa/{mfaTicket}/{allowedAuthTypes}") { backStackEntry ->
+                    val mfaTicket = backStackEntry.arguments?.getString("mfaTicket") ?: ""
+                    val allowedAuthTypes =
+                        backStackEntry.arguments?.getString("allowedAuthTypes") ?: ""
 
-            MfaScreen(navController, allowedAuthTypes, mfaTicket)
+                    MfaScreen(navController, allowedAuthTypes, mfaTicket)
+                }
+
+                composable("chat") { ChatRouterScreen(navController) }
+
+                composable("settings") { SettingsScreen(navController) }
+                composable("settings/appearance") { AppearanceSettingsScreen(navController) }
+
+                composable("about") { AboutScreen(navController) }
+                composable("about/oss") { AttributionScreen(navController) }
+                composable("about/placeholder") { PlaceholderScreen(navController) }
+            }
         }
-
-        composable("chat") { ChatRouterScreen(navController) }
-
-        composable("settings") { SettingsScreen(navController) }
-
-        composable("about") { AboutScreen(navController) }
-        composable("about/oss") { AttributionScreen(navController) }
-        composable("about/placeholder") { PlaceholderScreen(navController) }
     }
 }

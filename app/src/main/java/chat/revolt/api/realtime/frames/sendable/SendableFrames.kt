@@ -11,7 +11,7 @@ data class AuthorizationFrame(
 @Serializable
 data class PingFrame(
     val type: String,
-    val data: Int
+    val data: Long
 )
 
 @Serializable

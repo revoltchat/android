@@ -64,9 +64,9 @@ class ChannelScreenViewModel : ViewModel() {
     val channel: Channel?
         get() = _channel
 
-    private var _callbacks = mutableStateOf<RealtimeSocket.ChannelCallback?>(null)
-    val callbacks: RealtimeSocket.ChannelCallback?
-        get() = _callbacks.value
+    private var _callback = mutableStateOf<RealtimeSocket.ChannelCallback?>(null)
+    val callback: RealtimeSocket.ChannelCallback?
+        get() = _callback.value
 
     private var _renderableMessages = mutableStateListOf<MessageSchema>()
     val renderableMessages: List<MessageSchema>
@@ -164,8 +164,8 @@ class ChannelScreenViewModel : ViewModel() {
     }
 
     private fun registerCallback() {
-        _callbacks.value = ChannelScreenCallback()
-        RealtimeSocket.registerChannelCallback(channel!!.id!!, callbacks!!)
+        _callback.value = ChannelScreenCallback()
+        RealtimeSocket.registerChannelCallback(channel!!.id!!, callback!!)
     }
 
     fun fetchMessages() {
@@ -399,9 +399,7 @@ fun ChannelScreen(
 
     DisposableEffect(channelId) {
         onDispose {
-            viewModel.callbacks?.let {
-                RealtimeSocket.unregisterChannelCallback(channelId, it)
-            }
+            RealtimeSocket.unregisterChannelCallback(channelId)
         }
     }
 

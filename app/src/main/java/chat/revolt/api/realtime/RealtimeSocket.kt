@@ -14,7 +14,6 @@ import chat.revolt.api.realtime.frames.sendable.PingFrame
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.consumeEach
-import java.util.*
 
 enum class DisconnectionState {
     Disconnected,
@@ -64,7 +63,7 @@ object RealtimeSocket {
     suspend fun sendPing() {
         if (disconnectionState != DisconnectionState.Connected) return
 
-        val pingPacket = PingFrame("Ping", Calendar.getInstance().timeInMillis.toInt())
+        val pingPacket = PingFrame("Ping", System.currentTimeMillis())
         socket?.send(RevoltJson.encodeToString(PingFrame.serializer(), pingPacket))
         Log.d("RealtimeSocket", "Sent ping frame with ${pingPacket.data}")
     }
@@ -167,7 +166,7 @@ object RealtimeSocket {
             }
         }
     }
-    
+
     private fun invalidateAllChannelStates() {
         channelCallbacks.forEach { (_, callback) ->
             callback.onStateInvalidate()
@@ -189,8 +188,8 @@ object RealtimeSocket {
         Log.d("RealtimeSocket", "Registered channel callback for $channelId.")
     }
 
-    fun unregisterChannelCallback(channelId: String, callback: ChannelCallback) {
-        channelCallbacks.remove(channelId, callback)
+    fun unregisterChannelCallback(channelId: String) {
+        channelCallbacks.remove(channelId)
 
         Log.d("RealtimeSocket", "Unregistered channel callback for $channelId")
     }

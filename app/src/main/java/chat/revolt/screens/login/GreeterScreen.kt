@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -84,7 +83,9 @@ fun GreeterScreen(navController: NavController) {
 
             Text(
                 text = stringResource(R.string.login_onboarding_body),
-                color = Color(0xaaffffff),
+                color = MaterialTheme.colorScheme.onBackground.copy(
+                    alpha = 0.5f
+                ),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Normal,

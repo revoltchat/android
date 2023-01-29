@@ -14,7 +14,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -169,7 +168,9 @@ fun MfaScreen(
 
             Text(
                 text = stringResource(R.string.mfa_interstitial_lead),
-                color = Color(0xaaffffff),
+                color = MaterialTheme.colorScheme.onBackground.copy(
+                    alpha = 0.5f
+                ),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Normal,
@@ -206,7 +207,9 @@ fun MfaScreen(
                             ) {
                                 Text(
                                     text = stringResource(R.string.mfa_totp_lead),
-                                    color = Color(0xaaffffff),
+                                    color = MaterialTheme.colorScheme.onBackground.copy(
+                                        alpha = 0.5f
+                                    ),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         textAlign = TextAlign.Center,
                                         fontWeight = FontWeight.Normal,
@@ -244,7 +247,9 @@ fun MfaScreen(
                             ) {
                                 Text(
                                     text = stringResource(R.string.mfa_recovery_lead),
-                                    color = Color(0xaaffffff),
+                                    color = MaterialTheme.colorScheme.onBackground.copy(
+                                        alpha = 0.5f
+                                    ),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         textAlign = TextAlign.Center,
                                         fontWeight = FontWeight.Normal,

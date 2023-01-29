@@ -7,7 +7,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,10 +48,8 @@ fun PlaceholderScreen(
 
             Text(
                 text = stringResource(R.string.comingsoon_body),
-                color = Color(0xaaffffff),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onBackground.copy(
+                    alpha = 0.5f
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 10.dp)

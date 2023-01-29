@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,8 +22,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.screens.splash.DisconnectedScreen
 import chat.revolt.persistence.KVStorage
+import chat.revolt.ui.theme.RevoltColorScheme
+import chat.revolt.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -82,8 +87,16 @@ class SplashScreenViewModel @Inject constructor(
                 setNavigateTo("login")
             } else {
                 RevoltAPI.loginAs(token)
+                loadSettings()
                 setNavigateTo("home")
             }
+        }
+    }
+
+    private fun loadSettings() {
+        viewModelScope.launch {
+            SyncedSettings.fetch()
+            SyncedSettings.android.theme?.let { GlobalState.setTheme(Theme.valueOf(it)) }
         }
     }
 
@@ -93,7 +106,10 @@ class SplashScreenViewModel @Inject constructor(
 }
 
 @Composable
-fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel = hiltViewModel()) {
+fun SplashScreen(
+    navController: NavController,
+    viewModel: SplashScreenViewModel = hiltViewModel()
+) {
     if (!viewModel.isConnected) {
         DisconnectedScreen(
             onRetry = {
@@ -105,6 +121,7 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel 
 
     Column(
         modifier = Modifier
+            .background(color = RevoltColorScheme.background)
             .fillMaxWidth()
             .fillMaxHeight(),
         verticalArrangement = Arrangement.Center,
