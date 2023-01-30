@@ -1,17 +1,19 @@
 package chat.revolt.screens.about
 
 import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -22,9 +24,12 @@ import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.REVOLT_BASE
+import chat.revolt.api.RevoltJson
 import chat.revolt.api.routes.misc.Root
 import chat.revolt.api.routes.misc.getRootRoute
+import chat.revolt.components.generic.PageHeader
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
 import java.net.URI
 
 class AboutViewModel(
@@ -32,6 +37,21 @@ class AboutViewModel(
     private val _root = mutableStateOf<Root?>(null)
     val root: State<Root?>
         get() = _root
+
+    fun getDebugInformation(): Map<String, String> {
+        return mapOf(
+            "App ID" to BuildConfig.APPLICATION_ID,
+            "App Version" to BuildConfig.VERSION_NAME,
+            "API Host" to URI(REVOLT_BASE).host,
+            "API Version" to (root.value?.revolt ?: "Unknown"),
+            "Runtime SDK" to Build.VERSION.SDK_INT.toString(),
+            "Model" to "${Build.MANUFACTURER} ${
+                Build.DEVICE.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase() else it.toString()
+                }
+            } (${Build.MODEL})"
+        )
+    }
 
     init {
         viewModelScope.launch {
@@ -50,7 +70,7 @@ fun VersionItem(
         Text(
             text = key,
             color = MaterialTheme.colorScheme.onBackground.copy(
-                alpha = 0.5f
+                alpha = 1.0f
             ),
             style = MaterialTheme.typography.titleMedium.copy(
                 textAlign = TextAlign.Center,
@@ -62,7 +82,7 @@ fun VersionItem(
         Text(
             text = value,
             color = MaterialTheme.colorScheme.onBackground.copy(
-                alpha = 0.5f
+                alpha = 0.9f
             ),
             style = MaterialTheme.typography.titleMedium.copy(
                 textAlign = TextAlign.Center,
@@ -75,25 +95,17 @@ fun VersionItem(
 }
 
 @Composable
-fun ComponentVersions(
-    apiVersion: String
-) {
-    // App Info
-    VersionItem(key = BuildConfig.APPLICATION_ID, value = BuildConfig.VERSION_NAME)
-
-    // API Info
-    VersionItem(key = URI(REVOLT_BASE).host, value = apiVersion)
-
-    // Device Info
-    VersionItem(key = "Runtime SDK", value = Build.VERSION.SDK_INT.toString())
-    VersionItem(
-        key = "Model",
-        value = "${Build.MANUFACTURER} ${
-            Build.DEVICE.replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase() else it.toString()
-            }
-        }"
-    )
+fun DebugInfo(viewModel: AboutViewModel) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 30.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        viewModel.getDebugInformation().forEach { (key, value) ->
+            VersionItem(key, value)
+        }
+    }
 }
 
 @Composable
@@ -101,6 +113,19 @@ fun AboutScreen(
     navController: NavController,
     viewModel: AboutViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    val clipboardManager: ClipboardManager =
+        LocalClipboardManager.current
+
+    fun copyDebugInformation() {
+        clipboardManager.setText(AnnotatedString(RevoltJson.encodeToString(viewModel.getDebugInformation())))
+        Toast.makeText(
+            context,
+            context.getString(R.string.copied),
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -108,6 +133,11 @@ fun AboutScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        PageHeader(
+            text = stringResource(R.string.about),
+            showBackButton = true,
+            onBackButtonClicked = { navController.popBackStack() })
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -129,18 +159,10 @@ fun AboutScreen(
                     )
                 )
             } else {
-                Text(
-                    text = stringResource(R.string.about),
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontWeight = FontWeight.Black,
-                        textAlign = TextAlign.Center
-                    ),
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp, vertical = 10.dp)
-                        .fillMaxWidth(),
-                )
-
-                ComponentVersions(apiVersion = viewModel.root.value!!.revolt)
+                DebugInfo(viewModel)
+                TextButton(onClick = ::copyDebugInformation) {
+                    Text(text = stringResource(id = R.string.copy))
+                }
             }
         }
 
