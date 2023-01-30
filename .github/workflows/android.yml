@@ -3,8 +3,6 @@ name: Android CI
 on:
   push:
     branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
 
 jobs:
   build:
@@ -28,4 +26,11 @@ jobs:
       run: chmod +x gradlew
       
     - name: Build with Gradle
-      run: ./gradlew --no-daemon build
+      run: ./gradlew --no-daemon assembleDebug
+      
+    - name: Archive debug APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: debug-apk
+        path: |
+          app/build/outputs/apk/debug/app-debug.apk
