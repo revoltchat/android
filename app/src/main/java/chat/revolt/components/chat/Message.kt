@@ -5,7 +5,6 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,12 +18,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import chat.revolt.api.REVOLT_BASE
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.components.generic.RemoteImage
+import chat.revolt.components.generic.UserAvatar
 import chat.revolt.markdown.Renderer
 import chat.revolt.api.schemas.Message as MessageSchema
 
@@ -54,38 +53,28 @@ fun Message(
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
     val context = LocalContext.current
 
-    Row(modifier = Modifier
-        .padding(8.dp)
-        .fillMaxWidth()) {
-        if (author.avatar != null) {
-            RemoteImage(
-                url = "$REVOLT_FILES/avatars/${author.avatar.id!!}/user.png",
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape),
-                description = "Avatar for ${author.username}"
-            )
-        } else {
-            RemoteImage(
-                url = "$REVOLT_BASE/users/${author.id}/default_avatar",
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape),
-                description = "Avatar for ${author.username}"
-            )
-        }
+    Row(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        UserAvatar(
+            username = author.username ?: "",
+            userId = author.id!!,
+            avatar = author.avatar
+        )
 
         Column(modifier = Modifier.padding(start = 10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                author.username?.let {
-                    Text(
-                        text = it,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                Text(
+                    text = author.username ?: "",
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
                 Spacer(modifier = Modifier.width(5.dp))
+
                 Text(
                     text = formatLongAsTime(ULID.asTimestamp(message.id!!)),
                     fontSize = 12.sp,
