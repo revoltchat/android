@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -84,4 +85,12 @@ fun UserAvatar(
             PresenceBadge(presence)
         }
     }
+}
+
+@Composable
+fun UserAvatarWidthPlaceholder() {
+    Box(
+        modifier = Modifier
+            .width(40.dp)
+    )
 }

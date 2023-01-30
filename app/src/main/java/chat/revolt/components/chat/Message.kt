@@ -1,9 +1,12 @@
 package chat.revolt.components.chat
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -13,17 +16,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.UserAvatar
+import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.markdown.Renderer
 import chat.revolt.api.schemas.Message as MessageSchema
 
@@ -46,42 +53,66 @@ fun formatLongAsTime(time: Long): String {
     return format.format(date)
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Message(
     message: MessageSchema
 ) {
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
 
     Row(
         modifier = Modifier
-            .padding(8.dp)
+            .combinedClickable(
+                onClick = {},
+                onLongClick = {
+                    if (message.content != null && message.content.isNotEmpty()) {
+                        clipboardManager.setText(AnnotatedString(message.content))
+
+                        Toast
+                            .makeText(
+                                context,
+                                context.getString(R.string.copied),
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                    }
+                }
+            )
+            .padding(4.dp)
             .fillMaxWidth()
     ) {
-        UserAvatar(
-            username = author.username ?: "",
-            userId = author.id!!,
-            avatar = author.avatar
-        )
+        if (message.tail == false) {
+            UserAvatar(
+                username = author.username ?: "",
+                userId = author.id!!,
+                avatar = author.avatar
+            )
+        } else {
+            UserAvatarWidthPlaceholder()
+        }
 
         Column(modifier = Modifier.padding(start = 10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = author.username ?: "",
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+            if (message.tail == false) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = author.username ?: "",
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
-                Spacer(modifier = Modifier.width(5.dp))
+                    Spacer(modifier = Modifier.width(5.dp))
 
-                Text(
-                    text = formatLongAsTime(ULID.asTimestamp(message.id!!)),
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                    Text(
+                        text = formatLongAsTime(ULID.asTimestamp(message.id!!)),
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
             message.content?.let {

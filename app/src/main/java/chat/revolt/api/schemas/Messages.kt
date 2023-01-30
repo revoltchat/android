@@ -18,7 +18,10 @@ data class Message(
     val edited: String? = null,
     val embeds: List<Embed>? = null,
     val mentions: List<String>? = null,
+    val masquerade: Masquerade? = null,
+    val system: SystemInfo? = null,
     val type: String? = null, // this is _only_ used for websocket events!
+    val tail: Boolean? = null, // this is used to determine if the message is the last in a message group
 ) {
     fun getAuthor(): User? {
         return author?.let { RevoltAPI.userCache[it] }
@@ -78,4 +81,17 @@ data class Image(
 @Serializable
 data class Special(
     val type: String? = null
+)
+
+@Serializable
+data class Masquerade(
+    val name: String? = null,
+    val avatar: String? = null,
+    val colour: String? = null
+)
+
+@Serializable
+data class SystemInfo(
+    val type: String? = null,
+    val id: String? = null
 )

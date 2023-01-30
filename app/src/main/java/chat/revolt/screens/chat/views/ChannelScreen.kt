@@ -37,6 +37,7 @@ import chat.revolt.R
 import chat.revolt.RevoltTweenFloat
 import chat.revolt.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.ULID
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
@@ -56,7 +57,9 @@ import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelIcon
 import io.ktor.http.*
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import java.io.File
+import kotlin.time.Duration.Companion.minutes
 import chat.revolt.api.schemas.Message as MessageSchema
 
 class ChannelScreenViewModel : ViewModel() {
@@ -186,7 +189,7 @@ class ChannelScreenViewModel : ViewModel() {
                     messages.add(message)
                 }
             }
-            setRenderableMessages(renderableMessages + messages)
+            regroupMessages(renderableMessages + messages)
         }
     }
 
@@ -211,7 +214,7 @@ class ChannelScreenViewModel : ViewModel() {
                     messages.add(message)
                 }
             }
-            setRenderableMessages(renderableMessages + messages)
+            regroupMessages(renderableMessages + messages)
         }
     }
 
@@ -275,6 +278,39 @@ class ChannelScreenViewModel : ViewModel() {
                 u.username ?: u.id
             } ?: it
         }
+    }
+
+    private fun regroupMessages(newMessages: List<MessageSchema> = renderableMessages) {
+        val groupedMessages = arrayListOf<MessageSchema>()
+
+        // Verbatim implementation of https://wiki.rvlt.gg/index.php/Text_Channel_(UI)#Message_Grouping_Algorithm
+        // The exception is the date variable being pushed into cache, we don't need that here.
+        // Keep in mind: Recomposing UI is incredibly cheap in Jetpack Compose.
+        newMessages.forEach { message ->
+            var tail = true
+
+            val next = newMessages.getOrNull(newMessages.indexOf(message) + 1)
+            if (next != null) {
+                val dateA = Instant.fromEpochMilliseconds(ULID.asTimestamp(message.id!!))
+                val dateB = Instant.fromEpochMilliseconds(ULID.asTimestamp(next.id!!))
+
+                if (
+                    message.author != next.author ||
+                    dateB - dateA >= 7.minutes ||
+                    message.masquerade != next.masquerade ||
+                    message.system != null || next.system != null ||
+                    message.replies != null || next.replies != null
+                ) {
+                    tail = false
+                }
+            } else {
+                tail = false
+            }
+
+            groupedMessages.add(message.copy(tail = tail))
+        }
+
+        setRenderableMessages(groupedMessages)
     }
 }
 

@@ -1,5 +1,6 @@
 package chat.revolt.ui.theme
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -59,6 +60,7 @@ enum class Theme {
     Amoled,
 }
 
+@SuppressLint("NewApi")
 @Composable
 fun RevoltTheme(
     requestedTheme: Theme,
