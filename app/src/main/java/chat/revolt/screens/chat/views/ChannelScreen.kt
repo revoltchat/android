@@ -141,7 +141,7 @@ class ChannelScreenViewModel : ViewModel() {
                 addUserIfUnknown(message.author!!)
             }
 
-            _renderableMessages.add(0, message)
+            regroupMessages(listOf(message) + renderableMessages)
         }
 
         override fun onStartTyping(typing: ChannelStartTypingFrame) {
@@ -202,7 +202,7 @@ class ChannelScreenViewModel : ViewModel() {
             val messages = arrayListOf<MessageSchema>()
             fetchMessagesFromChannel(
                 channel!!.id!!,
-                limit = 20,
+                limit = 50,
                 true,
                 before = renderableMessages.last().id
             ).let {
