@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -34,6 +34,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.revolt.R
+import chat.revolt.RevoltTweenDp
 import chat.revolt.RevoltTweenFloat
 import chat.revolt.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
@@ -55,6 +56,7 @@ import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelIcon
+import chat.revolt.components.screens.chat.TypingIndicator
 import io.ktor.http.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -89,20 +91,6 @@ class ChannelScreenViewModel : ViewModel() {
 
     fun setMessageContent(content: String) {
         _messageContent = content
-
-        if (content.isEmpty()) {
-            _showButtons = true
-        } else if (showButtons) {
-            _showButtons = false
-        }
-    }
-
-    private var _showButtons by mutableStateOf(true)
-    val showButtons: Boolean
-        get() = _showButtons
-
-    fun setShowButtons(show: Boolean) {
-        _showButtons = show
     }
 
     private var _attachments = mutableStateListOf<FileArgs>()
@@ -262,23 +250,6 @@ class ChannelScreenViewModel : ViewModel() {
         }
     }
 
-    fun typingMessageResource(): Int {
-        return when (typingUsers.size) {
-            0 -> R.string.typing_blank
-            1 -> R.string.typing_one
-            in 2..4 -> R.string.typing_many
-            else -> R.string.typing_several
-        }
-    }
-
-    fun getTypingUsernames(): String {
-        return typingUsers.joinToString {
-            RevoltAPI.userCache[it]?.let { u ->
-                u.username ?: u.id
-            } ?: it
-        }
-    }
-
     private fun regroupMessages(newMessages: List<MessageSchema> = renderableMessages) {
         val groupedMessages = arrayListOf<MessageSchema>()
 
@@ -430,6 +401,11 @@ fun ChannelScreen(
         }
     }
 
+    val scrollDownFABPadding by animateDpAsState(
+        if (viewModel.typingUsers.isNotEmpty()) 32.dp else 0.dp,
+        animationSpec = RevoltTweenDp
+    )
+
     LaunchedEffect(channelId) {
         viewModel.fetchChannel(channelId)
     }
@@ -488,7 +464,7 @@ fun ChannelScreen(
 
         val isScrolledToBottom = remember(lazyListState) {
             derivedStateOf {
-                lazyListState.firstVisibleItemIndex <= 5
+                lazyListState.firstVisibleItemIndex <= 6
             }
         }
 
@@ -505,6 +481,10 @@ fun ChannelScreen(
             contentAlignment = Alignment.BottomEnd
         ) {
             LazyColumn(state = lazyListState, reverseLayout = true) {
+                item {
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
+
                 items(viewModel.renderableMessages) { message ->
                     Message(message)
                 }
@@ -540,6 +520,7 @@ fun ChannelScreen(
             ) {
                 ExtendedFloatingActionButton(
                     modifier = Modifier
+                        .padding(bottom = scrollDownFABPadding)
                         .align(Alignment.BottomEnd)
                         .padding(16.dp),
                     text = {
@@ -560,34 +541,10 @@ fun ChannelScreen(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             }
-        }
 
-        AnimatedVisibility(
-            visible = viewModel.typingUsers.isNotEmpty(),
-            enter = slideInVertically(
-                animationSpec = RevoltTweenInt,
-                initialOffsetY = { it }
-            ) + fadeIn(animationSpec = RevoltTweenFloat),
-            exit = slideOutVertically(
-                animationSpec = RevoltTweenInt,
-                targetOffsetY = { it }
-            ) + fadeOut(animationSpec = RevoltTweenFloat)
-        ) {
-            Row(
-                Modifier
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .fillMaxWidth()
-                    .padding(all = 4.dp)
-            ) {
-                Text(
-                    text = stringResource(
-                        id = viewModel.typingMessageResource(),
-                        viewModel.getTypingUsernames()
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+            TypingIndicator(
+                users = viewModel.typingUsers
+            )
         }
 
         AnimatedVisibility(visible = viewModel.attachments.isNotEmpty()) {
@@ -599,8 +556,6 @@ fun ChannelScreen(
         }
 
         MessageField(
-            showButtons = viewModel.showButtons,
-            onToggleButtons = viewModel::setShowButtons,
             messageContent = viewModel.messageContent,
             onMessageContentChange = viewModel::setMessageContent,
             onSendMessage = viewModel::sendPendingMessage,

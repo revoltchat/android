@@ -22,7 +22,7 @@ fun DrawerServerlikeIcon(
             .padding(8.dp)
             .size(48.dp)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         content()
     }

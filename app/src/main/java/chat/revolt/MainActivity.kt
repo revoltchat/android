@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import chat.revolt.api.settings.GlobalState
@@ -43,6 +44,7 @@ class MainActivity : ComponentActivity() {
 val RevoltTweenInt: FiniteAnimationSpec<IntOffset> = tween(400, easing = EaseInOutExpo)
 val RevoltTweenIntSize: FiniteAnimationSpec<IntSize> = tween(400, easing = EaseInOutExpo)
 val RevoltTweenFloat: FiniteAnimationSpec<Float> = tween(400, easing = EaseInOutExpo)
+val RevoltTweenDp: FiniteAnimationSpec<Dp> = tween(400, easing = EaseInOutExpo)
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable

@@ -1,6 +1,7 @@
 package chat.revolt.screens.settings
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +13,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -75,13 +78,25 @@ fun AppearanceSettingsScreen(
                 modifier = Modifier.padding(bottom = 10.dp)
             )
 
+            Text(
+                text = "old revolt blue will come back soon i promise, needs a bit of optimisation first 🐈",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    color = MaterialTheme.colorScheme.background,
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier
+                    .padding(bottom = 10.dp)
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(10.dp)
+            )
 
             FlowRow(
                 mainAxisSpacing = 10.dp,
                 crossAxisSpacing = 10.dp,
             ) {
                 ThemeChip(
-                    color = Color(0xff172333),
+                    color = Color(0xff1e1e1e),
                     text = stringResource(id = R.string.settings_appearance_theme_revolt),
                     selected = GlobalState.theme == Theme.Revolt,
                     modifier = Modifier.weight(1f),
@@ -108,7 +123,7 @@ fun AppearanceSettingsScreen(
                 }
 
                 ThemeChip(
-                    color = if (isSystemInDarkTheme()) Color(0xff172333) else Color(0xfff7f7f7),
+                    color = if (isSystemInDarkTheme()) Color(0xff1e1e1e) else Color(0xfff7f7f7),
                     text = stringResource(id = R.string.settings_appearance_theme_none),
                     selected = GlobalState.theme == Theme.None,
                     modifier = Modifier.weight(1f),

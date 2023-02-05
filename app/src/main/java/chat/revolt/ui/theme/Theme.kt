@@ -14,18 +14,17 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
 val RevoltColorScheme = darkColorScheme(
-    primary = Color(0xfffe4654),
+    primary = Color(0xffda4e5b),
     onPrimary = Color(0xffffffff),
-    secondary = Color(0xfffd6671),
+    secondary = Color(0xffe96a7a),
     onSecondary = Color(0xffffffff),
-    tertiary = Color(0xffff6667),
-    onTertiary = Color(0xffffffff),
-    background = Color(0xff101823),
+    background = Color(0xff121212),
     onBackground = Color(0xffffffff),
-    surfaceVariant = Color(0xff172333),
+    surfaceVariant = Color(0xff1e1e1e),
     onSurfaceVariant = Color(0xffffffff),
-    surface = Color(0xff111a26),
+    surface = Color(0xff2b2b2b),
     onSurface = Color(0xffffffff),
+    surfaceTint = Color(0xffc0c0c0),
 )
 
 val AmoledColorScheme = RevoltColorScheme.copy(
@@ -38,18 +37,17 @@ val AmoledColorScheme = RevoltColorScheme.copy(
 )
 
 val LightColorScheme = lightColorScheme(
-    primary = Color(0xfffe4654),
+    primary = Color(0xffda4e5b),
     onPrimary = Color(0xffffffff),
-    secondary = Color(0xfffd6671),
+    secondary = Color(0xffe96a7a),
     onSecondary = Color(0xffffffff),
-    tertiary = Color(0xffff6667),
-    onTertiary = Color(0xffffffff),
     background = Color(0xffffffff),
     onBackground = Color(0xff000000),
-    surfaceVariant = Color(0xffe6e6e6),
+    surfaceVariant = Color(0xffe0e0e0),
     onSurfaceVariant = Color(0xff000000),
-    surface = Color(0xffdddddd),
+    surface = Color(0xfff5f5f5),
     onSurface = Color(0xff000000),
+    surfaceTint = Color(0xff000000),
 )
 
 enum class Theme {

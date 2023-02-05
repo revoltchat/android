@@ -85,14 +85,16 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
         DismissibleNavigationDrawer(
             drawerState = channelDrawerState,
             drawerContent = {
-                ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.surfaceVariant) {
+                ModalDrawerSheet(
+                    drawerContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
+                ) {
                     Column(Modifier.fillMaxWidth()) {
                         Row {
                             Column(
                                 modifier = Modifier
                                     .fillMaxHeight()
                                     .verticalScroll(rememberScrollState())
-                                    .background(MaterialTheme.colorScheme.surface)
+                                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
                             ) {
                                 DrawerServerlikeIcon(
                                     onClick = {
