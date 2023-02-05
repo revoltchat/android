@@ -46,10 +46,16 @@ fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnReso
 
 
 fun formatLongAsTime(time: Long): String {
-    // TODO: look into using a library like kotlinx.datetime
     val date = java.util.Date(time)
     val format =
         java.text.SimpleDateFormat("dd.MM.yyyy HH:mm:ss", java.util.Locale.getDefault())
+
+    // EQUIVALENT CODE WITH kotlinx.datetime:
+
+    // val date = Instant.fromEpochMilliseconds(time)
+    // val format = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
+
+
     return format.format(date)
 }
 
@@ -62,93 +68,110 @@ fun Message(
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
 
-    Row(
-        modifier = Modifier
-            .combinedClickable(
-                onClick = {},
-                onLongClick = {
-                    if (message.content != null && message.content.isNotEmpty()) {
-                        clipboardManager.setText(AnnotatedString(message.content))
-
-                        Toast
-                            .makeText(
-                                context,
-                                context.getString(R.string.copied),
-                                Toast.LENGTH_SHORT
-                            )
-                            .show()
-                    }
-                }
-            )
-            .padding(4.dp)
-            .fillMaxWidth()
-    ) {
+    Column {
         if (message.tail == false) {
-            UserAvatar(
-                username = author.username ?: "",
-                userId = author.id!!,
-                avatar = author.avatar
-            )
-        } else {
-            UserAvatarWidthPlaceholder()
+            Spacer(modifier = Modifier.height(10.dp))
         }
 
-        Column(modifier = Modifier.padding(start = 10.dp)) {
+        message.replies?.forEach { reply ->
+            val replyMessage = RevoltAPI.messageCache[reply] ?: return@forEach
+
+            InReplyTo(
+                messageId = reply,
+                withMention = message.mentions?.contains(replyMessage.author) == true
+            ) {
+                // TODO Add jump to message
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = {
+                        if (message.content != null && message.content.isNotEmpty()) {
+                            clipboardManager.setText(AnnotatedString(message.content))
+
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.copied),
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+                        }
+                    }
+                )
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth()
+        ) {
             if (message.tail == false) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = author.username ?: "",
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                UserAvatar(
+                    username = author.username ?: "",
+                    userId = author.id!!,
+                    avatar = author.avatar
+                )
+            } else {
+                UserAvatarWidthPlaceholder()
+            }
 
-                    Spacer(modifier = Modifier.width(5.dp))
+            Column(modifier = Modifier.padding(start = 10.dp)) {
+                if (message.tail == false) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = author.username ?: "",
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
 
+                        Spacer(modifier = Modifier.width(5.dp))
+
+                        Text(
+                            text = formatLongAsTime(ULID.asTimestamp(message.id!!)),
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                message.content?.let {
                     Text(
-                        text = formatLongAsTime(ULID.asTimestamp(message.id!!)),
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        text = Renderer.annotateMarkdown(it),
                     )
                 }
-            }
 
-            message.content?.let {
-                Text(
-                    text = Renderer.annotateMarkdown(it),
-                )
-            }
-
-            message.attachments?.let {
-                if (message.attachments.isNotEmpty()) {
-                    message.attachments.forEach { attachment ->
-                        if (attachment.metadata?.type == "Image") {
-                            RemoteImage(
-                                url = "$REVOLT_FILES/attachments/${attachment.id}/image.png",
-                                modifier = Modifier
-                                    .padding(top = 5.dp)
-                                    .clickable {
-                                        viewAttachmentInBrowser(context, attachment)
-                                    },
-                                width = attachment.metadata.width?.toInt() ?: 0,
-                                height = attachment.metadata.height?.toInt() ?: 0,
-                                contentScale = ContentScale.Fit,
-                                description = "Attached image ${attachment.filename}"
-                            )
-                        } else {
-                            Text(
-                                text = attachment.filename ?: "Attachment",
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier
-                                    .clip(MaterialTheme.shapes.medium)
-                                    .clickable {
-                                        viewAttachmentInBrowser(context, attachment)
-                                    }
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .padding(8.dp)
-                            )
+                message.attachments?.let {
+                    if (message.attachments.isNotEmpty()) {
+                        message.attachments.forEach { attachment ->
+                            if (attachment.metadata?.type == "Image") {
+                                RemoteImage(
+                                    url = "$REVOLT_FILES/attachments/${attachment.id}/image.png",
+                                    modifier = Modifier
+                                        .padding(top = 5.dp)
+                                        .clickable {
+                                            viewAttachmentInBrowser(context, attachment)
+                                        },
+                                    width = attachment.metadata.width?.toInt() ?: 0,
+                                    height = attachment.metadata.height?.toInt() ?: 0,
+                                    contentScale = ContentScale.Fit,
+                                    description = "Attached image ${attachment.filename}"
+                                )
+                            } else {
+                                Text(
+                                    text = attachment.filename ?: "Attachment",
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier
+                                        .clip(MaterialTheme.shapes.medium)
+                                        .clickable {
+                                            viewAttachmentInBrowser(context, attachment)
+                                        }
+                                        .background(MaterialTheme.colorScheme.surface)
+                                        .padding(8.dp)
+                                )
+                            }
                         }
                     }
                 }

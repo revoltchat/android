@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.REVOLT_BASE
@@ -39,10 +40,10 @@ fun presenceColour(presence: Presence): Color {
 }
 
 @Composable
-fun PresenceBadge(presence: Presence) {
+fun PresenceBadge(presence: Presence, size: Dp = 16.dp) {
     Box(
         modifier = Modifier
-            .size(16.dp)
+            .size(size)
             .clip(CircleShape)
             .border(2.dp, MaterialTheme.colorScheme.background, CircleShape)
             .background(presenceColour(presence))
@@ -56,10 +57,12 @@ fun UserAvatar(
     modifier: Modifier = Modifier,
     presence: Presence? = null,
     avatar: AutumnResource? = null,
+    size: Dp = 40.dp,
+    presenceSize: Dp = 16.dp,
 ) {
     Box(
         modifier = modifier
-            .size(40.dp),
+            .size(size),
         contentAlignment = Alignment.BottomEnd
     ) {
         if (avatar != null) {
@@ -69,28 +72,30 @@ fun UserAvatar(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .size(40.dp)
+                    .size(size)
             )
         } else {
             RemoteImage(
                 url = "$REVOLT_BASE/users/${userId}/default_avatar",
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(size)
                     .clip(CircleShape),
                 description = stringResource(id = R.string.avatar_alt, username),
             )
         }
 
         if (presence != null) {
-            PresenceBadge(presence)
+            PresenceBadge(presence, size = presenceSize)
         }
     }
 }
 
 @Composable
-fun UserAvatarWidthPlaceholder() {
+fun UserAvatarWidthPlaceholder(
+    size: Dp = 40.dp,
+) {
     Box(
         modifier = Modifier
-            .width(40.dp)
+            .width(size)
     )
 }

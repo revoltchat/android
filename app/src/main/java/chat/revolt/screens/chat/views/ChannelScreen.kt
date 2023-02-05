@@ -59,7 +59,6 @@ import io.ktor.http.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import java.io.File
-import kotlin.time.Duration.Companion.minutes
 import chat.revolt.api.schemas.Message as MessageSchema
 
 class ChannelScreenViewModel : ViewModel() {
@@ -294,12 +293,14 @@ class ChannelScreenViewModel : ViewModel() {
                 val dateA = Instant.fromEpochMilliseconds(ULID.asTimestamp(message.id!!))
                 val dateB = Instant.fromEpochMilliseconds(ULID.asTimestamp(next.id!!))
 
+                val minuteDifference = (dateA - dateB).inWholeMinutes
+
                 if (
                     message.author != next.author ||
-                    dateB - dateA >= 7.minutes ||
+                    minuteDifference >= 7 ||
                     message.masquerade != next.masquerade ||
                     message.system != null || next.system != null ||
-                    message.replies != null || next.replies != null
+                    message.replies != null
                 ) {
                     tail = false
                 }
