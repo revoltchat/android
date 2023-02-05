@@ -1,7 +1,6 @@
 package chat.revolt.screens.chat.views
 
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
@@ -17,17 +16,11 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -52,12 +45,11 @@ import chat.revolt.api.routes.user.addUserIfUnknown
 import chat.revolt.api.schemas.Channel
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.MessageField
-import chat.revolt.components.generic.CollapsibleCard
-import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelIcon
 import chat.revolt.components.screens.chat.TypingIndicator
 import io.ktor.http.*
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import java.io.File
@@ -187,20 +179,34 @@ class ChannelScreenViewModel : ViewModel() {
 
         viewModelScope.launch {
             val messages = arrayListOf<MessageSchema>()
-            fetchMessagesFromChannel(
-                channel!!.id!!,
-                limit = 50,
-                true,
-                before = renderableMessages.last().id
-            ).let {
-                it.messages!!.forEach { message ->
-                    addUserIfUnknown(message.author ?: return@forEach)
-                    if (!RevoltAPI.messageCache.containsKey(message.id)) {
-                        RevoltAPI.messageCache[message.id!!] = message
+
+            if (!renderableMessages.isEmpty()) {
+                fetchMessagesFromChannel(
+                    channel!!.id!!,
+                    limit = 50,
+                    true,
+                    before = renderableMessages.last().id
+                ).let {
+                    it.messages!!.forEach { message ->
+                        addUserIfUnknown(message.author ?: return@forEach)
+                        if (!RevoltAPI.messageCache.containsKey(message.id)) {
+                            RevoltAPI.messageCache[message.id!!] = message
+                        }
+                        messages.add(message)
                     }
-                    messages.add(message)
+                }
+            } else {
+                fetchMessagesFromChannel(channel!!.id!!, limit = 50, true).let {
+                    it.messages!!.forEach { message ->
+                        addUserIfUnknown(message.author ?: return@forEach)
+                        if (!RevoltAPI.messageCache.containsKey(message.id)) {
+                            RevoltAPI.messageCache[message.id!!] = message
+                        }
+                        messages.add(message)
+                    }
                 }
             }
+
             regroupMessages(renderableMessages + messages)
         }
     }
@@ -213,7 +219,6 @@ class ChannelScreenViewModel : ViewModel() {
         }
 
         registerCallback()
-        fetchMessages()
     }
 
     fun sendPendingMessage() {
@@ -287,82 +292,6 @@ class ChannelScreenViewModel : ViewModel() {
 }
 
 @Composable
-fun ChannelInfoScreen(
-    channel: Channel,
-    viewModel: ChannelScreenViewModel,
-    onClosed: () -> Unit,
-) {
-    val context = LocalContext.current
-    val clipboardManager: ClipboardManager =
-        LocalClipboardManager.current
-    val coroutineScope = rememberCoroutineScope()
-
-    Column(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(16.dp)
-            .fillMaxSize()
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ChannelIcon(
-                channelType = channel.channelType!!,
-                modifier = Modifier.size(32.dp)
-            )
-            PageHeader(
-                text = channel.name ?: channel.id!!,
-                modifier = Modifier.offset((-8).dp, 0.dp)
-            )
-        }
-
-        Column(modifier = Modifier.weight(1f)) {
-            CollapsibleCard(title = "Advanced") {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text("Channel ID: ${channel.id}")
-
-                    Button(onClick = {
-                        clipboardManager.setText(AnnotatedString(channel.id!!))
-                        Toast.makeText(
-                            context,
-                            "Copied",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }) {
-                        Text("Copy ID")
-                    }
-
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                viewModel.fetchMessages()
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Text("Refetch messages")
-                    }
-                }
-            }
-        }
-
-        Button(
-            onClick = onClosed,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text("Close")
-        }
-    }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
 fun ChannelScreen(
     navController: NavController,
     channelId: String,
@@ -373,8 +302,6 @@ fun ChannelScreen(
     val context = LocalContext.current
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
-    val channelInfoOpen = remember { mutableStateOf(false) }
 
     val pickFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments()
@@ -421,28 +348,11 @@ fun ChannelScreen(
         return
     }
 
-    if (channelInfoOpen.value) {
-        Dialog(
-            onDismissRequest = {
-                channelInfoOpen.value = false
-            },
-            properties = DialogProperties(
-                usePlatformDefaultWidth = false,
-            )
-        ) {
-            ChannelInfoScreen(channel, viewModel) {
-                channelInfoOpen.value = false
-            }
-        }
-    }
-
     Column {
         Row(
             modifier = Modifier
                 .clickable {
-                    coroutineScope.launch {
-                        channelInfoOpen.value = true
-                    }
+                    navController.navigate("channel/${channel.id}/info")
                 }
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
@@ -461,19 +371,34 @@ fun ChannelScreen(
             )
         }
 
-
         val isScrolledToBottom = remember(lazyListState) {
             derivedStateOf {
                 lazyListState.firstVisibleItemIndex <= 6
             }
         }
 
-        LaunchedEffect(viewModel.renderableMessages.size) {
-            if (isScrolledToBottom.value) {
-                coroutineScope.launch {
-                    lazyListState.animateScrollToItem(0)
-                }
+        val isScrolledToTop = remember {
+            derivedStateOf {
+                val layoutInfo = lazyListState.layoutInfo
+                val totalItemsNumber = layoutInfo.totalItemsCount
+                val lastVisibleItemIndex =
+                    (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
+                val buffer = if (totalItemsNumber > 6) 6 else 0
+
+                lastVisibleItemIndex > (totalItemsNumber - buffer)
             }
+        }
+
+        LaunchedEffect(isScrolledToTop) {
+            snapshotFlow { isScrolledToTop.value }
+                .distinctUntilChanged()
+                .collect {
+                    if (it) {
+                        coroutineScope.launch {
+                            viewModel.fetchOlderMessages()
+                        }
+                    }
+                }
         }
 
         Box(
@@ -490,17 +415,11 @@ fun ChannelScreen(
                 }
 
                 item {
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                viewModel.fetchOlderMessages()
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp, horizontal = 8.dp)
-                    ) {
-                        Text("Load older")
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(16.dp)
+                        )
                     }
                 }
             }
