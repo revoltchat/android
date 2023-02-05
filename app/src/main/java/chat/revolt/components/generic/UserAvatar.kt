@@ -57,6 +57,7 @@ fun UserAvatar(
     modifier: Modifier = Modifier,
     presence: Presence? = null,
     avatar: AutumnResource? = null,
+    rawUrl: String? = null,
     size: Dp = 40.dp,
     presenceSize: Dp = 16.dp,
 ) {
@@ -67,7 +68,7 @@ fun UserAvatar(
     ) {
         if (avatar != null) {
             RemoteImage(
-                url = "$REVOLT_FILES/avatars/${avatar.id!!}/user.png",
+                url = rawUrl ?: "$REVOLT_FILES/avatars/${avatar.id!!}/user.png",
                 description = stringResource(id = R.string.avatar_alt, username),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

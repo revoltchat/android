@@ -3,14 +3,9 @@ package chat.revolt.components.chat
 import android.net.Uri
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +21,9 @@ import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.asJanuaryProxyUrl
 import chat.revolt.api.internals.ULID
+import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.UserAvatar
@@ -49,12 +46,6 @@ fun formatLongAsTime(time: Long): String {
     val date = java.util.Date(time)
     val format =
         java.text.SimpleDateFormat("dd.MM.yyyy HH:mm:ss", java.util.Locale.getDefault())
-
-    // EQUIVALENT CODE WITH kotlinx.datetime:
-
-    // val date = Instant.fromEpochMilliseconds(time)
-    // val format = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
-
 
     return format.format(date)
 }
@@ -109,7 +100,8 @@ fun Message(
                 UserAvatar(
                     username = author.username ?: "",
                     userId = author.id!!,
-                    avatar = author.avatar
+                    avatar = author.avatar,
+                    rawUrl = message.masquerade?.avatar?.let { asJanuaryProxyUrl(it) }
                 )
             } else {
                 UserAvatarWidthPlaceholder()
@@ -119,11 +111,24 @@ fun Message(
                 if (message.tail == false) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = author.username ?: "",
+                            text = message.masquerade?.name ?: author.username ?: "",
                             fontWeight = FontWeight.Bold,
+                            color = if (message.masquerade?.colour != null) {
+                                WebCompat.parseColour(message.masquerade.colour)
+                            } else LocalContentColor.current,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+
+                        if (message.masquerade != null && author.bot != null) {
+                            Spacer(modifier = Modifier.width(5.dp))
+
+                            InlineBadge(
+                                badge = InlineBadge.Masquerade,
+                                colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
 
                         Spacer(modifier = Modifier.width(5.dp))
 

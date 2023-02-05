@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.asJanuaryProxyUrl
 import chat.revolt.components.generic.UserAvatar
 
 @Composable
@@ -27,6 +28,8 @@ fun InReplyTo(
     val message = RevoltAPI.messageCache[messageId]
     val author = RevoltAPI.userCache[message?.author ?: ""]
 
+    val username = message?.masquerade?.name ?: author?.username ?: ""
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -38,22 +41,23 @@ fun InReplyTo(
 
         if (message != null) {
             UserAvatar(
-                username = author?.username ?: "",
+                username = username,
                 userId = author?.id ?: "",
                 avatar = author?.avatar,
+                rawUrl = message.masquerade?.avatar?.let { asJanuaryProxyUrl(it) },
                 size = 16.dp
             )
 
             Text(
                 text = if (author != null) {
                     if (withMention) {
-                        "@${author.username}"
+                        "@$username"
                     } else {
-                        author.username
+                        username
                     }
                 } else {
                     stringResource(id = R.string.unknown)
-                } ?: stringResource(id = R.string.unknown),
+                },
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
@@ -61,6 +65,15 @@ fun InReplyTo(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(horizontal = 4.dp)
             )
+
+            if (message.masquerade != null && author?.bot != null) {
+                InlineBadge(
+                    badge = InlineBadge.Masquerade,
+                    colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    modifier = Modifier.size(8.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+            }
 
             Text(
                 text = message.content ?: "",

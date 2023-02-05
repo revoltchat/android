@@ -23,7 +23,12 @@ const val REVOLT_BASE = "https://api.revolt.chat"
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
 const val REVOLT_MARKETING = "https://revolt.chat"
 const val REVOLT_FILES = "https://autumn.revolt.chat"
+const val REVOLT_JANUARY = "https://jan.revolt.chat"
 const val REVOLT_WEBSOCKET = "wss://ws.revolt.chat"
+
+fun asJanuaryProxyUrl(url: String): String {
+    return "$REVOLT_JANUARY/proxy?url=${url}"
+}
 
 private const val BACKEND_IS_STABLE = false
 
