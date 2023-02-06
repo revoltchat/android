@@ -97,7 +97,7 @@ val RevoltTypography = Typography(
     ),
     bodySmall = TextStyle(
         fontFamily = Inter,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Bold,
         fontSize = 12.sp
     )
 )

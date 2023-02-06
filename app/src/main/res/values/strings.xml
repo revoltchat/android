@@ -113,6 +113,9 @@
     <string name="copy">Copy</string>
     <string name="copied">Copied to clipboard</string>
 
+    <string name="channel_info_sheet_description">Channel description</string>
+    <string name="channel_info_sheet_description_empty">There hasn\'t been a description set for this channel yet.</string>
+
     <string name="settings_appearance">Appearance</string>
     <string name="settings_appearance_theme">Theme</string>
     <string name="settings_appearance_theme_none">System</string>

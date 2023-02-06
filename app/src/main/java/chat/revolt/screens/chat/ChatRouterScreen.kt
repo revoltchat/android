@@ -1,6 +1,7 @@
 package chat.revolt.screens.chat
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -31,8 +32,13 @@ import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.chat.DisconnectedNotice
 import chat.revolt.components.screens.chat.*
+import chat.revolt.screens.chat.sheets.ChannelInfoSheet
 import chat.revolt.screens.chat.views.ChannelScreen
 import chat.revolt.screens.chat.views.HomeScreen
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.ModalBottomSheetLayout
+import com.google.accompanist.navigation.material.bottomSheet
+import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import kotlinx.coroutines.launch
 
 class ChatRouterViewModel : ViewModel() {
@@ -65,129 +71,138 @@ class ChatRouterViewModel : ViewModel() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialNavigationApi::class)
 @Composable
 fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = viewModel()) {
     val channelDrawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val navController = rememberNavController()
+
+    val bottomSheetNavigator = rememberBottomSheetNavigator()
+    val navController = rememberNavController(bottomSheetNavigator)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    Column {
-        AnimatedVisibility(visible = RealtimeSocket.disconnectionState != DisconnectionState.Connected) {
-            DisconnectedNotice(
-                state = RealtimeSocket.disconnectionState,
-                onReconnect = {
-                    RealtimeSocket.updateDisconnectionState(DisconnectionState.Reconnecting)
-                    scope.launch { RevoltAPI.connectWS() }
-                })
-        }
-        DismissibleNavigationDrawer(
-            drawerState = channelDrawerState,
-            drawerContent = {
-                ModalDrawerSheet(
-                    drawerContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-                ) {
-                    Column(Modifier.fillMaxWidth()) {
-                        Row {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .verticalScroll(rememberScrollState())
-                                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
-                            ) {
-                                DrawerServerlikeIcon(
-                                    onClick = {
-                                        viewModel.navigateToServer("home", navController)
-                                    }
+    ModalBottomSheetLayout(bottomSheetNavigator = bottomSheetNavigator) {
+        Column {
+            AnimatedVisibility(visible = RealtimeSocket.disconnectionState != DisconnectionState.Connected) {
+                DisconnectedNotice(
+                    state = RealtimeSocket.disconnectionState,
+                    onReconnect = {
+                        RealtimeSocket.updateDisconnectionState(DisconnectionState.Reconnecting)
+                        scope.launch { RevoltAPI.connectWS() }
+                    })
+            }
+
+            DismissibleNavigationDrawer(
+                drawerState = channelDrawerState,
+                drawerContent = {
+                    ModalDrawerSheet(
+                        drawerContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
+                    ) {
+                        Column(Modifier.fillMaxWidth()) {
+                            Row {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .verticalScroll(rememberScrollState())
+                                        .background(
+                                            MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                                2.dp
+                                            )
+                                        )
                                 ) {
-                                    Icon(
-                                        Icons.Default.Home,
-                                        contentDescription = stringResource(id = R.string.home),
-                                        modifier = Modifier.padding(4.dp)
-                                    )
+                                    DrawerServerlikeIcon(
+                                        onClick = {
+                                            viewModel.navigateToServer("home", navController)
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Home,
+                                            contentDescription = stringResource(id = R.string.home),
+                                            modifier = Modifier.padding(4.dp)
+                                        )
+                                    }
+
+                                    ServerDrawerSeparator()
+
+                                    RevoltAPI.serverCache.values
+                                        .sortedBy { it.id }
+                                        .forEach { server ->
+                                            if (server.name == null) return@forEach
+
+                                            DrawerServer(
+                                                iconId = server.icon?.id,
+                                                serverName = server.name
+                                            ) {
+                                                viewModel.navigateToServer(
+                                                    server.id!!,
+                                                    navController
+                                                )
+                                            }
+                                        }
                                 }
 
-                                ServerDrawerSeparator()
-
-                                RevoltAPI.serverCache.values
-                                    .sortedBy { it.id }
-                                    .forEach { server ->
-                                        if (server.name == null) return@forEach
-
-                                        DrawerServer(
-                                            iconId = server.icon?.id,
-                                            serverName = server.name
-                                        ) {
-                                            viewModel.navigateToServer(
-                                                server.id!!,
-                                                navController
-                                            )
-                                        }
-                                    }
-                            }
-
-                            Crossfade(targetState = viewModel.currentServer) {
-                                Column(
-                                    Modifier
-                                        .weight(1f)
-                                ) {
-                                    if (it == "home") {
-                                        Column(
-                                            Modifier
-                                                .weight(1f)
-                                                .verticalScroll(rememberScrollState())
-                                        ) {
-                                            RevoltAPI.channelCache.values.filter { it.channelType == ChannelType.Group }
-                                                .forEach { channel ->
-                                                    DrawerChannel(
-                                                        name = channel.name
-                                                            ?: "GDM #${channel.id}",
-                                                        channelType = ChannelType.Group,
-                                                        selected = channel.id == (navBackStackEntry?.arguments?.getString(
-                                                            "channelId"
-                                                        ) ?: false),
-                                                        onClick = {
-                                                            navController.navigate("channel/${channel.id}")
-                                                            scope.launch {
-                                                                channelDrawerState.close()
-                                                            }
-                                                        }
-                                                    )
-                                                }
-                                        }
-                                    } else {
-                                        val server = RevoltAPI.serverCache[it]
-
-                                        Text(
-                                            text = server?.name
-                                                ?: stringResource(R.string.unknown),
-                                            fontWeight = FontWeight.Black,
-                                            fontSize = 24.sp,
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-
-                                        Column(
-                                            Modifier
-                                                .weight(1f)
-                                                .verticalScroll(rememberScrollState())
-                                        ) {
-                                            server?.channels?.forEach { channelId ->
-                                                RevoltAPI.channelCache[channelId]?.let { ch ->
-                                                    DrawerChannel(
-                                                        name = ch.name!!,
-                                                        channelType = ch.channelType!!,
-                                                        selected = navBackStackEntry?.arguments?.getString(
-                                                            "channelId"
-                                                        ) == ch.id,
-                                                        onClick = {
-                                                            scope.launch { channelDrawerState.close() }
-                                                            navController.navigate("channel/${ch.id}") {
-                                                                popUpTo("home") {
-                                                                    inclusive = true
+                                Crossfade(targetState = viewModel.currentServer) {
+                                    Column(
+                                        Modifier
+                                            .weight(1f)
+                                    ) {
+                                        if (it == "home") {
+                                            Column(
+                                                Modifier
+                                                    .weight(1f)
+                                                    .verticalScroll(rememberScrollState())
+                                            ) {
+                                                RevoltAPI.channelCache.values.filter { it.channelType == ChannelType.Group }
+                                                    .forEach { channel ->
+                                                        DrawerChannel(
+                                                            name = channel.name
+                                                                ?: "GDM #${channel.id}",
+                                                            channelType = ChannelType.Group,
+                                                            selected = channel.id == (navBackStackEntry?.arguments?.getString(
+                                                                "channelId"
+                                                            ) ?: false),
+                                                            onClick = {
+                                                                navController.navigate("channel/${channel.id}")
+                                                                scope.launch {
+                                                                    channelDrawerState.close()
                                                                 }
                                                             }
-                                                        })
+                                                        )
+                                                    }
+                                            }
+                                        } else {
+                                            val server = RevoltAPI.serverCache[it]
+
+                                            Text(
+                                                text = server?.name
+                                                    ?: stringResource(R.string.unknown),
+                                                fontWeight = FontWeight.Black,
+                                                fontSize = 24.sp,
+                                                modifier = Modifier.padding(16.dp)
+                                            )
+
+                                            Column(
+                                                Modifier
+                                                    .weight(1f)
+                                                    .verticalScroll(rememberScrollState())
+                                            ) {
+                                                server?.channels?.forEach { channelId ->
+                                                    RevoltAPI.channelCache[channelId]?.let { ch ->
+                                                        DrawerChannel(
+                                                            name = ch.name!!,
+                                                            channelType = ch.channelType!!,
+                                                            selected = navBackStackEntry?.arguments?.getString(
+                                                                "channelId"
+                                                            ) == ch.id,
+                                                            onClick = {
+                                                                scope.launch { channelDrawerState.close() }
+                                                                navController.navigate("channel/${ch.id}") {
+                                                                    popUpTo("home") {
+                                                                        inclusive = true
+                                                                    }
+                                                                }
+                                                            })
+                                                    }
                                                 }
                                             }
                                         }
@@ -196,28 +211,40 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                             }
                         }
                     }
-                }
-            },
-            modifier = Modifier.weight(1f),
-        ) {
-            Column(Modifier.fillMaxSize()) {
-                NavHost(navController = navController, startDestination = "home") {
-                    composable("home") {
-                        HomeScreen(navController = topNav)
-                    }
-                    composable("channel/{channelId}") { backStackEntry ->
-                        val channelId = backStackEntry.arguments?.getString("channelId")
-                        if (channelId != null) {
-                            ChannelScreen(navController, channelId = channelId)
+                },
+                modifier = Modifier.weight(1f),
+            ) {
+                Column(Modifier.fillMaxSize()) {
+                    NavHost(navController = navController, startDestination = "home") {
+                        composable("home") {
+                            HomeScreen(navController = topNav)
+                        }
+                        composable("channel/{channelId}") { backStackEntry ->
+                            val channelId = backStackEntry.arguments?.getString("channelId")
+                            if (channelId != null) {
+                                ChannelScreen(
+                                    navController = navController,
+                                    channelId = channelId
+                                )
+                            }
+                        }
+                        bottomSheet("channel/{channelId}/info") { backStackEntry ->
+                            val channelId = backStackEntry.arguments?.getString("channelId")
+                            if (channelId != null) {
+                                ChannelInfoSheet(
+                                    navController = navController,
+                                    channelId = channelId
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
 
-        BottomNavigation(
-            navController = topNav,
-            show = channelDrawerState.currentValue == DrawerValue.Open,
-        )
+            BottomNavigation(
+                navController = topNav,
+                show = channelDrawerState.currentValue == DrawerValue.Open,
+            )
+        }
     }
 }

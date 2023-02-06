@@ -61,14 +61,14 @@ class ChannelScreenViewModel : ViewModel() {
         get() = _channel
 
     private var _callback = mutableStateOf<RealtimeSocket.ChannelCallback?>(null)
-    val callback: RealtimeSocket.ChannelCallback?
+    private val callback: RealtimeSocket.ChannelCallback?
         get() = _callback.value
 
     private var _renderableMessages = mutableStateListOf<MessageSchema>()
     val renderableMessages: List<MessageSchema>
         get() = _renderableMessages
 
-    fun setRenderableMessages(messages: List<MessageSchema>) {
+    private fun setRenderableMessages(messages: List<MessageSchema>) {
         _renderableMessages.clear()
         _renderableMessages.addAll(messages)
     }
@@ -89,7 +89,7 @@ class ChannelScreenViewModel : ViewModel() {
     val attachments: List<FileArgs>
         get() = _attachments
 
-    fun setAttachments(attachments: List<FileArgs>) {
+    private fun setAttachments(attachments: List<FileArgs>) {
         _attachments.clear()
         _attachments.addAll(attachments)
     }
@@ -180,7 +180,7 @@ class ChannelScreenViewModel : ViewModel() {
         viewModelScope.launch {
             val messages = arrayListOf<MessageSchema>()
 
-            if (!renderableMessages.isEmpty()) {
+            if (renderableMessages.isNotEmpty()) {
                 fetchMessagesFromChannel(
                     channel!!.id!!,
                     limit = 50,
@@ -383,7 +383,7 @@ fun ChannelScreen(
                 val totalItemsNumber = layoutInfo.totalItemsCount
                 val lastVisibleItemIndex =
                     (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
-                val buffer = if (totalItemsNumber > 6) 6 else 0
+                val buffer = 6
 
                 lastVisibleItemIndex > (totalItemsNumber - buffer)
             }
