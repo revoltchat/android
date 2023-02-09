@@ -61,6 +61,7 @@
 
     <string name="comingsoon_heading">Gah, you found me!</string>
     <string name="comingsoon_body">The feature you are trying to access is not ready yet, but we are steadily working on polishing it to perfection..</string>
+    <string name="comingsoon_toast">Sorry, this feature is not ready yet.</string>
 
     <string name="typing_blank"><!-- this is a hack to prevent the typing indicator from showing typing_several when it's animating away --></string>
     <string name="typing_one">%1$s is typing…</string>
@@ -115,6 +116,21 @@
 
     <string name="channel_info_sheet_description">Channel description</string>
     <string name="channel_info_sheet_description_empty">There hasn\'t been a description set for this channel yet.</string>
+
+    <string name="message_context_sheet_actions_copy">Copy</string>
+    <string name="message_context_sheet_actions_copy_failed_empty">Message is empty, nothing to copy</string>
+    <string name="message_context_sheet_actions_reply">Reply</string>
+    <string name="message_context_sheet_actions_edit">Edit</string>
+    <string name="message_context_sheet_actions_delete">Delete</string>
+    <string name="message_context_sheet_actions_delete_confirm">Are you sure you want to delete this message?</string>
+    <string name="message_context_sheet_actions_delete_confirm_yes">Yes</string>
+    <string name="message_context_sheet_actions_delete_confirm_no">No</string>
+    <string name="message_context_sheet_actions_copy_id">Copy ID</string>
+    <string name="message_context_sheet_actions_copy_id_copied">Copied message ID to clipboard</string>
+    <string name="message_context_sheet_actions_copy_link">Copy link</string>
+    <string name="message_context_sheet_actions_copy_link_copied">Copied message link to clipboard</string>
+    <string name="message_context_sheet_actions_react">React</string>
+    <string name="message_context_sheet_actions_report">Report</string>
 
     <string name="settings_appearance">Appearance</string>
     <string name="settings_appearance_theme">Theme</string>

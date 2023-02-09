@@ -1,4 +1,4 @@
-package chat.revolt.components.screens.settings
+package chat.revolt.components.generic
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SettingsCategory(
+fun SheetClickable(
     icon: @Composable (Modifier) -> Unit,
     label: @Composable (TextStyle) -> Unit,
     onClick: () -> Unit,
@@ -30,7 +30,7 @@ fun SettingsCategory(
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.background)
                 .clickable(onClick = onClick)
                 .padding(all = 4.dp)
                 .fillMaxWidth()
@@ -40,7 +40,7 @@ fun SettingsCategory(
             icon(Modifier.padding(end = 16.dp))
             label(
                 MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.SemiBold,
                 )
             )
@@ -51,7 +51,7 @@ fun SettingsCategory(
 @Preview
 @Composable
 fun SettingsCategoryPreview() {
-    SettingsCategory(
+    SheetClickable(
         icon = { modifier ->
             Icon(
                 modifier = modifier,

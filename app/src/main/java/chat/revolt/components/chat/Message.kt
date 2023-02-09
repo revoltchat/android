@@ -1,7 +1,6 @@
 package chat.revolt.components.chat
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -11,14 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.asJanuaryProxyUrl
@@ -53,11 +49,12 @@ fun formatLongAsTime(time: Long): String {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Message(
-    message: MessageSchema
+    message: MessageSchema,
+    truncate: Boolean = false,
+    onMessageContextMenu: () -> Unit = {},
 ) {
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
     val context = LocalContext.current
-    val clipboardManager = LocalClipboardManager.current
 
     Column {
         if (message.tail == false) {
@@ -80,17 +77,7 @@ fun Message(
                 .combinedClickable(
                     onClick = {},
                     onLongClick = {
-                        if (message.content != null && message.content.isNotEmpty()) {
-                            clipboardManager.setText(AnnotatedString(message.content))
-
-                            Toast
-                                .makeText(
-                                    context,
-                                    context.getString(R.string.copied),
-                                    Toast.LENGTH_SHORT
-                                )
-                                .show()
-                        }
+                        onMessageContextMenu()
                     }
                 )
                 .padding(horizontal = 10.dp)
@@ -145,6 +132,8 @@ fun Message(
                 message.content?.let {
                     Text(
                         text = Renderer.annotateMarkdown(it),
+                        maxLines = if (truncate) 1 else Int.MAX_VALUE,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 

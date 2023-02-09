@@ -33,6 +33,7 @@ import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.chat.DisconnectedNotice
 import chat.revolt.components.screens.chat.*
 import chat.revolt.screens.chat.sheets.ChannelInfoSheet
+import chat.revolt.screens.chat.sheets.MessageContextSheet
 import chat.revolt.screens.chat.views.ChannelScreen
 import chat.revolt.screens.chat.views.HomeScreen
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -228,12 +229,22 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                 )
                             }
                         }
+
                         bottomSheet("channel/{channelId}/info") { backStackEntry ->
                             val channelId = backStackEntry.arguments?.getString("channelId")
                             if (channelId != null) {
                                 ChannelInfoSheet(
                                     navController = navController,
                                     channelId = channelId
+                                )
+                            }
+                        }
+                        bottomSheet("message/{messageId}/menu") { backStackEntry ->
+                            val messageId = backStackEntry.arguments?.getString("messageId")
+                            if (messageId != null) {
+                                MessageContextSheet(
+                                    navController = navController,
+                                    messageId = messageId
                                 )
                             }
                         }

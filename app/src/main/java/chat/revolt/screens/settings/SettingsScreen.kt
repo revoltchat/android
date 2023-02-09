@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.components.generic.PageHeader
-import chat.revolt.components.screens.settings.SettingsCategory
+import chat.revolt.components.generic.SheetClickable
 
 @Composable
 fun SettingsScreen(
@@ -37,7 +37,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(10.dp)
         ) {
-            SettingsCategory(
+            SheetClickable(
                 icon = { modifier ->
                     Icon(
                         painter = painterResource(id = R.drawable.ic_palette_24dp),
@@ -56,7 +56,7 @@ fun SettingsScreen(
                 navController.navigate("settings/appearance")
             }
 
-            SettingsCategory(
+            SheetClickable(
                 icon = { modifier ->
                     Icon(
                         imageVector = Icons.Default.Info,

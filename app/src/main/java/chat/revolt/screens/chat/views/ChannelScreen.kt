@@ -36,6 +36,7 @@ import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
 import chat.revolt.api.realtime.frames.receivable.MessageFrame
+import chat.revolt.api.routes.channel.SendMessageReply
 import chat.revolt.api.routes.channel.fetchMessagesFromChannel
 import chat.revolt.api.routes.channel.sendMessage
 import chat.revolt.api.routes.microservices.autumn.FileArgs
@@ -43,10 +44,12 @@ import chat.revolt.api.routes.microservices.autumn.MAX_ATTACHMENTS_PER_MESSAGE
 import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
 import chat.revolt.api.routes.user.addUserIfUnknown
 import chat.revolt.api.schemas.Channel
+import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.MessageField
 import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelIcon
+import chat.revolt.components.screens.chat.ReplyManager
 import chat.revolt.components.screens.chat.TypingIndicator
 import io.ktor.http.*
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -60,9 +63,9 @@ class ChannelScreenViewModel : ViewModel() {
     val channel: Channel?
         get() = _channel
 
-    private var _callback = mutableStateOf<RealtimeSocket.ChannelCallback?>(null)
-    private val callback: RealtimeSocket.ChannelCallback?
-        get() = _callback.value
+    private var _channelCallback = mutableStateOf<RealtimeSocket.ChannelCallback?>(null)
+    private val channelCallback: RealtimeSocket.ChannelCallback?
+        get() = _channelCallback.value
 
     private var _renderableMessages = mutableStateListOf<MessageSchema>()
     val renderableMessages: List<MessageSchema>
@@ -114,6 +117,36 @@ class ChannelScreenViewModel : ViewModel() {
         _sendingMessage = sending
     }
 
+    private var _replies = mutableStateListOf<SendMessageReply>()
+    val replies: List<SendMessageReply>
+        get() = _replies
+
+    fun addInReplyTo(reply: SendMessageReply) {
+        _replies.add(reply)
+    }
+
+    fun removeReply(reply: SendMessageReply) {
+        _replies.remove(reply)
+    }
+
+    fun toggleReplyMentionFor(reply: SendMessageReply) {
+        val index = _replies.indexOf(reply)
+        val newReply = SendMessageReply(
+            reply.id,
+            !reply.mention
+        )
+
+        _replies[index] = newReply
+    }
+
+    private fun clearInReplyTo() {
+        _replies.clear()
+    }
+
+    private var _uiCallbackReceiver = mutableStateOf<UiCallbacks.CallbackReceiver?>(null)
+    val uiCallbackReceiver: UiCallbacks.CallbackReceiver?
+        get() = _uiCallbackReceiver.value
+
     inner class ChannelScreenCallback : RealtimeSocket.ChannelCallback {
         override fun onMessage(message: MessageFrame) {
             viewModelScope.launch {
@@ -145,9 +178,20 @@ class ChannelScreenViewModel : ViewModel() {
         }
     }
 
-    private fun registerCallback() {
-        _callback.value = ChannelScreenCallback()
-        RealtimeSocket.registerChannelCallback(channel!!.id!!, callback!!)
+    inner class UiCallbackReceiver : UiCallbacks.CallbackReceiver {
+        override fun onQueueMessageForReply(messageId: String) {
+            viewModelScope.launch {
+                addInReplyTo(SendMessageReply(messageId, true))
+            }
+        }
+    }
+
+    private fun registerCallbacks() {
+        _channelCallback.value = ChannelScreenCallback()
+        RealtimeSocket.registerChannelCallback(channel!!.id!!, channelCallback!!)
+
+        _uiCallbackReceiver.value = UiCallbackReceiver()
+        UiCallbacks.registerReceiver(uiCallbackReceiver!!)
     }
 
     fun fetchMessages() {
@@ -218,7 +262,7 @@ class ChannelScreenViewModel : ViewModel() {
             Log.e("ChannelScreen", "Channel $id not in cache, for now this is fatal!") // FIXME
         }
 
-        registerCallback()
+        registerCallbacks()
     }
 
     fun sendPendingMessage() {
@@ -246,11 +290,13 @@ class ChannelScreenViewModel : ViewModel() {
             sendMessage(
                 channel!!.id!!,
                 messageContent,
-                attachments = if (attachmentIds.isEmpty()) null else attachmentIds
+                attachments = if (attachmentIds.isEmpty()) null else attachmentIds,
+                replies = replies
             )
 
             _messageContent = ""
             popAttachmentBatch()
+            clearInReplyTo()
             setSendingMessage(false)
         }
     }
@@ -340,6 +386,7 @@ fun ChannelScreen(
     DisposableEffect(channelId) {
         onDispose {
             RealtimeSocket.unregisterChannelCallback(channelId)
+            viewModel.uiCallbackReceiver?.let { UiCallbacks.unregisterReceiver(it) }
         }
     }
 
@@ -411,7 +458,9 @@ fun ChannelScreen(
                 }
 
                 items(viewModel.renderableMessages) { message ->
-                    Message(message)
+                    Message(message) {
+                        navController.navigate("message/${message.id}/menu")
+                    }
                 }
 
                 item {
@@ -463,6 +512,14 @@ fun ChannelScreen(
 
             TypingIndicator(
                 users = viewModel.typingUsers
+            )
+        }
+
+        AnimatedVisibility(visible = viewModel.replies.isNotEmpty()) {
+            ReplyManager(
+                replies = viewModel.replies,
+                onRemove = viewModel::removeReply,
+                onToggleMention = viewModel::toggleReplyMentionFor
             )
         }
 
