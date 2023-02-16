@@ -107,15 +107,15 @@ fun Message(
                             overflow = TextOverflow.Ellipsis
                         )
 
-                        if (message.masquerade != null && author.bot != null) {
-                            Spacer(modifier = Modifier.width(5.dp))
-
-                            InlineBadge(
-                                badge = InlineBadge.Masquerade,
-                                colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
+                        InlineBadges(
+                            bot = author.bot != null && message.masquerade == null,
+                            masquerade = message.masquerade != null && author.bot != null,
+                            colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                            modifier = Modifier.size(16.dp),
+                            precedingIfAny = {
+                                Spacer(modifier = Modifier.width(5.dp))
+                            }
+                        )
 
                         Spacer(modifier = Modifier.width(5.dp))
 

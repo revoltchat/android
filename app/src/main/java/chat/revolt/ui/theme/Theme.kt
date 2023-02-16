@@ -84,13 +84,24 @@ fun RevoltTheme(
         else -> RevoltColorScheme
     }
 
+    val colorSchemeIsDark = when {
+        m3Supported && requestedTheme == Theme.M3Dynamic -> isSystemInDarkTheme()
+        requestedTheme == Theme.Revolt -> true
+        requestedTheme == Theme.Light -> false
+        requestedTheme == Theme.Amoled -> true
+        requestedTheme == Theme.None && systemInDarkTheme -> true
+        requestedTheme == Theme.None && !systemInDarkTheme -> false
+        else -> true
+    }
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.background.toArgb()
             @Suppress("DEPRECATION")
-            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = false
+            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars =
+                !colorSchemeIsDark
         }
     }
 

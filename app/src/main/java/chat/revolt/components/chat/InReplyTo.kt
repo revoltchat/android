@@ -66,14 +66,15 @@ fun InReplyTo(
                 modifier = Modifier.padding(horizontal = 4.dp)
             )
 
-            if (message.masquerade != null && author?.bot != null) {
-                InlineBadge(
-                    badge = InlineBadge.Masquerade,
-                    colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                    modifier = Modifier.size(8.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-            }
+            InlineBadges(
+                bot = message.masquerade == null && author?.bot != null,
+                masquerade = message.masquerade != null && author?.bot != null,
+                colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                modifier = Modifier.size(8.dp),
+                followingIfAny = {
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
+            )
 
             Text(
                 text = message.content ?: "",

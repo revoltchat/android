@@ -1,5 +1,6 @@
 package chat.revolt.components.chat
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -36,5 +37,56 @@ fun InlineBadge(
         )
         InlineBadge.PlatformModeration -> TODO()
         InlineBadge.Developer -> TODO()
+    }
+}
+
+@Composable
+fun InlineBadges(
+    modifier: Modifier = Modifier,
+    bot: Boolean = false,
+    masquerade: Boolean = false,
+    platformModeration: Boolean = false,
+    developer: Boolean = false,
+    colour: Color = Color.Unspecified,
+    precedingIfAny: @Composable () -> Unit = {},
+    followingIfAny: @Composable () -> Unit = {},
+) {
+    if (bot || masquerade || platformModeration || developer) {
+        precedingIfAny()
+    }
+
+    Row {
+        if (bot) {
+            InlineBadge(
+                badge = InlineBadge.Bot,
+                modifier = modifier,
+                colour = colour
+            )
+        }
+        if (masquerade) {
+            InlineBadge(
+                badge = InlineBadge.Masquerade,
+                modifier = modifier,
+                colour = colour
+            )
+        }
+        if (platformModeration) {
+            InlineBadge(
+                badge = InlineBadge.PlatformModeration,
+                modifier = modifier,
+                colour = colour
+            )
+        }
+        if (developer) {
+            InlineBadge(
+                badge = InlineBadge.Developer,
+                modifier = modifier,
+                colour = colour
+            )
+        }
+    }
+
+    if (bot || masquerade || platformModeration || developer) {
+        followingIfAny()
     }
 }
