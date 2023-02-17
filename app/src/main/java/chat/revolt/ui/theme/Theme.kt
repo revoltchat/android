@@ -18,13 +18,13 @@ val RevoltColorScheme = darkColorScheme(
     onPrimary = Color(0xffffffff),
     secondary = Color(0xffe96a7a),
     onSecondary = Color(0xffffffff),
-    background = Color(0xff121212),
+    background = Color(0xff131722),
     onBackground = Color(0xffffffff),
-    surfaceVariant = Color(0xff1e1e1e),
+    surfaceVariant = Color(0xff191f30),
     onSurfaceVariant = Color(0xffffffff),
-    surface = Color(0xff2b2b2b),
+    surface = Color(0xff1c243c),
     onSurface = Color(0xffffffff),
-    surfaceTint = Color(0xffc0c0c0),
+    surfaceTint = Color(0xff5658b9),
 )
 
 val AmoledColorScheme = RevoltColorScheme.copy(
@@ -47,7 +47,7 @@ val LightColorScheme = lightColorScheme(
     onSurfaceVariant = Color(0xff000000),
     surface = Color(0xfff5f5f5),
     onSurface = Color(0xff000000),
-    surfaceTint = Color(0xff000000),
+    surfaceTint = Color(0xff5658b9),
 )
 
 enum class Theme {

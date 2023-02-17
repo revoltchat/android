@@ -1,6 +1,5 @@
 package chat.revolt.components.generic
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -30,7 +29,6 @@ fun SheetClickable(
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.background)
                 .clickable(onClick = onClick)
                 .padding(all = 4.dp)
                 .fillMaxWidth()
