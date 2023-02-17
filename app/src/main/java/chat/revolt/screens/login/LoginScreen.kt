@@ -6,10 +6,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -91,9 +88,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun navigationComplete() {
-        _navigateTo = null
-    }
 
     fun setEmail(email: String) {
         _email = email
@@ -109,20 +103,23 @@ fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    if (viewModel.navigateTo == "mfa") {
-        navController.navigate(
-            "login/mfa/${viewModel.mfaResponse!!.mfaSpec!!.ticket}/${
-                viewModel.mfaResponse!!.mfaSpec!!.allowedMethods.joinToString(
-                    ","
+    LaunchedEffect(viewModel.navigateTo) {
+        when (viewModel.navigateTo) {
+            "mfa" -> {
+                navController.navigate(
+                    "login/mfa/${viewModel.mfaResponse!!.mfaSpec!!.ticket}/${
+                        viewModel.mfaResponse!!.mfaSpec!!.allowedMethods.joinToString(
+                            ","
+                        )
+                    }"
                 )
-            }"
-        )
-        viewModel.navigationComplete()
-    } else if (viewModel.navigateTo == "home") {
-        navController.navigate("chat") {
-            popUpTo("login/greeting") { inclusive = true }
+            }
+            "home" -> {
+                navController.navigate("chat") {
+                    popUpTo("login/greeting") { inclusive = true }
+                }
+            }
         }
-        viewModel.navigationComplete()
     }
 
     Column(
@@ -199,8 +196,6 @@ fun LoginScreen(
                 .padding(horizontal = 20.dp, vertical = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-
             Weblink(
                 text = stringResource(R.string.password_manager_hint),
                 url = "$REVOLT_SUPPORT/kb/interface/android/using-a-password-manager",

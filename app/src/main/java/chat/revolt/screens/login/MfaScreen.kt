@@ -8,10 +8,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -63,10 +60,6 @@ class MfaScreenViewModel @Inject constructor(
 
     fun setRecoveryCode(code: String) {
         _recoveryCode = code
-    }
-
-    fun navigationComplete() {
-        _navigateToHome = false
     }
 
     fun tryAuthorizeTotp(mfaTicket: String) {
@@ -128,11 +121,12 @@ fun MfaScreen(
 ) {
     val allowedAuthTypes = allowedAuthTypesCommaSep.split(",")
 
-    if (viewModel.navigateToHome) {
-        navController.navigate("chat") {
-            popUpTo("login/greeting") { inclusive = true }
+    LaunchedEffect(viewModel.navigateToHome) {
+        if (viewModel.navigateToHome) {
+            navController.navigate("chat") {
+                popUpTo("login/greeting") { inclusive = true }
+            }
         }
-        viewModel.navigationComplete()
     }
 
     Column(

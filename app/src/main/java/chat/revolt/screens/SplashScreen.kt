@@ -7,10 +7,7 @@ import android.net.NetworkCapabilities
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -137,7 +134,7 @@ fun SplashScreen(
         )
     }
 
-    if (viewModel.navigateTo.isNotEmpty()) {
+    LaunchedEffect(viewModel.navigateTo) {
         when (viewModel.navigateTo) {
             "login" -> {
                 navController.navigate("login/greeting") {
@@ -154,6 +151,5 @@ fun SplashScreen(
                 }
             }
         }
-        viewModel.setNavigateTo("")
     }
 }
