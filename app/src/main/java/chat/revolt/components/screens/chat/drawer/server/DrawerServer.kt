@@ -1,4 +1,4 @@
-package chat.revolt.components.screens.chat
+package chat.revolt.components.screens.chat.drawer.server
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

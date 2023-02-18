@@ -1,19 +1,24 @@
 package chat.revolt.screens.chat
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,9 +36,17 @@ import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.chat.DisconnectedNotice
-import chat.revolt.components.screens.chat.*
+import chat.revolt.components.generic.UserAvatar
+import chat.revolt.components.generic.presenceFromStatus
+import chat.revolt.components.screens.chat.DoubleDrawer
+import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
+import chat.revolt.components.screens.chat.drawer.server.DrawerServer
+import chat.revolt.components.screens.chat.drawer.server.DrawerServerlikeIcon
+import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
+import chat.revolt.components.screens.chat.rememberDoubleDrawerState
 import chat.revolt.screens.chat.sheets.ChannelInfoSheet
 import chat.revolt.screens.chat.sheets.MessageContextSheet
+import chat.revolt.screens.chat.sheets.StatusSheet
 import chat.revolt.screens.chat.views.ChannelScreen
 import chat.revolt.screens.chat.views.HomeScreen
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -72,11 +85,12 @@ class ChatRouterViewModel : ViewModel() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = viewModel()) {
-    val channelDrawerState = rememberDrawerState(DrawerValue.Closed)
+    val drawerState = rememberDoubleDrawerState()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberNavController(bottomSheetNavigator)
@@ -93,56 +107,80 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                     })
             }
 
-            DismissibleNavigationDrawer(
-                drawerState = channelDrawerState,
-                drawerContent = {
-                    ModalDrawerSheet(
-                        drawerContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-                    ) {
-                        Column(Modifier.fillMaxWidth()) {
-                            Row {
-                                Column(
+            DoubleDrawer(
+                state = drawerState,
+                startPanel = {
+                    Column(Modifier.fillMaxWidth()) {
+                        Row {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .verticalScroll(rememberScrollState())
+                            ) {
+                                UserAvatar(
+                                    username = RevoltAPI.userCache[RevoltAPI.selfId]?.username
+                                        ?: "",
+                                    presence = presenceFromStatus(
+                                        RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence
+                                            ?: ""
+                                    ),
+                                    userId = RevoltAPI.selfId ?: "",
+                                    avatar = RevoltAPI.userCache[RevoltAPI.selfId]?.avatar,
+                                    size = 48.dp,
+                                    presenceSize = 16.dp,
+                                    onClick = {
+                                        viewModel.navigateToServer("home", navController)
+                                    },
+                                    onLongClick = {
+                                        navController.navigate("status")
+                                    },
                                     modifier = Modifier
-                                        .fillMaxHeight()
-                                        .verticalScroll(rememberScrollState())
-                                        .background(
-                                            MaterialTheme.colorScheme.surfaceColorAtElevation(
-                                                2.dp
+                                        .padding(8.dp)
+                                        .size(48.dp)
+                                )
+
+                                ServerDrawerSeparator()
+
+                                RevoltAPI.serverCache.values
+                                    .sortedBy { it.id }
+                                    .forEach { server ->
+                                        if (server.name == null) return@forEach
+
+                                        DrawerServer(
+                                            iconId = server.icon?.id,
+                                            serverName = server.name
+                                        ) {
+                                            viewModel.navigateToServer(
+                                                server.id!!,
+                                                navController
                                             )
-                                        )
-                                ) {
-                                    DrawerServerlikeIcon(
-                                        onClick = {
-                                            viewModel.navigateToServer("home", navController)
                                         }
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Home,
-                                            contentDescription = stringResource(id = R.string.home),
-                                            modifier = Modifier.padding(4.dp)
-                                        )
                                     }
 
-                                    ServerDrawerSeparator()
-
-                                    RevoltAPI.serverCache.values
-                                        .sortedBy { it.id }
-                                        .forEach { server ->
-                                            if (server.name == null) return@forEach
-
-                                            DrawerServer(
-                                                iconId = server.icon?.id,
-                                                serverName = server.name
-                                            ) {
-                                                viewModel.navigateToServer(
-                                                    server.id!!,
-                                                    navController
-                                                )
-                                            }
-                                        }
+                                DrawerServerlikeIcon(
+                                    onClick = {
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.comingsoon_toast),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Default.Add,
+                                        contentDescription = stringResource(id = R.string.server_plus_alt),
+                                        modifier = Modifier.padding(4.dp)
+                                    )
                                 }
+                            }
 
-                                Crossfade(targetState = viewModel.currentServer) {
+                            Crossfade(targetState = viewModel.currentServer) {
+                                Surface(
+                                    tonalElevation = 1.dp,
+                                    modifier = Modifier
+                                        .padding(vertical = 4.dp)
+                                        .clip(RoundedCornerShape(16.dp))
+                                ) {
                                     Column(
                                         Modifier
                                             .weight(1f)
@@ -165,7 +203,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                                             onClick = {
                                                                 navController.navigate("channel/${channel.id}")
                                                                 scope.launch {
-                                                                    channelDrawerState.close()
+                                                                    drawerState.focusCenter()
                                                                 }
                                                             }
                                                         )
@@ -196,13 +234,14 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                                                 "channelId"
                                                             ) == ch.id,
                                                             onClick = {
-                                                                scope.launch { channelDrawerState.close() }
+                                                                scope.launch { drawerState.focusCenter() }
                                                                 navController.navigate("channel/${ch.id}") {
                                                                     popUpTo("home") {
                                                                         inclusive = true
                                                                     }
                                                                 }
-                                                            })
+                                                            }
+                                                        )
                                                     }
                                                 }
                                             }
@@ -213,7 +252,16 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                         }
                     }
                 },
-                modifier = Modifier.weight(1f),
+                endPanel = {
+                    Box(
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "👋", fontSize = 64.sp)
+                    }
+                },
             ) {
                 Column(Modifier.fillMaxSize()) {
                     NavHost(navController = navController, startDestination = "home") {
@@ -248,14 +296,12 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                 )
                             }
                         }
+                        bottomSheet("status") {
+                            StatusSheet(navController = navController, topNav = topNav)
+                        }
                     }
                 }
             }
-
-            BottomNavigation(
-                navController = topNav,
-                show = channelDrawerState.currentValue == DrawerValue.Open,
-            )
         }
     }
 }

@@ -86,6 +86,8 @@
     <string name="home">Home</string>
     <string name="logout">Log out</string>
 
+    <string name="server_plus_alt">Add server</string>
+
     <string name="avatar_alt">%1$s\'s avatar</string>
 
     <string name="channel_dm">Direct Message</string>

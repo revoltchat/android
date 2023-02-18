@@ -1,4 +1,4 @@
-package chat.revolt.components.screens.chat
+package chat.revolt.components.screens.chat.drawer.server
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import chat.revolt.api.schemas.ChannelType
+import chat.revolt.components.screens.chat.ChannelIcon
 
 @Composable
 fun DrawerChannel(

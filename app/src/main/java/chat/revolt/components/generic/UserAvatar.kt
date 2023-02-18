@@ -1,7 +1,9 @@
 package chat.revolt.components.generic
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,7 +28,17 @@ enum class Presence {
     Idle,
     Dnd,
     Focus,
-    Offline,
+    Offline
+}
+
+fun presenceFromStatus(status: String): Presence {
+    return when (status) {
+        "online" -> Presence.Online
+        "idle" -> Presence.Idle
+        "dnd" -> Presence.Dnd
+        "focus" -> Presence.Focus
+        else -> Presence.Offline
+    }
 }
 
 fun presenceColour(presence: Presence): Color {
@@ -50,6 +62,7 @@ fun PresenceBadge(presence: Presence, size: Dp = 16.dp) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserAvatar(
     username: String,
@@ -60,6 +73,8 @@ fun UserAvatar(
     rawUrl: String? = null,
     size: Dp = 40.dp,
     presenceSize: Dp = 16.dp,
+    onLongClick: (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
 ) {
     Box(
         modifier = modifier
@@ -69,19 +84,35 @@ fun UserAvatar(
         if (avatar != null) {
             RemoteImage(
                 url = rawUrl ?: "$REVOLT_FILES/avatars/${avatar.id!!}/user.png",
-                description = stringResource(id = R.string.avatar_alt, username),
                 contentScale = ContentScale.Crop,
+                description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
                     .clip(CircleShape)
                     .size(size)
+                    .then(
+                        if (onLongClick != null || onClick != null) Modifier
+                            .combinedClickable(
+                                onClick = { onClick?.invoke() },
+                                onLongClick = { onLongClick?.invoke() }
+                            )
+                        else Modifier
+                    )
             )
         } else {
             RemoteImage(
                 url = "$REVOLT_BASE/users/${userId}/default_avatar",
+                description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
                     .size(size)
+                    .then(
+                        if (onLongClick != null || onClick != null) Modifier
+                            .combinedClickable(
+                                onClick = { onClick?.invoke() },
+                                onLongClick = { onLongClick?.invoke() }
+                            )
+                        else Modifier
+                    )
                     .clip(CircleShape),
-                description = stringResource(id = R.string.avatar_alt, username),
             )
         }
 
