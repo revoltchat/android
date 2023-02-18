@@ -12,6 +12,9 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -60,6 +63,23 @@ fun DisconnectedNotice(
     state: DisconnectionState,
     onReconnect: () -> Unit
 ) {
+    val retries = remember { mutableStateOf(0) }
+
+    LaunchedEffect(state) {
+        when (state) {
+            DisconnectionState.Disconnected -> {
+                if (retries.value < 3) {
+                    onReconnect()
+                    retries.value++
+                }
+            }
+            DisconnectionState.Connected -> {
+                retries.value = 0
+            }
+            else -> Unit
+        }
+    }
+
     when (state) {
         DisconnectionState.Disconnected -> DisconnectedNoticeBase(
             background = Color(0xfffe4654),
