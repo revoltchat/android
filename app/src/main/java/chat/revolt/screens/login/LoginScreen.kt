@@ -88,6 +88,9 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    fun navigationComplete() {
+        _navigateTo = null
+    }
 
     fun setEmail(email: String) {
         _email = email
@@ -119,6 +122,9 @@ fun LoginScreen(
                     popUpTo("login/greeting") { inclusive = true }
                 }
             }
+        }
+        if (viewModel.navigateTo != null) {
+            viewModel.navigationComplete()
         }
     }
 
