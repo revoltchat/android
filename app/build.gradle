@@ -111,7 +111,7 @@ dependencies {
 
     // Other AndroidX libraries - used for various things and never seem to have a consistent version
     implementation 'androidx.documentfile:documentfile:1.0.1'
-    implementation "androidx.browser:browser:1.4.0"
+    implementation "androidx.browser:browser:1.5.0"
     implementation "androidx.datastore:datastore-preferences:1.1.0-alpha01"
     implementation "androidx.datastore:datastore:1.1.0-alpha01"
 
