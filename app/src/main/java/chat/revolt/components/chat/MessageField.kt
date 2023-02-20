@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -87,7 +88,8 @@ fun MessageField(
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
                         errorIndicatorColor = Color.Transparent,
-                        placeholderColor = Color.Gray
+                        placeholderColor = Color.Gray,
+                        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
                     ),
                     contentPadding = PaddingValues(16.dp),
                     leadingIcon = {
@@ -126,7 +128,11 @@ fun MessageField(
                                     .padding(4.dp)
                             )
                         }
-                    }
+                    },
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp
+                    )
                 )
             }
         )

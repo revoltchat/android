@@ -33,10 +33,10 @@ enum class Presence {
 
 fun presenceFromStatus(status: String): Presence {
     return when (status) {
-        "online" -> Presence.Online
-        "idle" -> Presence.Idle
-        "dnd" -> Presence.Dnd
-        "focus" -> Presence.Focus
+        "Online" -> Presence.Online
+        "Idle" -> Presence.Idle
+        "Busy" -> Presence.Dnd
+        "Focus" -> Presence.Focus
         else -> Presence.Offline
     }
 }

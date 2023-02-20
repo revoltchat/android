@@ -161,6 +161,9 @@ object RealtimeSocket {
                 RevoltAPI.channelCache[channelUpdateFrame.id] =
                     existing.mergeWithPartial(channelUpdateFrame.data)
             }
+            "Authenticated" -> {
+                // No effect
+            }
             else -> {
                 Log.i("RealtimeSocket", "Unknown frame: $rawFrame")
             }

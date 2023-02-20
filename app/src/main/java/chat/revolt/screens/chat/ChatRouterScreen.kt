@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -96,7 +95,11 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
     val navController = rememberNavController(bottomSheetNavigator)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    ModalBottomSheetLayout(bottomSheetNavigator = bottomSheetNavigator) {
+    ModalBottomSheetLayout(
+        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        sheetBackgroundColor = MaterialTheme.colorScheme.surface,
+        bottomSheetNavigator = bottomSheetNavigator,
+    ) {
         Column {
             AnimatedVisibility(visible = RealtimeSocket.disconnectionState != DisconnectionState.Connected) {
                 DisconnectedNotice(
@@ -178,7 +181,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                 Surface(
                                     tonalElevation = 1.dp,
                                     modifier = Modifier
-                                        .padding(vertical = 4.dp)
+                                        .padding(start = 4.dp, top = 8.dp, bottom = 8.dp)
                                         .clip(RoundedCornerShape(16.dp))
                                 ) {
                                     Column(
@@ -215,7 +218,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                             Text(
                                                 text = server?.name
                                                     ?: stringResource(R.string.unknown),
-                                                fontWeight = FontWeight.Black,
+                                                style = MaterialTheme.typography.labelLarge,
                                                 fontSize = 24.sp,
                                                 modifier = Modifier.padding(16.dp)
                                             )

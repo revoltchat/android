@@ -126,12 +126,6 @@ fun DoubleDrawer(
                 modifier = Modifier
                     .fillMaxHeight()
                     .fillMaxWidth(drawerWeight)
-                    .clip(
-                        RoundedCornerShape(
-                            topEnd = 16.dp,
-                            bottomEnd = 16.dp
-                        )
-                    )
                     .align(Alignment.CenterStart)
                     .offset {
                         IntOffset(
@@ -140,15 +134,18 @@ fun DoubleDrawer(
                         )
                     },
             ) {
-                startPanel()
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp))
+                ) {
+                    startPanel()
+                }
             }
 
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(
-                        RoundedCornerShape(contentCornerRadius)
-                    )
                     .align(Alignment.Center)
                     .offset {
                         IntOffset(
@@ -157,7 +154,13 @@ fun DoubleDrawer(
                         )
                     },
             ) {
-                content()
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(contentCornerRadius))
+                ) {
+                    content()
+                }
             }
 
             Box(
@@ -178,7 +181,13 @@ fun DoubleDrawer(
                         )
                     },
             ) {
-                endPanel()
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
+                ) {
+                    endPanel()
+                }
             }
         }
     }
