@@ -25,7 +25,6 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.SheetClickable
-import chat.revolt.api.schemas.Message as MessageSchema
 
 @Composable
 fun MessageContextSheet(
@@ -54,7 +53,10 @@ fun MessageContextSheet(
                     .padding(bottom = 8.dp)
             ) {
                 Message(
-                    message = message.mergeWithPartial(MessageSchema(tail = false)),
+                    message = message.copy(
+                        tail = false,
+                        masquerade = null
+                    ),
                     truncate = true
                 )
             }
@@ -264,12 +266,7 @@ fun MessageContextSheet(
                     )
                 },
             ) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.comingsoon_toast),
-                    Toast.LENGTH_SHORT
-                ).show()
-                navController.popBackStack()
+                navController.navigate("report/message/${message.id}")
             }
         }
     }

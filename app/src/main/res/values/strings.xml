@@ -3,6 +3,7 @@
 
     <string name="back">← Back</string>
     <string name="next">Next →</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="lets_go">Let\'s go</string>
     <string name="loading">Fetching some info, hang in there…</string>
@@ -137,6 +138,50 @@
     <string name="message_context_sheet_actions_copy_link_copied">Copied message link to clipboard</string>
     <string name="message_context_sheet_actions_react">React</string>
     <string name="message_context_sheet_actions_report">Report</string>
+
+    <string name="report">Report</string>
+    <string name="report_cancel">Cancel</string>
+
+    <string name="report_message">Thank you for taking the time to report this message. Please provide a reason for reporting this message.</string>
+    <string name="report_message_preview">Selected message:</string>
+    <string name="report_server">Thank you for taking the time to report this server. Please provide a reason for reporting this server.</string>
+    <string name="report_server_preview">Selected server:</string>
+    <string name="report_user">Thank you for taking the time to report this user. Please provide a reason for reporting this user.</string>
+    <string name="report_user_preview">Selected user:</string>
+
+    <string name="report_reason">Reason</string>
+
+    <string name="report_reason_content_illegal">Illegal content</string>
+    <string name="report_reason_content_promotes_harm">Promotes harm</string>
+    <string name="report_reason_content_spam_abuse">Spam or similar platform abuse</string>
+    <string name="report_reason_content_malware">Malware or phishing</string>
+    <string name="report_reason_content_harassment">Harassment or cyberbullying</string>
+    <string name="report_reason_content_other">Other</string>
+
+    <string name="report_reason_user_spam_abuse">Spam or similar platform abuse</string>
+    <string name="report_reason_user_inappropriate_content">Inappropriate content (like NSFW)</string>
+    <string name="report_reason_user_impersonation">Impersonation</string>
+    <string name="report_reason_user_ban_evasion">Ban evasion</string>
+    <string name="report_reason_user_underage">Not of minimum age to use the platform</string>
+    <string name="report_reason_user_other">Other</string>
+
+    <string name="report_reason_additional">Additional information</string>
+    <string name="report_reason_additional_hint">Any additional information that may help us in our investigation. Optional.</string>
+
+    <string name="report_submit">Submit</string>
+    <string name="report_submitting">Reporting…</string>
+    <string name="report_submit_success">Reported</string>
+
+    <string name="report_submit_thanks">Thank you for helping to keep Revolt safe. We will review your report as soon as possible.</string>
+
+    <string name="report_submit_error_header">Error</string>
+    <string name="report_submit_error">An error occurred while submitting your report. Please try again later.</string>
+
+    <string name="report_submit_close">Close</string>
+
+    <string name="report_block_question">Would you like to block this user?</string>
+    <string name="report_block_yes">Block</string>
+    <string name="report_block_no">Don\'t block</string>
 
     <string name="settings_appearance">Appearance</string>
     <string name="settings_appearance_theme">Theme</string>

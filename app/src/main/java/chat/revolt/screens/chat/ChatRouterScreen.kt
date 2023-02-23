@@ -25,10 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.realtime.DisconnectionState
@@ -43,6 +40,7 @@ import chat.revolt.components.screens.chat.drawer.server.DrawerServer
 import chat.revolt.components.screens.chat.drawer.server.DrawerServerlikeIcon
 import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
 import chat.revolt.components.screens.chat.rememberDoubleDrawerState
+import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
 import chat.revolt.screens.chat.sheets.ChannelInfoSheet
 import chat.revolt.screens.chat.sheets.MessageContextSheet
 import chat.revolt.screens.chat.sheets.StatusSheet
@@ -301,6 +299,16 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                         }
                         bottomSheet("status") {
                             StatusSheet(navController = navController, topNav = topNav)
+                        }
+
+                        dialog("report/message/{messageId}") { backStackEntry ->
+                            val messageId = backStackEntry.arguments?.getString("messageId")
+                            if (messageId != null) {
+                                ReportMessageDialog(
+                                    navController = navController,
+                                    messageId = messageId
+                                )
+                            }
                         }
                     }
                 }

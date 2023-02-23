@@ -40,6 +40,7 @@ data class Message(
             edited = partial.edited ?: edited,
             embeds = partial.embeds ?: embeds,
             mentions = partial.mentions ?: mentions,
+            masquerade = partial.masquerade ?: masquerade,
             type = partial.type ?: type,
             tail = partial.tail ?: tail,
         )
