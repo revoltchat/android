@@ -33,6 +33,13 @@ object RealtimeSocket {
     }
 
     suspend fun connect(token: String) {
+        if (disconnectionState == DisconnectionState.Connected) {
+            Log.d("RealtimeSocket", "Already connected to websocket. Refusing to connect again.")
+            return
+        }
+        
+        socket?.close(CloseReason(CloseReason.Codes.NORMAL, "Reconnecting to websocket."))
+
         RevoltHttp.ws(REVOLT_WEBSOCKET) {
             socket = this
 

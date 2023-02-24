@@ -80,7 +80,7 @@ enum class UserReportReason(val value: String) {
 
 @Serializable
 data class MessageReport(
-    val type: String = "Message",
+    val type: String,
     val id: String,
     val report_reason: ContentReportReason,
 )
@@ -93,7 +93,7 @@ data class FullMessageReport(
 
 @Serializable
 data class ServerReport(
-    val type: String = "Server",
+    val type: String,
     val id: String,
     val report_reason: ContentReportReason,
 )
@@ -106,7 +106,7 @@ data class FullServerReport(
 
 @Serializable
 data class UserReport(
-    val type: String = "User",
+    val type: String,
     val id: String,
     val report_reason: UserReportReason,
 )

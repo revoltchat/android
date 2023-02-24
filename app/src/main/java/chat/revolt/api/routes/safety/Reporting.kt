@@ -16,8 +16,9 @@ suspend fun putMessageReport(
 ) {
     val fullMessageReport = FullMessageReport(
         content = MessageReport(
+            type = "Message",
             report_reason = reason,
-            id = messageId,
+            id = messageId
         ),
         additional_context = additionalContext,
     )
@@ -48,6 +49,7 @@ suspend fun putServerReport(
 ) {
     val fullServerReport = FullServerReport(
         content = ServerReport(
+            type = "Server",
             report_reason = reason,
             id = serverId,
         ),
@@ -80,6 +82,7 @@ suspend fun putUserReport(
 ) {
     val fullUserReport = FullUserReport(
         content = UserReport(
+            type = "User",
             report_reason = reason,
             id = userId,
         ),
