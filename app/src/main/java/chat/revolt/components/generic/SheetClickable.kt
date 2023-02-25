@@ -25,7 +25,7 @@ fun SheetClickable(
     label: @Composable (TextStyle) -> Unit,
     onClick: () -> Unit,
 ) {
-    Box(modifier = Modifier.padding(bottom = 8.dp)) {
+    Box(modifier = Modifier.padding(vertical = 4.dp)) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
@@ -46,7 +46,7 @@ fun SheetClickable(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun SettingsCategoryPreview() {
     SheetClickable(

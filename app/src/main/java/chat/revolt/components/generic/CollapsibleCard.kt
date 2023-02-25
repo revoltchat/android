@@ -62,6 +62,13 @@ fun CollapsibleCard(
 fun CollapsibleCardPreview() {
     CollapsibleCard(
         title = "Title",
-        content = { Text(text = "Content") }
+        content = {
+            Text(
+                text = "Content",
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth()
+            )
+        }
     )
 }

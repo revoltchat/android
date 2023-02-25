@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -45,14 +47,20 @@ fun AnyLink(text: String, action: () -> Unit, modifier: Modifier = Modifier) {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun WeblinkPreview() {
     Weblink(text = "https://revolt.chat", url = "https://revolt.chat")
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun AnyLinkPreview() {
-    AnyLink(text = "Click me!", action = {})
+    val clicked = remember {
+        mutableStateOf(0)
+    }
+
+    AnyLink(text = "Click me! #${clicked.value}", action = {
+        clicked.value++
+    })
 }

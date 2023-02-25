@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
@@ -129,5 +130,17 @@ fun UserAvatarWidthPlaceholder(
     Box(
         modifier = Modifier
             .width(size)
+    )
+}
+
+// Note - Preview will not render due to Glide not being able to load images in preview (NPE)
+// including here anyways on the off chance that it gets fixed in the future, or we switch to Coil lol
+@Preview
+@Composable
+fun UserAvatarWithPresencePreview() {
+    UserAvatar(
+        username = "infi",
+        userId = "01F1WKM5TK2V6KCZWR6DGBJDTZ",
+        presence = Presence.Online
     )
 }

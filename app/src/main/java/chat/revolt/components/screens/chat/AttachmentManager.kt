@@ -13,9 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.routes.microservices.autumn.FileArgs
+import java.io.File
 
 @Composable
 fun AttachmentManager(
@@ -61,4 +63,30 @@ fun AttachmentManager(
             Spacer(modifier = Modifier.width(8.dp))
         }
     }
+}
+
+@Preview
+@Composable
+fun AttachmentManagerPreview() {
+    AttachmentManager(
+        attachments = listOf(
+            FileArgs(
+                filename = "file1.png",
+                contentType = "image/png",
+                file = File("file1.png"),
+            ),
+            FileArgs(
+                filename = "file2.png",
+                contentType = "image/png",
+                file = File("file2.png"),
+            ),
+            FileArgs(
+                filename = "file3.png",
+                contentType = "image/png",
+                file = File("file3.png"),
+            ),
+        ),
+        uploading = false,
+        onRemove = {}
+    )
 }
