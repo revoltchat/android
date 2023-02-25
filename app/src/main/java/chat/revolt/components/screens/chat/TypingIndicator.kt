@@ -5,10 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,9 +45,15 @@ fun TypingIndicator(
     ) {
         Row(
             Modifier
-                .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
-                .padding(all = 4.dp)
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                    )
+                )
+                .background(MaterialTheme.colorScheme.background)
+                .padding(vertical = 8.dp, horizontal = 16.dp)
         ) {
             Text(
                 text = stringResource(

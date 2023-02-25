@@ -377,7 +377,7 @@ fun ChannelScreen(
     }
 
     val scrollDownFABPadding by animateDpAsState(
-        if (viewModel.typingUsers.isNotEmpty()) 32.dp else 0.dp,
+        if (viewModel.typingUsers.isNotEmpty()) 40.dp else 0.dp,
         animationSpec = RevoltTweenDp
     )
 
@@ -462,7 +462,7 @@ fun ChannelScreen(
         ) {
             LazyColumn(state = lazyListState, reverseLayout = true) {
                 item {
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
 
                 items(viewModel.renderableMessages) { message ->
@@ -523,33 +523,42 @@ fun ChannelScreen(
             )
         }
 
-        AnimatedVisibility(visible = viewModel.replies.isNotEmpty()) {
-            ReplyManager(
-                replies = viewModel.replies,
-                onRemove = viewModel::removeReply,
-                onToggleMention = viewModel::toggleReplyMentionFor
+        Column(
+            modifier = Modifier.clip(
+                RoundedCornerShape(
+                    topStart = 16.dp,
+                    topEnd = 16.dp
+                )
+            )
+        ) {
+            AnimatedVisibility(visible = viewModel.replies.isNotEmpty()) {
+                ReplyManager(
+                    replies = viewModel.replies,
+                    onRemove = viewModel::removeReply,
+                    onToggleMention = viewModel::toggleReplyMentionFor
+                )
+            }
+
+            AnimatedVisibility(visible = viewModel.attachments.isNotEmpty()) {
+                AttachmentManager(
+                    attachments = viewModel.attachments,
+                    uploading = viewModel.sendingMessage,
+                    onRemove = viewModel::removeAttachment
+                )
+            }
+
+            MessageField(
+                messageContent = viewModel.messageContent,
+                onMessageContentChange = viewModel::setMessageContent,
+                onSendMessage = viewModel::sendPendingMessage,
+                onAddAttachment = {
+                    pickFileLauncher.launch(arrayOf("*/*"))
+                },
+                channelType = channel.channelType!!,
+                channelName = channel.name ?: channel.id!!,
+                forceSendButton = viewModel.attachments.isNotEmpty(),
+                disabled = viewModel.attachments.isNotEmpty() && viewModel.sendingMessage
             )
         }
-
-        AnimatedVisibility(visible = viewModel.attachments.isNotEmpty()) {
-            AttachmentManager(
-                attachments = viewModel.attachments,
-                uploading = viewModel.sendingMessage,
-                onRemove = viewModel::removeAttachment
-            )
-        }
-
-        MessageField(
-            messageContent = viewModel.messageContent,
-            onMessageContentChange = viewModel::setMessageContent,
-            onSendMessage = viewModel::sendPendingMessage,
-            onAddAttachment = {
-                pickFileLauncher.launch(arrayOf("*/*"))
-            },
-            channelType = channel.channelType!!,
-            channelName = channel.name ?: channel.id!!,
-            forceSendButton = viewModel.attachments.isNotEmpty(),
-            disabled = viewModel.attachments.isNotEmpty() && viewModel.sendingMessage
-        )
     }
 }
