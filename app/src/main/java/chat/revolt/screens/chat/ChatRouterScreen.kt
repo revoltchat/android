@@ -201,6 +201,12 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                                             selected = channel.id == (navBackStackEntry?.arguments?.getString(
                                                                 "channelId"
                                                             ) ?: false),
+                                                            hasUnread = channel.lastMessageID?.let { lastMessageID ->
+                                                                RevoltAPI.unreads.hasUnread(
+                                                                    channel.id!!,
+                                                                    lastMessageID
+                                                                )
+                                                            } ?: false,
                                                             onClick = {
                                                                 navController.navigate("channel/${channel.id}")
                                                                 scope.launch {
@@ -234,6 +240,12 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                                             selected = navBackStackEntry?.arguments?.getString(
                                                                 "channelId"
                                                             ) == ch.id,
+                                                            hasUnread = ch.lastMessageID?.let { lastMessageID ->
+                                                                RevoltAPI.unreads.hasUnread(
+                                                                    ch.id!!,
+                                                                    lastMessageID
+                                                                )
+                                                            } ?: true,
                                                             onClick = {
                                                                 scope.launch { drawerState.focusCenter() }
                                                                 navController.navigate("channel/${ch.id}") {

@@ -1,9 +1,9 @@
 package chat.revolt.api.schemas
 
 import kotlinx.serialization.*
-import kotlinx.serialization.json.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.*
 
 @Serializable
 data class MessagesInChannel(
@@ -43,6 +43,7 @@ data class Channel(
     val description: String? = null,
     val recipients: List<String>? = null,
     val icon: AutumnResource? = null,
+    @SerialName("last_message_id")
     val lastMessageID: String? = null,
     val active: Boolean? = null,
     val permissions: Long? = null,
@@ -108,3 +109,25 @@ enum class ChannelType(val value: String) {
         }
     }
 }
+
+@Serializable
+data class ChannelUserChoice(
+    val channel: String,
+    val user: String,
+)
+
+@Serializable
+data class ChannelUnreadResponse(
+    @SerialName("_id")
+    val id: ChannelUserChoice,
+    val last_id: String? = null,
+    val mentions: List<String>? = null,
+)
+
+@Serializable
+data class ChannelUnread(
+    @SerialName("_id")
+    val id: String,
+    val last_id: String? = null,
+    val mentions: List<String>? = null,
+)

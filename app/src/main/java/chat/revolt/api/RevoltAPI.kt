@@ -8,6 +8,7 @@ import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.user.fetchSelf
 import chat.revolt.api.schemas.*
+import chat.revolt.api.unreads.Unreads
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
@@ -75,6 +76,8 @@ object RevoltAPI {
     val emojiCache = mutableStateMapOf<String, Emoji>()
     val messageCache = mutableStateMapOf<String, Message>()
 
+    val unreads = Unreads()
+
     var selfId: String? = null
 
     var sessionToken: String = ""
@@ -89,8 +92,8 @@ object RevoltAPI {
     suspend fun loginAs(token: String) {
         setSessionHeader(token)
         fetchSelf()
-
         startSocketOps()
+        unreads.sync()
     }
 
     suspend fun connectWS() {
@@ -153,6 +156,8 @@ object RevoltAPI {
         channelCache.clear()
         emojiCache.clear()
         messageCache.clear()
+
+        unreads.clear()
 
         socketThread?.interrupt()
     }

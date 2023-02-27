@@ -97,6 +97,8 @@
     <string name="channel_group">Group</string>
     <string name="channel_notes">Notes</string>
 
+    <string name="start_of_conversation">This is the start of your conversation</string>
+
     <string name="message_field_placeholder_dm">Message @%1$s</string>
     <string name="message_field_placeholder_text">Message #%1$s</string>
     <string name="message_field_placeholder_voice">Message #%1$s</string>

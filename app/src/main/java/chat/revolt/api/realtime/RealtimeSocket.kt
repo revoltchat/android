@@ -24,7 +24,7 @@ enum class DisconnectionState {
 object RealtimeSocket {
     var socket: WebSocketSession? = null
 
-    private var _disconnectionState = mutableStateOf(DisconnectionState.Disconnected)
+    private var _disconnectionState = mutableStateOf(DisconnectionState.Reconnecting)
     val disconnectionState: DisconnectionState
         get() = _disconnectionState.value
 
@@ -37,7 +37,7 @@ object RealtimeSocket {
             Log.d("RealtimeSocket", "Already connected to websocket. Refusing to connect again.")
             return
         }
-        
+
         socket?.close(CloseReason(CloseReason.Codes.NORMAL, "Reconnecting to websocket."))
 
         RevoltHttp.ws(REVOLT_WEBSOCKET) {
@@ -52,7 +52,15 @@ object RealtimeSocket {
             val authFrameString =
                 RevoltJson.encodeToString(AuthorizationFrame.serializer(), authFrame)
 
-            Log.d("RealtimeSocket", "Sending authorization frame: $authFrameString")
+            Log.d(
+                "RealtimeSocket",
+                "Sending authorization frame: ${
+                    authFrameString.replace(
+                        token,
+                        "X".repeat(token.length)
+                    )
+                }"
+            )
             send(RevoltJson.encodeToString(AuthorizationFrame.serializer(), authFrame))
 
             incoming.consumeEach { frame ->
@@ -126,6 +134,12 @@ object RealtimeSocket {
 
                 RevoltAPI.messageCache[messageFrame.id!!] = messageFrame
 
+                // Update last message ID for channel - important for unreads
+                messageFrame.channel?.let {
+                    RevoltAPI.channelCache[it] =
+                        RevoltAPI.channelCache[it]!!.copy(lastMessageID = messageFrame.id)
+                }
+
                 channelCallbacks[messageFrame.channel]?.onMessage(messageFrame)
             }
             "ChannelStartTyping" -> {
@@ -167,6 +181,16 @@ object RealtimeSocket {
 
                 RevoltAPI.channelCache[channelUpdateFrame.id] =
                     existing.mergeWithPartial(channelUpdateFrame.data)
+            }
+            "ChannelAck" -> {
+                val channelAckFrame =
+                    RevoltJson.decodeFromString(ChannelAckFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received channel ack frame for ${channelAckFrame.id} with new newest ${channelAckFrame.messageId}."
+                )
+
+                RevoltAPI.unreads.processExternalAck(channelAckFrame.id, channelAckFrame.messageId)
             }
             "Authenticated" -> {
                 // No effect

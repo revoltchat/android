@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
@@ -39,6 +40,7 @@ import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
 import chat.revolt.api.realtime.frames.receivable.MessageFrame
 import chat.revolt.api.routes.channel.SendMessageReply
+import chat.revolt.api.routes.channel.ackChannel
 import chat.revolt.api.routes.channel.fetchMessagesFromChannel
 import chat.revolt.api.routes.channel.sendMessage
 import chat.revolt.api.routes.microservices.autumn.FileArgs
@@ -54,6 +56,8 @@ import chat.revolt.components.screens.chat.ChannelIcon
 import chat.revolt.components.screens.chat.ReplyManager
 import chat.revolt.components.screens.chat.TypingIndicator
 import io.ktor.http.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -145,6 +149,14 @@ class ChannelScreenViewModel : ViewModel() {
         _replies.clear()
     }
 
+    private var _noMoreMessages by mutableStateOf(false)
+    val noMoreMessages: Boolean
+        get() = _noMoreMessages
+
+    private fun setNoMoreMessages(noMore: Boolean) {
+        _noMoreMessages = noMore
+    }
+
     private var _uiCallbackReceiver = mutableStateOf<UiCallbacks.CallbackReceiver?>(null)
     val uiCallbackReceiver: UiCallbacks.CallbackReceiver?
         get() = _uiCallbackReceiver.value
@@ -156,6 +168,7 @@ class ChannelScreenViewModel : ViewModel() {
             }
 
             regroupMessages(listOf(message) + renderableMessages)
+            ackNewest()
         }
 
         override fun onStartTyping(typing: ChannelStartTypingFrame) {
@@ -206,7 +219,11 @@ class ChannelScreenViewModel : ViewModel() {
         viewModelScope.launch {
             val messages = arrayListOf<MessageSchema>()
             fetchMessagesFromChannel(channel!!.id!!, limit = 50, false).let {
-                it.messages!!.forEach { message ->
+                if (it.messages.isNullOrEmpty() || it.messages.size < 50) {
+                    setNoMoreMessages(true)
+                }
+
+                it.messages?.forEach { message ->
                     addUserIfUnknown(message.author ?: return@forEach)
                     if (!RevoltAPI.messageCache.containsKey(message.id)) {
                         RevoltAPI.messageCache[message.id!!] = message
@@ -233,7 +250,11 @@ class ChannelScreenViewModel : ViewModel() {
                     true,
                     before = renderableMessages.last().id
                 ).let {
-                    it.messages!!.forEach { message ->
+                    if (it.messages.isNullOrEmpty() || it.messages.size < 50) {
+                        setNoMoreMessages(true)
+                    }
+
+                    it.messages?.forEach { message ->
                         addUserIfUnknown(message.author ?: return@forEach)
                         if (!RevoltAPI.messageCache.containsKey(message.id)) {
                             RevoltAPI.messageCache[message.id!!] = message
@@ -243,7 +264,11 @@ class ChannelScreenViewModel : ViewModel() {
                 }
             } else {
                 fetchMessagesFromChannel(channel!!.id!!, limit = 50, true).let {
-                    it.messages!!.forEach { message ->
+                    if (it.messages.isNullOrEmpty() || it.messages.size < 50) {
+                        setNoMoreMessages(true)
+                    }
+
+                    it.messages?.forEach { message ->
                         addUserIfUnknown(message.author ?: return@forEach)
                         if (!RevoltAPI.messageCache.containsKey(message.id)) {
                             RevoltAPI.messageCache[message.id!!] = message
@@ -265,6 +290,10 @@ class ChannelScreenViewModel : ViewModel() {
         }
 
         registerCallbacks()
+
+        if (channel?.lastMessageID != null) {
+            ackNewest()
+        }
     }
 
     fun sendPendingMessage() {
@@ -336,6 +365,27 @@ class ChannelScreenViewModel : ViewModel() {
         }
 
         setRenderableMessages(groupedMessages)
+    }
+
+    private var debouncedChannelAck: Job? = null
+    private fun ackNewest() {
+        if (debouncedChannelAck?.isActive == true) {
+            debouncedChannelAck?.cancel()
+
+            Log.d("ChannelScreen", "Cancelling channel ack")
+        }
+
+        if (channel?.lastMessageID == null) return
+
+        RevoltAPI.unreads.processExternalAck(channel!!.id!!, channel!!.lastMessageID!!)
+
+        debouncedChannelAck = viewModelScope.launch {
+            delay(1000)
+            if (channel?.lastMessageID == null) return@launch
+            ackChannel(channel!!.id!!, channel!!.lastMessageID!!)
+
+            Log.d("ChannelScreen", "Acking channel")
+        }
     }
 }
 
@@ -450,6 +500,7 @@ fun ChannelScreen(
                 .collect {
                     if (it) {
                         coroutineScope.launch {
+                            if (viewModel.noMoreMessages) return@launch
                             viewModel.fetchOlderMessages()
                         }
                     }
@@ -472,11 +523,25 @@ fun ChannelScreen(
                 }
 
                 item {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
+                    if (viewModel.noMoreMessages) {
+                        Text(
+                            text = stringResource(R.string.start_of_conversation),
                             modifier = Modifier
-                                .padding(16.dp)
+                                .padding(start = 8.dp, end = 8.dp, top = 64.dp, bottom = 32.dp)
+                                .fillMaxWidth(),
+                            style = MaterialTheme.typography.labelLarge,
+                            textAlign = TextAlign.Center
                         )
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                            )
+                        }
                     }
                 }
             }

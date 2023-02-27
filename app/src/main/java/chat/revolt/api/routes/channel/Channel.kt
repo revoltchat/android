@@ -90,3 +90,9 @@ suspend fun sendMessage(
 
     return response
 }
+
+suspend fun ackChannel(channelId: String, messageId: String = ULID.makeNext()) {
+    RevoltHttp.put("/channels/$channelId/ack/$messageId") {
+        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+    }
+}
