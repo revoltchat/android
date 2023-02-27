@@ -113,7 +113,8 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                             Column(
                                 modifier = Modifier
                                     .fillMaxHeight()
-                                    .verticalScroll(rememberScrollState())
+                                    .verticalScroll(rememberScrollState()),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 UserAvatar(
                                     username = RevoltAPI.userCache[RevoltAPI.selfId]?.username
@@ -142,14 +143,15 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                 RevoltAPI.serverCache.values
                                     .sortedBy { it.id }
                                     .forEach { server ->
-                                        if (server.name == null) return@forEach
+                                        if (server.id == null || server.name == null) return@forEach
 
                                         DrawerServer(
                                             iconId = server.icon?.id,
-                                            serverName = server.name
+                                            serverName = server.name,
+                                            hasUnreads = RevoltAPI.unreads.serverHasUnread(server.id),
                                         ) {
                                             viewModel.navigateToServer(
-                                                server.id!!,
+                                                server.id,
                                                 navController
                                             )
                                         }

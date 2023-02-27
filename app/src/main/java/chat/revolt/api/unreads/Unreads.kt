@@ -7,6 +7,7 @@ import chat.revolt.api.internals.ULID
 import chat.revolt.api.routes.channel.ackChannel
 import chat.revolt.api.routes.server.ackServer
 import chat.revolt.api.routes.sync.syncUnreads
+import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.ChannelUnread
 
 class Unreads {
@@ -33,6 +34,17 @@ class Unreads {
     fun hasUnread(channelId: String, lastMessageId: String): Boolean {
         if (!hasLoaded.value) return false
         return (channels[channelId]?.last_id?.compareTo(lastMessageId) ?: 0) < 0
+    }
+
+    fun serverHasUnread(serverId: String): Boolean {
+        if (!hasLoaded.value) return false
+
+        return RevoltAPI.serverCache[serverId]?.channels?.any {
+            val channel = RevoltAPI.channelCache[it] ?: return@any false
+            if (channel.channelType == ChannelType.VoiceChannel) return@any false // TODO remove this when text in voice channels is implemented
+            hasUnread(it, channel.lastMessageID ?: "")
+        }
+            ?: false
     }
 
     suspend fun markAsRead(channelId: String, messageId: String, sync: Boolean = true) {

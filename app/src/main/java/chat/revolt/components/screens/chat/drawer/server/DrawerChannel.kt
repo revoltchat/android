@@ -44,7 +44,7 @@ fun DrawerChannel(
         animationSpec = spring()
     )
     val channelAlpha = animateFloatAsState(
-        if (hasUnread) 1f else 0.8f,
+        if (hasUnread || selected) 1f else 0.8f,
         animationSpec = spring()
     )
 
