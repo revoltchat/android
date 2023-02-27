@@ -12,12 +12,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,17 +28,17 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
-import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.chat.DisconnectedNotice
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.DoubleDrawer
-import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
+import chat.revolt.components.screens.chat.drawer.channel.ChannelList
 import chat.revolt.components.screens.chat.drawer.server.DrawerServer
 import chat.revolt.components.screens.chat.drawer.server.DrawerServerlikeIcon
 import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
 import chat.revolt.components.screens.chat.rememberDoubleDrawerState
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
+import chat.revolt.screens.chat.sheets.ChannelContextSheet
 import chat.revolt.screens.chat.sheets.ChannelInfoSheet
 import chat.revolt.screens.chat.sheets.MessageContextSheet
 import chat.revolt.screens.chat.sheets.StatusSheet
@@ -91,7 +89,6 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
 
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberNavController(bottomSheetNavigator)
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
@@ -176,91 +173,11 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                             }
 
                             Crossfade(targetState = viewModel.currentServer) {
-                                Surface(
-                                    tonalElevation = 1.dp,
-                                    modifier = Modifier
-                                        .padding(start = 4.dp, top = 8.dp, bottom = 8.dp)
-                                        .clip(RoundedCornerShape(16.dp))
-                                ) {
-                                    Column(
-                                        Modifier
-                                            .weight(1f)
-                                    ) {
-                                        if (it == "home") {
-                                            Column(
-                                                Modifier
-                                                    .weight(1f)
-                                                    .verticalScroll(rememberScrollState())
-                                            ) {
-                                                RevoltAPI.channelCache.values.filter { it.channelType == ChannelType.Group }
-                                                    .forEach { channel ->
-                                                        DrawerChannel(
-                                                            name = channel.name
-                                                                ?: "GDM #${channel.id}",
-                                                            channelType = ChannelType.Group,
-                                                            selected = channel.id == (navBackStackEntry?.arguments?.getString(
-                                                                "channelId"
-                                                            ) ?: false),
-                                                            hasUnread = channel.lastMessageID?.let { lastMessageID ->
-                                                                RevoltAPI.unreads.hasUnread(
-                                                                    channel.id!!,
-                                                                    lastMessageID
-                                                                )
-                                                            } ?: false,
-                                                            onClick = {
-                                                                navController.navigate("channel/${channel.id}")
-                                                                scope.launch {
-                                                                    drawerState.focusCenter()
-                                                                }
-                                                            }
-                                                        )
-                                                    }
-                                            }
-                                        } else {
-                                            val server = RevoltAPI.serverCache[it]
-
-                                            Text(
-                                                text = server?.name
-                                                    ?: stringResource(R.string.unknown),
-                                                style = MaterialTheme.typography.labelLarge,
-                                                fontSize = 24.sp,
-                                                modifier = Modifier.padding(16.dp)
-                                            )
-
-                                            Column(
-                                                Modifier
-                                                    .weight(1f)
-                                                    .verticalScroll(rememberScrollState())
-                                            ) {
-                                                server?.channels?.forEach { channelId ->
-                                                    RevoltAPI.channelCache[channelId]?.let { ch ->
-                                                        DrawerChannel(
-                                                            name = ch.name!!,
-                                                            channelType = ch.channelType!!,
-                                                            selected = navBackStackEntry?.arguments?.getString(
-                                                                "channelId"
-                                                            ) == ch.id,
-                                                            hasUnread = ch.lastMessageID?.let { lastMessageID ->
-                                                                RevoltAPI.unreads.hasUnread(
-                                                                    ch.id!!,
-                                                                    lastMessageID
-                                                                )
-                                                            } ?: true,
-                                                            onClick = {
-                                                                scope.launch { drawerState.focusCenter() }
-                                                                navController.navigate("channel/${ch.id}") {
-                                                                    popUpTo("home") {
-                                                                        inclusive = true
-                                                                    }
-                                                                }
-                                                            }
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                ChannelList(
+                                    serverId = it,
+                                    navController = navController,
+                                    drawerState = drawerState
+                                )
                             }
                         }
                     }
@@ -295,6 +212,15 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                             val channelId = backStackEntry.arguments?.getString("channelId")
                             if (channelId != null) {
                                 ChannelInfoSheet(
+                                    navController = navController,
+                                    channelId = channelId
+                                )
+                            }
+                        }
+                        bottomSheet("channel/{channelId}/menu") { backStackEntry ->
+                            val channelId = backStackEntry.arguments?.getString("channelId")
+                            if (channelId != null) {
+                                ChannelContextSheet(
                                     navController = navController,
                                     channelId = channelId
                                 )

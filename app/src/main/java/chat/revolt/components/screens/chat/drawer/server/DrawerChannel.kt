@@ -3,8 +3,9 @@ package chat.revolt.components.screens.chat.drawer.server
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.LocalContentColor
@@ -22,13 +23,15 @@ import androidx.compose.ui.unit.dp
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.screens.chat.ChannelIcon
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DrawerChannel(
     channelType: ChannelType,
     name: String,
     selected: Boolean,
     hasUnread: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit = {},
 ) {
     val backgroundColor = animateColorAsState(
         if (selected) MaterialTheme.colorScheme.background
@@ -52,7 +55,10 @@ fun DrawerChannel(
             .clip(MaterialTheme.shapes.medium)
             .background(backgroundColor.value)
             .alpha(channelAlpha.value)
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
