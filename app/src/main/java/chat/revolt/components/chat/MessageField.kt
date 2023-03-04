@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
@@ -76,10 +77,12 @@ fun MessageField(
                     interactionSource = remember { MutableInteractionSource() },
                     placeholder = {
                         Text(
-                            stringResource(
+                            text = stringResource(
                                 id = placeholderResource,
                                 channelName
-                            )
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     },
                     colors = TextFieldDefaults.textFieldColors(

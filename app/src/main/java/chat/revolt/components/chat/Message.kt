@@ -9,8 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,7 +20,6 @@ import chat.revolt.api.asJanuaryProxyUrl
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.schemas.AutumnResource
-import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.markdown.Markdown
@@ -135,6 +132,8 @@ fun Message(
                 }
 
                 message.content?.let {
+                    if (message.content.isBlank()) return@let // if only an attachment is sent
+
                     Text(
                         text = Markdown.annotate(it),
                         maxLines = if (truncate) 1 else Int.MAX_VALUE,
@@ -143,34 +142,10 @@ fun Message(
                 }
 
                 message.attachments?.let {
-                    if (message.attachments.isNotEmpty()) {
-                        message.attachments.forEach { attachment ->
-                            if (attachment.metadata?.type == "Image") {
-                                RemoteImage(
-                                    url = "$REVOLT_FILES/attachments/${attachment.id}/image.png",
-                                    modifier = Modifier
-                                        .padding(top = 5.dp)
-                                        .clickable {
-                                            viewAttachmentInBrowser(context, attachment)
-                                        },
-                                    width = attachment.metadata.width?.toInt() ?: 0,
-                                    height = attachment.metadata.height?.toInt() ?: 0,
-                                    contentScale = ContentScale.Fit,
-                                    description = "Attached image ${attachment.filename}"
-                                )
-                            } else {
-                                Text(
-                                    text = attachment.filename ?: "Attachment",
-                                    fontWeight = FontWeight.Medium,
-                                    modifier = Modifier
-                                        .clip(MaterialTheme.shapes.medium)
-                                        .clickable {
-                                            viewAttachmentInBrowser(context, attachment)
-                                        }
-                                        .background(MaterialTheme.colorScheme.surface)
-                                        .padding(8.dp)
-                                )
-                            }
+                    message.attachments.forEach { attachment ->
+                        Spacer(modifier = Modifier.height(5.dp))
+                        MessageAttachment(attachment) {
+                            viewAttachmentInBrowser(context, attachment)
                         }
                     }
                 }
