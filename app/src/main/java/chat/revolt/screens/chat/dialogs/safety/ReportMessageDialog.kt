@@ -27,6 +27,7 @@ import chat.revolt.api.routes.user.blockUser
 import chat.revolt.api.schemas.ContentReportReason
 import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.FormTextField
+import chat.revolt.markdown.Markdown
 import kotlinx.coroutines.launch
 
 enum class ReportingState {
@@ -47,6 +48,9 @@ fun ReportMessageDialog(
         navController.popBackStack()
         return
     }
+
+    val author = RevoltAPI.userCache[message.author]
+    val messageIsBridged = author?.let { author.bot != null && message.masquerade != null } ?: false
 
     val state = remember { mutableStateOf(ReportingState.Reason) }
 
@@ -101,6 +105,14 @@ fun ReportMessageDialog(
                                     masquerade = null
                                 ),
                                 truncate = false
+                            )
+                        }
+
+                        if (messageIsBridged) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = Markdown.annotate(stringResource(id = R.string.report_message_bridge_notice)),
+                                fontSize = 12.sp
                             )
                         }
 

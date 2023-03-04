@@ -58,10 +58,3 @@ open class Node(
      */
     val position: Position = Position()
 )
-
-open class UnistParent(
-    /**
-     * List representing the children of a node.
-     */
-    val children: List<Node> = emptyList()
-) : Node()

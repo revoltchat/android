@@ -155,6 +155,7 @@
 
     <string name="report_message">Thank you for taking the time to report this message. Please provide a reason for reporting this message.</string>
     <string name="report_message_preview">Selected message:</string>
+    <string name="report_message_bridge_notice">**Note:** This message may have been sent from another platform. It is recommended to also report the message on the platform it was sent from.</string>
     <string name="report_server">Thank you for taking the time to report this server. Please provide a reason for reporting this server.</string>
     <string name="report_server_preview">Selected server:</string>
     <string name="report_user">Thank you for taking the time to report this user. Please provide a reason for reporting this user.</string>

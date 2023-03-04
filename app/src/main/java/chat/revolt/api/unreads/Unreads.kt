@@ -50,11 +50,7 @@ class Unreads {
     suspend fun markAsRead(channelId: String, messageId: String, sync: Boolean = true) {
         if (!hasLoaded.value) return
         channels[channelId]?.let {
-            if (it.last_id == messageId) {
-                channels.remove(channelId)
-            } else {
-                channels[channelId] = it.copy(last_id = messageId)
-            }
+            channels[channelId] = it.copy(last_id = messageId)
         }
         if (sync) {
             ackChannel(channelId, messageId)
@@ -63,11 +59,7 @@ class Unreads {
 
     fun processExternalAck(channelId: String, messageId: String) {
         channels[channelId]?.let {
-            if (it.last_id == messageId) {
-                channels.remove(channelId)
-            } else {
-                channels[channelId] = it.copy(last_id = messageId)
-            }
+            channels[channelId] = it.copy(last_id = messageId)
         }
     }
 

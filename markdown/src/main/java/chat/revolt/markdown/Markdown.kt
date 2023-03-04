@@ -5,8 +5,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 
-object Renderer {
-    fun annotateMarkdown(text: String): AnnotatedString {
+object Markdown {
+    fun <Ctx> annotateInContext(text: String, context: Ctx): AnnotatedString {
         // TODO this is all placeholder code
         val boldRegex = Regex("\\*\\*(.*?)\\*\\*")
         return buildAnnotatedString {
@@ -23,4 +23,6 @@ object Renderer {
             toAnnotatedString()
         }
     }
+
+    fun annotate(text: String): AnnotatedString = annotateInContext(text, Unit)
 }

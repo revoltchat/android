@@ -1,6 +1,7 @@
 package chat.revolt.components.chat
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -24,7 +25,7 @@ import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
-import chat.revolt.markdown.Renderer
+import chat.revolt.markdown.Markdown
 import chat.revolt.api.schemas.Message as MessageSchema
 
 fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnResource) {
@@ -62,13 +63,17 @@ fun Message(
         }
 
         message.replies?.forEach { reply ->
-            val replyMessage = RevoltAPI.messageCache[reply] ?: return@forEach
+            val replyMessage = RevoltAPI.messageCache[reply]
 
             InReplyTo(
                 messageId = reply,
-                withMention = message.mentions?.contains(replyMessage.author) == true
+                withMention = replyMessage?.author?.let { message.mentions?.contains(replyMessage.author) }
+                    ?: false,
             ) {
                 // TODO Add jump to message
+                if (replyMessage == null) {
+                    Toast.makeText(context, "lmao prankd", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -131,7 +136,7 @@ fun Message(
 
                 message.content?.let {
                     Text(
-                        text = Renderer.annotateMarkdown(it),
+                        text = Markdown.annotate(it),
                         maxLines = if (truncate) 1 else Int.MAX_VALUE,
                         overflow = TextOverflow.Ellipsis
                     )
