@@ -427,7 +427,7 @@ fun ChannelScreen(
     }
 
     val scrollDownFABPadding by animateDpAsState(
-        if (viewModel.typingUsers.isNotEmpty()) 40.dp else 0.dp,
+        if (viewModel.typingUsers.isNotEmpty()) 25.dp else 0.dp,
         animationSpec = RevoltTweenDp
     )
 
@@ -513,10 +513,13 @@ fun ChannelScreen(
         ) {
             LazyColumn(state = lazyListState, reverseLayout = true) {
                 item {
-                    Spacer(modifier = Modifier.height(40.dp))
+                    Spacer(modifier = Modifier.height(25.dp))
                 }
 
-                items(viewModel.renderableMessages) { message ->
+                items(
+                    items = viewModel.renderableMessages,
+                    key = { it.id!! }
+                ) { message ->
                     Message(message) {
                         navController.navigate("message/${message.id}/menu")
                     }
@@ -589,12 +592,14 @@ fun ChannelScreen(
         }
 
         Column(
-            modifier = Modifier.clip(
-                RoundedCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 16.dp
+            modifier = Modifier
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp,
+                    top = 8.dp
                 )
-            )
+                .clip(MaterialTheme.shapes.medium)
         ) {
             AnimatedVisibility(visible = viewModel.replies.isNotEmpty()) {
                 ReplyManager(

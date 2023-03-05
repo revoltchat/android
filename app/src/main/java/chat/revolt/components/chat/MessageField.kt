@@ -1,6 +1,7 @@
 package chat.revolt.components.chat
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -54,7 +55,10 @@ fun MessageField(
 
     val sendButtonVisible = (messageContent.isNotBlank() || forceSendButton) && !disabled
 
-    Row(modifier) {
+    Row(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+    ) {
         BasicTextField(
             value = messageContent,
             onValueChange = onMessageContentChange,
