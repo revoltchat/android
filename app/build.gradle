@@ -110,6 +110,10 @@ dependencies {
     // AboutLibraries - automated OSS library attribution
     implementation "com.mikepenz:aboutlibraries-compose:$aboutlibraries_version"
 
+    // Sentry - crash reporting
+    implementation 'io.sentry:sentry-android:6.15.0'
+    implementation 'io.sentry:sentry-compose-android:6.15.0'
+
     // Other AndroidX libraries - used for various things and never seem to have a consistent version
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation "androidx.browser:browser:1.5.0"
