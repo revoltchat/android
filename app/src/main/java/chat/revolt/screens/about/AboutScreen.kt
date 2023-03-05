@@ -177,12 +177,6 @@ fun AboutScreen(
             ) {
                 Text(text = stringResource(id = R.string.oss_attribution))
             }
-            Button(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.back))
-            }
         }
     }
 }
