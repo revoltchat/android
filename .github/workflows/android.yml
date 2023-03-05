@@ -9,28 +9,31 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      RVX_SENTRY_DSN: ""
+
     steps:
-    - uses: actions/checkout@v3
-    - name: set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'microsoft'
-        cache: gradle
+      - uses: actions/checkout@v3
+      - name: set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'microsoft'
+          cache: gradle
 
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
-    
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-      
-    - name: Build with Gradle
-      run: ./gradlew --no-daemon assembleDebug
-      
-    - name: Archive debug APK
-      uses: actions/upload-artifact@v3
-      with:
-        name: debug-apk
-        path: |
-          app/build/outputs/apk/debug/app-debug.apk
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Archive debug APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: debug-apk
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk

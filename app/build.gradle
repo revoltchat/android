@@ -9,7 +9,7 @@ plugins {
     id 'kotlin-kapt'
 }
 
-def property(String fileName, String propertyName) {
+def property(String fileName, String propertyName, String fallbackEnv = null) {
     def propsFile = rootProject.file(fileName)
     if (propsFile.exists()) {
         def props = new Properties()
@@ -17,10 +17,28 @@ def property(String fileName, String propertyName) {
         if (props[propertyName] != null) {
             return props[propertyName]
         } else {
-            throw new GradleException("'" + propertyName + "' not found in '" + fileName + "'")
+            logger.warn("Property '$propertyName' not found in '$fileName'. Attempting to use environment variable '$fallbackEnv'")
+            if (fallbackEnv != null) {
+                def env = System.getenv(fallbackEnv)
+                if (env != null) {
+                    return env
+                } else {
+                    logger.warn("Environment variable '$fallbackEnv' not found either. Returning null")
+                }
+            }
+            return null
         }
     } else {
-        throw new GradleException("'" + fileName + "' not found in app/, please create it from '" + fileName + ".example'")
+        logger.warn("Properties file '$fileName' not found. Attempting to use environment variable '$fallbackEnv'")
+        if (fallbackEnv != null) {
+            def env = System.getenv(fallbackEnv)
+            if (env != null) {
+                return env
+            } else {
+                logger.warn("Environment variable '$fallbackEnv' not found either. Returning null")
+            }
+        }
+        return null
     }
 }
 
@@ -45,11 +63,11 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn')}\""
+            buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn', 'RVX_SENTRY_DSN')}\""
         }
 
         debug {
-            buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn')}\""
+            buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn', 'RVX_SENTRY_DSN')}\""
         }
     }
     compileOptions {
