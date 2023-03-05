@@ -64,8 +64,8 @@ class ChatRouterViewModel : ViewModel() {
 
         if (serverId == "home") {
             navController.navigate("home") {
-                popUpTo("home") {
-                    inclusive = true
+                navController.graph.startDestinationRoute?.let { route ->
+                    popUpTo(route)
                 }
             }
             return
@@ -73,8 +73,8 @@ class ChatRouterViewModel : ViewModel() {
 
         val channelId = RevoltAPI.serverCache[serverId]?.channels?.firstOrNull()
         navController.navigate("channel/$channelId") {
-            popUpTo("home") {
-                inclusive = true
+            navController.graph.startDestinationRoute?.let { route ->
+                popUpTo(route)
             }
         }
     }

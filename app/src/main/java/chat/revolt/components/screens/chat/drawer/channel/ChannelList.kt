@@ -67,7 +67,11 @@ fun RowScope.ChannelList(
                                     )
                                 } ?: false,
                                 onClick = {
-                                    navController.navigate("channel/${channel.id}")
+                                    navController.navigate("channel/${channel.id}") {
+                                        navController.graph.startDestinationRoute?.let { route ->
+                                            popUpTo(route)
+                                        }
+                                    }
                                     coroutineScope.launch { drawerState.focusCenter() }
                                 },
                                 onLongClick = {
@@ -109,8 +113,8 @@ fun RowScope.ChannelList(
                                 onClick = {
                                     coroutineScope.launch { drawerState.focusCenter() }
                                     navController.navigate("channel/${ch.id}") {
-                                        popUpTo("home") {
-                                            inclusive = true
+                                        navController.graph.startDestinationRoute?.let { route ->
+                                            popUpTo(route)
                                         }
                                     }
                                 },
