@@ -23,9 +23,10 @@ import androidx.compose.ui.unit.dp
 fun SheetClickable(
     icon: @Composable (Modifier) -> Unit,
     label: @Composable (TextStyle) -> Unit,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    Box(modifier = Modifier.padding(vertical = 4.dp)) {
+    Box(modifier = modifier.padding(vertical = 4.dp)) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)

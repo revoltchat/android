@@ -30,11 +30,20 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.android.core.SentryAndroid
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        SentryAndroid.init(this) { options ->
+            options.dsn = BuildConfig.SENTRY_DSN
+            options.isDebug = BuildConfig.DEBUG
+            options.environment = BuildConfig.BUILD_TYPE
+            options.release = BuildConfig.VERSION_NAME
+        }
+
         setContent {
             AppEntrypoint()
         }

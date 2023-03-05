@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -225,6 +226,7 @@ fun MfaScreen(
                                     modifier = Modifier
                                         .padding(horizontal = 20.dp, vertical = 10.dp)
                                         .fillMaxWidth()
+                                        .testTag("do_totp_button")
                                 ) {
                                     Text(
                                         text = stringResource(R.string.next),
@@ -264,6 +266,7 @@ fun MfaScreen(
                                     modifier = Modifier
                                         .padding(horizontal = 20.dp, vertical = 10.dp)
                                         .fillMaxWidth()
+                                        .testTag("do_mfa_recovery_button")
                                 ) {
                                     Text(
                                         text = stringResource(R.string.next),

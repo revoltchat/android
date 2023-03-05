@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -103,14 +104,18 @@ fun GreeterScreen(navController: NavController) {
         ) {
             ElevatedButton(
                 onClick = { navController.navigate("about/placeholder") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("view_signup_page_button")
             ) {
                 Text(text = stringResource(R.string.signup))
             }
 
             Button(
                 onClick = { navController.navigate("login/login") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("view_login_page_button")
             ) {
                 Text(text = stringResource(R.string.login))
             }

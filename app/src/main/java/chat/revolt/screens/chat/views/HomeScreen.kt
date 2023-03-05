@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -53,14 +54,17 @@ fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hi
                         inclusive = true
                     }
                 }
-            })
+            },
+            modifier = Modifier.testTag("logout_from_home")
+        )
 
         LinkOnHome(
             heading = stringResource(id = R.string.settings),
             icon = Icons.Default.Settings,
             onClick = {
                 navController.navigate("settings")
-            })
+            }
+        )
         Text(buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                 append("Note: ")

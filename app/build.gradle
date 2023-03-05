@@ -4,8 +4,24 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'com.mikepenz.aboutlibraries.plugin'
     id 'com.google.dagger.hilt.android'
+    id "io.sentry.android.gradle" version "3.4.2"
 
     id 'kotlin-kapt'
+}
+
+def property(String fileName, String propertyName) {
+    def propsFile = rootProject.file(fileName)
+    if (propsFile.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(propsFile))
+        if (props[propertyName] != null) {
+            return props[propertyName]
+        } else {
+            throw new GradleException("'" + propertyName + "' not found in '" + fileName + "'")
+        }
+    } else {
+        throw new GradleException("'" + fileName + "' not found in app/, please create it from '" + fileName + ".example'")
+    }
 }
 
 android {
@@ -29,6 +45,11 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn')}\""
+        }
+
+        debug {
+            buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn')}\""
         }
     }
     compileOptions {

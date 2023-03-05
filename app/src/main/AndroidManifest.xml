@@ -16,6 +16,9 @@
         android:name=".RevoltApplication"
         android:theme="@style/Theme.Revolt"
         tools:targetApi="31">
+        <meta-data
+            android:name="io.sentry.auto-init"
+            android:value="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

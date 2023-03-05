@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -185,16 +186,22 @@ fun ReportMessageDialog(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = {
-                        navController.popBackStack()
-                    }) {
+                    TextButton(
+                        onClick = {
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier.testTag("report_cancel")
+                    ) {
                         Text(text = stringResource(id = R.string.report_cancel))
                     }
                 },
                 confirmButton = {
-                    TextButton(onClick = {
-                        state.value = ReportingState.Sending
-                    }) {
+                    TextButton(
+                        onClick = {
+                            state.value = ReportingState.Sending
+                        },
+                        modifier = Modifier.testTag("report_send")
+                    ) {
                         Text(text = stringResource(id = R.string.report_submit))
                     }
                 }
@@ -284,19 +291,25 @@ fun ReportMessageDialog(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = {
-                        navController.popBackStack()
-                    }) {
+                    TextButton(
+                        onClick = {
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier.testTag("report_block_no")
+                    ) {
                         Text(text = stringResource(id = R.string.report_block_no))
                     }
                 },
                 confirmButton = {
-                    TextButton(onClick = {
-                        scope.launch {
-                            blockUser(message.author ?: return@launch)
-                        }
-                        navController.popBackStack()
-                    }) {
+                    TextButton(
+                        onClick = {
+                            scope.launch {
+                                blockUser(message.author ?: return@launch)
+                            }
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier.testTag("report_block_yes")
+                    ) {
                         Text(text = stringResource(id = R.string.report_block_yes))
                     }
                 }
@@ -331,9 +344,12 @@ fun ReportMessageDialog(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = {
-                        navController.popBackStack()
-                    }) {
+                    TextButton(
+                        onClick = {
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier.testTag("report_error_ok")
+                    ) {
                         Text(text = stringResource(id = R.string.ok))
                     }
                 },

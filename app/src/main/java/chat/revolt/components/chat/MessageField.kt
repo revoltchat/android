@@ -21,6 +21,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -111,6 +112,7 @@ fun MessageField(
                                     onAddAttachment()
                                 }
                                 .padding(4.dp)
+                                .testTag("add_attachment")
                         )
                     },
                     trailingIcon = {
@@ -132,6 +134,7 @@ fun MessageField(
                                     .size(32.dp)
                                     .clickable { onSendMessage() }
                                     .padding(4.dp)
+                                    .testTag("send_message")
                             )
                         }
                     }

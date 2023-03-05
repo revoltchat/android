@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -83,7 +84,7 @@ fun AppearanceSettingsScreen(
                     color = Color(0xff1c243c),
                     text = stringResource(id = R.string.settings_appearance_theme_revolt),
                     selected = GlobalState.theme == Theme.Revolt,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag("set_theme_revolt"),
                 ) {
                     setNewTheme(Theme.Revolt)
                 }
@@ -92,7 +93,7 @@ fun AppearanceSettingsScreen(
                     color = Color(0xfff7f7f7),
                     text = stringResource(id = R.string.settings_appearance_theme_light),
                     selected = GlobalState.theme == Theme.Light,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag("set_theme_light"),
                 ) {
                     setNewTheme(Theme.Light)
                 }
@@ -101,7 +102,7 @@ fun AppearanceSettingsScreen(
                     color = Color(0xff000000),
                     text = stringResource(id = R.string.settings_appearance_theme_amoled),
                     selected = GlobalState.theme == Theme.Amoled,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag("set_theme_amoled"),
                 ) {
                     setNewTheme(Theme.Amoled)
                 }
@@ -110,7 +111,7 @@ fun AppearanceSettingsScreen(
                     color = if (isSystemInDarkTheme()) Color(0xff1c243c) else Color(0xfff7f7f7),
                     text = stringResource(id = R.string.settings_appearance_theme_none),
                     selected = GlobalState.theme == Theme.None,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag("set_theme_none"),
                 ) {
                     setNewTheme(Theme.None)
                 }
@@ -120,7 +121,7 @@ fun AppearanceSettingsScreen(
                         color = dynamicDarkColorScheme(LocalContext.current).primary,
                         text = stringResource(id = R.string.settings_appearance_theme_m3dynamic),
                         selected = GlobalState.theme == Theme.M3Dynamic,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).testTag("set_theme_m3dynamic"),
                     ) {
                         setNewTheme(Theme.M3Dynamic)
                     }
@@ -129,7 +130,7 @@ fun AppearanceSettingsScreen(
                         color = Color(0xffa0a0a0),
                         text = stringResource(id = R.string.settings_appearance_theme_m3dynamic_unsupported),
                         selected = false,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).testTag("set_theme_m3dynamic_unsupported"),
                     ) {
                         Toast.makeText(
                             context,

@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -205,24 +206,31 @@ fun LoginScreen(
             Weblink(
                 text = stringResource(R.string.password_manager_hint),
                 url = "$REVOLT_SUPPORT/kb/interface/android/using-a-password-manager",
+                modifier = Modifier.testTag("password_manager_kb_link")
             )
 
             AnyLink(
                 text = stringResource(R.string.resend_verification),
                 action = { navController.navigate("about/placeholder") },
-                modifier = Modifier.padding(vertical = 7.dp)
+                modifier = Modifier
+                    .padding(vertical = 7.dp)
+                    .testTag("resend_verification_link")
             )
 
             ElevatedButton(
                 onClick = { navController.popBackStack() },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("exit_login_page_button")
             ) {
                 Text(text = stringResource(R.string.back))
             }
 
             Button(
                 onClick = { viewModel.doLogin() },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("do_login_button")
             ) {
                 Text(text = stringResource(R.string.login))
             }
