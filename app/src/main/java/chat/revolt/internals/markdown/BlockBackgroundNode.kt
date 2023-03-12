@@ -15,6 +15,11 @@ import com.discord.simpleast.core.node.Node
 // https://github.com/discord/SimpleAST/blob/567b61c51056cbdec39e839100690c576c26a4c6/app/src/main/java/com/discord/simpleast/sample/spans/BlockBackgroundNode.kt
 // LICENSED UNDER THE APACHE LICENSE, VERSION 2.0
 // Adapted for Revolt.
+// 
+// Changes:
+// - Fill and stroke colours are now parameters
+// - Whether we are in a quote is no longer a boolean, but an integer with the quote depth
+// - The left margin is now calculated based on the quote depth
 
 /**
  * Creates a block background for code sections.
