@@ -1,6 +1,8 @@
 package chat.revolt.components.chat
 
 import android.net.Uri
+import android.text.SpannableStringBuilder
+import android.text.TextUtils
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.*
@@ -9,11 +11,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.res.ResourcesCompat
+import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.asJanuaryProxyUrl
@@ -22,7 +28,6 @@ import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
-import chat.revolt.markdown.Markdown
 import chat.revolt.api.schemas.Message as MessageSchema
 
 fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnResource) {
@@ -49,10 +54,12 @@ fun formatLongAsTime(time: Long): String {
 fun Message(
     message: MessageSchema,
     truncate: Boolean = false,
+    parse: (MessageSchema) -> SpannableStringBuilder = { SpannableStringBuilder(it.content) },
     onMessageContextMenu: () -> Unit = {},
 ) {
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
     val context = LocalContext.current
+    val contentColor = LocalContentColor.current
 
     Column {
         if (message.tail == false) {
@@ -134,11 +141,17 @@ fun Message(
                 message.content?.let {
                     if (message.content.isBlank()) return@let // if only an attachment is sent
 
-                    Text(
-                        text = Markdown.annotate(it),
-                        maxLines = if (truncate) 1 else Int.MAX_VALUE,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    AndroidView(factory = { ctx ->
+                        androidx.appcompat.widget.AppCompatTextView(ctx).apply {
+                            text = parse(message)
+                            maxLines = if (truncate) 1 else Int.MAX_VALUE
+                            ellipsize = TextUtils.TruncateAt.END
+                            textSize = 16f
+                            typeface = ResourcesCompat.getFont(ctx, R.font.inter)
+
+                            setTextColor(contentColor.toArgb())
+                        }
+                    })
                 }
 
                 message.attachments?.let {

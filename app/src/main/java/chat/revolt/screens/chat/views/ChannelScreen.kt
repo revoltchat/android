@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +56,16 @@ import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelIcon
 import chat.revolt.components.screens.chat.ReplyManager
 import chat.revolt.components.screens.chat.TypingIndicator
+import chat.revolt.internals.markdown.ChannelMentionRule
+import chat.revolt.internals.markdown.CustomEmoteRule
+import chat.revolt.internals.markdown.MarkdownContext
+import chat.revolt.internals.markdown.MarkdownParser
+import chat.revolt.internals.markdown.MarkdownState
+import chat.revolt.internals.markdown.UserMentionRule
+import chat.revolt.internals.markdown.createCodeRule
+import chat.revolt.internals.markdown.createInlineCodeRule
+import com.discord.simpleast.core.simple.SimpleMarkdownRules
+import com.discord.simpleast.core.simple.SimpleRenderer
 import io.ktor.http.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -401,6 +412,8 @@ fun ChannelScreen(
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
+    val codeBlockColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+
     val pickFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments()
     ) { uriList ->
@@ -520,7 +533,39 @@ fun ChannelScreen(
                     items = viewModel.renderableMessages,
                     key = { it.id!! }
                 ) { message ->
-                    Message(message) {
+                    Message(message, parse = {
+                        val parser = MarkdownParser()
+                            .addRules(
+                                SimpleMarkdownRules.createEscapeRule(),
+                                UserMentionRule(),
+                                ChannelMentionRule(),
+                                CustomEmoteRule(),
+                            )
+                            .addRules(
+                                createCodeRule(context, codeBlockColor.toArgb()),
+                                createInlineCodeRule(context, codeBlockColor.toArgb()),
+                            )
+                            .addRules(
+                                SimpleMarkdownRules.createSimpleMarkdownRules(
+                                    includeEscapeRule = false
+                                )
+                            )
+
+                        SimpleRenderer.render(
+                            source = it.content ?: "",
+                            parser = parser,
+                            initialState = MarkdownState(0),
+                            renderContext = MarkdownContext(
+                                memberMap = mapOf(),
+                                userMap = RevoltAPI.userCache.toMap(),
+                                channelMap = RevoltAPI.channelCache.mapValues { ch ->
+                                    ch.value.name ?: ch.value.id!!
+                                },
+                                emojiMap = RevoltAPI.emojiCache,
+                                serverId = channel.server ?: "",
+                            )
+                        )
+                    }) {
                         navController.navigate("message/${message.id}/menu")
                     }
                 }
