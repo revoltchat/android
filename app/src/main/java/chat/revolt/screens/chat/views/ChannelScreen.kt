@@ -67,6 +67,7 @@ import chat.revolt.internals.markdown.createInlineCodeRule
 import com.discord.simpleast.core.simple.SimpleMarkdownRules
 import com.discord.simpleast.core.simple.SimpleRenderer
 import io.ktor.http.*
+import io.sentry.Sentry
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -213,6 +214,11 @@ class ChannelScreenViewModel : ViewModel() {
     }
 
     private fun registerCallbacks() {
+        if (channel?.id == null) {
+            Sentry.captureException(IllegalStateException("Channel ID is null while trying to register callbacks"))
+            return
+        }
+
         _channelCallback.value = ChannelScreenCallback()
         RealtimeSocket.registerChannelCallback(channel!!.id!!, channelCallback!!)
 
@@ -344,7 +350,7 @@ class ChannelScreenViewModel : ViewModel() {
     }
 
     private fun regroupMessages(newMessages: List<MessageSchema> = renderableMessages) {
-        val groupedMessages = arrayListOf<MessageSchema>()
+        val groupedMessages = mutableMapOf<String, MessageSchema>()
 
         // Verbatim implementation of https://wiki.rvlt.gg/index.php/Text_Channel_(UI)#Message_Grouping_Algorithm
         // The exception is the date variable being pushed into cache, we don't need that here.
@@ -372,10 +378,12 @@ class ChannelScreenViewModel : ViewModel() {
                 tail = false
             }
 
-            groupedMessages.add(message.copy(tail = tail))
+            if (groupedMessages.containsKey(message.id!!)) return@forEach
+
+            groupedMessages[message.id] = message.copy(tail = tail)
         }
 
-        setRenderableMessages(groupedMessages)
+        setRenderableMessages(groupedMessages.values.toList())
     }
 
     private var debouncedChannelAck: Job? = null
@@ -446,6 +454,12 @@ fun ChannelScreen(
 
     LaunchedEffect(channelId) {
         viewModel.fetchChannel(channelId)
+    }
+
+    LaunchedEffect(viewModel.channel) {
+        if (viewModel.channel?.id != channelId) {
+            viewModel.fetchChannel(channelId)
+        }
     }
 
     DisposableEffect(channelId) {

@@ -142,7 +142,7 @@ fun Message(
                     if (message.content.isBlank()) return@let // if only an attachment is sent
 
                     AndroidView(factory = { ctx ->
-                        androidx.appcompat.widget.AppCompatTextView(ctx).apply {
+                        android.widget.TextView(ctx).apply {
                             text = parse(message)
                             maxLines = if (truncate) 1 else Int.MAX_VALUE
                             ellipsize = TextUtils.TruncateAt.END
