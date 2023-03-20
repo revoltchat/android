@@ -5,8 +5,8 @@ import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.schemas.User
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.SerializationException
 
 suspend fun fetchSelf(): User {
@@ -50,7 +50,9 @@ suspend fun fetchUser(id: String): User {
 
     val user = RevoltJson.decodeFromString(User.serializer(), response)
 
-    RevoltAPI.userCache[user.id!!] = user
+    user.id?.let {
+        RevoltAPI.userCache[it] = user
+    }
 
     return user
 }

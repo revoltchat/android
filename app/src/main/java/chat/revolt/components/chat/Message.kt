@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -95,7 +96,7 @@ fun Message(
             if (message.tail == false) {
                 UserAvatar(
                     username = author.username ?: "",
-                    userId = author.id!!,
+                    userId = author.id ?: message.id ?: ULID.makeSpecial(0),
                     avatar = author.avatar,
                     rawUrl = message.masquerade?.avatar?.let { asJanuaryProxyUrl(it) }
                 )
@@ -107,7 +108,9 @@ fun Message(
                 if (message.tail == false) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = message.masquerade?.name ?: author.username ?: "",
+                            text = message.masquerade?.name
+                                ?: author.username
+                                ?: stringResource(id = R.string.unknown),
                             fontWeight = FontWeight.Bold,
                             color = if (message.masquerade?.colour != null) {
                                 WebCompat.parseColour(message.masquerade.colour)

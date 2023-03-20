@@ -43,6 +43,7 @@ import chat.revolt.api.realtime.frames.receivable.MessageFrame
 import chat.revolt.api.routes.channel.SendMessageReply
 import chat.revolt.api.routes.channel.ackChannel
 import chat.revolt.api.routes.channel.fetchMessagesFromChannel
+import chat.revolt.api.routes.channel.fetchSingleChannel
 import chat.revolt.api.routes.channel.sendMessage
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.routes.microservices.autumn.MAX_ATTACHMENTS_PER_MESSAGE
@@ -80,6 +81,8 @@ class ChannelScreenViewModel : ViewModel() {
     private var _channel by mutableStateOf<Channel?>(null)
     val channel: Channel?
         get() = _channel
+
+    private var _uiCallbackRegistered by mutableStateOf(false)
 
     private var _channelCallback = mutableStateOf<RealtimeSocket.ChannelCallback?>(null)
     private val channelCallback: RealtimeSocket.ChannelCallback?
@@ -222,8 +225,16 @@ class ChannelScreenViewModel : ViewModel() {
         _channelCallback.value = ChannelScreenCallback()
         RealtimeSocket.registerChannelCallback(channel!!.id!!, channelCallback!!)
 
-        _uiCallbackReceiver.value = UiCallbackReceiver()
-        UiCallbacks.registerReceiver(uiCallbackReceiver!!)
+        if (!_uiCallbackRegistered) {
+            _uiCallbackReceiver.value = UiCallbackReceiver()
+            UiCallbacks.registerReceiver(uiCallbackReceiver!!)
+            _uiCallbackRegistered = true
+        } else {
+            Log.d(
+                "ChannelScreenViewModel",
+                "UI Callbacks already registered but trying to register again. Ignoring but this is a bug."
+            )
+        }
     }
 
     fun fetchMessages() {
@@ -300,16 +311,22 @@ class ChannelScreenViewModel : ViewModel() {
     }
 
     fun fetchChannel(id: String) {
-        if (id in RevoltAPI.channelCache) {
-            _channel = RevoltAPI.channelCache[id]
-        } else {
-            Log.e("ChannelScreen", "Channel $id not in cache, for now this is fatal!") // FIXME
-        }
+        viewModelScope.launch {
+            if (id !in RevoltAPI.channelCache) {
+                val channel = fetchSingleChannel(id)
+                _channel = channel
+                RevoltAPI.channelCache[id] = channel
+            } else {
+                _channel = RevoltAPI.channelCache[id]
+            }
 
-        registerCallbacks()
+            registerCallbacks()
 
-        if (channel?.lastMessageID != null) {
-            ackNewest()
+            if (_channel?.lastMessageID != null) {
+                ackNewest()
+            } else {
+                Log.d("ChannelScreen", "No last message ID, not acking.")
+            }
         }
     }
 

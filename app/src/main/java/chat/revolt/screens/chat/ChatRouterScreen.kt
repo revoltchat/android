@@ -34,8 +34,9 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -55,6 +56,7 @@ import chat.revolt.components.screens.chat.drawer.server.DrawerServer
 import chat.revolt.components.screens.chat.drawer.server.DrawerServerlikeIcon
 import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
 import chat.revolt.components.screens.chat.rememberDoubleDrawerState
+import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
 import chat.revolt.screens.chat.sheets.ChannelContextSheet
 import chat.revolt.screens.chat.sheets.ChannelInfoSheet
@@ -62,35 +64,80 @@ import chat.revolt.screens.chat.sheets.MessageContextSheet
 import chat.revolt.screens.chat.sheets.StatusSheet
 import chat.revolt.screens.chat.views.ChannelScreen
 import chat.revolt.screens.chat.views.HomeScreen
+import chat.revolt.screens.chat.views.NoCurrentChannelScreen
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ChatRouterViewModel : ViewModel() {
+@HiltViewModel
+class ChatRouterViewModel @Inject constructor(
+    private val kvStorage: KVStorage
+) : ViewModel() {
     private var _currentServer = mutableStateOf("home")
     val currentServer: String
         get() = _currentServer.value
 
-    fun setCurrentServer(serverId: String) {
+    private var _currentChannel = mutableStateOf<String?>(null)
+    val currentChannel: String?
+        get() = _currentChannel.value
+
+    init {
+        viewModelScope.launch {
+            _currentServer.value = kvStorage.get("currentServer") ?: "home"
+            _currentChannel.value = kvStorage.get("currentChannel")
+        }
+    }
+
+    private fun setCurrentServer(serverId: String, save: Boolean = true) {
         _currentServer.value = serverId
+
+        if (save) viewModelScope.launch {
+            kvStorage.set("currentServer", serverId)
+        }
+    }
+
+    private fun setCurrentChannel(channelId: String) {
+        _currentChannel.value = channelId
+
+        viewModelScope.launch {
+            kvStorage.set("currentChannel", channelId)
+        }
     }
 
     fun navigateToServer(serverId: String, navController: NavController) {
-        setCurrentServer(serverId)
-
         if (serverId == "home") {
             navController.navigate("home") {
                 navController.graph.startDestinationRoute?.let { route ->
                     popUpTo(route)
                 }
             }
+            setCurrentServer("home")
             return
         }
 
         val channelId = RevoltAPI.serverCache[serverId]?.channels?.firstOrNull()
+
+        setCurrentServer(serverId, channelId != null)
+
+        if (channelId != null) {
+            navigateToChannel(channelId, navController)
+        } else {
+            navController.navigate("no_current_channel") {
+                navController.graph.startDestinationRoute?.let { route ->
+                    popUpTo(route)
+                }
+            }
+        }
+    }
+
+    fun navigateToChannel(channelId: String, navController: NavController, pure: Boolean = false) {
+        if (!pure) setCurrentChannel(channelId)
+
         navController.navigate("channel/$channelId") {
             navController.graph.startDestinationRoute?.let { route ->
                 popUpTo(route)
@@ -101,7 +148,7 @@ class ChatRouterViewModel : ViewModel() {
 
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalComposeUiApi::class)
 @Composable
-fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = viewModel()) {
+fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hiltViewModel()) {
     val drawerState = rememberDoubleDrawerState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -116,6 +163,16 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
             .collect { state ->
                 if (state != DoubleDrawerOpenState.Center) {
                     keyboardController?.hide()
+                }
+            }
+    }
+
+    LaunchedEffect(viewModel.currentChannel) {
+        snapshotFlow { viewModel.currentChannel }
+            .distinctUntilChanged()
+            .collect { channelId ->
+                if (channelId != null) {
+                    viewModel.navigateToChannel(channelId, navController, pure = true)
                 }
             }
     }
@@ -207,8 +264,14 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                             Crossfade(targetState = viewModel.currentServer) {
                                 ChannelList(
                                     serverId = it,
-                                    navController = navController,
-                                    drawerState = drawerState
+                                    drawerState = drawerState,
+                                    currentChannel = viewModel.currentChannel,
+                                    onChannelClick = { channelId ->
+                                        viewModel.navigateToChannel(channelId, navController)
+                                    },
+                                    onChannelLongClick = { channelId ->
+                                        navController.navigate("channel/$channelId/info")
+                                    },
                                 )
                             }
                         }
@@ -238,6 +301,9 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = vie
                                     channelId = channelId
                                 )
                             }
+                        }
+                        composable("no_current_channel") {
+                            NoCurrentChannelScreen()
                         }
 
                         bottomSheet("channel/{channelId}/info") { backStackEntry ->

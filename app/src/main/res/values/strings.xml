@@ -89,6 +89,11 @@
 
     <string name="server_plus_alt">Add server</string>
 
+    <string name="no_channels_heading">Bit awkward.</string>
+    <string name="no_channels_body">There aren\'t any channels in this server. Not even a welcome channel. How rude.</string>
+    <string name="no_active_channel">You\'re not in a channel right now.</string>
+    <string name="no_active_channel_body">Select a server from the left to get started. If you\'re feeling adventurous, you can create a new server.</string>
+
     <string name="avatar_alt">%1$s\'s avatar</string>
 
     <string name="channel_dm">Direct Message</string>

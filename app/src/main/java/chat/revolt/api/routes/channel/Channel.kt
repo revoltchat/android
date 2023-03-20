@@ -4,11 +4,17 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ULID
+import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.MessagesInChannel
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.serialization.builtins.ListSerializer
 
 suspend fun fetchMessagesFromChannel(
@@ -95,4 +101,16 @@ suspend fun ackChannel(channelId: String, messageId: String = ULID.makeNext()) {
     RevoltHttp.put("/channels/$channelId/ack/$messageId") {
         headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
     }
+}
+
+suspend fun fetchSingleChannel(channelId: String): Channel {
+    val response = RevoltHttp.get("/channels/$channelId") {
+        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+    }
+        .bodyAsText()
+
+    return RevoltJson.decodeFromString(
+        Channel.serializer(),
+        response
+    )
 }

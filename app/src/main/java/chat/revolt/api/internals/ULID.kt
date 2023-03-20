@@ -19,7 +19,7 @@ object ULID {
         0x59.toChar(), 0x5a.toChar()
     )
 
-    fun makeSpecial(timestamp: Long, entropy: ByteArray): String {
+    fun makeSpecial(timestamp: Long, entropy: ByteArray = fetchEntropy()): String {
         if (timestamp < minTimestamp || timestamp > maxTimestamp) {
             throw IllegalArgumentException("timestamp out of range: $timestamp")
         }
