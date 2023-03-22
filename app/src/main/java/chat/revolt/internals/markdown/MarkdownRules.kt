@@ -54,10 +54,10 @@ fun <RC, S> createInlineCodeRule(context: Context, backgroundColor: Int): Rule<R
     )
 }
 
-fun <RC, S : MarkdownState> createCodeRule(
+fun <RC> createCodeRule(
     context: Context,
     backgroundColor: Int
-): Rule<RC, Node<RC>, S> {
+): Rule<RC, Node<RC>, MarkdownState> {
     val codeStyleProviders = CodeStyleProviders<RC>(
         defaultStyleProvider = { listOf(TextAppearanceSpan(context, R.style.Code_TextAppearance)) },
         commentStyleProvider = {
@@ -117,7 +117,7 @@ fun <RC, S : MarkdownState> createCodeRule(
             )
         },
     )
-    val languageMap = CodeRules.createCodeLanguageMap<RC, S>(codeStyleProviders)
+    val languageMap = CodeRules.createCodeLanguageMap<RC, MarkdownState>(codeStyleProviders)
 
     return CodeRules.createCodeRule(
         codeStyleProviders.defaultStyleProvider,
