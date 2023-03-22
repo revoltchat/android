@@ -11,6 +11,10 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url "https://jitpack.io" }
+        maven {
+            name 'snapshot'
+            url 'https://oss.sonatype.org/content/repositories/snapshots'
+        }
     }
 }
 rootProject.name = "Revolt"

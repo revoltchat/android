@@ -24,7 +24,11 @@ suspend fun fetchSelf(): User {
 
     val user = RevoltJson.decodeFromString(User.serializer(), response)
 
-    RevoltAPI.userCache[user.id!!] = user
+    if (user.id == null) {
+        throw Error("Self user ID is null")
+    }
+
+    RevoltAPI.userCache[user.id] = user
     RevoltAPI.selfId = user.id
 
     return user

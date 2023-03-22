@@ -4,6 +4,7 @@ import android.text.SpannableStringBuilder
 import android.text.TextUtils
 import android.util.Log
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -42,8 +43,8 @@ import com.discord.simpleast.core.simple.SimpleRenderer
 @Composable
 fun UIMarkdown(
     text: String,
-    fontSize: TextUnit,
     modifier: Modifier = Modifier,
+    fontSize: TextUnit = LocalTextStyle.current.fontSize,
     maxLines: Int = Int.MAX_VALUE,
 ) {
     val context = LocalContext.current
@@ -96,8 +97,6 @@ fun UIMarkdown(
                 setTextColor(foregroundColor.toArgb())
                 setMaxLines(maxLines)
                 setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, fontSize.value)
-
-                setText(spannableStringBuilder.value)
             }
         },
         modifier = modifier,

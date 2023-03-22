@@ -31,14 +31,16 @@ import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.api.schemas.Message as MessageSchema
 
-fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnResource) {
+fun viewUrlInBrowser(ctx: android.content.Context, url: String) {
     val customTab = CustomTabsIntent
         .Builder()
         .build()
-    customTab.launchUrl(
-        ctx,
-        Uri.parse("$REVOLT_FILES/attachments/${attachment.id}/${attachment.filename}")
-    )
+    customTab.launchUrl(ctx, Uri.parse(url))
+}
+
+fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnResource) {
+    val url = REVOLT_FILES + attachment.id + "/" + attachment.filename
+    viewUrlInBrowser(ctx, url)
 }
 
 
@@ -159,10 +161,31 @@ fun Message(
 
                 message.attachments?.let {
                     message.attachments.forEach { attachment ->
-                        Spacer(modifier = Modifier.height(5.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                         MessageAttachment(attachment) {
                             viewAttachmentInBrowser(context, attachment)
                         }
+                        Spacer(modifier = Modifier.height(2.dp))
+                    }
+                }
+
+                message.embeds?.let {
+                    message.embeds.forEach { embed ->
+                        val embedIsEmpty =
+                            embed.title == null && embed.description == null && embed.iconURL == null && embed.image == null
+
+                        if (embedIsEmpty) {
+                            // if we do not emit anything, compose will cause an internal error.
+                            // FIXME if you are doing fixme's anyways then check if this is still an issue
+                            Box {}
+                            return@forEach
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Embed(embed = embed, onLinkClick = {
+                            viewUrlInBrowser(context, it)
+                        })
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }

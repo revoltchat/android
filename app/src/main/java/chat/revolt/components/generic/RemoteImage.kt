@@ -16,7 +16,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 @Composable
 fun RemoteImage(
     url: String,
-    description: String,
+    description: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     width: Int = 0,
