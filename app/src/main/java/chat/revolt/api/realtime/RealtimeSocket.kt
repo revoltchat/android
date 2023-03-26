@@ -1,19 +1,34 @@
 package chat.revolt.api.realtime
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import chat.revolt.api.REVOLT_WEBSOCKET
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
-import chat.revolt.api.realtime.frames.receivable.*
+import chat.revolt.api.realtime.frames.receivable.AnyFrame
+import chat.revolt.api.realtime.frames.receivable.BulkFrame
+import chat.revolt.api.realtime.frames.receivable.ChannelAckFrame
+import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
+import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
+import chat.revolt.api.realtime.frames.receivable.ChannelUpdateFrame
+import chat.revolt.api.realtime.frames.receivable.MessageFrame
+import chat.revolt.api.realtime.frames.receivable.MessageUpdateFrame
+import chat.revolt.api.realtime.frames.receivable.PongFrame
+import chat.revolt.api.realtime.frames.receivable.ReadyFrame
+import chat.revolt.api.realtime.frames.receivable.UserUpdateFrame
 import chat.revolt.api.realtime.frames.sendable.AuthorizationFrame
 import chat.revolt.api.realtime.frames.sendable.PingFrame
-import io.ktor.client.plugins.websocket.*
-import io.ktor.websocket.*
+import chat.revolt.callbacks.ChannelCallbacks
+import io.ktor.client.plugins.websocket.ws
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.Frame
+import io.ktor.websocket.WebSocketSession
+import io.ktor.websocket.close
+import io.ktor.websocket.readText
+import io.ktor.websocket.send
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.serialization.SerializationException
 
 enum class DisconnectionState {
     Disconnected,
@@ -89,6 +104,7 @@ object RealtimeSocket {
                 val pongFrame = RevoltJson.decodeFromString(PongFrame.serializer(), rawFrame)
                 Log.d("RealtimeSocket", "Received pong frame for ${pongFrame.data}")
             }
+
             "Bulk" -> {
                 val bulkFrame = RevoltJson.decodeFromString(BulkFrame.serializer(), rawFrame)
                 Log.d("RealtimeSocket", "Received bulk frame with ${bulkFrame.v.size} sub-frames.")
@@ -98,6 +114,7 @@ object RealtimeSocket {
                     handleFrame(subFrameType, subFrame.toString())
                 }
             }
+
             "Ready" -> {
                 val readyFrame = RevoltJson.decodeFromString(ReadyFrame.serializer(), rawFrame)
                 Log.d(
@@ -125,6 +142,7 @@ object RealtimeSocket {
                     RevoltAPI.emojiCache[emoji.id!!] = emoji
                 }
             }
+
             "Message" -> {
                 val messageFrame = RevoltJson.decodeFromString(MessageFrame.serializer(), rawFrame)
                 Log.d(
@@ -132,16 +150,82 @@ object RealtimeSocket {
                     "Received message frame for ${messageFrame.id} in channel ${messageFrame.channel}."
                 )
 
-                RevoltAPI.messageCache[messageFrame.id!!] = messageFrame
-
-                // Update last message ID for channel - important for unreads
-                messageFrame.channel?.let {
-                    RevoltAPI.channelCache[it] =
-                        RevoltAPI.channelCache[it]!!.copy(lastMessageID = messageFrame.id)
+                if (messageFrame.id == null) {
+                    Log.d("RealtimeSocket", "Message frame has no ID or channel. Ignoring.")
+                    return
                 }
 
-                channelCallbacks[messageFrame.channel]?.onMessage(messageFrame)
+                RevoltAPI.messageCache[messageFrame.id] = messageFrame
+
+                messageFrame.channel?.let {
+                    if (RevoltAPI.channelCache[it] == null) {
+                        Log.d("RealtimeSocket", "Channel $it not found in cache. Ignoring.")
+                        return
+                    }
+
+                    RevoltAPI.channelCache[it] =
+                        RevoltAPI.channelCache[it]!!.copy(lastMessageID = messageFrame.id)
+
+                    ChannelCallbacks.emitMessage(it, messageFrame.id)
+                }
             }
+
+            "MessageUpdate" -> {
+                val messageUpdateFrame =
+                    RevoltJson.decodeFromString(MessageUpdateFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received message update frame for ${messageUpdateFrame.id} in channel ${messageUpdateFrame.channel}."
+                )
+
+                val oldMessage = RevoltAPI.messageCache[messageUpdateFrame.id]
+                if (oldMessage == null) {
+                    Log.d(
+                        "RealtimeSocket",
+                        "Message ${messageUpdateFrame.id} not found in cache. Will not update."
+                    )
+                    return
+                }
+
+                val rawMessage: MessageFrame
+                try {
+                    rawMessage =
+                        RevoltJson.decodeFromJsonElement(
+                            MessageFrame.serializer(),
+                            messageUpdateFrame.data
+                        )
+                } catch (e: SerializationException) {
+                    Log.d("RealtimeSocket", "Message update frame has invalid data. Ignoring.")
+                    return
+                }
+
+                Log.d(
+                    "RealtimeSocket",
+                    "Merging message ${messageUpdateFrame.id} with partial message: $rawMessage"
+                )
+                Log.d(
+                    "RealtimeSocket",
+                    "Old: $oldMessage"
+                )
+
+                RevoltAPI.messageCache[messageUpdateFrame.id] =
+                    oldMessage.mergeWithPartial(rawMessage)
+
+                Log.d(
+                    "RealtimeSocket",
+                    "New: ${RevoltAPI.messageCache[messageUpdateFrame.id]}"
+                )
+
+                messageUpdateFrame.channel.let {
+                    if (RevoltAPI.channelCache[it] == null) {
+                        Log.d("RealtimeSocket", "Channel $it not found in cache. Ignoring.")
+                        return
+                    }
+
+                    ChannelCallbacks.emitMessageUpdate(it, messageUpdateFrame.id)
+                }
+            }
+
             "ChannelStartTyping" -> {
                 val typingFrame =
                     RevoltJson.decodeFromString(ChannelStartTypingFrame.serializer(), rawFrame)
@@ -150,8 +234,9 @@ object RealtimeSocket {
                     "Received channel start typing frame for ${typingFrame.id} from ${typingFrame.user}."
                 )
 
-                channelCallbacks[typingFrame.id]?.onStartTyping(typingFrame)
+                ChannelCallbacks.emitStartTyping(typingFrame.id, typingFrame.user)
             }
+
             "ChannelStopTyping" -> {
                 val typingFrame =
                     RevoltJson.decodeFromString(ChannelStopTypingFrame.serializer(), rawFrame)
@@ -160,8 +245,9 @@ object RealtimeSocket {
                     "Received channel stop typing frame for ${typingFrame.id} from ${typingFrame.user}."
                 )
 
-                channelCallbacks[typingFrame.id]?.onStopTyping(typingFrame)
+                ChannelCallbacks.emitStopTyping(typingFrame.id, typingFrame.user)
             }
+
             "UserUpdate" -> {
                 val userUpdateFrame =
                     RevoltJson.decodeFromString(UserUpdateFrame.serializer(), rawFrame)
@@ -172,6 +258,7 @@ object RealtimeSocket {
                 RevoltAPI.userCache[userUpdateFrame.id] =
                     existing.mergeWithPartial(userUpdateFrame.data)
             }
+
             "ChannelUpdate" -> {
                 val channelUpdateFrame =
                     RevoltJson.decodeFromString(ChannelUpdateFrame.serializer(), rawFrame)
@@ -182,6 +269,7 @@ object RealtimeSocket {
                 RevoltAPI.channelCache[channelUpdateFrame.id] =
                     existing.mergeWithPartial(channelUpdateFrame.data)
             }
+
             "ChannelAck" -> {
                 val channelAckFrame =
                     RevoltJson.decodeFromString(ChannelAckFrame.serializer(), rawFrame)
@@ -192,9 +280,11 @@ object RealtimeSocket {
 
                 RevoltAPI.unreads.processExternalAck(channelAckFrame.id, channelAckFrame.messageId)
             }
+
             "Authenticated" -> {
                 // No effect
             }
+
             else -> {
                 Log.i("RealtimeSocket", "Unknown frame: $rawFrame")
             }
@@ -202,12 +292,10 @@ object RealtimeSocket {
     }
 
     private fun invalidateAllChannelStates() {
-        channelCallbacks.forEach { (_, callback) ->
-            callback.onStateInvalidate()
-        }
+        ChannelCallbacks.emitReconnect()
     }
 
-    interface ChannelCallback {
+    /*interface ChannelCallback {
         fun onStartTyping(typing: ChannelStartTypingFrame)
         fun onStopTyping(typing: ChannelStopTypingFrame)
         fun onMessage(message: MessageFrame)
@@ -226,5 +314,5 @@ object RealtimeSocket {
         channelCallbacks.remove(channelId)
 
         Log.d("RealtimeSocket", "Unregistered channel callback for $channelId")
-    }
+    }*/
 }

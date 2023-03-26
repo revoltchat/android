@@ -90,7 +90,7 @@ fun UIMarkdown(
 
     AndroidView(
         factory = {
-            android.widget.TextView(it).apply {
+            androidx.appcompat.widget.AppCompatTextView(it).apply {
                 ellipsize = TextUtils.TruncateAt.END
                 typeface = ResourcesCompat.getFont(it, R.font.inter)
 

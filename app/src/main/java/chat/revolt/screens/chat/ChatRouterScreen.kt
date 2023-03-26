@@ -62,9 +62,9 @@ import chat.revolt.screens.chat.sheets.ChannelContextSheet
 import chat.revolt.screens.chat.sheets.ChannelInfoSheet
 import chat.revolt.screens.chat.sheets.MessageContextSheet
 import chat.revolt.screens.chat.sheets.StatusSheet
-import chat.revolt.screens.chat.views.ChannelScreen
 import chat.revolt.screens.chat.views.HomeScreen
 import chat.revolt.screens.chat.views.NoCurrentChannelScreen
+import chat.revolt.screens.chat.views.channel.ChannelScreen
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
