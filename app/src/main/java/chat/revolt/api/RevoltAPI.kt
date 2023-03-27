@@ -4,18 +4,27 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
+import chat.revolt.BuildConfig
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.user.fetchSelf
-import chat.revolt.api.schemas.*
+import chat.revolt.api.schemas.Channel
+import chat.revolt.api.schemas.Emoji
+import chat.revolt.api.schemas.Message
+import chat.revolt.api.schemas.Server
+import chat.revolt.api.schemas.User
 import chat.revolt.api.unreads.Unreads
-import io.ktor.client.*
-import io.ktor.client.engine.okhttp.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.request.header
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -61,6 +70,10 @@ val RevoltHttp = HttpClient(OkHttp) {
 
     defaultRequest {
         url(REVOLT_BASE)
+        header(
+            "User-Agent",
+            "Ktor RevoltAndroid/${BuildConfig.VERSION_NAME} (Android ${android.os.Build.VERSION.SDK_INT}; ${android.os.Build.MANUFACTURER} ${android.os.Build.DEVICE})"
+        )
     }
 }
 

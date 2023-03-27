@@ -1,1 +1,3 @@
 sentry.dsn=
+analysis.enabled=false
+analysis.base_url=

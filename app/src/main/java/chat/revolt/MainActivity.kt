@@ -14,12 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.navigation.compose.dialog
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
 import chat.revolt.screens.about.PlaceholderScreen
 import chat.revolt.screens.chat.ChatRouterScreen
+import chat.revolt.screens.chat.dialogs.FeedbackDialog
 import chat.revolt.screens.login.GreeterScreen
 import chat.revolt.screens.login.LoginScreen
 import chat.revolt.screens.login.MfaScreen
@@ -111,6 +113,7 @@ fun AppEntrypoint() {
 
                 composable("settings") { SettingsScreen(navController) }
                 composable("settings/appearance") { AppearanceSettingsScreen(navController) }
+                dialog("settings/feedback") { FeedbackDialog(navController) }
 
                 composable("about") { AboutScreen(navController) }
                 composable("about/oss") { AttributionScreen(navController) }

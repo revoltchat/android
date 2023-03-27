@@ -30,7 +30,7 @@ import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.FormTextField
 import kotlinx.coroutines.launch
 
-enum class ReportingState {
+enum class ReportFlowState {
     Reason,
     Sending,
     Done,
@@ -52,13 +52,13 @@ fun ReportMessageDialog(
     val author = RevoltAPI.userCache[message.author]
     val messageIsBridged = author?.let { author.bot != null && message.masquerade != null } ?: false
 
-    val state = remember { mutableStateOf(ReportingState.Reason) }
+    val state = remember { mutableStateOf(ReportFlowState.Reason) }
 
     val selectedReason = remember { mutableStateOf("Illegal") }
     val userAddedContext = remember { mutableStateOf("") }
 
     when (state.value) {
-        ReportingState.Reason -> {
+        ReportFlowState.Reason -> {
             val reasons = mapOf(
                 "Illegal" to stringResource(id = R.string.report_reason_content_illegal),
                 "PromotesHarm" to stringResource(id = R.string.report_reason_content_promotes_harm),
@@ -169,19 +169,18 @@ fun ReportMessageDialog(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Text(
-                            text = stringResource(id = R.string.report_reason_additional_hint),
-                            fontSize = 12.sp,
-                        )
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
                         FormTextField(
                             value = userAddedContext.value,
                             label = stringResource(id = R.string.report_reason_additional),
                             onChange = {
                                 userAddedContext.value = it
-                            })
+                            },
+                            supportingText = {
+                                Text(
+                                    text = stringResource(id = R.string.report_reason_additional_hint)
+                                )
+                            }
+                        )
                     }
                 },
                 dismissButton = {
@@ -197,7 +196,7 @@ fun ReportMessageDialog(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            state.value = ReportingState.Sending
+                            state.value = ReportFlowState.Sending
                         },
                         modifier = Modifier.testTag("report_send")
                     ) {
@@ -207,7 +206,7 @@ fun ReportMessageDialog(
             )
         }
 
-        ReportingState.Sending -> {
+        ReportFlowState.Sending -> {
             AlertDialog(
                 onDismissRequest = {},
                 title = {
@@ -231,9 +230,9 @@ fun ReportMessageDialog(
                                         ContentReportReason.valueOf(selectedReason.value),
                                         userAddedContext.value
                                     )
-                                    state.value = ReportingState.Done
+                                    state.value = ReportFlowState.Done
                                 } catch (e: Exception) {
-                                    state.value = ReportingState.Error
+                                    state.value = ReportFlowState.Error
                                     Log.e("ReportMessageDialog", "Failed to report message", e)
                                     return@launch
                                 }
@@ -246,7 +245,7 @@ fun ReportMessageDialog(
             )
         }
 
-        ReportingState.Done -> {
+        ReportFlowState.Done -> {
             val scope = rememberCoroutineScope()
 
             AlertDialog(
@@ -315,7 +314,7 @@ fun ReportMessageDialog(
             )
         }
 
-        ReportingState.Error -> {
+        ReportFlowState.Error -> {
             AlertDialog(
                 onDismissRequest = {
                     navController.popBackStack()

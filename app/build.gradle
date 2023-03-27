@@ -64,10 +64,14 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn', 'RVX_SENTRY_DSN')}\""
+            buildConfigField "Boolean", "ANALYSIS_ENABLED", "${property('revoltbuild.properties', 'analysis.enabled', 'RVX_ANALYSIS_ENABLED')}"
+            buildConfigField "String", "ANALYSIS_BASEURL", "\"${property('revoltbuild.properties', 'analysis.base_url', 'RVX_ANALYSIS_BASEURL')}\""
         }
 
         debug {
             buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn', 'RVX_SENTRY_DSN')}\""
+            buildConfigField "Boolean", "ANALYSIS_ENABLED", "${property('revoltbuild.properties', 'analysis.enabled', 'RVX_ANALYSIS_ENABLED')}"
+            buildConfigField "String", "ANALYSIS_BASEURL", "\"${property('revoltbuild.properties', 'analysis.base_url', 'RVX_ANALYSIS_BASEURL')}\""
         }
     }
     compileOptions {
@@ -112,9 +116,9 @@ dependencies {
     implementation 'androidx.compose.material:material'
     implementation 'androidx.compose.material3:material3'
     implementation "androidx.compose.ui:ui-tooling-preview"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0'
-    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
+    implementation 'androidx.activity:activity-compose:1.7.0'
 
     // Accompanist - Jetpack Compose Extensions
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"

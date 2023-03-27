@@ -1,10 +1,14 @@
 package chat.revolt.screens.settings
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -72,6 +76,40 @@ fun SettingsScreen(
                 modifier = Modifier.testTag("settings_view_about")
             ) {
                 navController.navigate("about")
+            }
+
+            Divider()
+
+            SheetClickable(
+                icon = { modifier ->
+                    Icon(
+                        imageVector = Icons.Default.Build,
+                        contentDescription = stringResource(id = R.string.settings_feedback),
+                        modifier = modifier
+                    )
+                },
+                label = { textStyle ->
+                    Text(text = stringResource(id = R.string.settings_feedback), style = textStyle)
+                },
+                modifier = Modifier.testTag("settings_view_feedback")
+            ) {
+                navController.navigate("settings/feedback")
+            }
+
+            SheetClickable(
+                icon = { modifier ->
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(id = R.string.logout),
+                        modifier = modifier
+                    )
+                },
+                label = { textStyle ->
+                    Text(text = stringResource(id = R.string.logout), style = textStyle)
+                },
+                modifier = Modifier.testTag("settings_view_logout")
+            ) {
+                Toast.makeText(navController.context, "Not implemented yet", Toast.LENGTH_SHORT).show()
             }
         }
     }

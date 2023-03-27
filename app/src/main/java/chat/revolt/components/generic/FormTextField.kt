@@ -10,6 +10,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 
+/**
+ * Convenience wrapper around [TextField] that sets the [KeyboardOptions] and [VisualTransformation]
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormTextField(
@@ -18,14 +21,19 @@ fun FormTextField(
     onChange: (it: String) -> Unit,
     modifier: Modifier = Modifier,
     type: KeyboardType = KeyboardType.Text,
+    supportingText: @Composable (() -> Unit)? = null,
+    singleLine: Boolean = true,
+    enabled: Boolean = true,
 ) {
     TextField(
         value = value,
         onValueChange = onChange,
-        singleLine = true,
+        singleLine = singleLine,
         keyboardOptions = KeyboardOptions(keyboardType = type),
         visualTransformation = if (type == KeyboardType.Password) PasswordVisualTransformation() else VisualTransformation.None,
         label = { Text(label) },
+        supportingText = supportingText,
+        enabled = enabled,
         modifier = modifier
     )
 }
