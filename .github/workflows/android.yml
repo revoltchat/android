@@ -10,7 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      RVX_SENTRY_DSN: ""
+      RVX_SENTRY_DSN: ${{ vars.RVX_SENTRY_DSN }}
+      RVX_ANALYSIS_ENABLED: ${{ vars.RVX_ANALYSIS_ENABLED }}
+      RVX_ANALYSIS_BASEURL: ${{ vars.RVX_ANALYSIS_BASEURL }}
 
     steps:
       - uses: actions/checkout@v3
