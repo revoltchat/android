@@ -41,6 +41,10 @@ fun asJanuaryProxyUrl(url: String): String {
     return "$REVOLT_JANUARY/proxy?url=${url}"
 }
 
+fun buildUserAgent(accessMethod: String = "Ktor"): String {
+    return "$accessMethod RevoltAndroid/${BuildConfig.VERSION_NAME} (Android ${android.os.Build.VERSION.SDK_INT}; ${android.os.Build.MANUFACTURER} ${android.os.Build.DEVICE})"
+}
+
 private const val BACKEND_IS_STABLE = false
 
 val RevoltJson = Json { ignoreUnknownKeys = true }
@@ -70,10 +74,7 @@ val RevoltHttp = HttpClient(OkHttp) {
 
     defaultRequest {
         url(REVOLT_BASE)
-        header(
-            "User-Agent",
-            "Ktor RevoltAndroid/${BuildConfig.VERSION_NAME} (Android ${android.os.Build.VERSION.SDK_INT}; ${android.os.Build.MANUFACTURER} ${android.os.Build.DEVICE})"
-        )
+        header("User-Agent", buildUserAgent())
     }
 }
 

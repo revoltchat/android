@@ -83,6 +83,7 @@ android {
         jvmTarget = '1.8'
     }
     buildFeatures {
+        viewBinding true
         compose true
     }
     composeOptions {
@@ -162,6 +163,9 @@ dependencies {
     implementation "androidx.browser:browser:1.5.0"
     implementation "androidx.datastore:datastore-preferences:1.1.0-alpha01"
     implementation "androidx.datastore:datastore:1.1.0-alpha01"
+
+    // Libraries used for legacy View-based UI
+    implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha09"
 
     // JDK Desugaring - polyfill for new Java APIs
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.2'
