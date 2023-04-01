@@ -39,7 +39,7 @@ fun viewUrlInBrowser(ctx: android.content.Context, url: String) {
 }
 
 fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnResource) {
-    val url = REVOLT_FILES + attachment.id + "/" + attachment.filename
+    val url = "$REVOLT_FILES/attachments/${attachment.id}/${attachment.filename}"
     viewUrlInBrowser(ctx, url)
 }
 
