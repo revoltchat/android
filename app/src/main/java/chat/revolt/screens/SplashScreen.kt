@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -122,6 +124,14 @@ fun SplashScreen(
 ) {
     val context = LocalContext.current
 
+    val webChallengeActivityResult = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == 0) {
+            viewModel.checkLoggedInState()
+        }
+    }
+
     if (!viewModel.isConnected) {
         DisconnectedScreen(
             onRetry = {
@@ -160,13 +170,8 @@ fun SplashScreen(
             }
 
             "webchallenge" -> {
-                context.startActivity(
-                    Intent(
-                        context,
-                        WebChallengeActivity::class.java
-                    )
-                )
-                viewModel.checkLoggedInState()
+                val intent = Intent(context, WebChallengeActivity::class.java)
+                webChallengeActivityResult.launch(intent)
             }
 
             "home" -> {

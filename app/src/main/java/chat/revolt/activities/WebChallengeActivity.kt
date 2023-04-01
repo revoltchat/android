@@ -2,6 +2,7 @@ package chat.revolt.activities
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +37,11 @@ class WebChallengeActivity : AppCompatActivity() {
             binding.webView.evaluateJavascript(
                 "(function() { return document.getElementById('cf-wrapper') != null; })();"
             ) { result ->
-                if (result == "false") { // No challenge
+                if (result == "false") {
+                    Log.d(
+                        "WebChallenge",
+                        "Challenge has been solved or we have been considered human."
+                    )
                     finish()
                 }
             }
