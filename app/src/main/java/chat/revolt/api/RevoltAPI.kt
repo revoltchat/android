@@ -42,7 +42,7 @@ fun asJanuaryProxyUrl(url: String): String {
 }
 
 fun buildUserAgent(accessMethod: String = "Ktor"): String {
-    return "$accessMethod RevoltAndroid/${BuildConfig.VERSION_NAME} (Android ${android.os.Build.VERSION.SDK_INT}; ${android.os.Build.MANUFACTURER} ${android.os.Build.DEVICE})"
+    return "$accessMethod RevoltAndroid/${BuildConfig.VERSION_NAME} ${BuildConfig.APPLICATION_ID} (Android ${android.os.Build.VERSION.SDK_INT}; ${android.os.Build.MANUFACTURER} ${android.os.Build.DEVICE}; Analysis ${BuildConfig.ANALYSIS_ENABLED} ${BuildConfig.ANALYSIS_BASEURL}; (Kotlin ${KotlinVersion.CURRENT})"
 }
 
 private const val BACKEND_IS_STABLE = false
