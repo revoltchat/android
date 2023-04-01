@@ -1,12 +1,17 @@
 package chat.revolt.components.chat
 
+import android.icu.text.DateFormat
+import android.icu.text.RelativeDateTimeFormatter
 import android.net.Uri
+import android.os.Build
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -44,12 +49,39 @@ fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnReso
 }
 
 
-fun formatLongAsTime(time: Long): String {
+fun formatLongAsTime(
+    time: Long,
+    context: android.content.Context,
+): String {
     val date = java.util.Date(time)
-    val format =
-        java.text.SimpleDateFormat("dd.MM.yyyy HH:mm:ss", java.util.Locale.getDefault())
 
-    return format.format(date)
+    val withinLastWeek = System.currentTimeMillis() - time < 604800000
+
+    return if (withinLastWeek) {
+        val howManyDays = (System.currentTimeMillis() - time) / 86400000
+
+        val relativeDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            RelativeDateTimeFormatter.getInstance()
+                .format(
+                    -howManyDays.toDouble(),
+                    RelativeDateTimeFormatter.RelativeDateTimeUnit.DAY
+                )
+        } else {
+            when (howManyDays.toInt()) {
+                0 -> context.getString(R.string.today)
+                1 -> context.getString(R.string.yesterday)
+                else -> context.getString(R.string.x_days_ago, howManyDays)
+            }
+        }
+        val relativeTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(date)
+
+        "$relativeDate $relativeTime"
+    } else {
+        val absoluteDate = DateFormat.getDateInstance(DateFormat.SHORT).format(date)
+        val absoluteTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(date)
+
+        "$absoluteDate $absoluteTime"
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -134,12 +166,23 @@ fun Message(
                         Spacer(modifier = Modifier.width(5.dp))
 
                         Text(
-                            text = formatLongAsTime(ULID.asTimestamp(message.id!!)),
+                            text = formatLongAsTime(ULID.asTimestamp(message.id!!), context),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+
+                        Spacer(modifier = Modifier.width(2.dp))
+
+                        if (message.edited != null) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(id = R.string.edited),
+                                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
 
