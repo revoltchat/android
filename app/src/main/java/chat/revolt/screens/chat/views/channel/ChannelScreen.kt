@@ -117,7 +117,7 @@ fun ChannelScreen(
         }
     }
 
-    if (channel == null) {
+    if (channel?.channelType == null) {
         CircularProgressIndicator()
         return
     }
@@ -140,7 +140,7 @@ fun ChannelScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ChannelIcon(
-                channelType = channel.channelType!!,
+                channelType = channel.channelType,
                 modifier = Modifier.padding(end = 8.dp)
             )
             Text(
@@ -331,7 +331,7 @@ fun ChannelScreen(
                 onAddAttachment = {
                     pickFileLauncher.launch(arrayOf("*/*"))
                 },
-                channelType = channel.channelType!!,
+                channelType = channel.channelType,
                 channelName = channel.name ?: channel.id!!,
                 forceSendButton = viewModel.attachments.isNotEmpty(),
                 disabled = viewModel.attachments.isNotEmpty() && viewModel.sendingMessage

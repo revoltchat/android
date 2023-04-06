@@ -30,9 +30,42 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.WebChallengeActivity"
             android:theme="@style/Theme.Revolt" />
+
+        <activity
+            android:name=".activities.InviteActivity"
+            android:theme="@style/Theme.Revolt"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+
+                <data android:host="app.revolt.chat" />
+                <data android:host="nightly.revolt.chat" />
+
+                <data android:pathPrefix="/invite/" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+
+                <data android:host="rvlt.gg" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

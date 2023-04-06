@@ -1,6 +1,5 @@
 package chat.revolt.screens.chat
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
@@ -29,7 +28,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -58,6 +56,7 @@ import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
 import chat.revolt.components.screens.chat.rememberDoubleDrawerState
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
+import chat.revolt.screens.chat.sheets.AddServerSheet
 import chat.revolt.screens.chat.sheets.ChannelContextSheet
 import chat.revolt.screens.chat.sheets.ChannelInfoSheet
 import chat.revolt.screens.chat.sheets.MessageContextSheet
@@ -151,7 +150,6 @@ class ChatRouterViewModel @Inject constructor(
 fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hiltViewModel()) {
     val drawerState = rememberDoubleDrawerState()
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val bottomSheetNavigator = rememberBottomSheetNavigator()
@@ -246,11 +244,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
 
                                 DrawerServerlikeIcon(
                                     onClick = {
-                                        Toast.makeText(
-                                            context,
-                                            context.getString(R.string.comingsoon_toast),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        navController.navigate("add_server")
                                     }
                                 ) {
                                     Icon(
@@ -335,6 +329,9 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                         }
                         bottomSheet("status") {
                             StatusSheet(navController = navController, topNav = topNav)
+                        }
+                        bottomSheet("add_server") {
+                            AddServerSheet()
                         }
 
                         dialog("report/message/{messageId}") { backStackEntry ->

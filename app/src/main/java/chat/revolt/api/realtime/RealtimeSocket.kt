@@ -16,6 +16,7 @@ import chat.revolt.api.realtime.frames.receivable.MessageFrame
 import chat.revolt.api.realtime.frames.receivable.MessageUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.PongFrame
 import chat.revolt.api.realtime.frames.receivable.ReadyFrame
+import chat.revolt.api.realtime.frames.receivable.ServerCreateFrame
 import chat.revolt.api.realtime.frames.receivable.UserUpdateFrame
 import chat.revolt.api.realtime.frames.sendable.AuthorizationFrame
 import chat.revolt.api.realtime.frames.sendable.PingFrame
@@ -279,6 +280,22 @@ object RealtimeSocket {
                 )
 
                 RevoltAPI.unreads.processExternalAck(channelAckFrame.id, channelAckFrame.messageId)
+            }
+
+            "ServerCreate" -> {
+                val serverCreateFrame =
+                    RevoltJson.decodeFromString(ServerCreateFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received server create frame for ${serverCreateFrame.id}, with name ${serverCreateFrame.server.name}. Adding to cache."
+                )
+
+                RevoltAPI.serverCache[serverCreateFrame.id] = serverCreateFrame.server
+
+                serverCreateFrame.channels.forEach { channel ->
+                    if (channel.id == null) return@forEach
+                    RevoltAPI.channelCache[channel.id] = channel
+                }
             }
 
             "Authenticated" -> {

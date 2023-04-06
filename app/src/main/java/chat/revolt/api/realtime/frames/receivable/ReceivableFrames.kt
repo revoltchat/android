@@ -151,7 +151,8 @@ data class ChannelAckFrame(
 data class ServerCreateFrame(
     val type: String = "ServerCreate",
     val id: String,
-    val server: Server
+    val server: Server,
+    val channels: List<Channel>,
 )
 
 @Serializable
