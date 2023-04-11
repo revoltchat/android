@@ -176,7 +176,7 @@ fun InviteScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         GlideImage(
-                            model = "$REVOLT_FILES/banners/${invite?.serverBanner?.id}?max_side=256",
+                            model = "$REVOLT_FILES/banners/${invite?.serverBanner?.id}",
                             contentScale = ContentScale.Crop,
                             contentDescription = null,
                             modifier = Modifier
