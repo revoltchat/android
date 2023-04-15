@@ -102,7 +102,7 @@ android {
 
 dependencies {
     // Android/Kotlin Core
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.10.0'
 
     // Kotlinx - various first-party extensions for Kotlin
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
@@ -161,14 +161,14 @@ dependencies {
     // Other AndroidX libraries - used for various things and never seem to have a consistent version
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation "androidx.browser:browser:1.5.0"
-    implementation "androidx.datastore:datastore-preferences:1.1.0-alpha01"
-    implementation "androidx.datastore:datastore:1.1.0-alpha01"
+    implementation "androidx.datastore:datastore-preferences:1.1.0-alpha04"
+    implementation "androidx.datastore:datastore:1.1.0-alpha04"
 
     // Libraries used for legacy View-based UI
     implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha09"
 
     // JDK Desugaring - polyfill for new Java APIs
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.2'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
 
     // Markdown
     implementation "com.github.discord:SimpleAST:2.7.0"
