@@ -7,6 +7,7 @@ plugins {
     id "io.sentry.android.gradle" version "3.4.2"
 
     id 'kotlin-kapt'
+    id 'kotlin-parcelize'
 }
 
 def property(String fileName, String propertyName, String fallbackEnv = null) {
@@ -166,6 +167,7 @@ dependencies {
 
     // Libraries used for legacy View-based UI
     implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha09"
+    implementation 'com.github.MikeOrtiz:TouchImageView:3.3'
 
     // JDK Desugaring - polyfill for new Java APIs
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'

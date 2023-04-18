@@ -1,5 +1,6 @@
 package chat.revolt.components.chat
 
+import android.content.Intent
 import android.icu.text.DateFormat
 import android.icu.text.RelativeDateTimeFormatter
 import android.net.Uri
@@ -7,6 +8,8 @@ import android.os.Build
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -26,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import chat.revolt.R
+import chat.revolt.activities.media.ImageViewActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.asJanuaryProxyUrl
@@ -96,6 +100,12 @@ fun Message(
     val context = LocalContext.current
     val contentColor = LocalContentColor.current
 
+    val attachmentView = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = {
+            // do nothing
+        })
+
     Column {
         if (message.tail == false) {
             Spacer(modifier = Modifier.height(10.dp))
@@ -106,7 +116,11 @@ fun Message(
 
             InReplyTo(
                 messageId = reply,
-                withMention = replyMessage?.author?.let { message.mentions?.contains(replyMessage.author) }
+                withMention = replyMessage?.author?.let {
+                    message.mentions?.contains(
+                        replyMessage.author
+                    )
+                }
                     ?: false,
             ) {
                 // TODO Add jump to message
@@ -206,7 +220,15 @@ fun Message(
                     message.attachments.forEach { attachment ->
                         Spacer(modifier = Modifier.height(2.dp))
                         MessageAttachment(attachment) {
-                            viewAttachmentInBrowser(context, attachment)
+                            if (attachment.metadata?.type == "Image") {
+                                attachmentView.launch(
+                                    Intent(context, ImageViewActivity::class.java).apply {
+                                        putExtra("autumnResource", attachment)
+                                    }
+                                )
+                            } else {
+                                viewAttachmentInBrowser(context, attachment)
+                            }
                         }
                         Spacer(modifier = Modifier.height(2.dp))
                     }

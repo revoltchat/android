@@ -1,10 +1,10 @@
 package chat.revolt.components.generic
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +26,8 @@ fun PageHeader(
     modifier: Modifier = Modifier,
     showBackButton: Boolean = false,
     onBackButtonClicked: () -> Unit = {},
+    additionalButtons: @Composable () -> Unit = {},
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -41,6 +43,7 @@ fun PageHeader(
         }
         Text(
             text = text,
+            maxLines = maxLines,
             style = MaterialTheme.typography.displaySmall.copy(
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Left,
@@ -48,19 +51,34 @@ fun PageHeader(
             ),
             modifier = modifier
                 .padding(horizontal = 15.dp, vertical = 15.dp)
-                .fillMaxWidth(),
+                .weight(1f),
         )
+        additionalButtons()
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PageHeaderPreview() {
     PageHeader(text = "Page Header")
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PageHeaderPreviewWithBackButton() {
     PageHeader(text = "Page Header", showBackButton = true)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PageHeaderPreviewWithAdditionalButtons() {
+    PageHeader(text = "Page Header", showBackButton = true, additionalButtons = {
+        IconButton(onClick = {}) {
+            Icon(
+                modifier = Modifier,
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = null
+            )
+        }
+    })
 }

@@ -41,8 +41,6 @@ class MainActivity : ComponentActivity() {
 
         SentryAndroid.init(this) { options ->
             options.dsn = BuildConfig.SENTRY_DSN
-            options.isDebug = BuildConfig.DEBUG
-            options.environment = BuildConfig.BUILD_TYPE
             options.release = BuildConfig.VERSION_NAME
         }
 
