@@ -20,7 +20,6 @@ import chat.revolt.api.realtime.frames.receivable.ServerCreateFrame
 import chat.revolt.api.realtime.frames.receivable.UserUpdateFrame
 import chat.revolt.api.realtime.frames.sendable.AuthorizationFrame
 import chat.revolt.api.realtime.frames.sendable.PingFrame
-import chat.revolt.callbacks.ChannelCallbacks
 import io.ktor.client.plugins.websocket.ws
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
@@ -35,6 +34,10 @@ enum class DisconnectionState {
     Disconnected,
     Reconnecting,
     Connected
+}
+
+sealed class RealtimeSocketFrames {
+    data class Reconnected(val unit: Unit = Unit) : RealtimeSocketFrames()
 }
 
 object RealtimeSocket {
@@ -61,7 +64,7 @@ object RealtimeSocket {
 
             Log.d("RealtimeSocket", "Connected to websocket.")
             updateDisconnectionState(DisconnectionState.Connected)
-            invalidateAllChannelStates()
+            pushReconnectEvent()
 
             // Send authorization frame
             val authFrame = AuthorizationFrame("Authenticate", token)
@@ -99,7 +102,7 @@ object RealtimeSocket {
         Log.d("RealtimeSocket", "Sent ping frame with ${pingPacket.data}")
     }
 
-    private fun handleFrame(type: String, rawFrame: String) {
+    private suspend fun handleFrame(type: String, rawFrame: String) {
         when (type) {
             "Pong" -> {
                 val pongFrame = RevoltJson.decodeFromString(PongFrame.serializer(), rawFrame)
@@ -167,7 +170,7 @@ object RealtimeSocket {
                     RevoltAPI.channelCache[it] =
                         RevoltAPI.channelCache[it]!!.copy(lastMessageID = messageFrame.id)
 
-                    ChannelCallbacks.emitMessage(it, messageFrame.id)
+                    RevoltAPI.wsFrameChannel.send(messageFrame)
                 }
             }
 
@@ -202,51 +205,20 @@ object RealtimeSocket {
 
                 Log.d(
                     "RealtimeSocket",
-                    "Merging message ${messageUpdateFrame.id} with partial message: $rawMessage"
-                )
-                Log.d(
-                    "RealtimeSocket",
-                    "Old: $oldMessage"
+                    "Merging message ${messageUpdateFrame.id} with updated partial."
                 )
 
                 RevoltAPI.messageCache[messageUpdateFrame.id] =
                     oldMessage.mergeWithPartial(rawMessage)
-
-                Log.d(
-                    "RealtimeSocket",
-                    "New: ${RevoltAPI.messageCache[messageUpdateFrame.id]}"
-                )
 
                 messageUpdateFrame.channel.let {
                     if (RevoltAPI.channelCache[it] == null) {
                         Log.d("RealtimeSocket", "Channel $it not found in cache. Ignoring.")
                         return
                     }
-
-                    ChannelCallbacks.emitMessageUpdate(it, messageUpdateFrame.id)
                 }
-            }
 
-            "ChannelStartTyping" -> {
-                val typingFrame =
-                    RevoltJson.decodeFromString(ChannelStartTypingFrame.serializer(), rawFrame)
-                Log.d(
-                    "RealtimeSocket",
-                    "Received channel start typing frame for ${typingFrame.id} from ${typingFrame.user}."
-                )
-
-                ChannelCallbacks.emitStartTyping(typingFrame.id, typingFrame.user)
-            }
-
-            "ChannelStopTyping" -> {
-                val typingFrame =
-                    RevoltJson.decodeFromString(ChannelStopTypingFrame.serializer(), rawFrame)
-                Log.d(
-                    "RealtimeSocket",
-                    "Received channel stop typing frame for ${typingFrame.id} from ${typingFrame.user}."
-                )
-
-                ChannelCallbacks.emitStopTyping(typingFrame.id, typingFrame.user)
+                RevoltAPI.wsFrameChannel.send(messageUpdateFrame)
             }
 
             "UserUpdate" -> {
@@ -298,8 +270,30 @@ object RealtimeSocket {
                 }
             }
 
+            "ChannelStartTyping" -> {
+                val channelStartTypingFrame =
+                    RevoltJson.decodeFromString(ChannelStartTypingFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received channel start typing frame for ${channelStartTypingFrame.id}."
+                )
+
+                RevoltAPI.wsFrameChannel.send(channelStartTypingFrame)
+            }
+
+            "ChannelStopTyping" -> {
+                val channelStopTypingFrame =
+                    RevoltJson.decodeFromString(ChannelStopTypingFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received channel stop typing frame for ${channelStopTypingFrame.id}."
+                )
+
+                RevoltAPI.wsFrameChannel.send(channelStopTypingFrame)
+            }
+
             "Authenticated" -> {
-                // No effect
+                /* no-op */
             }
 
             else -> {
@@ -308,28 +302,7 @@ object RealtimeSocket {
         }
     }
 
-    private fun invalidateAllChannelStates() {
-        ChannelCallbacks.emitReconnect()
+    private suspend fun pushReconnectEvent() {
+        RevoltAPI.wsFrameChannel.send(RealtimeSocketFrames.Reconnected())
     }
-
-    /*interface ChannelCallback {
-        fun onStartTyping(typing: ChannelStartTypingFrame)
-        fun onStopTyping(typing: ChannelStopTypingFrame)
-        fun onMessage(message: MessageFrame)
-        fun onStateInvalidate()
-    }
-
-    private val channelCallbacks: SnapshotStateMap<String, ChannelCallback> = mutableStateMapOf()
-
-    fun registerChannelCallback(channelId: String, callback: ChannelCallback) {
-        channelCallbacks[channelId] = callback
-
-        Log.d("RealtimeSocket", "Registered channel callback for $channelId.")
-    }
-
-    fun unregisterChannelCallback(channelId: String) {
-        channelCallbacks.remove(channelId)
-
-        Log.d("RealtimeSocket", "Unregistered channel callback for $channelId")
-    }*/
 }

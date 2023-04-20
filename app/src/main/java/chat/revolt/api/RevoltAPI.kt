@@ -8,7 +8,6 @@ import chat.revolt.BuildConfig
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.user.fetchSelf
-import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.Server
@@ -25,9 +24,18 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import chat.revolt.api.schemas.Channel as ChannelSchema
 
 const val REVOLT_BASE = "https://api.revolt.chat"
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
@@ -86,7 +94,7 @@ object RevoltAPI {
     // FIXME discount caching solutions! LRU would be better but this is fine for now
     val userCache = mutableStateMapOf<String, User>()
     val serverCache = mutableStateMapOf<String, Server>()
-    val channelCache = mutableStateMapOf<String, Channel>()
+    val channelCache = mutableStateMapOf<String, ChannelSchema>()
     val emojiCache = mutableStateMapOf<String, Emoji>()
     val messageCache = mutableStateMapOf<String, Message>()
 
@@ -97,7 +105,11 @@ object RevoltAPI {
     var sessionToken: String = ""
         private set
 
-    private var socketThread: Thread? = null
+    @OptIn(DelicateCoroutinesApi::class)
+    val realtimeContext = newSingleThreadContext("RealtimeContext")
+    val wsFrameChannel = Channel<Any>(Channel.UNLIMITED)
+
+    private var socketCoroutine: Job? = null
 
     fun setSessionHeader(token: String) {
         sessionToken = token
@@ -111,9 +123,9 @@ object RevoltAPI {
     }
 
     suspend fun connectWS() {
-        socketThread = Thread {
+        socketCoroutine = CoroutineScope(Dispatchers.IO).launch {
             try {
-                runBlocking {
+                withContext(realtimeContext) {
                     RealtimeSocket.connect(sessionToken)
                 }
             } catch (e: Exception) {
@@ -125,7 +137,6 @@ object RevoltAPI {
                 RealtimeSocket.updateDisconnectionState(DisconnectionState.Disconnected)
             }
         }
-        socketThread!!.start()
     }
 
     private suspend fun startSocketOps() {
@@ -173,7 +184,7 @@ object RevoltAPI {
 
         unreads.clear()
 
-        socketThread?.interrupt()
+        socketCoroutine?.cancel()
     }
 
     /**

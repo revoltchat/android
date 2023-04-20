@@ -33,8 +33,6 @@ import chat.revolt.RevoltTweenFloat
 import chat.revolt.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.microservices.autumn.FileArgs
-import chat.revolt.callbacks.ChannelCallbacks
-import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.MessageField
 import chat.revolt.components.screens.chat.AttachmentManager
@@ -75,7 +73,7 @@ fun ChannelScreen(
     ) { uriList ->
         uriList.let { uris ->
             uris.forEach {
-                DocumentFile.fromSingleUri(context, it)?.let docfile@{ file ->
+                DocumentFile.fromSingleUri(context, it)?.let { file ->
                     val mFile = File(context.cacheDir, file.name ?: "attachment")
 
                     mFile.outputStream().use { output ->
@@ -97,23 +95,19 @@ fun ChannelScreen(
 
     val scrollDownFABPadding by animateDpAsState(
         if (viewModel.typingUsers.isNotEmpty()) 25.dp else 0.dp,
-        animationSpec = RevoltTweenDp
+        animationSpec = RevoltTweenDp,
+        label = "ScrollDownFABPadding"
     )
 
     LaunchedEffect(channelId) {
         viewModel.fetchChannel(channelId)
-    }
 
-    LaunchedEffect(viewModel.channel) {
-        if (viewModel.channel?.id != channelId) {
-            viewModel.fetchChannel(channelId)
+        coroutineScope.launch {
+            viewModel.listenForWsFrame()
         }
-    }
 
-    DisposableEffect(channelId) {
-        onDispose {
-            viewModel.channelCallbackReceiver?.let { ChannelCallbacks.unregisterReceiver(channelId) }
-            viewModel.uiCallbackReceiver?.let { UiCallbacks.unregisterReceiver(it) }
+        coroutineScope.launch {
+            viewModel.listenForUiCallbacks()
         }
     }
 

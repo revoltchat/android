@@ -8,7 +8,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ULID
+import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
+import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
+import chat.revolt.api.realtime.frames.receivable.MessageDeleteFrame
+import chat.revolt.api.realtime.frames.receivable.MessageFrame
+import chat.revolt.api.realtime.frames.receivable.MessageUpdateFrame
 import chat.revolt.api.routes.channel.SendMessageReply
 import chat.revolt.api.routes.channel.ackChannel
 import chat.revolt.api.routes.channel.fetchMessagesFromChannel
@@ -20,13 +26,18 @@ import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
 import chat.revolt.api.routes.user.addUserIfUnknown
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Message
-import chat.revolt.callbacks.ChannelCallbacks
+import chat.revolt.callbacks.UiCallback
 import chat.revolt.callbacks.UiCallbacks
 import io.ktor.http.ContentType
-import io.sentry.Sentry
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 
 class ChannelScreenViewModel : ViewModel() {
@@ -114,190 +125,8 @@ class ChannelScreenViewModel : ViewModel() {
     val noMoreMessages: Boolean
         get() = _noMoreMessages
 
-    private fun setNoMoreMessages(noMore: Boolean) {
-        _noMoreMessages = noMore
-    }
-
-    private var _uiCallbackReceiver = mutableStateOf<UiCallbacks.CallbackReceiver?>(null)
-    val uiCallbackReceiver: UiCallbacks.CallbackReceiver?
-        get() = _uiCallbackReceiver.value
-
-    private var _uiCallbackRegistered by mutableStateOf(false)
-
-    private var _channelCallbackReceiver = mutableStateOf<ChannelCallbacks.CallbackReceiver?>(null)
-    val channelCallbackReceiver: ChannelCallbacks.CallbackReceiver?
-        get() = _channelCallbackReceiver.value
-
-    private var _channelCallbackRegistered by mutableStateOf(false)
-
-    /*
-    inner class ChannelScreenCallback : RealtimeSocket.ChannelCallback {
-        override fun onMessage(message: Message) {
-            viewModelScope.launch {
-                addUserIfUnknown(message.author!!)
-            }
-
-            regroupMessages(listOf(message) + renderableMessages)
-            ackNewest()
-        }
-
-        override fun onStartTyping(typing: ChannelStartTypingFrame) {
-            viewModelScope.launch {
-                addUserIfUnknown(typing.user)
-            }
-
-            if (!_typingUsers.contains(typing.user)) {
-                _typingUsers.add(typing.user)
-            }
-        }
-
-        override fun onStopTyping(typing: ChannelStopTypingFrame) {
-            if (_typingUsers.contains(typing.user)) {
-                _typingUsers.remove(typing.user)
-            }
-        }
-
-        override fun onStateInvalidate() {
-            fetchMessages()
-            _typingUsers.clear()
-        }
-    }*/
-
-    inner class UiCallbackReceiver : UiCallbacks.CallbackReceiver {
-        override fun onQueueMessageForReply(messageId: String) {
-            viewModelScope.launch {
-                addInReplyTo(SendMessageReply(messageId, true))
-            }
-        }
-    }
-
-    inner class ChannelCallbackReceiver : ChannelCallbacks.CallbackReceiver {
-        override fun onReconnect() {
-            fetchMessages()
-            _typingUsers.clear()
-            // TODO push time rift to messages
-        }
-
-        override fun onStartTyping(channelId: String, userId: String) {
-            viewModelScope.launch {
-                addUserIfUnknown(userId)
-
-                if (!_typingUsers.contains(userId)) {
-                    _typingUsers.add(userId)
-                }
-            }
-        }
-
-        override fun onStopTyping(channelId: String, userId: String) {
-            if (_typingUsers.contains(userId)) {
-                _typingUsers.remove(userId)
-            }
-        }
-
-        override fun onMessage(messageId: String) {
-            viewModelScope.launch {
-                val message = RevoltAPI.messageCache[messageId] ?: return@launch
-
-                addUserIfUnknown(message.author!!)
-
-                regroupMessages(listOf(message) + renderableMessages)
-                ackNewest()
-            }
-        }
-
-        override fun onMessageUpdate(messageId: String) {
-            val message = RevoltAPI.messageCache[messageId] ?: return
-
-            Log.d("ChannelScreen", "Handler Message updated: $message")
-
-            regroupMessages(renderableMessages.map {
-                if (it.id == message.id) {
-                    message
-                } else {
-                    it
-                }
-            })
-        }
-
-        override fun onMessageDelete(messageId: String) {
-            // TODO Not implemented
-            Log.d("ChannelScreen", "Handler Message deleted: $messageId")
-        }
-
-        override fun onMessageBulkDelete(messageIds: List<String>) {
-            // TODO Not implemented
-            Log.d("ChannelScreen", "Handler Messages bulk deleted: $messageIds")
-        }
-
-        override fun onMessageReactionAdd(messageId: String, emoji: String, userId: String) {
-            // TODO Not implemented
-            Log.d("ChannelScreen", "Handler Message reaction added: $messageId $emoji $userId")
-        }
-
-        override fun onMessageReactionRemove(messageId: String, emoji: String, userId: String) {
-            // TODO Not implemented
-            Log.d("ChannelScreen", "Handler Message reaction removed: $messageId $emoji $userId")
-        }
-
-        override fun onMessageReactionRemoveAll(messageId: String) {
-            // TODO Not implemented
-            Log.d("ChannelScreen", "Handler Message reactions removed: $messageId")
-        }
-    }
-
-    private fun registerCallbacks() {
-        if (channel?.id == null) {
-            Sentry.captureException(IllegalStateException("Channel ID is null while trying to register callbacks"))
-            return
-        }
-
-        if (!_channelCallbackRegistered) {
-            _channelCallbackReceiver.value = ChannelCallbackReceiver()
-            ChannelCallbacks.registerReceiver(channel!!.id!!, _channelCallbackReceiver.value!!)
-            _channelCallbackRegistered = true
-        } else {
-            Log.d(
-                "ChannelScreenViewModel",
-                "Channel Callbacks already registered but trying to register again. Ignoring but this is a bug."
-            )
-        }
-
-        if (!_uiCallbackRegistered) {
-            _uiCallbackReceiver.value = UiCallbackReceiver()
-            UiCallbacks.registerReceiver(_uiCallbackReceiver.value!!)
-            _uiCallbackRegistered = true
-        } else {
-            Log.d(
-                "ChannelScreenViewModel",
-                "UI Callbacks already registered but trying to register again. Ignoring but this is a bug."
-            )
-        }
-    }
-
-    fun fetchMessages() {
-        if (channel == null) {
-            return
-        }
-
-        _renderableMessages.clear()
-
-        viewModelScope.launch {
-            val messages = arrayListOf<Message>()
-            fetchMessagesFromChannel(channel!!.id!!, limit = 50, false).let {
-                if (it.messages.isNullOrEmpty() || it.messages.size < 50) {
-                    setNoMoreMessages(true)
-                }
-
-                it.messages?.forEach { message ->
-                    addUserIfUnknown(message.author ?: return@forEach)
-                    if (!RevoltAPI.messageCache.containsKey(message.id)) {
-                        RevoltAPI.messageCache[message.id!!] = message
-                    }
-                    messages.add(message)
-                }
-            }
-            regroupMessages(renderableMessages + messages)
-        }
+    private fun setNoMoreMessages() {
+        _noMoreMessages = true
     }
 
     fun fetchOlderMessages() {
@@ -308,38 +137,26 @@ class ChannelScreenViewModel : ViewModel() {
         viewModelScope.launch {
             val messages = arrayListOf<Message>()
 
-            if (renderableMessages.isNotEmpty()) {
-                fetchMessagesFromChannel(
-                    channel!!.id!!,
-                    limit = 50,
-                    true,
-                    before = renderableMessages.last().id
-                ).let {
-                    if (it.messages.isNullOrEmpty() || it.messages.size < 50) {
-                        setNoMoreMessages(true)
-                    }
-
-                    it.messages?.forEach { message ->
-                        addUserIfUnknown(message.author ?: return@forEach)
-                        if (!RevoltAPI.messageCache.containsKey(message.id)) {
-                            RevoltAPI.messageCache[message.id!!] = message
-                        }
-                        messages.add(message)
-                    }
+            fetchMessagesFromChannel(
+                channel!!.id!!,
+                limit = 50,
+                true,
+                before = if (renderableMessages.isNotEmpty()) {
+                    renderableMessages.first().id
+                } else {
+                    null
                 }
-            } else {
-                fetchMessagesFromChannel(channel!!.id!!, limit = 50, true).let {
-                    if (it.messages.isNullOrEmpty() || it.messages.size < 50) {
-                        setNoMoreMessages(true)
-                    }
+            ).let {
+                if (it.messages.isNullOrEmpty() || it.messages.size < 50) {
+                    setNoMoreMessages()
+                }
 
-                    it.messages?.forEach { message ->
-                        addUserIfUnknown(message.author ?: return@forEach)
-                        if (!RevoltAPI.messageCache.containsKey(message.id)) {
-                            RevoltAPI.messageCache[message.id!!] = message
-                        }
-                        messages.add(message)
+                it.messages?.forEach { message ->
+                    addUserIfUnknown(message.author ?: return@forEach)
+                    if (!RevoltAPI.messageCache.containsKey(message.id)) {
+                        RevoltAPI.messageCache[message.id!!] = message
                     }
+                    messages.add(message)
                 }
             }
 
@@ -356,8 +173,6 @@ class ChannelScreenViewModel : ViewModel() {
             } else {
                 _channel = RevoltAPI.channelCache[id]
             }
-
-            registerCallbacks()
 
             if (_channel?.lastMessageID != null) {
                 ackNewest()
@@ -438,6 +253,89 @@ class ChannelScreenViewModel : ViewModel() {
         }
 
         setRenderableMessages(groupedMessages.values.toList())
+    }
+
+    suspend fun listenForWsFrame() {
+        withContext(RevoltAPI.realtimeContext) {
+            flow {
+                while (true) {
+                    emit(RevoltAPI.wsFrameChannel.receive())
+                }
+            }.onEach {
+                when (it) {
+                    is MessageFrame -> {
+                        if (it.channel != channel?.id) return@onEach
+
+                        addUserIfUnknown(it.author!!)
+                        regroupMessages(listOf(it) + renderableMessages)
+                        ackNewest()
+                    }
+
+                    is MessageUpdateFrame -> {
+                        if (it.channel != channel?.id) return@onEach
+
+                        val messageFrame =
+                            RevoltJson.decodeFromJsonElement(MessageFrame.serializer(), it.data)
+
+                        renderableMessages.find { currentMsg ->
+                            currentMsg.id == it.id
+                        } ?: return@onEach // Message not found, ignore.
+
+                        regroupMessages(renderableMessages.map { currentMsg ->
+                            if (currentMsg.id == it.id) {
+                                messageFrame
+                            } else {
+                                currentMsg
+                            }
+                        })
+                    }
+
+                    is MessageDeleteFrame -> {
+                        if (it.channel != channel?.id) return@onEach
+
+                        regroupMessages(renderableMessages.filter { currentMsg ->
+                            currentMsg.id != it.id
+                        })
+                    }
+
+                    is ChannelStartTypingFrame -> {
+                        if (it.id != channel?.id) return@onEach
+                        if (_typingUsers.contains(it.user)) return@onEach
+
+                        addUserIfUnknown(it.user)
+                        _typingUsers.add(it.user)
+                    }
+
+                    is ChannelStopTypingFrame -> {
+                        if (it.id != channel?.id) return@onEach
+                        if (!_typingUsers.contains(it.user)) return@onEach
+
+                        _typingUsers.remove(it.user)
+                    }
+                }
+            }.catch {
+                Log.e("ChannelScreen", "Failed to receive WS frame", it)
+            }.launchIn(this)
+        }
+    }
+
+    suspend fun listenForUiCallbacks() {
+        withContext(Dispatchers.Main) {
+            UiCallbacks.uiCallbackFlow.onEach {
+                when (it) {
+                    is UiCallback.ReplyToMessage -> {
+                        addInReplyTo(
+                            SendMessageReply(
+                                id = it.messageId,
+                                mention = false
+                            )
+                        )
+                    }
+                }
+            }.catch {
+                Log.e("ChannelScreen", "Failed to receive UI callback", it)
+            }.launchIn(this)
+        }
     }
 
     private var debouncedChannelAck: Job? = null

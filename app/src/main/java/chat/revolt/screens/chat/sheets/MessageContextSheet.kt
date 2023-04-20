@@ -2,7 +2,11 @@ package chat.revolt.screens.chat.sheets
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -13,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -28,6 +33,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.SheetClickable
+import kotlinx.coroutines.launch
 
 @Composable
 fun MessageContextSheet(
@@ -42,6 +48,7 @@ fun MessageContextSheet(
 
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -80,7 +87,9 @@ fun MessageContextSheet(
                 )
             },
         ) {
-            UiCallbacks.emitQueueMessageForReply(messageId)
+            coroutineScope.launch {
+                UiCallbacks.replyToMessage(messageId)
+            }
             navController.popBackStack()
         }
 
@@ -122,7 +131,7 @@ fun MessageContextSheet(
                 )
             },
         ) {
-            if (message.content == null || message.content.isEmpty()) {
+            if (message.content.isNullOrEmpty()) {
                 Toast.makeText(
                     context,
                     context.getString(R.string.message_context_sheet_actions_copy_failed_empty),
@@ -156,7 +165,7 @@ fun MessageContextSheet(
                 )
             },
         ) {
-            if (message.content == null || message.content.isEmpty()) {
+            if (message.content.isNullOrEmpty()) {
                 Toast.makeText(
                     context,
                     context.getString(R.string.message_context_sheet_actions_copy_failed_empty),
