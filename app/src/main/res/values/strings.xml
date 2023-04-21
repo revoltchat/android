@@ -261,5 +261,5 @@
     <string name="settings_feedback_error">An error occurred while sending your feedback. Please try again later.</string>
 
     <string name="settings_feedback_disabled_title">Feedback unavailable</string>
-    <string name="settings_feedback_disabled_message">Feedback is not available on this build of Revolt. Support for self-built versions is limited.</string>
+    <string name="settings_feedback_disabled_message">Feedback is not available on this build of Revolt. Support for this build is limited. (Build: %1$s %2$s)</string>
 </resources>

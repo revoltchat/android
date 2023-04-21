@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -58,13 +57,20 @@ enum class FeedbackType(val value: String) {
 data class FeedbackBody(
     val type: String,
     val message: String,
-    val api_host: String,
-    val app_id: String,
-    val app_version: String,
-    val app_build: String,
-    val android_api: String,
-    val android_device: String,
-    val android_manufacturer: String,
+    @SerialName("api_host")
+    val apiHost: String,
+    @SerialName("app_id")
+    val appId: String,
+    @SerialName("app_version")
+    val appVersion: String,
+    @SerialName("app_build")
+    val appBuild: String,
+    @SerialName("android_api")
+    val androidApi: String,
+    @SerialName("android_device")
+    val androidDevice: String,
+    @SerialName("android_manufacturer")
+    val androidManufacturer: String,
     @SerialName("id_for_spam_protection_pls_dont_spam_but_if_you_do_i_will_know")
     val author: String
 )
@@ -75,13 +81,13 @@ suspend fun sendFeedback(type: FeedbackType, message: String): String {
             FeedbackBody(
                 type = type.value,
                 message = message,
-                api_host = REVOLT_BASE,
-                app_id = BuildConfig.APPLICATION_ID,
-                app_version = BuildConfig.VERSION_NAME,
-                app_build = BuildConfig.VERSION_CODE.toString(),
-                android_api = android.os.Build.VERSION.SDK_INT.toString(),
-                android_device = android.os.Build.DEVICE,
-                android_manufacturer = android.os.Build.MANUFACTURER,
+                apiHost = REVOLT_BASE,
+                appId = BuildConfig.APPLICATION_ID,
+                appVersion = BuildConfig.VERSION_NAME,
+                appBuild = BuildConfig.VERSION_CODE.toString(),
+                androidApi = android.os.Build.VERSION.SDK_INT.toString(),
+                androidDevice = android.os.Build.DEVICE,
+                androidManufacturer = android.os.Build.MANUFACTURER,
                 author = RevoltAPI.selfId ?: "RevoltAPI.selfId is null"
             )
         )
@@ -93,7 +99,7 @@ suspend fun sendFeedback(type: FeedbackType, message: String): String {
     return response.bodyAsText()
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedbackDialog(navController: NavController) {
     if (!BuildConfig.ANALYSIS_ENABLED) {
@@ -105,7 +111,13 @@ fun FeedbackDialog(navController: NavController) {
                 modifier = Modifier.fillMaxWidth()
             )
         }, text = {
-            Text(text = stringResource(id = R.string.settings_feedback_disabled_message))
+            Text(
+                text = stringResource(
+                    id = R.string.settings_feedback_disabled_message,
+                    BuildConfig.VERSION_NAME,
+                    BuildConfig.BUILD_TYPE
+                )
+            )
         }, confirmButton = {
             TextButton(onClick = {
                 navController.popBackStack()
