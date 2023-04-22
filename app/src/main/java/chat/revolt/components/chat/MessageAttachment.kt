@@ -3,11 +3,20 @@ package chat.revolt.components.chat
 import android.text.format.Formatter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.LocalContentColor
-import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -17,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
@@ -76,8 +86,39 @@ fun ImageAttachment(attachment: AutumnResource) {
 
 @Composable
 fun VideoAttachment(attachment: AutumnResource) {
-    // FIXME Use ExoPlayer to play videos.
-    FileAttachment(attachment)
+    val url = "$REVOLT_FILES/attachments/${attachment.id}/${attachment.filename}"
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        // Turns out that when you give Glide a video URL, you get a perfectly cromulent thumbnail.
+        RemoteImage(
+            url = url,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()),
+            description = attachment.filename ?: "Video",
+        )
+
+        Box(
+            modifier = Modifier
+                .width(48.dp)
+                .aspectRatio(1f)
+                .clip(MaterialTheme.shapes.medium)
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
+        )
+
+        Icon(
+            imageVector = Icons.Default.PlayArrow,
+            contentDescription = stringResource(id = R.string.video_viewer_play),
+            modifier = Modifier
+                .width(32.dp)
+                .aspectRatio(1f),
+        )
+    }
 }
 
 @Composable

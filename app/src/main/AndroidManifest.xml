@@ -80,6 +80,11 @@
             android:name=".activities.media.ImageViewActivity"
             android:theme="@style/Theme.Revolt" />
 
+        <activity
+            android:name=".activities.media.VideoViewActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/Theme.Revolt" />
+
     </application>
 
 </manifest>

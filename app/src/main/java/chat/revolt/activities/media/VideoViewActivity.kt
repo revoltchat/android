@@ -30,6 +30,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,6 +41,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltHttp
@@ -48,12 +52,11 @@ import chat.revolt.api.settings.GlobalState
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.provider.getAttachmentContentUri
 import chat.revolt.ui.theme.RevoltTheme
-import com.bumptech.glide.Glide
 import io.ktor.client.request.get
 import io.ktor.client.statement.readBytes
 import kotlinx.coroutines.launch
 
-class ImageViewActivity : ComponentActivity() {
+class VideoViewActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -65,29 +68,28 @@ class ImageViewActivity : ComponentActivity() {
         }
 
         if (autumnResource?.id == null) {
-            Log.e("ImageViewActivity", "No AutumnResource provided")
+            Log.e("VideoViewActivity", "No AutumnResource provided")
             finish()
             return
         }
 
         setContent {
-            ImageViewScreen(resource = autumnResource, onClose = { finish() })
+            VideoViewScreen(resource = autumnResource, onClose = { finish() })
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-fun ImageViewScreen(
+fun VideoViewScreen(
     resource: AutumnResource,
     onClose: () -> Unit = {}
 ) {
     val resourceUrl = "$REVOLT_FILES/attachments/${resource.id}/${resource.filename}"
 
     val context = LocalContext.current
-
     val coroutineScope = rememberCoroutineScope()
-
     val activityLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {}
@@ -110,7 +112,7 @@ fun ImageViewScreen(
         activityLauncher.launch(shareIntent)
     }
 
-    fun shareImage() {
+    fun shareVideo() {
         shareSubmenuIsOpen.value = false
 
         coroutineScope.launch {
@@ -118,12 +120,12 @@ fun ImageViewScreen(
                 context,
                 resourceUrl,
                 resource.id!!,
-                resource.filename ?: "image"
+                resource.filename ?: "video"
             )
 
             val intent =
                 Intent(Intent.ACTION_SEND)
-            intent.type = resource.contentType ?: "image/*"
+            intent.type = resource.contentType ?: "video/*"
             intent.putExtra(
                 Intent.EXTRA_STREAM,
                 contentUri
@@ -138,24 +140,24 @@ fun ImageViewScreen(
         coroutineScope.launch {
             context.applicationContext.let {
                 it.contentResolver.insert(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                     ContentValues().apply {
-                        put(MediaStore.Images.Media.DISPLAY_NAME, resource.filename)
-                        put(MediaStore.Images.Media.MIME_TYPE, resource.contentType)
-                        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Revolt")
-                        put(MediaStore.Images.Media.IS_PENDING, 1)
+                        put(MediaStore.Video.Media.DISPLAY_NAME, resource.filename)
+                        put(MediaStore.Video.Media.MIME_TYPE, resource.contentType)
+                        put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/Revolt")
+                        put(MediaStore.Video.Media.IS_PENDING, 1)
                     }
                 )
             }?.let { uri ->
                 context.contentResolver.openOutputStream(uri).use { stream ->
-                    val image = RevoltHttp.get(resourceUrl).readBytes()
-                    stream?.write(image)
+                    val video = RevoltHttp.get(resourceUrl).readBytes()
+                    stream?.write(video)
 
                     context.applicationContext.let {
                         it.contentResolver.update(
                             uri,
                             ContentValues().apply {
-                                put(MediaStore.Images.Media.IS_PENDING, 0)
+                                put(MediaStore.Video.Media.IS_PENDING, 0)
                             },
                             null,
                             null
@@ -163,8 +165,8 @@ fun ImageViewScreen(
                     }
 
                     val snackbar = snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.image_viewer_saved),
-                        actionLabel = context.getString(R.string.image_viewer_open),
+                        message = context.getString(R.string.video_viewer_saved),
+                        actionLabel = context.getString(R.string.video_viewer_open),
                         duration = SnackbarDuration.Short
                     )
 
@@ -176,6 +178,20 @@ fun ImageViewScreen(
                     }
                 }
             }
+        }
+    }
+
+    val player = remember {
+        ExoPlayer.Builder(context).build().apply {
+            setMediaItem(MediaItem.fromUri(resourceUrl))
+            prepare()
+            play()
+        }
+    }
+
+    DisposableEffect(player) {
+        onDispose {
+            player.release()
         }
     }
 
@@ -191,7 +207,7 @@ fun ImageViewScreen(
             ) {
                 Column {
                     PageHeader(text = stringResource(
-                        id = R.string.image_viewer_title, resource.filename ?: resource.id!!
+                        id = R.string.video_viewer_title, resource.filename ?: resource.id!!
                     ),
                         showBackButton = true,
                         onBackButtonClicked = onClose,
@@ -217,15 +233,15 @@ fun ImageViewScreen(
                                             shareUrl()
                                         },
                                         text = {
-                                            Text(stringResource(id = R.string.image_viewer_share_url))
+                                            Text(stringResource(id = R.string.video_viewer_share_url))
                                         }
                                     )
                                     DropdownMenuItem(
                                         onClick = {
-                                            shareImage()
+                                            shareVideo()
                                         },
                                         text = {
-                                            Text(stringResource(id = R.string.image_viewer_share_image))
+                                            Text(stringResource(id = R.string.video_viewer_share_video))
                                         }
                                     )
                                 }
@@ -235,7 +251,7 @@ fun ImageViewScreen(
                                 }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_download_24dp),
-                                        contentDescription = stringResource(id = R.string.image_viewer_save)
+                                        contentDescription = stringResource(id = R.string.video_viewer_save)
                                     )
                                 }
                             }
@@ -248,13 +264,12 @@ fun ImageViewScreen(
                     ) {
                         AndroidView(
                             factory = { context ->
-                                com.ortiz.touchview.TouchImageView(context).apply {
-                                    maxZoom = 10f
-                                    doubleTapScale = 3f
+                                PlayerView(context).apply {
+                                    setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
                                 }
                             },
                             update = {
-                                Glide.with(it).load(resourceUrl).into(it)
+                                it.player = player
                             },
                             modifier = Modifier
                                 .fillMaxSize()

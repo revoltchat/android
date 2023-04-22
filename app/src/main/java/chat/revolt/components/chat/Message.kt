@@ -30,6 +30,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import chat.revolt.R
 import chat.revolt.activities.media.ImageViewActivity
+import chat.revolt.activities.media.VideoViewActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.asJanuaryProxyUrl
@@ -220,14 +221,26 @@ fun Message(
                     message.attachments.forEach { attachment ->
                         Spacer(modifier = Modifier.height(2.dp))
                         MessageAttachment(attachment) {
-                            if (attachment.metadata?.type == "Image") {
-                                attachmentView.launch(
-                                    Intent(context, ImageViewActivity::class.java).apply {
-                                        putExtra("autumnResource", attachment)
-                                    }
-                                )
-                            } else {
-                                viewAttachmentInBrowser(context, attachment)
+                            when (attachment.metadata?.type) {
+                                "Image" -> {
+                                    attachmentView.launch(
+                                        Intent(context, ImageViewActivity::class.java).apply {
+                                            putExtra("autumnResource", attachment)
+                                        }
+                                    )
+                                }
+
+                                "Video" -> {
+                                    attachmentView.launch(
+                                        Intent(context, VideoViewActivity::class.java).apply {
+                                            putExtra("autumnResource", attachment)
+                                        }
+                                    )
+                                }
+
+                                else -> {
+                                    viewAttachmentInBrowser(context, attachment)
+                                }
                             }
                         }
                         Spacer(modifier = Modifier.height(2.dp))

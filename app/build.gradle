@@ -168,13 +168,19 @@ dependencies {
     // Libraries used for legacy View-based UI
     implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha09"
     implementation 'com.github.MikeOrtiz:TouchImageView:3.3'
+    implementation "androidx.appcompat:appcompat:1.7.0-alpha02"
 
     // JDK Desugaring - polyfill for new Java APIs
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
 
     // Markdown
     implementation "com.github.discord:SimpleAST:2.7.0"
-    implementation "androidx.appcompat:appcompat:1.7.0-alpha02"
+
+    // AndroidX Media3 w/ ExoPlayer
+    implementation "androidx.media3:media3-exoplayer:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
+    implementation "androidx.media3:media3-datasource-okhttp:$media3_version"
+    implementation "androidx.media3:media3-ui:1.0.1"
 }
 
 kapt {
