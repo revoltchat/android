@@ -163,8 +163,8 @@ fun ImageViewScreen(
                     }
 
                     val snackbar = snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.image_viewer_saved),
-                        actionLabel = context.getString(R.string.image_viewer_open),
+                        message = context.getString(R.string.media_viewer_saved),
+                        actionLabel = context.getString(R.string.media_viewer_open),
                         duration = SnackbarDuration.Short
                     )
 
@@ -191,7 +191,8 @@ fun ImageViewScreen(
             ) {
                 Column {
                     PageHeader(text = stringResource(
-                        id = R.string.image_viewer_title, resource.filename ?: resource.id!!
+                        id = R.string.media_viewer_title_image,
+                        resource.filename ?: resource.id!!
                     ),
                         showBackButton = true,
                         onBackButtonClicked = onClose,
@@ -217,7 +218,7 @@ fun ImageViewScreen(
                                             shareUrl()
                                         },
                                         text = {
-                                            Text(stringResource(id = R.string.image_viewer_share_url))
+                                            Text(stringResource(id = R.string.media_viewer_share_url))
                                         }
                                     )
                                     DropdownMenuItem(
@@ -225,7 +226,7 @@ fun ImageViewScreen(
                                             shareImage()
                                         },
                                         text = {
-                                            Text(stringResource(id = R.string.image_viewer_share_image))
+                                            Text(stringResource(id = R.string.media_viewer_share_image))
                                         }
                                     )
                                 }
@@ -235,7 +236,7 @@ fun ImageViewScreen(
                                 }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_download_24dp),
-                                        contentDescription = stringResource(id = R.string.image_viewer_save)
+                                        contentDescription = stringResource(id = R.string.media_viewer_save)
                                     )
                                 }
                             }

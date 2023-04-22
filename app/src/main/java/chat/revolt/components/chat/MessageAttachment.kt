@@ -33,6 +33,7 @@ import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.components.generic.RemoteImage
+import chat.revolt.components.media.AudioPlayer
 
 @Composable
 fun FileAttachment(attachment: AutumnResource) {
@@ -113,7 +114,7 @@ fun VideoAttachment(attachment: AutumnResource) {
 
         Icon(
             imageVector = Icons.Default.PlayArrow,
-            contentDescription = stringResource(id = R.string.video_viewer_play),
+            contentDescription = stringResource(id = R.string.media_viewer_play),
             modifier = Modifier
                 .width(32.dp)
                 .aspectRatio(1f),
@@ -123,8 +124,12 @@ fun VideoAttachment(attachment: AutumnResource) {
 
 @Composable
 fun AudioAttachment(attachment: AutumnResource) {
-    // FIXME Use ExoPlayer to play audio.
-    FileAttachment(attachment)
+    val url = "$REVOLT_FILES/attachments/${attachment.id}/${attachment.filename}"
+    AudioPlayer(
+        url = url,
+        filename = attachment.filename ?: "Audio",
+        contentType = attachment.metadata?.type ?: "audio/mpeg",
+    )
 }
 
 @Composable

@@ -238,6 +238,10 @@ fun Message(
                                     )
                                 }
 
+                                "Audio" -> {
+                                    /* no-op */
+                                }
+
                                 else -> {
                                     viewAttachmentInBrowser(context, attachment)
                                 }

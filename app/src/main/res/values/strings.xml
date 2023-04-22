@@ -228,23 +228,21 @@
     <string name="invite_error_banned">You are banned from this server.</string>
     <string name="invite_error_unknown">An unknown error occurred.</string>
 
-    <string name="image_viewer_title">%1$s</string>
-    <string name="image_viewer_save">Save</string>
-    <string name="image_viewer_saved">Saved</string>
-    <string name="image_viewer_save_failed">Failed to save image</string>
-    <string name="image_viewer_open">Open</string>
-    <string name="image_viewer_share_url">Share URL</string>
-    <string name="image_viewer_share_image">Share image</string>
-
-    <string name="video_viewer_title">%1$s</string>
-    <string name="video_viewer_play">Play</string>
-    <string name="video_viewer_pause">Pause</string>
-    <string name="video_viewer_save">Save</string>
-    <string name="video_viewer_saved">Saved</string>
-    <string name="video_viewer_save_failed">Failed to save video</string>
-    <string name="video_viewer_open">Open</string>
-    <string name="video_viewer_share_url">Share URL</string>
-    <string name="video_viewer_share_video">Share video</string>
+    <string name="media_viewer_title_image">%1$s</string>
+    <string name="media_viewer_title_video">%1$s</string>
+    <string name="media_viewer_play">Play</string>
+    <string name="media_viewer_pause">Pause</string>
+    <string name="media_viewer_more">More…</string>
+    <string name="media_viewer_save">Save</string>
+    <string name="media_viewer_saved">Saved</string>
+    <string name="media_viewer_save_failed_audio">Failed to save audio</string>
+    <string name="media_viewer_save_failed_video">Failed to save video</string>
+    <string name="media_viewer_save_failed_image">Failed to save image</string>
+    <string name="media_viewer_open">Open</string>
+    <string name="media_viewer_share_url">Share URL</string>
+    <string name="media_viewer_share_audio">Share audio</string>
+    <string name="media_viewer_share_video">Share video</string>
+    <string name="media_viewer_share_image">Share image</string>
 
     <string name="settings_appearance">Appearance</string>
     <string name="settings_appearance_theme">Theme</string>
