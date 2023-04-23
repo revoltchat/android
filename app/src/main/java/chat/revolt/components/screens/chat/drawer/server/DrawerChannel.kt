@@ -11,12 +11,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -35,17 +35,21 @@ fun DrawerChannel(
 ) {
     val backgroundColor = animateColorAsState(
         if (selected) MaterialTheme.colorScheme.background
-        else MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
-        animationSpec = spring()
+        else Color.Transparent,
+        animationSpec = spring(),
+        label = "Channel background colour"
     )
 
     val unreadDotOpacity = animateFloatAsState(
         if (hasUnread) 1f else 0f,
-        animationSpec = spring()
+        animationSpec = spring(),
+        label = "Unread dot opacity"
     )
+
     val channelAlpha = animateFloatAsState(
         if (hasUnread || selected) 1f else 0.8f,
-        animationSpec = spring()
+        animationSpec = spring(),
+        label = "Channel alpha"
     )
 
     Row(
