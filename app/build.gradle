@@ -101,6 +101,10 @@ android {
     namespace 'chat.revolt'
 }
 
+sentry {
+    autoUploadProguardMapping = property('revoltbuild.properties', 'sentry.upload_mappings', 'RVX_SENTRY_UPLOAD_MAPPINGS') == 'true'
+}
+
 dependencies {
     // Android/Kotlin Core
     implementation 'androidx.core:core-ktx:1.10.0'
