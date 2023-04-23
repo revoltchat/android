@@ -58,3 +58,13 @@
 #-keepnames class <1>$$serializer { # -keepnames suffices; class is kept when serializer() is kept.
 #    static <1>$$serializer INSTANCE;
 #}
+
+# Excerpt of https://raw.githubusercontent.com/square/okhttp/f408411/okhttp/src/jvmMain/resources/META-INF/proguard/okhttp3.pro
+# (Licensed under Apache 2.0. No modifications.)
+# OkHttp platform used only on JVM and when Conscrypt and other security providers are available.
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**
+# End of excerpt.
+-dontwarn org.slf4j.impl.**

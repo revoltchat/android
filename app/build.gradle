@@ -50,8 +50,8 @@ android {
         applicationId "chat.revolt"
         minSdk 24
         targetSdk 33
-        versionCode Integer.parseInt("000_001_000".replaceAll("_", ""), 10)
-        versionName "0.1.0"
+        versionCode Integer.parseInt("000_002_000".replaceAll("_", ""), 10)
+        versionName "0.2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -132,10 +132,10 @@ dependencies {
 
     // KTOR - HTTP+WebSocket Library
     implementation "io.ktor:ktor-client-core:$ktor_version"
-    implementation "io.ktor:ktor-client-okhttp:$ktor_version"
     implementation "io.ktor:ktor-client-logging:$ktor_version"
     implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
     implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
+    implementation "io.ktor:ktor-client-okhttp:$ktor_version"
 
     // Screen Navigation
     implementation "androidx.navigation:navigation-compose:$nav_version"
