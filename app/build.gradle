@@ -156,6 +156,9 @@ dependencies {
     // AboutLibraries - automated OSS library attribution
     implementation "com.mikepenz:aboutlibraries-compose:$aboutlibraries_version"
 
+    // Lottie - animated vector graphics
+    implementation "com.airbnb.android:lottie-compose:6.0.0"
+
     // Sentry - crash reporting
     implementation 'io.sentry:sentry-android:6.15.0'
     implementation 'io.sentry:sentry-compose-android:6.15.0'

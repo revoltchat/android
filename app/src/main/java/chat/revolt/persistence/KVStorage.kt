@@ -29,6 +29,16 @@ class KVStorage @Inject constructor(
         return dataStore.data.firstOrNull()?.get(stringPreferencesKey(key))
     }
 
+    suspend fun set(key: String, value: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[stringPreferencesKey(key)] = value.toString()
+        }
+    }
+
+    suspend fun getBoolean(key: String): Boolean? {
+        return dataStore.data.firstOrNull()?.get(stringPreferencesKey(key))?.toBoolean()
+    }
+
     suspend fun remove(key: String) {
         dataStore.edit { preferences ->
             preferences.remove(stringPreferencesKey(key))

@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,13 +17,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -64,6 +69,11 @@ import chat.revolt.screens.chat.sheets.StatusSheet
 import chat.revolt.screens.chat.views.HomeScreen
 import chat.revolt.screens.chat.views.NoCurrentChannelScreen
 import chat.revolt.screens.chat.views.channel.ChannelScreen
+import com.airbnb.lottie.RenderMode
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
@@ -85,10 +95,19 @@ class ChatRouterViewModel @Inject constructor(
     val currentChannel: String?
         get() = _currentChannel.value
 
+    private var _sidebarSparkDisplayed = mutableStateOf(true)
+    val sidebarSparkDisplayed: Boolean
+        get() = _sidebarSparkDisplayed.value
+
     init {
         viewModelScope.launch {
             _currentServer.value = kvStorage.get("currentServer") ?: "home"
             _currentChannel.value = kvStorage.get("currentChannel")
+            _sidebarSparkDisplayed.value = if (kvStorage.getBoolean("sidebarSpark") == null) {
+                false
+            } else {
+                kvStorage.getBoolean("sidebarSpark")!!
+            }
         }
     }
 
@@ -106,6 +125,10 @@ class ChatRouterViewModel @Inject constructor(
         viewModelScope.launch {
             kvStorage.set("currentChannel", channelId)
         }
+    }
+
+    suspend fun setSettingsHintDisplayed() {
+        kvStorage.set("sidebarSpark", true)
     }
 
     fun navigateToServer(serverId: String, navController: NavController) {
@@ -155,6 +178,12 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberNavController(bottomSheetNavigator)
 
+    val showSidebarSpark = remember { mutableStateOf(false) }
+    val sidebarSparkComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.open_settings_tutorial))
+    val sidebarSparkProgress by animateLottieCompositionAsState(
+        composition = sidebarSparkComposition,
+    )
+
     LaunchedEffect(drawerState) {
         snapshotFlow { drawerState.currentValue }
             .distinctUntilChanged()
@@ -175,11 +204,52 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
             }
     }
 
+    LaunchedEffect(viewModel.sidebarSparkDisplayed) {
+        snapshotFlow { viewModel.sidebarSparkDisplayed }
+            .distinctUntilChanged()
+            .collect { displayed ->
+                showSidebarSpark.value = !displayed
+            }
+    }
+
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         sheetBackgroundColor = MaterialTheme.colorScheme.surface,
         bottomSheetNavigator = bottomSheetNavigator,
     ) {
+        if (showSidebarSpark.value) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = {
+                    Text(stringResource(id = R.string.spark_sidebar_settings_tutorial))
+                },
+                text = {
+                    Column {
+                        LottieAnimation(
+                            composition = sidebarSparkComposition,
+                            progress = { sidebarSparkProgress },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f),
+                            renderMode = RenderMode.HARDWARE
+                        )
+                        Text(stringResource(id = R.string.spark_sidebar_settings_tutorial_description_1))
+                        Text(stringResource(id = R.string.spark_sidebar_settings_tutorial_description_2))
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        scope.launch {
+                            viewModel.setSettingsHintDisplayed()
+                        }
+                        showSidebarSpark.value = false
+                    }) {
+                        Text(stringResource(id = R.string.spark_sidebar_settings_tutorial_acknowledge))
+                    }
+                }
+            )
+        }
+
         Column {
             AnimatedVisibility(visible = RealtimeSocket.disconnectionState != DisconnectionState.Connected) {
                 DisconnectedNotice(
@@ -255,7 +325,10 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                                 }
                             }
 
-                            Crossfade(targetState = viewModel.currentServer) {
+                            Crossfade(
+                                targetState = viewModel.currentServer,
+                                label = "Channel List"
+                            ) {
                                 ChannelList(
                                     serverId = it,
                                     drawerState = drawerState,

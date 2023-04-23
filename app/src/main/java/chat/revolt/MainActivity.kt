@@ -26,6 +26,7 @@ import chat.revolt.screens.login.GreeterScreen
 import chat.revolt.screens.login.LoginScreen
 import chat.revolt.screens.login.MfaScreen
 import chat.revolt.screens.settings.AppearanceSettingsScreen
+import chat.revolt.screens.settings.DebugSettingsScreen
 import chat.revolt.screens.settings.SettingsScreen
 import chat.revolt.ui.theme.RevoltTheme
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -111,6 +112,7 @@ fun AppEntrypoint() {
 
                 composable("settings") { SettingsScreen(navController) }
                 composable("settings/appearance") { AppearanceSettingsScreen(navController) }
+                composable("settings/debug") { DebugSettingsScreen(navController) }
                 dialog("settings/feedback") { FeedbackDialog(navController) }
 
                 composable("about") { AboutScreen(navController) }

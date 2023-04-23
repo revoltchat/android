@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -18,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.SheetClickable
@@ -78,6 +80,24 @@ fun SettingsScreen(
                 navController.navigate("about")
             }
 
+            if (BuildConfig.DEBUG) {
+                SheetClickable(
+                    icon = { modifier ->
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Debug",
+                            modifier = modifier
+                        )
+                    },
+                    label = { textStyle ->
+                        Text(text = "Debug", style = textStyle)
+                    },
+                    modifier = Modifier.testTag("settings_view_debug")
+                ) {
+                    navController.navigate("settings/debug")
+                }
+            }
+
             Divider()
 
             SheetClickable(
@@ -109,7 +129,8 @@ fun SettingsScreen(
                 },
                 modifier = Modifier.testTag("settings_view_logout")
             ) {
-                Toast.makeText(navController.context, "Not implemented yet", Toast.LENGTH_SHORT).show()
+                Toast.makeText(navController.context, "Not implemented yet", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
