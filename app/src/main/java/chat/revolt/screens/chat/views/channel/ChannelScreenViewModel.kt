@@ -142,7 +142,7 @@ class ChannelScreenViewModel : ViewModel() {
                 limit = 50,
                 true,
                 before = if (renderableMessages.isNotEmpty()) {
-                    renderableMessages.first().id
+                    renderableMessages.last().id
                 } else {
                     null
                 }
