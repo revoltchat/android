@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -25,6 +26,7 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.activities.WebChallengeActivity
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.RevoltHttp
 import chat.revolt.api.internals.WebChallenge
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
@@ -34,6 +36,7 @@ import chat.revolt.ui.theme.RevoltColorScheme
 import chat.revolt.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.ktor.client.request.get
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -76,6 +79,11 @@ class SplashScreenViewModel @Inject constructor(
         }
     }
 
+    private suspend fun canReachRevolt(): Boolean {
+        val res = RevoltHttp.get("/")
+        return res.status.value == 200
+    }
+
     fun checkLoggedInState() {
         Log.d("SplashScreenViewModel", "Checking logged in state")
         viewModelScope.launch {
@@ -92,9 +100,15 @@ class SplashScreenViewModel @Inject constructor(
 
             val token = kvStorage.get("sessionToken") ?: return@launch setNavigateTo("login")
 
+            val canReachRevolt = canReachRevolt()
             val valid = RevoltAPI.checkSessionToken(token)
 
-            if (!valid) {
+            if (canReachRevolt && !valid) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.token_invalid_toast),
+                    Toast.LENGTH_SHORT
+                ).show()
                 kvStorage.remove("sessionToken")
                 setNavigateTo("login")
             } else {

@@ -31,7 +31,15 @@
     <string name="password_forgot_heading">Forgot your password?</string>
     <string name="password_forgot_instructions">Enter your email and we\'ll send you instructions on how to reset your password.</string>
 
-    <string name="register_heading">Let\'s get you started</string>
+    <string name="register_heading">Welcome to Revolt</string>
+    <string name="register_instructions">It\'s like a place to hang out, get together, and talk about stuff. Best part, it\'s on the internet.</string>
+    <string name="register_form_heading">Let\'s get you set up.</string>
+    <string name="register_data">Your data is safe with us. We don\'t sell it, or use it to show you ads.</string>
+    <string name="register_email">Email</string>
+    <string name="register_email_verification_hint">We\'ll send you a verification email to confirm your account.</string>
+    <string name="register_password">Password</string>
+    <string name="register_password_rules">Eight or more, common ones are bad. Try messing around with a sentence.</string>
+
     <string name="check_mail">Check your mail!</string>
     <string name="instructions_at_mail">We\'ve sent further instructions to %1$s.</string>
     <string name="verify_then_choose_username">Verify your email, and then we\'ll get on with choosing your username.</string>
@@ -40,6 +48,8 @@
     <string name="username_choose_lead">It\'s time to choose a username!</string>
     <string name="username_choose_others">Others will find, recognise and mention you with this name.</string>
     <string name="username_choose_changeable">But if you change your mind, you can change your username at any time in your User Settings.</string>
+
+    <string name="token_invalid_toast">You have been logged out. Please log in again.</string>
 
     <string name="mfa_interstitial_header">One more thing</string>
     <string name="mfa_interstitial_lead">You\'ve got 2FA enabled to keep your account extra-safe.</string>

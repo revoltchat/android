@@ -212,6 +212,20 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
             }
     }
 
+    LaunchedEffect(RevoltAPI.selfId) {
+        snapshotFlow { RevoltAPI.selfId }
+            .distinctUntilChanged()
+            .collect { selfId ->
+                if (selfId == null) {
+                    topNav.popBackStack(
+                        topNav.graph.startDestinationRoute!!,
+                        inclusive = true
+                    )
+                    topNav.navigate("splash")
+                }
+            }
+    }
+
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         sheetBackgroundColor = MaterialTheme.colorScheme.surface,
