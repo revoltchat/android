@@ -33,7 +33,7 @@ import chat.revolt.activities.media.ImageViewActivity
 import chat.revolt.activities.media.VideoViewActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
-import chat.revolt.api.asJanuaryProxyUrl
+import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.schemas.AutumnResource

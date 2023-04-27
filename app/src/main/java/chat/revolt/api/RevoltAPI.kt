@@ -45,10 +45,6 @@ const val REVOLT_JANUARY = "https://jan.revolt.chat"
 const val REVOLT_APP = "https://app.revolt.chat"
 const val REVOLT_WEBSOCKET = "wss://ws.revolt.chat"
 
-fun asJanuaryProxyUrl(url: String): String {
-    return "$REVOLT_JANUARY/proxy?url=${url}"
-}
-
 fun buildUserAgent(accessMethod: String = "Ktor"): String {
     return "$accessMethod RevoltAndroid/${BuildConfig.VERSION_NAME} ${BuildConfig.APPLICATION_ID} (Android ${android.os.Build.VERSION.SDK_INT}; ${android.os.Build.MANUFACTURER} ${android.os.Build.DEVICE}; Analysis ${BuildConfig.ANALYSIS_ENABLED} ${BuildConfig.ANALYSIS_BASEURL}; (Kotlin ${KotlinVersion.CURRENT})"
 }
@@ -185,6 +181,7 @@ object RevoltAPI {
         unreads.clear()
 
         socketCoroutine?.cancel()
+        mainHandler.removeCallbacksAndMessages(null)
     }
 
     /**

@@ -23,7 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import chat.revolt.api.asJanuaryProxyUrl
+import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.schemas.Embed
 import chat.revolt.components.generic.RemoteImage
