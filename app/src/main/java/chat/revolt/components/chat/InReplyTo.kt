@@ -83,7 +83,7 @@ fun InReplyTo(
 
                 InlineBadges(
                     bot = message.masquerade == null && author?.bot != null,
-                    masquerade = message.masquerade != null && author?.bot != null,
+                    bridge = message.masquerade != null && author?.bot != null,
                     colour = contentColor.copy(alpha = 0.5f),
                     modifier = Modifier.size(8.dp),
                     followingIfAny = {

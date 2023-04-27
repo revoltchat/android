@@ -19,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -33,13 +34,31 @@ import chat.revolt.activities.media.ImageViewActivity
 import chat.revolt.activities.media.VideoViewActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
-import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.WebCompat
+import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.api.schemas.Message as MessageSchema
+
+@Composable
+fun authorColour(message: MessageSchema): Color {
+    return if (message.masquerade?.colour != null) {
+        WebCompat.parseColour(message.masquerade.colour)
+    } else {
+        LocalContentColor.current
+    }
+}
+
+@Composable
+fun authorName(message: MessageSchema): String {
+    return if (message.masquerade?.name != null) {
+        message.masquerade.name
+    } else {
+        RevoltAPI.userCache[message.author]?.username ?: stringResource(id = R.string.unknown)
+    }
+}
 
 fun viewUrlInBrowser(ctx: android.content.Context, url: String) {
     val customTab = CustomTabsIntent
@@ -157,20 +176,16 @@ fun Message(
                 if (message.tail == false) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = message.masquerade?.name
-                                ?: author.username
-                                ?: stringResource(id = R.string.unknown),
+                            text = authorName(message),
                             fontWeight = FontWeight.Bold,
-                            color = if (message.masquerade?.colour != null) {
-                                WebCompat.parseColour(message.masquerade.colour)
-                            } else LocalContentColor.current,
+                            color = authorColour(message),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
 
                         InlineBadges(
                             bot = author.bot != null && message.masquerade == null,
-                            masquerade = message.masquerade != null && author.bot != null,
+                            bridge = message.masquerade != null && author.bot != null,
                             colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                             modifier = Modifier.size(16.dp),
                             precedingIfAny = {

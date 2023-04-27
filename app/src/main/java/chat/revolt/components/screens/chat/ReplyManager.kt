@@ -32,7 +32,17 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.routes.channel.SendMessageReply
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
+import chat.revolt.api.schemas.Message
 import chat.revolt.components.generic.UserAvatar
+
+@Composable
+fun replyContentText(message: Message): String {
+    return if (message.content.isNullOrBlank()) {
+        stringResource(id = R.string.reply_message_empty_has_attachments)
+    } else {
+        message.content
+    }
+}
 
 @Composable
 fun ManageableReply(
@@ -90,11 +100,7 @@ fun ManageableReply(
         )
 
         Text(
-            text = if (replyMessage.content?.trim().isNullOrEmpty()) {
-                stringResource(id = R.string.reply_message_empty_has_attachments)
-            } else {
-                replyMessage.content!!
-            },
+            text = replyContentText(replyMessage),
             fontSize = 12.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

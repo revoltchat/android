@@ -11,7 +11,7 @@ import chat.revolt.R
 
 enum class InlineBadge {
     Bot,
-    Masquerade,
+    Bridge,
     PlatformModeration,
     Developer
 }
@@ -29,7 +29,7 @@ fun InlineBadge(
             tint = colour,
             modifier = modifier
         )
-        InlineBadge.Masquerade -> Icon(
+        InlineBadge.Bridge -> Icon(
             painter = painterResource(id = R.drawable.ic_link_variant_24dp),
             contentDescription = stringResource(id = R.string.badge_masquerade_alt),
             tint = colour,
@@ -44,14 +44,16 @@ fun InlineBadge(
 fun InlineBadges(
     modifier: Modifier = Modifier,
     bot: Boolean = false,
-    masquerade: Boolean = false,
+    bridge: Boolean = false,
     platformModeration: Boolean = false,
     developer: Boolean = false,
     colour: Color = Color.Unspecified,
     precedingIfAny: @Composable () -> Unit = {},
     followingIfAny: @Composable () -> Unit = {},
 ) {
-    if (bot || masquerade || platformModeration || developer) {
+    val hasBadges = bot || bridge || platformModeration || developer
+
+    if (hasBadges) {
         precedingIfAny()
     }
 
@@ -63,9 +65,9 @@ fun InlineBadges(
                 colour = colour
             )
         }
-        if (masquerade) {
+        if (bridge) {
             InlineBadge(
-                badge = InlineBadge.Masquerade,
+                badge = InlineBadge.Bridge,
                 modifier = modifier,
                 colour = colour
             )
@@ -86,7 +88,7 @@ fun InlineBadges(
         }
     }
 
-    if (bot || masquerade || platformModeration || developer) {
+    if (hasBadges) {
         followingIfAny()
     }
 }
