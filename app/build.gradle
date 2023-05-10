@@ -178,6 +178,9 @@ dependencies {
     implementation 'com.github.MikeOrtiz:TouchImageView:3.3'
     implementation "androidx.appcompat:appcompat:1.7.0-alpha02"
 
+    // hCaptcha - captcha provider
+    implementation "com.github.hcaptcha:hcaptcha-android-sdk:3.8.1"
+
     // JDK Desugaring - polyfill for new Java APIs
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
 

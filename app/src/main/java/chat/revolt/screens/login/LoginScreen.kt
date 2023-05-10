@@ -1,12 +1,24 @@
 package chat.revolt.screens.login
 
 import android.util.Log
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -118,6 +130,7 @@ fun LoginScreen(
                     }"
                 )
             }
+
             "home" -> {
                 navController.navigate("chat") {
                     popUpTo("login/greeting") { inclusive = true }
@@ -131,15 +144,13 @@ fun LoginScreen(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
+            .fillMaxSize()
+            .padding(20.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
                 .weight(1f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -199,8 +210,7 @@ fun LoginScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 30.dp),
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Weblink(
@@ -217,22 +227,22 @@ fun LoginScreen(
                     .testTag("resend_verification_link")
             )
 
-            ElevatedButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("exit_login_page_button")
-            ) {
-                Text(text = stringResource(R.string.back))
-            }
+            Spacer(modifier = Modifier.height(10.dp))
 
-            Button(
-                onClick = { viewModel.doLogin() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("do_login_button")
-            ) {
-                Text(text = stringResource(R.string.login))
+            Row {
+                TextButton(onClick = {
+                    navController.popBackStack()
+                }) {
+                    Text(text = stringResource(R.string.back))
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Button(onClick = {
+                    viewModel.doLogin()
+                }) {
+                    Text(text = stringResource(R.string.login))
+                }
             }
         }
     }

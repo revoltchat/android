@@ -73,9 +73,11 @@ fun RevoltTheme(
         m3Supported && requestedTheme == Theme.M3Dynamic && systemInDarkTheme -> dynamicDarkColorScheme(
             context
         )
+
         m3Supported && requestedTheme == Theme.M3Dynamic && !systemInDarkTheme -> dynamicLightColorScheme(
             context
         )
+
         requestedTheme == Theme.Revolt -> RevoltColorScheme
         requestedTheme == Theme.Light -> LightColorScheme
         requestedTheme == Theme.Amoled -> AmoledColorScheme

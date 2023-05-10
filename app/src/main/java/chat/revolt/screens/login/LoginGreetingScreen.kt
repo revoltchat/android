@@ -4,12 +4,25 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -23,23 +36,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import chat.revolt.R
+import chat.revolt.api.REVOLT_MARKETING
+import chat.revolt.components.generic.Weblink
 
 @Composable
-fun GreeterScreen(navController: NavController) {
+fun LoginGreetingScreen(navController: NavController) {
     val context = LocalContext.current
     var catTaps by remember { mutableStateOf(0) }
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
+            .fillMaxSize()
+            .padding(vertical = 20.dp, horizontal = 0.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
                 .weight(1f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -49,8 +62,8 @@ fun GreeterScreen(navController: NavController) {
                 contentDescription = "Revolt Logo",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .height(60.dp)
-                    .padding(bottom = 30.dp)
+                    .height(70.dp)
+                    .padding(bottom = 10.dp)
                     .clickable(
                         interactionSource = remember(::MutableInteractionSource),
                         indication = null
@@ -73,7 +86,7 @@ fun GreeterScreen(navController: NavController) {
             Text(
                 text = stringResource(R.string.login_onboarding_heading),
                 style = MaterialTheme.typography.displaySmall.copy(
-                    fontSize = 30.sp,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Black,
                     textAlign = TextAlign.Center
                 ),
@@ -88,6 +101,7 @@ fun GreeterScreen(navController: NavController) {
                     alpha = 0.5f
                 ),
                 style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = 16.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Normal,
                 ),
@@ -99,18 +113,10 @@ fun GreeterScreen(navController: NavController) {
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 30.dp)
+                .width(200.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ElevatedButton(
-                onClick = { navController.navigate("about/placeholder") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("view_signup_page_button")
-            ) {
-                Text(text = stringResource(R.string.signup))
-            }
-
             Button(
                 onClick = { navController.navigate("login/login") },
                 modifier = Modifier
@@ -119,6 +125,37 @@ fun GreeterScreen(navController: NavController) {
             ) {
                 Text(text = stringResource(R.string.login))
             }
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            ElevatedButton(
+                onClick = { navController.navigate("register/greeting") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("view_signup_page_button")
+            ) {
+                Text(text = stringResource(R.string.signup))
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            CompositionLocalProvider(
+                LocalTextStyle provides LocalTextStyle.current.copy(textAlign = TextAlign.Center)
+            ) {
+                Weblink(
+                    text = stringResource(R.string.terms_of_service),
+                    url = "$REVOLT_MARKETING/terms"
+                )
+                Weblink(
+                    text = stringResource(R.string.privacy_policy),
+                    url = "$REVOLT_MARKETING/privacy"
+                )
+                Weblink(
+                    text = stringResource(R.string.community_guidelines),
+                    url = "$REVOLT_MARKETING/aup"
+                )
+            }
+
         }
     }
 }

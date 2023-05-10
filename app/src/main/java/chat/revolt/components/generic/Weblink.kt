@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,14 +37,16 @@ fun AnyLink(text: String, action: () -> Unit, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.onBackground.copy(
             alpha = 0.5f
         ),
-        style = MaterialTheme.typography.titleMedium.copy(
+        style = LocalTextStyle.current.copy(
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Normal,
             fontSize = 15.sp
         ),
         modifier = modifier
             .padding(horizontal = 2.5.dp, vertical = 3.dp)
-            .clickable(onClick = action)
+            .clickable(
+                onClick = action
+            )
     )
 }
 

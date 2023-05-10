@@ -14,8 +14,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
-import chat.revolt.RevoltTweenFloat
-import chat.revolt.RevoltTweenInt
+import chat.revolt.activities.RevoltTweenFloat
+import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
 import chat.revolt.components.generic.UserAvatar
 

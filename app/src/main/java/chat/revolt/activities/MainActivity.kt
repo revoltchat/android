@@ -1,7 +1,6 @@
-package chat.revolt
+package chat.revolt.activities
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.EaseInOutExpo
@@ -14,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.dialog
+import chat.revolt.BuildConfig
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
@@ -22,9 +23,12 @@ import chat.revolt.screens.about.AttributionScreen
 import chat.revolt.screens.about.PlaceholderScreen
 import chat.revolt.screens.chat.ChatRouterScreen
 import chat.revolt.screens.chat.dialogs.FeedbackDialog
-import chat.revolt.screens.login.GreeterScreen
+import chat.revolt.screens.login.LoginGreetingScreen
 import chat.revolt.screens.login.LoginScreen
 import chat.revolt.screens.login.MfaScreen
+import chat.revolt.screens.register.RegisterDetailsScreen
+import chat.revolt.screens.register.RegisterGreetingScreen
+import chat.revolt.screens.register.RegisterVerifyScreen
 import chat.revolt.screens.settings.AppearanceSettingsScreen
 import chat.revolt.screens.settings.DebugSettingsScreen
 import chat.revolt.screens.settings.SettingsScreen
@@ -36,7 +40,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.android.core.SentryAndroid
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -98,7 +102,7 @@ fun AppEntrypoint() {
             ) {
                 composable("splash") { SplashScreen(navController) }
 
-                composable("login/greeting") { GreeterScreen(navController) }
+                composable("login/greeting") { LoginGreetingScreen(navController) }
                 composable("login/login") { LoginScreen(navController) }
                 composable("login/mfa/{mfaTicket}/{allowedAuthTypes}") { backStackEntry ->
                     val mfaTicket = backStackEntry.arguments?.getString("mfaTicket") ?: ""
@@ -106,6 +110,14 @@ fun AppEntrypoint() {
                         backStackEntry.arguments?.getString("allowedAuthTypes") ?: ""
 
                     MfaScreen(navController, allowedAuthTypes, mfaTicket)
+                }
+
+                composable("register/greeting") { RegisterGreetingScreen(navController) }
+                composable("register/details") { RegisterDetailsScreen(navController) }
+                composable("register/verify/{email}") { backStackEntry ->
+                    val email = backStackEntry.arguments?.getString("email") ?: ""
+
+                    RegisterVerifyScreen(navController, email)
                 }
 
                 composable("chat") { ChatRouterScreen(navController) }

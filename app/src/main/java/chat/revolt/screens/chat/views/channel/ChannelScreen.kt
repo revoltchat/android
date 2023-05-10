@@ -28,9 +28,9 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.revolt.R
-import chat.revolt.RevoltTweenDp
-import chat.revolt.RevoltTweenFloat
-import chat.revolt.RevoltTweenInt
+import chat.revolt.activities.RevoltTweenDp
+import chat.revolt.activities.RevoltTweenFloat
+import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.components.chat.Message
@@ -215,7 +215,7 @@ fun ChannelScreen(
                                 memberMap = mapOf(),
                                 userMap = RevoltAPI.userCache.toMap(),
                                 channelMap = RevoltAPI.channelCache.mapValues { ch ->
-                                    ch.value.name ?: ch.value.id!!
+                                    ch.value.name ?: ch.value.id ?: "#DeletedChannel"
                                 },
                                 emojiMap = RevoltAPI.emojiCache,
                                 serverId = channel.server ?: "",

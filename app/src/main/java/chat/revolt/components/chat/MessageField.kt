@@ -28,8 +28,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
-import chat.revolt.RevoltTweenFloat
-import chat.revolt.RevoltTweenInt
+import chat.revolt.activities.RevoltTweenFloat
+import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.schemas.ChannelType
 
 @OptIn(ExperimentalMaterial3Api::class)

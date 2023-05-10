@@ -32,17 +32,19 @@
     <string name="password_forgot_instructions">Enter your email and we\'ll send you instructions on how to reset your password.</string>
 
     <string name="register_heading">Welcome to Revolt</string>
+    <string name="register_image_alt">Use Revolt to chat about stuff.</string>
     <string name="register_instructions">It\'s like a place to hang out, get together, and talk about stuff. Best part, it\'s on the internet.</string>
     <string name="register_form_heading">Let\'s get you set up.</string>
-    <string name="register_data">Your data is safe with us. We don\'t sell it, or use it to show you ads.</string>
+    <string name="register_data">Your data is safe with us. We don\'t sell it, and neither do we use it to show you ads.</string>
     <string name="register_email">Email</string>
     <string name="register_email_verification_hint">We\'ll send you a verification email to confirm your account.</string>
     <string name="register_password">Password</string>
-    <string name="register_password_rules">Eight or more, common ones are bad. Try messing around with a sentence.</string>
+    <string name="register_password_rules">Eight or more, common ones are bad. Symbols and numbers recommended.</string>
 
     <string name="check_mail">Check your mail!</string>
     <string name="instructions_at_mail">We\'ve sent further instructions to %1$s.</string>
     <string name="verify_then_choose_username">Verify your email, and then we\'ll get on with choosing your username.</string>
+    <string name="open_mail_app">Open mail app</string>
 
     <string name="welcome">Welcome!</string>
     <string name="username_choose_lead">It\'s time to choose a username!</string>
@@ -90,12 +92,10 @@
     <string name="badge_bot_alt">Bot</string>
     <string name="badge_masquerade_alt">From linked channel</string>
 
-    <string name="tutorial">Welcome to Revolt\'s in-progress Android experience!</string>
-    <string name="select_channel">Select a server and channel by swiping from the left.</string>
-
     <string name="unknown">Unknown</string>
 
     <string name="home">Home</string>
+    <string name="menu">Menu</string>
     <string name="logout">Log out</string>
 
     <string name="server_plus_alt">Add server</string>
