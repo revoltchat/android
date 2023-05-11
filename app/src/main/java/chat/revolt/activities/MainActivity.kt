@@ -26,6 +26,7 @@ import chat.revolt.screens.chat.dialogs.FeedbackDialog
 import chat.revolt.screens.login.LoginGreetingScreen
 import chat.revolt.screens.login.LoginScreen
 import chat.revolt.screens.login.MfaScreen
+import chat.revolt.screens.register.OnboardingScreen
 import chat.revolt.screens.register.RegisterDetailsScreen
 import chat.revolt.screens.register.RegisterGreetingScreen
 import chat.revolt.screens.register.RegisterVerifyScreen
@@ -119,6 +120,7 @@ fun AppEntrypoint() {
 
                     RegisterVerifyScreen(navController, email)
                 }
+                composable("register/onboarding") { OnboardingScreen(navController) }
 
                 composable("chat") { ChatRouterScreen(navController) }
 

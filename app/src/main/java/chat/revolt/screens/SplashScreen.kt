@@ -28,6 +28,7 @@ import chat.revolt.activities.WebChallengeActivity
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.internals.WebChallenge
+import chat.revolt.api.routes.onboard.needsOnboarding
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.screens.splash.DisconnectedScreen
@@ -112,6 +113,12 @@ class SplashScreenViewModel @Inject constructor(
                 kvStorage.remove("sessionToken")
                 setNavigateTo("login")
             } else {
+                val onboard = needsOnboarding()
+                if (onboard) {
+                    setNavigateTo("onboarding")
+                    return@launch
+                }
+
                 RevoltAPI.loginAs(token)
                 loadSettings()
                 setNavigateTo("home")
@@ -177,6 +184,14 @@ fun SplashScreen(
         when (viewModel.navigateTo) {
             "login" -> {
                 navController.navigate("login/greeting") {
+                    popUpTo("splash") {
+                        inclusive = true
+                    }
+                }
+            }
+
+            "onboarding" -> {
+                navController.navigate("register/onboarding") {
                     popUpTo("splash") {
                         inclusive = true
                     }

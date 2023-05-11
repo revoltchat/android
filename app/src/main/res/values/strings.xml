@@ -46,10 +46,11 @@
     <string name="verify_then_choose_username">Verify your email, and then we\'ll get on with choosing your username.</string>
     <string name="open_mail_app">Open mail app</string>
 
-    <string name="welcome">Welcome!</string>
-    <string name="username_choose_lead">It\'s time to choose a username!</string>
-    <string name="username_choose_others">Others will find, recognise and mention you with this name.</string>
-    <string name="username_choose_changeable">But if you change your mind, you can change your username at any time in your User Settings.</string>
+    <string name="onboarding_welcome">Welcome!</string>
+    <string name="onboarding_lead">It\'s time to choose a username!</string>
+    <string name="onboarding_others">Others will find, recognise and mention you with this name.</string>
+    <string name="onboarding_changeable">But if you change your mind, you can change your username at any time in your User Settings.</string>
+    <string name="onboarding_username">Username</string>
 
     <string name="token_invalid_toast">You have been logged out. Please log in again.</string>
 

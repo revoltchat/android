@@ -37,6 +37,7 @@ import chat.revolt.api.REVOLT_SUPPORT
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.account.EmailPasswordAssessment
 import chat.revolt.api.routes.account.negotiateAuthentication
+import chat.revolt.api.routes.onboard.needsOnboarding
 import chat.revolt.components.generic.AnyLink
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.Weblink
@@ -89,8 +90,17 @@ class LoginViewModel @Inject constructor(
                     )
 
                     try {
-                        RevoltAPI.loginAs(response.firstUserHints!!.token)
-                        kvStorage.set("sessionToken", response.firstUserHints.token)
+                        val token = response.firstUserHints!!.token
+
+                        kvStorage.set("sessionToken", token)
+
+                        val onboard = needsOnboarding(token)
+                        if (onboard) {
+                            _navigateTo = "onboarding"
+                            return@launch
+                        }
+                        
+                        RevoltAPI.loginAs(token)
 
                         _navigateTo = "home"
                     } catch (e: Error) {
@@ -133,6 +143,12 @@ fun LoginScreen(
 
             "home" -> {
                 navController.navigate("chat") {
+                    popUpTo("login/greeting") { inclusive = true }
+                }
+            }
+
+            "onboarding" -> {
+                navController.navigate("register/onboarding") {
                     popUpTo("login/greeting") { inclusive = true }
                 }
             }

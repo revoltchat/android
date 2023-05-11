@@ -17,20 +17,24 @@ object SyncedSettings {
         get() = _android.value
 
     suspend fun fetch() {
-        val settings = getKeys("ordering", "android")
+        try {
+            val settings = getKeys("ordering", "android")
 
-        settings["ordering"]?.let {
-            _ordering.value = RevoltJson.decodeFromString(
-                OrderingSettings.serializer(),
-                it.value
-            )
-        }
+            settings["ordering"]?.let {
+                _ordering.value = RevoltJson.decodeFromString(
+                    OrderingSettings.serializer(),
+                    it.value
+                )
+            }
 
-        settings["android"]?.let {
-            _android.value = RevoltJson.decodeFromString(
-                AndroidSpecificSettings.serializer(),
-                it.value
-            )
+            settings["android"]?.let {
+                _android.value = RevoltJson.decodeFromString(
+                    AndroidSpecificSettings.serializer(),
+                    it.value
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
