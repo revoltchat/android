@@ -1,6 +1,5 @@
 package chat.revolt.api.routes.onboard
 
-import android.util.Log
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
@@ -49,8 +48,6 @@ suspend fun completeOnboarding(
         contentType(ContentType.Application.Json)
         header(RevoltAPI.TOKEN_HEADER_NAME, sessionToken)
     }
-
-    Log.d("RevoltAPI", "completeOnboarding: ${response.status}")
 
     if (response.status == HttpStatusCode.Conflict) {
         return RsResult.err(RevoltError("UsernameTaken"))

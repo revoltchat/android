@@ -1,6 +1,5 @@
 package chat.revolt.screens.register
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -52,8 +51,6 @@ fun OnboardingScreen(navController: NavController) {
 
         val sessionToken = KVStorage(context).get("sessionToken") ?: return
         val result = completeOnboarding(body, sessionToken)
-
-        Log.d("OnboardingScreen", "onboard: $result")
 
         if (result.ok) {
             onboardingComplete()
