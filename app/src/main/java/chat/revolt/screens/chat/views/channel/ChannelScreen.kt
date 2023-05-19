@@ -4,13 +4,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
@@ -21,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
@@ -36,7 +32,7 @@ import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.MessageField
 import chat.revolt.components.screens.chat.AttachmentManager
-import chat.revolt.components.screens.chat.ChannelIcon
+import chat.revolt.components.screens.chat.ChannelHeader
 import chat.revolt.components.screens.chat.ReplyManager
 import chat.revolt.components.screens.chat.TypingIndicator
 import chat.revolt.internals.markdown.ChannelMentionRule
@@ -58,6 +54,7 @@ import java.io.File
 fun ChannelScreen(
     navController: NavController,
     channelId: String,
+    onToggleDrawer: () -> Unit,
     viewModel: ChannelScreenViewModel = viewModel()
 ) {
     val channel = viewModel.channel
@@ -117,34 +114,14 @@ fun ChannelScreen(
     }
 
     Column {
-        Row(
-            modifier = Modifier
-                .clickable {
-                    navController.navigate("channel/${channel.id}/info")
-                }
-                .fillMaxWidth()
-                .clip(
-                    RoundedCornerShape(
-                        bottomStart = 16.dp,
-                        bottomEnd = 16.dp
-                    )
-                )
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ChannelIcon(
-                channelType = channel.channelType,
-                modifier = Modifier.padding(end = 8.dp)
-            )
-            Text(
-                text = channel.name ?: channel.id!!,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f),
-            )
-        }
-
+        ChannelHeader(
+            channel = channel,
+            onChannelClick = {
+                navController.navigate("channel/${channel.id}/info")
+            },
+            onToggleDrawer = onToggleDrawer
+        )
+        
         val isScrolledToBottom = remember(lazyListState) {
             derivedStateOf {
                 lazyListState.firstVisibleItemIndex <= 6
@@ -189,41 +166,49 @@ fun ChannelScreen(
                     items = viewModel.renderableMessages,
                     key = { it.id!! }
                 ) { message ->
-                    Message(message, parse = {
-                        val parser = MarkdownParser()
-                            .addRules(
-                                SimpleMarkdownRules.createEscapeRule(),
-                                UserMentionRule(),
-                                ChannelMentionRule(),
-                                CustomEmoteRule(),
-                            )
-                            .addRules(
-                                createCodeRule(context, codeBlockColor.toArgb()),
-                                createInlineCodeRule(context, codeBlockColor.toArgb()),
-                            )
-                            .addRules(
-                                SimpleMarkdownRules.createSimpleMarkdownRules(
-                                    includeEscapeRule = false
+                    Message(
+                        message,
+                        parse = {
+                            val parser = MarkdownParser()
+                                .addRules(
+                                    SimpleMarkdownRules.createEscapeRule(),
+                                    UserMentionRule(),
+                                    ChannelMentionRule(),
+                                    CustomEmoteRule(),
+                                )
+                                .addRules(
+                                    createCodeRule(context, codeBlockColor.toArgb()),
+                                    createInlineCodeRule(context, codeBlockColor.toArgb()),
+                                )
+                                .addRules(
+                                    SimpleMarkdownRules.createSimpleMarkdownRules(
+                                        includeEscapeRule = false
+                                    )
+                                )
+
+                            SimpleRenderer.render(
+                                source = it.content ?: "",
+                                parser = parser,
+                                initialState = MarkdownState(0),
+                                renderContext = MarkdownContext(
+                                    memberMap = mapOf(),
+                                    userMap = RevoltAPI.userCache.toMap(),
+                                    channelMap = RevoltAPI.channelCache.mapValues { ch ->
+                                        ch.value.name ?: ch.value.id ?: "#DeletedChannel"
+                                    },
+                                    emojiMap = RevoltAPI.emojiCache,
+                                    serverId = channel.server ?: "",
                                 )
                             )
-
-                        SimpleRenderer.render(
-                            source = it.content ?: "",
-                            parser = parser,
-                            initialState = MarkdownState(0),
-                            renderContext = MarkdownContext(
-                                memberMap = mapOf(),
-                                userMap = RevoltAPI.userCache.toMap(),
-                                channelMap = RevoltAPI.channelCache.mapValues { ch ->
-                                    ch.value.name ?: ch.value.id ?: "#DeletedChannel"
-                                },
-                                emojiMap = RevoltAPI.emojiCache,
-                                serverId = channel.server ?: "",
-                            )
-                        )
-                    }) {
-                        navController.navigate("message/${message.id}/menu")
-                    }
+                        },
+                        onMessageContextMenu = {
+                            navController.navigate("message/${message.id}/menu")
+                        },
+                        canReply = true,
+                        onReply = {
+                            viewModel.replyToMessage(message)
+                        },
+                    )
                 }
 
                 item {

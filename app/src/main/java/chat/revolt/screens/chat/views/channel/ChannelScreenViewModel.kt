@@ -358,4 +358,13 @@ class ChannelScreenViewModel : ViewModel() {
             Log.d("ChannelScreen", "Acking channel")
         }
     }
+
+    fun replyToMessage(message: Message) {
+        addInReplyTo(
+            SendMessageReply(
+                id = message.id!!,
+                mention = false
+            )
+        )
+    }
 }

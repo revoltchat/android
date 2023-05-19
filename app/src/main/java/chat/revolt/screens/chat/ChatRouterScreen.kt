@@ -1,9 +1,8 @@
 package chat.revolt.screens.chat
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -18,11 +17,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DismissibleDrawerSheet
+import androidx.compose.material3.DismissibleNavigationDrawer
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,10 +36,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -52,13 +55,10 @@ import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.components.chat.DisconnectedNotice
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
-import chat.revolt.components.screens.chat.DoubleDrawer
-import chat.revolt.components.screens.chat.DoubleDrawerOpenState
 import chat.revolt.components.screens.chat.drawer.channel.ChannelList
 import chat.revolt.components.screens.chat.drawer.server.DrawerServer
 import chat.revolt.components.screens.chat.drawer.server.DrawerServerlikeIcon
 import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
-import chat.revolt.components.screens.chat.rememberDoubleDrawerState
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
 import chat.revolt.screens.chat.sheets.AddServerSheet
@@ -168,10 +168,14 @@ class ChatRouterViewModel @Inject constructor(
     }
 }
 
-@OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(
+    ExperimentalMaterialNavigationApi::class,
+    ExperimentalComposeUiApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hiltViewModel()) {
-    val drawerState = rememberDoubleDrawerState()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -184,11 +188,17 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
         composition = sidebarSparkComposition,
     )
 
+    BackHandler(enabled = drawerState.isClosed) {
+        scope.launch {
+            drawerState.open()
+        }
+    }
+
     LaunchedEffect(drawerState) {
         snapshotFlow { drawerState.currentValue }
             .distinctUntilChanged()
             .collect { state ->
-                if (state != DoubleDrawerOpenState.Center) {
+                if (state == DrawerValue.Closed) {
                     keyboardController?.hide()
                 }
             }
@@ -274,165 +284,167 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                     })
             }
 
-            DoubleDrawer(
-                state = drawerState,
-                startPanel = {
-                    Column(Modifier.fillMaxWidth()) {
-                        Row {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .verticalScroll(rememberScrollState()),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                UserAvatar(
-                                    username = RevoltAPI.userCache[RevoltAPI.selfId]?.username
-                                        ?: "",
-                                    presence = presenceFromStatus(
-                                        RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence
-                                            ?: ""
-                                    ),
-                                    userId = RevoltAPI.selfId ?: "",
-                                    avatar = RevoltAPI.userCache[RevoltAPI.selfId]?.avatar,
-                                    size = 48.dp,
-                                    presenceSize = 16.dp,
-                                    onClick = {
-                                        viewModel.navigateToServer("home", navController)
-                                    },
-                                    onLongClick = {
-                                        navController.navigate("status")
-                                    },
+            DismissibleNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    DismissibleDrawerSheet(
+                        drawerContainerColor = Color.Transparent,
+                    ) {
+                        Column(Modifier.fillMaxWidth()) {
+                            Row {
+                                Column(
                                     modifier = Modifier
-                                        .padding(8.dp)
-                                        .size(48.dp)
-                                )
-
-                                ServerDrawerSeparator()
-
-                                RevoltAPI.serverCache.values
-                                    .sortedBy { it.id }
-                                    .forEach { server ->
-                                        if (server.id == null || server.name == null) return@forEach
-
-                                        DrawerServer(
-                                            iconId = server.icon?.id,
-                                            serverName = server.name,
-                                            hasUnreads = RevoltAPI.unreads.serverHasUnread(server.id),
-                                        ) {
-                                            viewModel.navigateToServer(
-                                                server.id,
-                                                navController
-                                            )
-                                        }
-                                    }
-
-                                DrawerServerlikeIcon(
-                                    onClick = {
-                                        navController.navigate("add_server")
-                                    }
+                                        .fillMaxHeight()
+                                        .verticalScroll(rememberScrollState()),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Icon(
-                                        Icons.Default.Add,
-                                        contentDescription = stringResource(id = R.string.server_plus_alt),
-                                        modifier = Modifier.padding(4.dp)
+                                    UserAvatar(
+                                        username = RevoltAPI.userCache[RevoltAPI.selfId]?.username
+                                            ?: "",
+                                        presence = presenceFromStatus(
+                                            RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence
+                                                ?: ""
+                                        ),
+                                        userId = RevoltAPI.selfId ?: "",
+                                        avatar = RevoltAPI.userCache[RevoltAPI.selfId]?.avatar,
+                                        size = 48.dp,
+                                        presenceSize = 16.dp,
+                                        onClick = {
+                                            viewModel.navigateToServer("home", navController)
+                                        },
+                                        onLongClick = {
+                                            navController.navigate("status")
+                                        },
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                            .size(48.dp)
+                                    )
+
+                                    ServerDrawerSeparator()
+
+                                    RevoltAPI.serverCache.values
+                                        .sortedBy { it.id }
+                                        .forEach { server ->
+                                            if (server.id == null || server.name == null) return@forEach
+
+                                            DrawerServer(
+                                                iconId = server.icon?.id,
+                                                serverName = server.name,
+                                                hasUnreads = RevoltAPI.unreads.serverHasUnread(
+                                                    server.id
+                                                ),
+                                            ) {
+                                                viewModel.navigateToServer(
+                                                    server.id,
+                                                    navController
+                                                )
+                                            }
+                                        }
+
+                                    DrawerServerlikeIcon(
+                                        onClick = {
+                                            navController.navigate("add_server")
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Add,
+                                            contentDescription = stringResource(id = R.string.server_plus_alt),
+                                            modifier = Modifier.padding(4.dp)
+                                        )
+                                    }
+                                }
+
+                                Crossfade(
+                                    targetState = viewModel.currentServer,
+                                    label = "Channel List"
+                                ) {
+                                    ChannelList(
+                                        serverId = it,
+                                        drawerState = drawerState,
+                                        currentChannel = viewModel.currentChannel,
+                                        onChannelClick = { channelId ->
+                                            viewModel.navigateToChannel(channelId, navController)
+                                        },
+                                        onChannelLongClick = { channelId ->
+                                            navController.navigate("channel/$channelId/info")
+                                        },
                                     )
                                 }
                             }
-
-                            Crossfade(
-                                targetState = viewModel.currentServer,
-                                label = "Channel List"
-                            ) {
-                                ChannelList(
-                                    serverId = it,
-                                    drawerState = drawerState,
-                                    currentChannel = viewModel.currentChannel,
-                                    onChannelClick = { channelId ->
-                                        viewModel.navigateToChannel(channelId, navController)
-                                    },
-                                    onChannelLongClick = { channelId ->
-                                        navController.navigate("channel/$channelId/info")
-                                    },
-                                )
-                            }
                         }
                     }
                 },
-                endPanel = {
-                    Box(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "👋", fontSize = 64.sp)
-                    }
-                },
-            ) {
-                Column(Modifier.fillMaxSize()) {
-                    NavHost(navController = navController, startDestination = "home") {
-                        composable("home") {
-                            HomeScreen(navController = topNav)
-                        }
-                        composable("channel/{channelId}") { backStackEntry ->
-                            val channelId = backStackEntry.arguments?.getString("channelId")
-                            if (channelId != null) {
-                                ChannelScreen(
-                                    navController = navController,
-                                    channelId = channelId
-                                )
+                content = {
+                    Column(Modifier.fillMaxSize()) {
+                        NavHost(navController = navController, startDestination = "home") {
+                            composable("home") {
+                                HomeScreen(navController = topNav)
                             }
-                        }
-                        composable("no_current_channel") {
-                            NoCurrentChannelScreen()
-                        }
+                            composable("channel/{channelId}") { backStackEntry ->
+                                val channelId = backStackEntry.arguments?.getString("channelId")
+                                if (channelId != null) {
+                                    ChannelScreen(
+                                        navController = navController,
+                                        channelId = channelId,
+                                        onToggleDrawer = {
+                                            scope.launch {
+                                                if (drawerState.isOpen) drawerState.close()
+                                                else drawerState.open()
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                            composable("no_current_channel") {
+                                NoCurrentChannelScreen()
+                            }
 
-                        bottomSheet("channel/{channelId}/info") { backStackEntry ->
-                            val channelId = backStackEntry.arguments?.getString("channelId")
-                            if (channelId != null) {
-                                ChannelInfoSheet(
-                                    navController = navController,
-                                    channelId = channelId
-                                )
+                            bottomSheet("channel/{channelId}/info") { backStackEntry ->
+                                val channelId = backStackEntry.arguments?.getString("channelId")
+                                if (channelId != null) {
+                                    ChannelInfoSheet(
+                                        navController = navController,
+                                        channelId = channelId
+                                    )
+                                }
                             }
-                        }
-                        bottomSheet("channel/{channelId}/menu") { backStackEntry ->
-                            val channelId = backStackEntry.arguments?.getString("channelId")
-                            if (channelId != null) {
-                                ChannelContextSheet(
-                                    navController = navController,
-                                    channelId = channelId
-                                )
+                            bottomSheet("channel/{channelId}/menu") { backStackEntry ->
+                                val channelId = backStackEntry.arguments?.getString("channelId")
+                                if (channelId != null) {
+                                    ChannelContextSheet(
+                                        navController = navController,
+                                        channelId = channelId
+                                    )
+                                }
                             }
-                        }
-                        bottomSheet("message/{messageId}/menu") { backStackEntry ->
-                            val messageId = backStackEntry.arguments?.getString("messageId")
-                            if (messageId != null) {
-                                MessageContextSheet(
-                                    navController = navController,
-                                    messageId = messageId
-                                )
+                            bottomSheet("message/{messageId}/menu") { backStackEntry ->
+                                val messageId = backStackEntry.arguments?.getString("messageId")
+                                if (messageId != null) {
+                                    MessageContextSheet(
+                                        navController = navController,
+                                        messageId = messageId
+                                    )
+                                }
                             }
-                        }
-                        bottomSheet("status") {
-                            StatusSheet(navController = navController, topNav = topNav)
-                        }
-                        bottomSheet("add_server") {
-                            AddServerSheet()
-                        }
+                            bottomSheet("status") {
+                                StatusSheet(navController = navController, topNav = topNav)
+                            }
+                            bottomSheet("add_server") {
+                                AddServerSheet()
+                            }
 
-                        dialog("report/message/{messageId}") { backStackEntry ->
-                            val messageId = backStackEntry.arguments?.getString("messageId")
-                            if (messageId != null) {
-                                ReportMessageDialog(
-                                    navController = navController,
-                                    messageId = messageId
-                                )
+                            dialog("report/message/{messageId}") { backStackEntry ->
+                                val messageId = backStackEntry.arguments?.getString("messageId")
+                                if (messageId != null) {
+                                    ReportMessageDialog(
+                                        navController = navController,
+                                        messageId = messageId
+                                    )
+                                }
                             }
                         }
                     }
-                }
-            }
+                })
         }
     }
 }

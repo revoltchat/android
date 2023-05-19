@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -23,14 +25,14 @@ import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.schemas.ChannelType
-import chat.revolt.components.screens.chat.DoubleDrawerState
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RowScope.ChannelList(
     serverId: String,
-    drawerState: DoubleDrawerState,
+    drawerState: DrawerState,
     currentChannel: String?,
     onChannelClick: (String) -> Unit,
     onChannelLongClick: (String) -> Unit,
@@ -69,7 +71,7 @@ fun RowScope.ChannelList(
                                 } ?: false,
                                 onClick = {
                                     onChannelClick(channel.id ?: return@DrawerChannel)
-                                    coroutineScope.launch { drawerState.focusCenter() }
+                                    coroutineScope.launch { drawerState.close() }
                                 },
                                 onLongClick = {
                                     onChannelLongClick(channel.id ?: return@DrawerChannel)
@@ -127,7 +129,7 @@ fun RowScope.ChannelList(
                                     } ?: true,
                                     onClick = {
                                         onChannelClick(ch.id ?: return@DrawerChannel)
-                                        coroutineScope.launch { drawerState.focusCenter() }
+                                        coroutineScope.launch { drawerState.close() }
                                     },
                                     onLongClick = {
                                         onChannelLongClick(ch.id ?: return@DrawerChannel)
