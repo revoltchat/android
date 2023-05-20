@@ -129,6 +129,7 @@ class ChatRouterViewModel @Inject constructor(
 
     suspend fun setSettingsHintDisplayed() {
         kvStorage.set("sidebarSpark", true)
+        _sidebarSparkDisplayed.value = true
     }
 
     fun navigateToServer(serverId: String, navController: NavController) {
