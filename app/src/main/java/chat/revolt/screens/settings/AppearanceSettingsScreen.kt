@@ -49,7 +49,7 @@ fun AppearanceSettingsScreen(
     val context = LocalContext.current
 
     fun setNewTheme(theme: Theme) {
-        GlobalState.setTheme(theme)
+        GlobalState.theme = theme
         viewModel.saveNewTheme(theme)
     }
 

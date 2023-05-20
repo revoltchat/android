@@ -34,7 +34,6 @@ import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.screens.splash.DisconnectedScreen
 import chat.revolt.persistence.KVStorage
 import chat.revolt.ui.theme.RevoltColorScheme
-import chat.revolt.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.request.get
@@ -129,7 +128,7 @@ class SplashScreenViewModel @Inject constructor(
     private fun loadSettings() {
         viewModelScope.launch {
             SyncedSettings.fetch()
-            SyncedSettings.android.theme?.let { GlobalState.setTheme(Theme.valueOf(it)) }
+            GlobalState.hydrateWithSettings(SyncedSettings)
         }
     }
 

@@ -1,15 +1,15 @@
 package chat.revolt.api.settings
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import chat.revolt.ui.theme.Theme
 import chat.revolt.ui.theme.getDefaultTheme
 
 object GlobalState {
-    private var _theme = mutableStateOf(getDefaultTheme())
-    val theme
-        get() = _theme.value
+    var theme by mutableStateOf(getDefaultTheme())
 
-    fun setTheme(theme: Theme) {
-        _theme.value = theme
+    fun hydrateWithSettings(settings: SyncedSettings) {
+        settings.android.theme?.let { this.theme = Theme.valueOf(it) }
     }
 }
