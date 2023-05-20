@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -87,23 +88,15 @@ import javax.inject.Inject
 class ChatRouterViewModel @Inject constructor(
     private val kvStorage: KVStorage
 ) : ViewModel() {
-    private var _currentServer = mutableStateOf("home")
-    val currentServer: String
-        get() = _currentServer.value
-
-    private var _currentChannel = mutableStateOf<String?>(null)
-    val currentChannel: String?
-        get() = _currentChannel.value
-
-    private var _sidebarSparkDisplayed = mutableStateOf(true)
-    val sidebarSparkDisplayed: Boolean
-        get() = _sidebarSparkDisplayed.value
+    var currentServer by mutableStateOf("home")
+    var currentChannel by mutableStateOf<String?>(null)
+    var sidebarSparkDisplayed by mutableStateOf(true)
 
     init {
         viewModelScope.launch {
-            _currentServer.value = kvStorage.get("currentServer") ?: "home"
-            _currentChannel.value = kvStorage.get("currentChannel")
-            _sidebarSparkDisplayed.value = if (kvStorage.getBoolean("sidebarSpark") == null) {
+            currentServer = kvStorage.get("currentServer") ?: "home"
+            currentChannel = kvStorage.get("currentChannel")
+            sidebarSparkDisplayed = if (kvStorage.getBoolean("sidebarSpark") == null) {
                 false
             } else {
                 kvStorage.getBoolean("sidebarSpark")!!
@@ -112,15 +105,15 @@ class ChatRouterViewModel @Inject constructor(
     }
 
     private fun setCurrentServer(serverId: String, save: Boolean = true) {
-        _currentServer.value = serverId
+        currentServer = serverId
 
         if (save) viewModelScope.launch {
             kvStorage.set("currentServer", serverId)
         }
     }
 
-    private fun setCurrentChannel(channelId: String) {
-        _currentChannel.value = channelId
+    private fun setSaveCurrentChannel(channelId: String) {
+        currentChannel = channelId
 
         viewModelScope.launch {
             kvStorage.set("currentChannel", channelId)
@@ -129,7 +122,7 @@ class ChatRouterViewModel @Inject constructor(
 
     suspend fun setSettingsHintDisplayed() {
         kvStorage.set("sidebarSpark", true)
-        _sidebarSparkDisplayed.value = true
+        sidebarSparkDisplayed = true
     }
 
     fun navigateToServer(serverId: String, navController: NavController) {
@@ -159,7 +152,7 @@ class ChatRouterViewModel @Inject constructor(
     }
 
     fun navigateToChannel(channelId: String, navController: NavController, pure: Boolean = false) {
-        if (!pure) setCurrentChannel(channelId)
+        if (!pure) setSaveCurrentChannel(channelId)
 
         navController.navigate("channel/$channelId") {
             navController.graph.startDestinationRoute?.let { route ->
