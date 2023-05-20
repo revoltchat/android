@@ -38,6 +38,8 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.account.EmailPasswordAssessment
 import chat.revolt.api.routes.account.negotiateAuthentication
 import chat.revolt.api.routes.onboard.needsOnboarding
+import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.AnyLink
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.Weblink
@@ -70,6 +72,11 @@ class LoginViewModel @Inject constructor(
     val mfaResponse: EmailPasswordAssessment?
         get() = _mfaResponse
 
+    private suspend fun loadSettings() {
+        SyncedSettings.fetch()
+        GlobalState.hydrateWithSettings(SyncedSettings)
+    }
+
     fun doLogin() {
         _error = null
 
@@ -99,7 +106,8 @@ class LoginViewModel @Inject constructor(
                             _navigateTo = "onboarding"
                             return@launch
                         }
-                        
+
+                        loadSettings()
                         RevoltAPI.loginAs(token)
 
                         _navigateTo = "home"

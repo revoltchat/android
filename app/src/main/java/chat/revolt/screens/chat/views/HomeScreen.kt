@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.settings.GlobalState
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.screens.home.LinkOnHome
 import chat.revolt.persistence.KVStorage
@@ -26,6 +27,7 @@ class HomeScreenViewModel @Inject constructor(
     fun logout() {
         runBlocking {
             kvStorage.remove("sessionToken")
+            GlobalState.reset()
             RevoltAPI.logout()
         }
     }

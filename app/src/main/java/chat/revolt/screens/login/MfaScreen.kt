@@ -36,6 +36,8 @@ import chat.revolt.api.routes.account.MfaResponseRecoveryCode
 import chat.revolt.api.routes.account.MfaResponseTotpCode
 import chat.revolt.api.routes.account.authenticateWithMfaRecoveryCode
 import chat.revolt.api.routes.account.authenticateWithMfaTotpCode
+import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.persistence.KVStorage
@@ -71,6 +73,11 @@ class MfaScreenViewModel @Inject constructor(
         _recoveryCode = code
     }
 
+    private suspend fun loadSettings() {
+        SyncedSettings.fetch()
+        GlobalState.hydrateWithSettings(SyncedSettings)
+    }
+
     fun tryAuthorizeTotp(mfaTicket: String) {
         _error = null
         viewModelScope.launch {
@@ -84,6 +91,7 @@ class MfaScreenViewModel @Inject constructor(
                 )
 
                 try {
+                    loadSettings()
                     RevoltAPI.loginAs(response.firstUserHints!!.token)
                     kvStorage.set("sessionToken", response.firstUserHints.token)
 
@@ -109,6 +117,7 @@ class MfaScreenViewModel @Inject constructor(
                 )
 
                 try {
+                    loadSettings()
                     RevoltAPI.loginAs(response.firstUserHints!!.token)
                     kvStorage.set("sessionToken", response.firstUserHints.token)
 

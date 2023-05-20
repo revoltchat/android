@@ -12,4 +12,8 @@ object GlobalState {
     fun hydrateWithSettings(settings: SyncedSettings) {
         settings.android.theme?.let { this.theme = Theme.valueOf(it) }
     }
+
+    fun reset() {
+        theme = getDefaultTheme()
+    }
 }
