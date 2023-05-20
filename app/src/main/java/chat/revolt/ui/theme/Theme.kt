@@ -117,3 +117,10 @@ fun RevoltTheme(
 fun systemSupportsDynamicColors(): Boolean {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 }
+
+fun getDefaultTheme(): Theme {
+    return when {
+        systemSupportsDynamicColors() -> Theme.M3Dynamic
+        else -> Theme.Revolt
+    }
+}
