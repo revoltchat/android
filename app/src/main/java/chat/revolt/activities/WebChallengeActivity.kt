@@ -35,7 +35,7 @@ class WebChallengeActivity : AppCompatActivity() {
 
         binding.webView.webViewClient = WebChallengeClient {
             binding.webView.evaluateJavascript(
-                "(function() { return document.getElementById('cf-wrapper') != null; })();"
+                "(function() { return document.getElementById('cf-wrapper') === null; })();"
             ) { result ->
                 if (result == "false") {
                     Log.d(
