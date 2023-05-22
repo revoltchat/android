@@ -80,7 +80,7 @@ fun AppEntrypoint() {
                     slideIntoContainer(
                         AnimatedContentScope.SlideDirection.Left,
                         animationSpec = RevoltTweenInt
-                    ) + fadeIn(animationSpec = RevoltTweenFloat)
+                    )
                 },
                 exitTransition = {
                     slideOutOfContainer(
@@ -92,13 +92,13 @@ fun AppEntrypoint() {
                     slideIntoContainer(
                         AnimatedContentScope.SlideDirection.Right,
                         animationSpec = RevoltTweenInt
-                    ) + fadeIn(animationSpec = RevoltTweenFloat)
+                    )
                 },
                 popExitTransition = {
                     slideOutOfContainer(
                         AnimatedContentScope.SlideDirection.Right,
                         animationSpec = RevoltTweenInt
-                    ) + fadeOut(animationSpec = RevoltTweenFloat)
+                    )
                 }
             ) {
                 composable("splash") { SplashScreen(navController) }
