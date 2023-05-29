@@ -107,7 +107,7 @@ sentry {
 
 dependencies {
     // Android/Kotlin Core
-    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
 
     // Kotlinx - various first-party extensions for Kotlin
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
@@ -125,7 +125,7 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.1'
+    implementation 'androidx.activity:activity-compose:1.7.2'
 
     // Accompanist - Jetpack Compose Extensions
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
@@ -174,7 +174,7 @@ dependencies {
     implementation "androidx.datastore:datastore:1.1.0-alpha04"
 
     // Libraries used for legacy View-based UI
-    implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha09"
+    implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha10"
     implementation 'com.github.MikeOrtiz:TouchImageView:3.3'
     implementation "androidx.appcompat:appcompat:1.7.0-alpha02"
 
@@ -191,7 +191,7 @@ dependencies {
     implementation "androidx.media3:media3-exoplayer:$media3_version"
     implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
     implementation "androidx.media3:media3-datasource-okhttp:$media3_version"
-    implementation "androidx.media3:media3-ui:1.0.1"
+    implementation "androidx.media3:media3-ui:$media3_version"
 }
 
 kapt {
