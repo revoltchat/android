@@ -1,17 +1,23 @@
-package chat.revolt.screens.chat.sheets
+package chat.revolt.sheets
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.navigation.NavController
+import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.components.generic.SheetClickable
@@ -19,12 +25,18 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ChannelContextSheet(
-    navController: NavController,
     channelId: String,
+    onHideSheet: suspend () -> Unit,
 ) {
     val channel = RevoltAPI.channelCache[channelId]
     if (channel == null) {
-        navController.popBackStack()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        ) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
         return
     }
 
@@ -57,7 +69,10 @@ fun ChannelContextSheet(
                 context.getString(R.string.channel_context_sheet_actions_copy_id_copied),
                 Toast.LENGTH_SHORT
             ).show()
-            navController.popBackStack()
+
+            coroutineScope.launch {
+                onHideSheet()
+            }
         }
 
         SheetClickable(
@@ -79,8 +94,8 @@ fun ChannelContextSheet(
                 channel.lastMessageID?.let {
                     RevoltAPI.unreads.markAsRead(channelId, it, sync = true)
                 }
+                onHideSheet()
             }
-            navController.popBackStack()
         }
     }
 }

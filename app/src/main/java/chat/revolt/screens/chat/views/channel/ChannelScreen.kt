@@ -43,6 +43,8 @@ import chat.revolt.internals.markdown.MarkdownState
 import chat.revolt.internals.markdown.UserMentionRule
 import chat.revolt.internals.markdown.createCodeRule
 import chat.revolt.internals.markdown.createInlineCodeRule
+import chat.revolt.sheets.ChannelInfoSheet
+import chat.revolt.sheets.MessageContextSheet
 import com.discord.simpleast.core.simple.SimpleMarkdownRules
 import com.discord.simpleast.core.simple.SimpleRenderer
 import io.ktor.http.*
@@ -50,6 +52,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.io.File
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChannelScreen(
     navController: NavController,
@@ -64,6 +67,11 @@ fun ChannelScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val codeBlockColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+
+    var channelInfoSheetShown by remember { mutableStateOf(false) }
+
+    var messageContextSheetShown by remember { mutableStateOf(false) }
+    var messageContextSheetTarget by remember { mutableStateOf("") }
 
     val pickFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments()
@@ -108,6 +116,43 @@ fun ChannelScreen(
         }
     }
 
+    if (channelInfoSheetShown) {
+        val channelInfoSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = channelInfoSheetState,
+            onDismissRequest = {
+                channelInfoSheetShown = false
+            },
+        ) {
+            ChannelInfoSheet(
+                channelId = channelId,
+            )
+        }
+    }
+
+    if (messageContextSheetShown) {
+        val messageContextSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = messageContextSheetState,
+            onDismissRequest = {
+                messageContextSheetShown = false
+            },
+        ) {
+            MessageContextSheet(
+                messageId = messageContextSheetTarget,
+                onHideSheet = {
+                    messageContextSheetState.hide()
+                    messageContextSheetShown = false
+                },
+                onReportMessage = {
+                    navController.navigate("report/message/$messageContextSheetTarget")
+                },
+            )
+        }
+    }
+
     if (channel?.channelType == null) {
         CircularProgressIndicator()
         return
@@ -117,11 +162,11 @@ fun ChannelScreen(
         ChannelHeader(
             channel = channel,
             onChannelClick = {
-                navController.navigate("channel/${channel.id}/info")
+                channelInfoSheetShown = true
             },
             onToggleDrawer = onToggleDrawer
         )
-        
+
         val isScrolledToBottom = remember(lazyListState) {
             derivedStateOf {
                 lazyListState.firstVisibleItemIndex <= 6
@@ -202,7 +247,8 @@ fun ChannelScreen(
                             )
                         },
                         onMessageContextMenu = {
-                            navController.navigate("message/${message.id}/menu")
+                            messageContextSheetShown = true
+                            messageContextSheetTarget = message.id ?: ""
                         },
                         canReply = true,
                         onReply = {

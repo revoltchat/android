@@ -1,4 +1,4 @@
-package chat.revolt.screens.chat.sheets
+package chat.revolt.sheets
 
 import android.content.Intent
 import android.util.Log

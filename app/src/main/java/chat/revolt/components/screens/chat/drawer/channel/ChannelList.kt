@@ -11,10 +11,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +32,7 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
+import chat.revolt.sheets.ChannelContextSheet
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,9 +42,30 @@ fun RowScope.ChannelList(
     drawerState: DrawerState,
     currentChannel: String?,
     onChannelClick: (String) -> Unit,
-    onChannelLongClick: (String) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
+
+    var channelContextSheetShown by remember { mutableStateOf(false) }
+    var channelContextSheetTarget by remember { mutableStateOf("") }
+
+    if (channelContextSheetShown) {
+        val channelContextSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = channelContextSheetState,
+            onDismissRequest = {
+                channelContextSheetShown = false
+            },
+        ) {
+            ChannelContextSheet(
+                channelId = channelContextSheetTarget,
+                onHideSheet = {
+                    channelContextSheetState.hide()
+                    channelContextSheetShown = false
+                }
+            )
+        }
+    }
 
     Surface(
         tonalElevation = 1.dp,
@@ -74,7 +102,8 @@ fun RowScope.ChannelList(
                                     coroutineScope.launch { drawerState.close() }
                                 },
                                 onLongClick = {
-                                    onChannelLongClick(channel.id ?: return@DrawerChannel)
+                                    channelContextSheetTarget = channel.id ?: return@DrawerChannel
+                                    channelContextSheetShown = true
                                 }
                             )
                         }
@@ -132,7 +161,8 @@ fun RowScope.ChannelList(
                                         coroutineScope.launch { drawerState.close() }
                                     },
                                     onLongClick = {
-                                        onChannelLongClick(ch.id ?: return@DrawerChannel)
+                                        channelContextSheetTarget = ch.id ?: return@DrawerChannel
+                                        channelContextSheetShown = true
                                     }
                                 )
                             }

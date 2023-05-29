@@ -73,7 +73,7 @@ fun MessageField(
             keyboardOptions = KeyboardOptions.Default,
             keyboardActions = KeyboardActions.Default,
             decorationBox = @Composable { innerTextField ->
-                TextFieldDefaults.TextFieldDecorationBox(
+                TextFieldDefaults.DecorationBox(
                     value = messageContent,
                     innerTextField = innerTextField,
                     enabled = !disabled,
@@ -90,13 +90,17 @@ fun MessageField(
                             overflow = TextOverflow.Ellipsis,
                         )
                     },
-                    colors = TextFieldDefaults.textFieldColors(
+                    colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
                         errorIndicatorColor = Color.Transparent,
-                        placeholderColor = Color.Gray,
-                        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
+                        unfocusedPlaceholderColor = Color.Gray,
+                        focusedPlaceholderColor = Color.Gray,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                            1.dp
+                        ),
+                        focusedContainerColor = Color.Transparent,
                     ),
                     contentPadding = PaddingValues(16.dp),
                     leadingIcon = {

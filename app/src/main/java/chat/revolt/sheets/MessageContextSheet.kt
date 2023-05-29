@@ -1,10 +1,11 @@
-package chat.revolt.screens.chat.sheets
+package chat.revolt.sheets
 
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -12,12 +13,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -26,7 +29,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.REVOLT_APP
 import chat.revolt.api.RevoltAPI
@@ -37,12 +39,19 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MessageContextSheet(
-    navController: NavController,
     messageId: String,
+    onHideSheet: suspend () -> Unit,
+    onReportMessage: () -> Unit,
 ) {
     val message = RevoltAPI.messageCache[messageId]
     if (message == null) {
-        navController.popBackStack()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        ) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
         return
     }
 
@@ -89,8 +98,8 @@ fun MessageContextSheet(
         ) {
             coroutineScope.launch {
                 UiCallbacks.replyToMessage(messageId)
+                onHideSheet()
             }
-            navController.popBackStack()
         }
 
         SheetClickable(
@@ -113,7 +122,10 @@ fun MessageContextSheet(
                 context.getString(R.string.comingsoon_toast),
                 Toast.LENGTH_SHORT
             ).show()
-            navController.popBackStack()
+
+            coroutineScope.launch {
+                onHideSheet()
+            }
         }
 
         SheetClickable(
@@ -132,22 +144,27 @@ fun MessageContextSheet(
             },
         ) {
             if (message.content.isNullOrEmpty()) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.message_context_sheet_actions_copy_failed_empty),
-                    Toast.LENGTH_SHORT
-                ).show()
-                navController.popBackStack()
+                coroutineScope.launch {
+                    onHideSheet()
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.message_context_sheet_actions_copy_failed_empty),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
                 return@SheetClickable
             }
 
-            clipboardManager.setText(AnnotatedString(message.content))
             Toast.makeText(
                 context,
                 context.getString(R.string.copied),
                 Toast.LENGTH_SHORT
             ).show()
-            navController.popBackStack()
+
+            coroutineScope.launch {
+                clipboardManager.setText(AnnotatedString(message.content))
+                onHideSheet()
+            }
         }
 
         SheetClickable(
@@ -171,7 +188,11 @@ fun MessageContextSheet(
                     context.getString(R.string.message_context_sheet_actions_copy_failed_empty),
                     Toast.LENGTH_SHORT
                 ).show()
-                navController.popBackStack()
+
+                coroutineScope.launch {
+                    onHideSheet()
+                }
+
                 return@SheetClickable
             }
 
@@ -187,7 +208,10 @@ fun MessageContextSheet(
                 context.getString(R.string.message_context_sheet_actions_copy_link_copied),
                 Toast.LENGTH_SHORT
             ).show()
-            navController.popBackStack()
+
+            coroutineScope.launch {
+                onHideSheet()
+            }
         }
 
         SheetClickable(
@@ -213,7 +237,10 @@ fun MessageContextSheet(
                 context.getString(R.string.message_context_sheet_actions_copy_id_copied),
                 Toast.LENGTH_SHORT
             ).show()
-            navController.popBackStack()
+
+            coroutineScope.launch {
+                onHideSheet()
+            }
         }
 
 
@@ -237,7 +264,10 @@ fun MessageContextSheet(
                 context.getString(R.string.comingsoon_toast),
                 Toast.LENGTH_SHORT
             ).show()
-            navController.popBackStack()
+
+            coroutineScope.launch {
+                onHideSheet()
+            }
         }
 
         SheetClickable(
@@ -260,7 +290,10 @@ fun MessageContextSheet(
                 context.getString(R.string.comingsoon_toast),
                 Toast.LENGTH_SHORT
             ).show()
-            navController.popBackStack()
+
+            coroutineScope.launch {
+                onHideSheet()
+            }
         }
 
         SheetClickable(
@@ -283,7 +316,10 @@ fun MessageContextSheet(
                 context.getString(R.string.comingsoon_toast),
                 Toast.LENGTH_SHORT
             ).show()
-            navController.popBackStack()
+
+            coroutineScope.launch {
+                onHideSheet()
+            }
         }
 
         SheetClickable(
@@ -301,7 +337,9 @@ fun MessageContextSheet(
                 )
             },
         ) {
-            navController.navigate("report/message/${message.id}")
+            coroutineScope.launch {
+                onReportMessage()
+            }
         }
     }
 }

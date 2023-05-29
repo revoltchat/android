@@ -12,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.dialog
 import chat.revolt.BuildConfig
@@ -57,7 +56,6 @@ class MainActivity : FragmentActivity() {
 }
 
 val RevoltTweenInt: FiniteAnimationSpec<IntOffset> = tween(400, easing = EaseInOutExpo)
-val RevoltTweenIntSize: FiniteAnimationSpec<IntSize> = tween(400, easing = EaseInOutExpo)
 val RevoltTweenFloat: FiniteAnimationSpec<Float> = tween(400, easing = EaseInOutExpo)
 val RevoltTweenDp: FiniteAnimationSpec<Dp> = tween(400, easing = EaseInOutExpo)
 
@@ -78,25 +76,25 @@ fun AppEntrypoint() {
                 startDestination = "splash",
                 enterTransition = {
                     slideIntoContainer(
-                        AnimatedContentScope.SlideDirection.Left,
+                        AnimatedContentTransitionScope.SlideDirection.Left,
                         animationSpec = RevoltTweenInt
                     )
                 },
                 exitTransition = {
                     slideOutOfContainer(
-                        AnimatedContentScope.SlideDirection.Left,
+                        AnimatedContentTransitionScope.SlideDirection.Left,
                         animationSpec = RevoltTweenInt
                     ) + fadeOut(animationSpec = RevoltTweenFloat)
                 },
                 popEnterTransition = {
                     slideIntoContainer(
-                        AnimatedContentScope.SlideDirection.Right,
+                        AnimatedContentTransitionScope.SlideDirection.Right,
                         animationSpec = RevoltTweenInt
                     )
                 },
                 popExitTransition = {
                     slideOutOfContainer(
-                        AnimatedContentScope.SlideDirection.Right,
+                        AnimatedContentTransitionScope.SlideDirection.Right,
                         animationSpec = RevoltTweenInt
                     )
                 }

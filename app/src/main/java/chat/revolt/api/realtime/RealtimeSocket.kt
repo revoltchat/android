@@ -127,24 +127,20 @@ object RealtimeSocket {
                 )
 
                 Log.d("RealtimeSocket", "Adding users to cache.")
-                readyFrame.users.forEach { user ->
-                    RevoltAPI.userCache[user.id!!] = user
-                }
+                val userMap = readyFrame.users.associateBy { it.id!! }
+                RevoltAPI.userCache.putAll(userMap)
 
                 Log.d("RealtimeSocket", "Adding servers to cache.")
-                readyFrame.servers.forEach { server ->
-                    RevoltAPI.serverCache[server.id!!] = server
-                }
+                val serverMap = readyFrame.servers.associateBy { it.id!! }
+                RevoltAPI.serverCache.putAll(serverMap)
 
                 Log.d("RealtimeSocket", "Adding channels to cache.")
-                readyFrame.channels.forEach { channel ->
-                    RevoltAPI.channelCache[channel.id!!] = channel
-                }
+                val channelMap = readyFrame.channels.associateBy { it.id!! }
+                RevoltAPI.channelCache.putAll(channelMap)
 
                 Log.d("RealtimeSocket", "Adding emojis to cache.")
-                readyFrame.emojis.forEach { emoji ->
-                    RevoltAPI.emojiCache[emoji.id!!] = emoji
-                }
+                val emojiMap = readyFrame.emojis.associateBy { it.id!! }
+                RevoltAPI.emojiCache.putAll(emojiMap)
             }
 
             "Message" -> {
