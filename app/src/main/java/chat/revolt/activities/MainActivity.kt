@@ -13,7 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
+import androidx.navigation.compose.rememberNavController
 import chat.revolt.BuildConfig
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.screens.SplashScreen
@@ -33,9 +36,6 @@ import chat.revolt.screens.settings.AppearanceSettingsScreen
 import chat.revolt.screens.settings.DebugSettingsScreen
 import chat.revolt.screens.settings.SettingsScreen
 import chat.revolt.ui.theme.RevoltTheme
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.android.core.SentryAndroid
 
@@ -62,7 +62,7 @@ val RevoltTweenDp: FiniteAnimationSpec<Dp> = tween(400, easing = EaseInOutExpo)
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AppEntrypoint() {
-    val navController = rememberAnimatedNavController()
+    val navController = rememberNavController()
 
     RevoltTheme(
         requestedTheme = GlobalState.theme,
@@ -71,7 +71,7 @@ fun AppEntrypoint() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            AnimatedNavHost(
+            NavHost(
                 navController = navController,
                 startDestination = "splash",
                 enterTransition = {
