@@ -67,7 +67,7 @@ fun MessageContextSheet(
         Box(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp))
                 .padding(bottom = 8.dp)
         ) {
             Message(
