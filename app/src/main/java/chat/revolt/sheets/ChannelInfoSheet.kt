@@ -23,7 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.generic.SheetClickable
+import chat.revolt.components.screens.chat.ChannelSheetHeader
 
 @Composable
 fun ChannelInfoSheet(
@@ -46,7 +48,14 @@ fun ChannelInfoSheet(
             .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState()),
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        ChannelSheetHeader(
+            channelName = channel.name ?: stringResource(id = R.string.unknown),
+            channelIcon = channel.icon,
+            channelType = channel.channelType ?: ChannelType.TextChannel,
+            channelId = channel.id ?: "9",
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Text(
             text = stringResource(id = R.string.channel_info_sheet_description),
