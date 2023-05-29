@@ -68,3 +68,7 @@
 -dontwarn org.openjsse.**
 # End of excerpt.
 -dontwarn org.slf4j.impl.**
+
+# hCaptcha related
+-dontwarn edu.umd.cs.findbugs.annotations.**
+-dontwarn lombok.**
