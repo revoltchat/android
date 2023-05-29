@@ -264,6 +264,10 @@
     <string name="spark_sidebar_settings_tutorial_description_2">Then long tap your profile picture to open the settings.</string>
     <string name="spark_sidebar_settings_tutorial_acknowledge">Got it</string>
 
+    <string name="settings_category_general">General</string>
+    <string name="settings_category_miscellaneous">Miscellaneous</string>
+    <string name="settings_category_last" translatable="false">Revolt v%1$s</string>
+
     <string name="settings_appearance">Appearance</string>
     <string name="settings_appearance_theme">Theme</string>
     <string name="settings_appearance_theme_none">System</string>
