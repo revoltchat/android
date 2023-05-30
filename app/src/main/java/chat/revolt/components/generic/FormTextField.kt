@@ -1,7 +1,6 @@
 package chat.revolt.components.generic
 
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -13,7 +12,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 /**
  * Convenience wrapper around [TextField] that sets the [KeyboardOptions] and [VisualTransformation]
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormTextField(
     value: String,
