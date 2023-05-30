@@ -218,7 +218,7 @@ class ChannelScreenViewModel : ViewModel() {
         }
     }
 
-    private fun regroupMessages(newMessages: List<Message> = renderableMessages) {
+    private suspend fun regroupMessages(newMessages: List<Message> = renderableMessages) {
         val groupedMessages = mutableMapOf<String, Message>()
 
         // Verbatim implementation of https://wiki.rvlt.gg/index.php/Text_Channel_(UI)#Message_Grouping_Algorithm
@@ -252,7 +252,9 @@ class ChannelScreenViewModel : ViewModel() {
             groupedMessages[message.id] = message.copy(tail = tail)
         }
 
-        setRenderableMessages(groupedMessages.values.toList())
+        withContext(Dispatchers.Main) {
+            setRenderableMessages(groupedMessages.values.toList())
+        }
     }
 
     suspend fun listenForWsFrame() {
