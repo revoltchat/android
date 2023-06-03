@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ULID
+import chat.revolt.api.realtime.RealtimeSocketFrames
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
 import chat.revolt.api.realtime.frames.receivable.MessageDeleteFrame
@@ -283,9 +284,12 @@ class ChannelScreenViewModel : ViewModel() {
                             currentMsg.id == it.id
                         } ?: return@onEach // Message not found, ignore.
 
+                        if (messageFrame.author != null)
+                            addUserIfUnknown(messageFrame.author)
+
                         regroupMessages(renderableMessages.map { currentMsg ->
                             if (currentMsg.id == it.id) {
-                                messageFrame
+                                currentMsg.mergeWithPartial(messageFrame)
                             } else {
                                 currentMsg
                             }
@@ -295,9 +299,10 @@ class ChannelScreenViewModel : ViewModel() {
                     is MessageDeleteFrame -> {
                         if (it.channel != channel?.id) return@onEach
 
-                        regroupMessages(renderableMessages.filter { currentMsg ->
+                        val newRenderableMessages = renderableMessages.filter { currentMsg ->
                             currentMsg.id != it.id
-                        })
+                        }
+                        regroupMessages(newRenderableMessages)
                     }
 
                     is ChannelStartTypingFrame -> {
@@ -313,6 +318,11 @@ class ChannelScreenViewModel : ViewModel() {
                         if (!_typingUsers.contains(it.user)) return@onEach
 
                         _typingUsers.remove(it.user)
+                    }
+
+                    is RealtimeSocketFrames.Reconnected -> {
+                        Log.d("ChannelScreen", "Reconnected to WS.")
+                        listenForWsFrame()
                     }
                 }
             }.catch {
