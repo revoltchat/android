@@ -140,7 +140,6 @@ fun Message(
         onResult = {
             // do nothing
         })
-
     Column {
         if (message.tail == false) {
             Spacer(modifier = Modifier.height(10.dp))
@@ -169,6 +168,9 @@ fun Message(
             modifier = Modifier
                 .combinedClickable(
                     onClick = {},
+                    onDoubleClick = {
+                        onReply()
+                    },
                     onLongClick = {
                         onMessageContextMenu()
                     }
