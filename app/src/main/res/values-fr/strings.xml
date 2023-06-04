@@ -1,3 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="terms_of_service">Conditions d\'utilisation</string>
+    <string name="share">Partager</string>
+    <string name="cancel">Annuler</string>
+    <string name="privacy_policy">Politique de confidentialité</string>
+    <string name="ok">OK</string>
+</resources>
