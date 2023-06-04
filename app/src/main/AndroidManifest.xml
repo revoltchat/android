@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:name=".RevoltApplication"
         android:theme="@style/Theme.Revolt"
-        tools:targetApi="31">
+        android:localeConfig="@xml/locale_config"
+        tools:targetApi="tiramisu">
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
