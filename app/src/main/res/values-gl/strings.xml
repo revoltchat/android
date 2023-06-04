@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">De volta</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="share">Compartir</string>
+    <string name="lets_go">Veña</string>
+    <string name="loading">Conseguindo información, quédate aí…</string>
+    <string name="terms_of_service">Condicións de servicio</string>
+    <string name="community_guidelines">Directrices da comunidade</string>
+    <string name="email">Correo Electrónico</string>
+    <string name="password">Contrasinal</string>
+    <string name="login">Acceso</string>
+    <string name="signup">Acceder</string>
+    <string name="resend">Reenviar</string>
+    <string name="send_email">Enviar un correo electrónico</string>
+    <string name="password_forgot">Esqueceches o teu contrasinal\?</string>
+    <string name="resend_verification">Reenviar un correo electrónico de verificación</string>
+    <string name="password_manager_hint">Usas un xestor de contrasinais\?</string>
+    <string name="register_heading">Benvido á Revolt</string>
+    <string name="register_instructions">É como un lugar para saír, reunirse e falar de cousas. A mellor parte, está en internet.</string>
+    <string name="next">Seguindo</string>
+    <string name="privacy_policy">Política de Privacidade</string>
+    <string name="login_onboarding_heading">Busca a túa comunidade, conecta co mundo.</string>
+    <string name="login_onboarding_body">Revolt é unha das mellores formas de estar conectado cos teus amigos e comunidade, en calquera lugar e en calquera momento.</string>
+    <string name="login_heading">imos iniciar sesión</string>
+    <string name="password_forgot_heading">Esqueciches o teu contrasinal\?</string>
+    <string name="password_forgot_instructions">Introduce o teu correo electrónico e enviarémosche instrucións sobre como restablecer o teu contrasinal.</string>
+    <string name="register_image_alt">Usa Revolt para falar de cousas.</string>
+</resources>

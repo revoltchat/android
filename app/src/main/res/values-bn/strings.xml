@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_onboarding_body">Revolt হল আপনার বন্ধুদের এবং সম্প্রদায়ের (কমিউনিটির) সাথে, যেকোনো জায়গায়, যে কোনো সময় যুক্ত থাকার এক অন্যতম সেরা উপায়।</string>
+    <string name="resend_verification">যাচাইকরণ ই-মেইল আবার পাঠানোর জন্য অনুরোধ পাঠান</string>
+    <string name="back">← ফিরে যান</string>
+    <string name="next">এরপর →</string>
+    <string name="ok">ঠিক আছে</string>
+    <string name="cancel">বাতিল করুন</string>
+    <string name="share">শেয়ার করুন</string>
+    <string name="terms_of_service">Revolt এর সার্ভিসের শর্তাবলী</string>
+    <string name="privacy_policy">গোপনীয়তা নীতি</string>
+    <string name="email">ই-মেইল</string>
+    <string name="password">পাসওয়ার্ড</string>
+    <string name="login">লগ ইন করুন</string>
+    <string name="resend">আবার পাঠান</string>
+    <string name="send_email">ই-মেইল পাঠান</string>
+    <string name="login_heading">চলুন, আপনাকে লগ ইন করাই</string>
+    <string name="password_forgot">পাসওয়ার্ড ভুলে গেছেন\?</string>
+    <string name="password_manager_hint">আপনি কি পাসওয়ার্ড ম্যানেজার ব্যবহার করছেন\?</string>
+    <string name="password_forgot_heading">আপনি কি পাসওয়ার্ড ভুলে গেছেন\?</string>
+    <string name="mfa_interstitial_lead">আপনার অ্যাকাউন্টকে আরো নিরাপদ রাখতে আপনি 2FA চালু করেছেন।</string>
+    <string name="lets_go">চলুন</string>
+    <string name="password_forgot_instructions">আপনার ইমেল লিখুন এবং আমরা আপনাকে আপনার পাসওয়ার্ড রিসেট করার নির্দেশাবলী পাঠাব।</string>
+    <string name="register_heading">Revolt-এ আপনাকে স্বাগত জানাই</string>
+    <string name="register_image_alt">যে কোনো কিছু সম্পর্কে কথা বলার জন্য Revolt -কে ব্যবহার করুন।</string>
+    <string name="register_instructions">এটি আড্ডা দেওয়ার, একত্রিত হওয়ার এবং যে কোনো কিছুর বিষয়ে আলোচনা করার মতো জায়গা৷ এটি হলো ইন্টারনেটের এক অন্যতম সেরা জায়গা।</string>
+    <string name="register_form_heading">চলুন, আপনাকে সমস্ত কিছু সেট আপ করাই।</string>
+    <string name="register_data">আপনার তথ্য আমাদের কাছে নিরাপদ। আমরা এটি কারোর কাছেই বিক্রি করি না, এবং আমরা আপনাকে বিজ্ঞাপন দেখানোর জন্য এর ব্যবহার করি না।</string>
+    <string name="register_email">ই-মেইল</string>
+    <string name="register_email_verification_hint">আপনার অ্যাকাউন্ট নিশ্চিত করতে আমরা আপনাকে একটি যাচাইকরণ ই-মেইল পাঠাব।</string>
+    <string name="register_password">পাসওয়ার্ড</string>
+    <string name="check_mail">আপনার ই-মেইল দেখুন!</string>
+    <string name="instructions_at_mail">আমরা %1$s -কে আরও নির্দেশনা পাঠিয়েছি।</string>
+    <string name="verify_then_choose_username">আপনার ইমেল যাচাই করান, এবং তারপরে আমরা আপনার ইউজারনেম বেছে নেব।</string>
+    <string name="open_mail_app">ই-মেইল অ্যাপ খুলুন</string>
+    <string name="onboarding_welcome">স্বাগত!</string>
+    <string name="onboarding_lead">এখন হলো একটি ইউজারনেম বেছে নেওয়ার সময়!</string>
+    <string name="onboarding_others">অন্যরা এই নাম দিয়ে আপনাকে খুঁজে পাবে, চিনতে পারবে এবং এই নামে পিং করতে পারবে।</string>
+    <string name="onboarding_changeable">কিন্তু আপনি যদি আপনার মন পরিবর্তন করেন, তাহলে আপনি আপনার ইউজার সেটিংসে যে কোনো সময় আপনার ইউজারনেম পরিবর্তন করতে পারেন।</string>
+    <string name="onboarding_username">ইউজারনেম</string>
+    <string name="token_invalid_toast">আপনি লগ আউট হয়ে গেছেন। আবার লগ ইন করুন।</string>
+    <string name="mfa_interstitial_header">আরো একটা জিনিস</string>
+</resources>
