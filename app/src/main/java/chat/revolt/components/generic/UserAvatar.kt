@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -119,6 +120,65 @@ fun UserAvatar(
 
         if (presence != null) {
             PresenceBadge(presence, size = presenceSize)
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun GroupIcon(
+    name: String,
+    modifier: Modifier = Modifier,
+    icon: AutumnResource? = null,
+    rawUrl: String? = null,
+    size: Dp = 40.dp,
+    onLongClick: (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
+) {
+    Box(
+        modifier = modifier
+            .size(size),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        if (icon != null) {
+            RemoteImage(
+                url = rawUrl ?: "$REVOLT_FILES/icons/${icon.id!!}/group.png",
+                contentScale = ContentScale.Crop,
+                description = stringResource(id = R.string.avatar_alt, name),
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .size(size)
+                    .then(
+                        if (onLongClick != null || onClick != null) Modifier
+                            .combinedClickable(
+                                onClick = { onClick?.invoke() },
+                                onLongClick = { onLongClick?.invoke() }
+                            )
+                        else Modifier
+                    )
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(size)
+                    .then(
+                        if (onLongClick != null || onClick != null) Modifier
+                            .combinedClickable(
+                                onClick = { onClick?.invoke() },
+                                onLongClick = { onLongClick?.invoke() }
+                            )
+                        else Modifier
+                    )
+                    .clip(MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.primary)
+            ) {
+                Text(
+                    text = name.first().toString(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
         }
     }
 }

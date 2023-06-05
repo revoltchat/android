@@ -6,7 +6,13 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +26,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.ChannelType
+import chat.revolt.components.generic.GroupIcon
+import chat.revolt.components.generic.Presence
+import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.screens.chat.ChannelIcon
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -32,6 +42,11 @@ fun DrawerChannel(
     hasUnread: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit = {},
+    dmPartnerStatus: Presence? = null,
+    dmPartnerName: String? = null,
+    dmPartnerIcon: AutumnResource? = null,
+    dmPartnerId: String? = null,
+    large: Boolean = false,
 ) {
     val backgroundColor = animateColorAsState(
         if (selected) MaterialTheme.colorScheme.background
@@ -66,7 +81,37 @@ fun DrawerChannel(
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ChannelIcon(channelType = channelType, modifier = Modifier.padding(end = 8.dp))
+        when (channelType) {
+            ChannelType.DirectMessage -> UserAvatar(
+                username = dmPartnerName ?: "",
+                avatar = dmPartnerIcon,
+                userId = dmPartnerId ?: "",
+                presence = dmPartnerStatus,
+                size = 32.dp,
+                presenceSize = 16.dp,
+                modifier = Modifier.padding(end = 8.dp)
+            )
+
+            ChannelType.Group -> GroupIcon(
+                name = name,
+                icon = dmPartnerIcon,
+                size = 32.dp,
+                modifier = Modifier.padding(end = 8.dp)
+            )
+
+            else -> ChannelIcon(
+                channelType = channelType,
+                modifier = Modifier.then(
+                    if (large) Modifier.padding(
+                        end = 12.dp,
+                        start = 4.dp,
+                        top = 4.dp,
+                        bottom = 4.dp
+                    ) else Modifier.padding(end = 8.dp)
+                )
+            )
+        }
+
         Text(
             text = name,
             fontWeight = FontWeight.Medium,

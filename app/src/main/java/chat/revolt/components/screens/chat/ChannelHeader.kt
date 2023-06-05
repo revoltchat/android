@@ -22,7 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
+import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.schemas.Channel
+import chat.revolt.api.schemas.ChannelType
 
 @Composable
 fun ChannelHeader(
@@ -64,7 +66,13 @@ fun ChannelHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = channel.name ?: "Ch #${channel.id}",
+                text = channel.name
+                    ?: ChannelUtils.resolveDMName(channel)
+                    ?: if (channel.channelType == ChannelType.SavedMessages) {
+                        stringResource(R.string.channel_notes)
+                    } else {
+                        stringResource(R.string.unknown)
+                    },
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

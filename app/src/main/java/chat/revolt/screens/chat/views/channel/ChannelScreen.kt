@@ -54,6 +54,7 @@ import chat.revolt.activities.RevoltTweenDp
 import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.MessageField
@@ -390,7 +391,9 @@ fun ChannelScreen(
                     pickFileLauncher.launch(arrayOf("*/*"))
                 },
                 channelType = channel.channelType,
-                channelName = channel.name ?: channel.id!!,
+                channelName = channel.name ?: ChannelUtils.resolveDMName(channel) ?: stringResource(
+                    R.string.unknown
+                ),
                 forceSendButton = viewModel.attachments.isNotEmpty(),
                 disabled = viewModel.attachments.isNotEmpty() && viewModel.sendingMessage
             )

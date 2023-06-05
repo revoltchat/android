@@ -109,6 +109,8 @@
 
     <string name="avatar_alt">%1$s\'s avatar</string>
 
+    <string name="direct_messages">Direct Messages</string>
+
     <string name="channel_dm">Direct Message</string>
     <string name="channel_text">Text Channel</string>
     <string name="channel_voice">Voice Channel</string>

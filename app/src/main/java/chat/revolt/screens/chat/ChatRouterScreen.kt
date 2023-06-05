@@ -153,6 +153,14 @@ class ChatRouterViewModel @Inject constructor(
             }
         }
     }
+
+    fun navigateToSpecial(destination: String, navController: NavController) {
+        navController.navigate(destination) {
+            navController.graph.startDestinationRoute?.let { route ->
+                popUpTo(route)
+            }
+        }
+    }
 }
 
 @OptIn(
@@ -379,11 +387,16 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                             ) {
                                 ChannelList(
                                     serverId = it,
-                                    drawerState = drawerState,
+                                    currentDestination = navController.currentDestination?.route,
                                     currentChannel = viewModel.currentChannel,
                                     onChannelClick = { channelId ->
                                         viewModel.navigateToChannel(channelId, navController)
-                                    }
+                                        scope.launch { drawerState.close() }
+                                    },
+                                    onSpecialClick = { destination ->
+                                        viewModel.navigateToSpecial(destination, navController)
+                                        scope.launch { drawerState.close() }
+                                    },
                                 )
                             }
                         }
