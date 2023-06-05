@@ -53,6 +53,7 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
+import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.chat.DisconnectedNotice
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
@@ -349,8 +350,22 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
 
                                 ServerDrawerSeparator()
 
-                                RevoltAPI.serverCache.values
-                                    .sortedBy { it.id }
+                                // This seems to confuse the formatter, here's what it does:
+                                // - Take the list of servers and filter them by the ones that are in the ordering.
+                                // - Sort the servers that are in the ordering using the ordering.
+                                // - Add the servers that aren't in the ordering to the end of the list.
+                                // - Sort the servers that aren't in the ordering by their ID (creation order).
+                                ((RevoltAPI.serverCache.values.filter {
+                                    SyncedSettings.ordering.servers.contains(
+                                        it.id
+                                    )
+                                }
+                                    .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }) + (RevoltAPI.serverCache.values.filter {
+                                    !SyncedSettings.ordering.servers.contains(
+                                        it.id
+                                    )
+                                }.sortedBy { it.id }
+                                        ))
                                     .forEach { server ->
                                         if (server.id == null || server.name == null) return@forEach
 
