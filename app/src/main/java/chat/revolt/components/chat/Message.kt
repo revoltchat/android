@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -145,161 +146,176 @@ fun Message(
             Spacer(modifier = Modifier.height(10.dp))
         }
 
-        message.replies?.forEach { reply ->
-            val replyMessage = RevoltAPI.messageCache[reply]
-
-            InReplyTo(
-                messageId = reply,
-                withMention = replyMessage?.author?.let {
-                    message.mentions?.contains(
-                        replyMessage.author
+        Column(
+            modifier = Modifier.then(
+                if (message.mentions?.contains(RevoltAPI.selfId) == true) {
+                    Modifier.background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                     )
+                } else {
+                    Modifier
                 }
-                    ?: false,
-            ) {
-                // TODO Add jump to message
-                if (replyMessage == null) {
-                    Toast.makeText(context, "lmao prankd", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .combinedClickable(
-                    onClick = {},
-                    onDoubleClick = {
-                        onReply()
-                    },
-                    onLongClick = {
-                        onMessageContextMenu()
-                    }
-                )
-                .padding(horizontal = 10.dp)
-                .fillMaxWidth()
+            )
         ) {
-            if (message.tail == false) {
-                UserAvatar(
-                    username = author.username ?: "",
-                    userId = author.id ?: message.id ?: ULID.makeSpecial(0),
-                    avatar = author.avatar,
-                    rawUrl = message.masquerade?.avatar?.let { asJanuaryProxyUrl(it) }
-                )
-            } else {
-                UserAvatarWidthPlaceholder()
+            message.replies?.forEach { reply ->
+                val replyMessage = RevoltAPI.messageCache[reply]
+
+                InReplyTo(
+                    messageId = reply,
+                    withMention = replyMessage?.author?.let {
+                        message.mentions?.contains(
+                            replyMessage.author
+                        )
+                    }
+                        ?: false,
+                ) {
+                    // TODO Add jump to message
+                    if (replyMessage == null) {
+                        Toast.makeText(context, "lmao prankd", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
 
-            Column(modifier = Modifier.padding(start = 10.dp)) {
+            Row(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onDoubleClick = {
+                            onReply()
+                        },
+                        onLongClick = {
+                            onMessageContextMenu()
+                        }
+                    )
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth()
+            ) {
                 if (message.tail == false) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = authorName(message),
-                            fontWeight = FontWeight.Bold,
-                            color = authorColour(message),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                    Column {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        UserAvatar(
+                            username = author.username ?: "",
+                            userId = author.id ?: message.id ?: ULID.makeSpecial(0),
+                            avatar = author.avatar,
+                            rawUrl = message.masquerade?.avatar?.let { asJanuaryProxyUrl(it) }
                         )
+                    }
+                } else {
+                    UserAvatarWidthPlaceholder()
+                }
 
-                        InlineBadges(
-                            bot = author.bot != null && message.masquerade == null,
-                            bridge = message.masquerade != null && author.bot != null,
-                            colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            modifier = Modifier.size(16.dp),
-                            precedingIfAny = {
-                                Spacer(modifier = Modifier.width(5.dp))
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.width(5.dp))
-
-                        Text(
-                            text = formatLongAsTime(ULID.asTimestamp(message.id!!), context),
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-
-                        Spacer(modifier = Modifier.width(2.dp))
-
-                        if (message.edited != null) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = stringResource(id = R.string.edited),
-                                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                                modifier = Modifier.size(16.dp)
+                Column(modifier = Modifier.padding(start = 10.dp)) {
+                    if (message.tail == false) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = authorName(message),
+                                fontWeight = FontWeight.Bold,
+                                color = authorColour(message),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
-                        }
-                    }
-                }
 
-                message.content?.let {
-                    if (message.content.isBlank()) return@let // if only an attachment is sent
-
-                    AndroidView(factory = { ctx ->
-                        androidx.appcompat.widget.AppCompatTextView(ctx).apply {
-                            text = parse(message)
-                            maxLines = if (truncate) 1 else Int.MAX_VALUE
-                            ellipsize = TextUtils.TruncateAt.END
-                            textSize = 16f
-                            typeface = ResourcesCompat.getFont(ctx, R.font.inter)
-
-                            setTextColor(contentColor.toArgb())
-                        }
-                    })
-                }
-
-                message.attachments?.let {
-                    message.attachments.forEach { attachment ->
-                        Spacer(modifier = Modifier.height(2.dp))
-                        MessageAttachment(attachment) {
-                            when (attachment.metadata?.type) {
-                                "Image" -> {
-                                    attachmentView.launch(
-                                        Intent(context, ImageViewActivity::class.java).apply {
-                                            putExtra("autumnResource", attachment)
-                                        }
-                                    )
+                            InlineBadges(
+                                bot = author.bot != null && message.masquerade == null,
+                                bridge = message.masquerade != null && author.bot != null,
+                                colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                modifier = Modifier.size(16.dp),
+                                precedingIfAny = {
+                                    Spacer(modifier = Modifier.width(5.dp))
                                 }
+                            )
 
-                                "Video" -> {
-                                    attachmentView.launch(
-                                        Intent(context, VideoViewActivity::class.java).apply {
-                                            putExtra("autumnResource", attachment)
-                                        }
-                                    )
-                                }
+                            Spacer(modifier = Modifier.width(5.dp))
 
-                                "Audio" -> {
-                                    /* no-op */
-                                }
+                            Text(
+                                text = formatLongAsTime(ULID.asTimestamp(message.id!!), context),
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
 
-                                else -> {
-                                    viewAttachmentInBrowser(context, attachment)
-                                }
+                            Spacer(modifier = Modifier.width(2.dp))
+
+                            if (message.edited != null) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = stringResource(id = R.string.edited),
+                                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                    modifier = Modifier.size(16.dp)
+                                )
                             }
                         }
-                        Spacer(modifier = Modifier.height(2.dp))
                     }
-                }
 
-                message.embeds?.let {
-                    message.embeds.forEach { embed ->
-                        val embedIsEmpty =
-                            embed.title == null && embed.description == null && embed.iconURL == null && embed.image == null
+                    message.content?.let {
+                        if (message.content.isBlank()) return@let // if only an attachment is sent
 
-                        if (embedIsEmpty) {
-                            // if we do not emit anything, compose will cause an internal error.
-                            // FIXME if you are doing fixme's anyways then check if this is still an issue
-                            Box {}
-                            return@forEach
-                        }
+                        AndroidView(factory = { ctx ->
+                            androidx.appcompat.widget.AppCompatTextView(ctx).apply {
+                                text = parse(message)
+                                maxLines = if (truncate) 1 else Int.MAX_VALUE
+                                ellipsize = TextUtils.TruncateAt.END
+                                textSize = 16f
+                                typeface = ResourcesCompat.getFont(ctx, R.font.inter)
 
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Embed(embed = embed, onLinkClick = {
-                            viewUrlInBrowser(context, it)
+                                setTextColor(contentColor.toArgb())
+                            }
                         })
-                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    message.attachments?.let {
+                        message.attachments.forEach { attachment ->
+                            Spacer(modifier = Modifier.height(2.dp))
+                            MessageAttachment(attachment) {
+                                when (attachment.metadata?.type) {
+                                    "Image" -> {
+                                        attachmentView.launch(
+                                            Intent(context, ImageViewActivity::class.java).apply {
+                                                putExtra("autumnResource", attachment)
+                                            }
+                                        )
+                                    }
+
+                                    "Video" -> {
+                                        attachmentView.launch(
+                                            Intent(context, VideoViewActivity::class.java).apply {
+                                                putExtra("autumnResource", attachment)
+                                            }
+                                        )
+                                    }
+
+                                    "Audio" -> {
+                                        /* no-op */
+                                    }
+
+                                    else -> {
+                                        viewAttachmentInBrowser(context, attachment)
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                        }
+                    }
+
+                    message.embeds?.let {
+                        message.embeds.forEach { embed ->
+                            val embedIsEmpty =
+                                embed.title == null && embed.description == null && embed.iconURL == null && embed.image == null
+
+                            if (embedIsEmpty) {
+                                // if we do not emit anything, compose will cause an internal error.
+                                // FIXME if you are doing fixme's anyways then check if this is still an issue
+                                Box {}
+                                return@forEach
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Embed(embed = embed, onLinkClick = {
+                                viewUrlInBrowser(context, it)
+                            })
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
                 }
             }
