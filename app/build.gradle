@@ -58,7 +58,7 @@ android {
             useSupportLibrary true
         }
 
-        resourceConfigurations += ["en", "de", "fr", "id"]
+        resourceConfigurations += ["en", "de", "fr", "id", "b+es+419", "bn", "ca", "es", "gl", "in", "pt-rBR", "pt", "ru", "tr", "uk", "zh-rCN"]
     }
 
     buildTypes {
@@ -75,6 +75,8 @@ android {
             buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn', 'RVX_SENTRY_DSN')}\""
             buildConfigField "Boolean", "ANALYSIS_ENABLED", "${property('revoltbuild.properties', 'analysis.enabled', 'RVX_ANALYSIS_ENABLED')}"
             buildConfigField "String", "ANALYSIS_BASEURL", "\"${property('revoltbuild.properties', 'analysis.base_url', 'RVX_ANALYSIS_BASEURL')}\""
+
+            pseudoLocalesEnabled true
         }
     }
     compileOptions {
