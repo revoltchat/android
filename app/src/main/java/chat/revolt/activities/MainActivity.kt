@@ -35,6 +35,7 @@ import chat.revolt.screens.register.RegisterDetailsScreen
 import chat.revolt.screens.register.RegisterGreetingScreen
 import chat.revolt.screens.register.RegisterVerifyScreen
 import chat.revolt.screens.settings.AppearanceSettingsScreen
+import chat.revolt.screens.settings.ClosedBetaUpdaterScreen
 import chat.revolt.screens.settings.DebugSettingsScreen
 import chat.revolt.screens.settings.SettingsScreen
 import chat.revolt.ui.theme.RevoltTheme
@@ -128,6 +129,7 @@ fun AppEntrypoint() {
                 composable("settings") { SettingsScreen(navController) }
                 composable("settings/appearance") { AppearanceSettingsScreen(navController) }
                 composable("settings/debug") { DebugSettingsScreen(navController) }
+                composable("settings/updater") { ClosedBetaUpdaterScreen(navController) }
                 dialog("settings/feedback") { FeedbackDialog(navController) }
 
                 composable("about") { AboutScreen(navController) }
