@@ -2,6 +2,7 @@ package chat.revolt.screens.about
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,7 +15,10 @@ import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 
 @Composable
 fun AttributionScreen(navController: NavController) {
-    Column() {
+    Column(
+        modifier = Modifier
+            .safeDrawingPadding()
+    ) {
         PageHeader(
             text = stringResource(R.string.oss_attribution),
             showBackButton = true,

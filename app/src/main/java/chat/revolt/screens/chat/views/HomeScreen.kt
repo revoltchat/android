@@ -1,6 +1,7 @@
 package chat.revolt.screens.chat.views
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
@@ -35,7 +36,9 @@ class HomeScreenViewModel @Inject constructor(
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hiltViewModel()) {
-    Column {
+    Column(
+        modifier = Modifier.safeDrawingPadding()
+    ) {
         PageHeader(text = stringResource(id = R.string.home))
 
         LinkOnHome(

@@ -1,7 +1,6 @@
 package chat.revolt.activities
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -44,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -69,7 +69,7 @@ class InviteActivity : ComponentActivity() {
 
         val inviteCode = intent.data?.lastPathSegment
 
-        Log.d("InviteActivity", "Invite code: $inviteCode")
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             InviteScreen(

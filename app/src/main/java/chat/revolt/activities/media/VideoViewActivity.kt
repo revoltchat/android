@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -71,6 +72,8 @@ class VideoViewActivity : ComponentActivity() {
             finish()
             return
         }
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             VideoViewScreen(resource = autumnResource, onClose = { finish() })

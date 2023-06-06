@@ -74,8 +74,6 @@
     <string name="app_full_name">Revolt on Android</string>
     <string name="oss_attribution">OSS Attribution</string>
 
-    <string name="comingsoon_heading">Gah, you found me!</string>
-    <string name="comingsoon_body">The feature you are trying to access is not ready yet, but we are steadily working on polishing it to perfection..</string>
     <string name="comingsoon_toast">Sorry, this feature is not ready yet.</string>
 
     <string name="typing_blank" translatable="false"><!-- this is a hack to prevent the typing indicator from showing typing_several when it's animating away --></string>

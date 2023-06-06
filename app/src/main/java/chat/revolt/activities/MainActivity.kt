@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,7 +25,6 @@ import chat.revolt.api.settings.GlobalState
 import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
-import chat.revolt.screens.about.PlaceholderScreen
 import chat.revolt.screens.chat.ChatRouterScreen
 import chat.revolt.screens.chat.dialogs.FeedbackDialog
 import chat.revolt.screens.login.LoginGreetingScreen
@@ -50,6 +50,8 @@ class MainActivity : FragmentActivity() {
             options.dsn = BuildConfig.SENTRY_DSN
             options.release = BuildConfig.VERSION_NAME
         }
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             AppEntrypoint()
@@ -130,7 +132,6 @@ fun AppEntrypoint() {
 
                 composable("about") { AboutScreen(navController) }
                 composable("about/oss") { AttributionScreen(navController) }
-                composable("about/placeholder") { PlaceholderScreen(navController) }
             }
         }
     }

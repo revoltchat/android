@@ -1,6 +1,7 @@
 package chat.revolt.screens.login
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,7 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -137,6 +141,8 @@ fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
     LaunchedEffect(viewModel.navigateTo) {
         when (viewModel.navigateTo) {
             "mfa" -> {
@@ -169,7 +175,9 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
+            .padding(20.dp)
+            .imePadding()
+            .safeDrawingPadding(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -213,7 +221,13 @@ fun LoginScreen(
 
                 AnyLink(
                     text = stringResource(R.string.password_forgot),
-                    action = { navController.navigate("about/placeholder") },
+                    action = {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.comingsoon_toast),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
                     modifier = Modifier.padding(vertical = 7.dp)
                 )
 
@@ -245,7 +259,13 @@ fun LoginScreen(
 
             AnyLink(
                 text = stringResource(R.string.resend_verification),
-                action = { navController.navigate("about/placeholder") },
+                action = {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.comingsoon_toast),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                },
                 modifier = Modifier
                     .padding(vertical = 7.dp)
                     .testTag("resend_verification_link")

@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
 import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltHttp
@@ -68,6 +69,8 @@ class ImageViewActivity : ComponentActivity() {
             finish()
             return
         }
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             ImageViewScreen(resource = autumnResource, onClose = { finish() })
