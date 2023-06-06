@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -302,7 +303,11 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
         }
     }
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .safeDrawingPadding()
+    ) {
         AnimatedVisibility(visible = RealtimeSocket.disconnectionState != DisconnectionState.Connected) {
             DisconnectedNotice(
                 state = RealtimeSocket.disconnectionState,
