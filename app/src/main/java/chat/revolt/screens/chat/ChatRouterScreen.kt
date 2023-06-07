@@ -196,7 +196,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
         snapshotFlow { drawerState.currentValue }
             .distinctUntilChanged()
             .collect { state ->
-                if (state == DrawerValue.Closed) {
+                if (state == DrawerValue.Open) {
                     keyboardController?.hide()
                 }
             }
