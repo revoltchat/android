@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
-import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
+import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 
 @Composable
@@ -36,12 +36,12 @@ fun InReplyTo(
     val message = RevoltAPI.messageCache[messageId]
     val author = RevoltAPI.userCache[message?.author ?: ""]
 
-    val username = message?.masquerade?.name ?: author?.username ?: ""
+    val username = message?.let { authorName(it) }
+        ?: author?.let { User.resolveDefaultName(it) }
+        ?: stringResource(id = R.string.unknown)
 
     val contentColor = LocalContentColor.current
-    val usernameColor = message?.masquerade?.colour?.let {
-        WebCompat.parseColour(it)
-    } ?: contentColor
+    val usernameColor = message?.let { authorColour(it) } ?: contentColor
 
     Box(
         modifier = modifier

@@ -52,6 +52,7 @@ import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
+import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.api.schemas.Message as MessageSchema
@@ -67,11 +68,9 @@ fun authorColour(message: MessageSchema): Color {
 
 @Composable
 fun authorName(message: MessageSchema): String {
-    return if (message.masquerade?.name != null) {
-        message.masquerade.name
-    } else {
-        RevoltAPI.userCache[message.author]?.username ?: stringResource(id = R.string.unknown)
-    }
+    return message.masquerade?.name
+        ?: RevoltAPI.userCache[message.author]?.let { User.resolveDefaultName(it) }
+        ?: stringResource(R.string.unknown)
 }
 
 fun viewUrlInBrowser(ctx: android.content.Context, url: String) {
@@ -194,7 +193,7 @@ fun Message(
                     Column {
                         Spacer(modifier = Modifier.height(4.dp))
                         UserAvatar(
-                            username = author.username ?: "",
+                            username = User.resolveDefaultName(author),
                             userId = author.id ?: message.id ?: ULID.makeSpecial(0),
                             avatar = author.avatar,
                             rawUrl = message.masquerade?.avatar?.let { asJanuaryProxyUrl(it) }

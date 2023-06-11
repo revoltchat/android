@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
@@ -29,10 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
-import chat.revolt.api.internals.WebCompat
+import chat.revolt.api.internals.ULID
 import chat.revolt.api.routes.channel.SendMessageReply
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.Message
+import chat.revolt.components.chat.authorColour
+import chat.revolt.components.chat.authorName
 import chat.revolt.components.generic.UserAvatar
 
 @Composable
@@ -76,8 +77,8 @@ fun ManageableReply(
         Spacer(modifier = Modifier.width(8.dp))
 
         UserAvatar(
-            username = replyAuthor.username!!,
-            userId = replyAuthor.id!!,
+            username = authorName(message = replyMessage),
+            userId = replyAuthor.id ?: ULID.makeSpecial(0),
             avatar = replyAuthor.avatar,
             rawUrl = replyMessage.masquerade?.avatar?.let { asJanuaryProxyUrl(it) },
             size = 16.dp
@@ -86,16 +87,14 @@ fun ManageableReply(
         Spacer(modifier = Modifier.width(4.dp))
 
         Text(
-            text = replyMessage.masquerade?.name ?: replyAuthor.username,
+            text = authorName(message = replyMessage),
             fontSize = 12.sp,
             modifier = Modifier
                 .clickable {
                     onToggleMention()
                 }
                 .padding(4.dp),
-            color = if (replyMessage.masquerade?.colour != null) {
-                WebCompat.parseColour(replyMessage.masquerade.colour)
-            } else LocalContentColor.current,
+            color = authorColour(message = replyMessage),
             fontWeight = FontWeight.Bold,
         )
 

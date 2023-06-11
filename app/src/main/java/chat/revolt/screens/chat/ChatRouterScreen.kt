@@ -54,6 +54,7 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
+import chat.revolt.api.schemas.User
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.chat.DisconnectedNotice
 import chat.revolt.components.generic.UserAvatar
@@ -332,7 +333,11 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 UserAvatar(
-                                    username = RevoltAPI.userCache[RevoltAPI.selfId]?.username
+                                    username = RevoltAPI.userCache[RevoltAPI.selfId]?.let {
+                                        User.resolveDefaultName(
+                                            it
+                                        )
+                                    }
                                         ?: "",
                                     presence = presenceFromStatus(
                                         RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence

@@ -1,8 +1,17 @@
 package chat.revolt.components.screens.chat
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,6 +26,7 @@ import chat.revolt.R
 import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 
 @Composable
@@ -33,7 +43,7 @@ fun StackedUserAvatars(
             UserAvatar(
                 avatar = user?.avatar,
                 userId = userId,
-                username = user?.username ?: stringResource(id = R.string.unknown),
+                username = user?.let {User.resolveDefaultName(it)} ?: stringResource(id = R.string.unknown),
                 size = 16.dp,
                 modifier = Modifier
                     .offset(
@@ -87,7 +97,7 @@ fun TypingIndicator(
                     id = typingMessageResource(),
                     users.joinToString {
                         RevoltAPI.userCache[it]?.let { u ->
-                            u.username ?: u.id
+                            User.resolveDefaultName(u)
                         } ?: it
                     }
                 ),

@@ -1,15 +1,16 @@
 package chat.revolt.api.schemas
 
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
     @SerialName("_id")
     val id: String? = null,
     val username: String? = null,
+    val discriminator: String? = null,
+    @SerialName("display_name")
+    val displayName: String? = null,
     val avatar: AutumnResource? = null,
     val relations: List<Relation>? = null,
     val badges: Long? = null,
@@ -25,6 +26,8 @@ data class User(
         return User(
             id = partial.id ?: id,
             username = partial.username ?: username,
+            discriminator = partial.discriminator ?: discriminator,
+            displayName = partial.displayName ?: displayName,
             avatar = partial.avatar ?: avatar,
             relations = partial.relations ?: relations,
             badges = partial.badges ?: badges,
@@ -42,6 +45,8 @@ data class User(
         fun getPlaceholder(forId: String) = User(
             id = forId,
             username = "Unknown User",
+            discriminator = "0000",
+            displayName = null,
             avatar = null,
             badges = 0,
             status = null,
@@ -52,6 +57,11 @@ data class User(
             relationship = null,
             online = false
         )
+
+        fun resolveDefaultName(user: User, withDiscriminator: Boolean = false): String {
+            val maybeDiscriminator = if (withDiscriminator) "#${user.discriminator}" else ""
+            return user.displayName ?: "${user.username}$maybeDiscriminator"
+        }
     }
 }
 

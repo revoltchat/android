@@ -31,6 +31,7 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.schemas.ChannelType
+import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
 import chat.revolt.sheets.ChannelContextSheet
@@ -157,7 +158,7 @@ fun RowScope.ChannelList(
                         )] else null
 
                     DrawerChannel(
-                        name = partner?.username ?: channel.name
+                        name = partner?.let { p -> User.resolveDefaultName(p) } ?: channel.name
                         ?: stringResource(R.string.unknown),
                         channelType = channel.channelType ?: ChannelType.TextChannel,
                         selected = currentDestination == "channel/{channelId}" && currentChannel == channel.id,
@@ -169,7 +170,7 @@ fun RowScope.ChannelList(
                         } ?: false,
                         dmPartnerIcon = partner?.avatar ?: channel.icon,
                         dmPartnerId = partner?.id,
-                        dmPartnerName = partner?.username,
+                        dmPartnerName = partner?.let { p -> User.resolveDefaultName(p) },
                         dmPartnerStatus = presenceFromStatus(
                             partner?.status?.presence ?: "Offline"
                         ),
