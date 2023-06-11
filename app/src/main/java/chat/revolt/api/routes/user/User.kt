@@ -4,6 +4,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.schemas.Profile
 import chat.revolt.api.schemas.User
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -69,4 +70,21 @@ suspend fun addUserIfUnknown(id: String) {
     if (RevoltAPI.userCache[id] == null) {
         RevoltAPI.userCache[id] = fetchUser(id)
     }
+}
+
+suspend fun fetchUserProfile(id: String): Profile {
+    val res = RevoltHttp.get("/users/$id/profile") {
+        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+    }
+
+    val response = res.bodyAsText()
+
+    try {
+        val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
+        throw Error(error.type)
+    } catch (e: SerializationException) {
+        // Not an error
+    }
+
+    return RevoltJson.decodeFromString(Profile.serializer(), response)
 }

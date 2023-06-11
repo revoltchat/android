@@ -26,6 +26,7 @@ import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.SheetClickable
+import chat.revolt.components.screens.settings.SelfUserOverview
 
 @Composable
 fun SettingsScreen(
@@ -42,6 +43,8 @@ fun SettingsScreen(
             onBackButtonClicked = {
                 navController.popBackStack()
             })
+
+        SelfUserOverview()
 
         Column(
             modifier = Modifier
