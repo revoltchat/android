@@ -101,6 +101,7 @@ class ChannelScreenViewModel : ViewModel() {
         get() = _replies
 
     fun addInReplyTo(reply: SendMessageReply) {
+        if (_replies.any { it.id == reply.id }) return
         _replies.add(reply)
     }
 

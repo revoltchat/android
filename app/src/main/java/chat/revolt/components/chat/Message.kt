@@ -180,7 +180,9 @@ fun Message(
                     .combinedClickable(
                         onClick = {},
                         onDoubleClick = {
-                            onReply()
+                            if (canReply) {
+                                onReply()
+                            }
                         },
                         onLongClick = {
                             onMessageContextMenu()
