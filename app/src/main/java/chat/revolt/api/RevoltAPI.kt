@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import chat.revolt.api.schemas.Channel as ChannelSchema
@@ -51,7 +52,11 @@ fun buildUserAgent(accessMethod: String = "Ktor"): String {
 
 private const val BACKEND_IS_STABLE = false
 
-val RevoltJson = Json { ignoreUnknownKeys = true }
+@OptIn(ExperimentalSerializationApi::class)
+val RevoltJson = Json {
+    ignoreUnknownKeys = true
+    explicitNulls = false
+}
 
 val RevoltHttp = HttpClient(OkHttp) {
     install(DefaultRequest)

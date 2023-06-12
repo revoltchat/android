@@ -20,6 +20,7 @@ import chat.revolt.api.realtime.frames.receivable.MessageFrame
 import chat.revolt.api.realtime.frames.receivable.MessageUpdateFrame
 import chat.revolt.api.routes.channel.SendMessageReply
 import chat.revolt.api.routes.channel.ackChannel
+import chat.revolt.api.routes.channel.editMessage
 import chat.revolt.api.routes.channel.fetchMessagesFromChannel
 import chat.revolt.api.routes.channel.fetchSingleChannel
 import chat.revolt.api.routes.channel.sendMessage
@@ -57,6 +58,8 @@ class ChannelScreenViewModel : ViewModel() {
     var pendingAttachments = mutableStateListOf<FileArgs>()
 
     var pendingUploadProgress by mutableFloatStateOf(0f)
+
+    var editingMessage by mutableStateOf<String?>(null)
 
     private fun popAttachmentBatch() {
         pendingAttachments =
@@ -141,6 +144,11 @@ class ChannelScreenViewModel : ViewModel() {
     }
 
     fun sendPendingMessage() {
+        if (editingMessage != null) {
+            editPendingMessage()
+            return
+        }
+
         isSendingMessage = true
 
         viewModelScope.launch {
@@ -181,6 +189,21 @@ class ChannelScreenViewModel : ViewModel() {
             pendingUploadProgress = 0f
             popAttachmentBatch()
             clearInReplyTo()
+        }
+    }
+
+    private fun editPendingMessage() {
+        isSendingMessage = true
+
+        viewModelScope.launch {
+            editMessage(
+                channelId = activeChannel!!.id!!,
+                messageId = editingMessage!!,
+                newContent = pendingMessageContent.trimIndent()
+            )
+
+            pendingMessageContent = ""
+            isSendingMessage = false
         }
     }
 
@@ -308,6 +331,14 @@ class ChannelScreenViewModel : ViewModel() {
                             )
                         )
                     }
+
+                    is UiCallback.EditMessage -> {
+                        editingMessage = it.messageId
+                        val message = renderableMessages.find { msg ->
+                            msg.id == it.messageId
+                        } ?: return@onEach
+                        pendingMessageContent = message.content ?: ""
+                    }
                 }
             }.catch {
                 Log.e("ChannelScreen", "Failed to receive UI callback", it)
@@ -346,5 +377,10 @@ class ChannelScreenViewModel : ViewModel() {
                 mention = false
             )
         )
+    }
+
+    fun cancelEditingMessage() {
+        editingMessage = null
+        pendingMessageContent = ""
     }
 }

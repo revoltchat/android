@@ -1,6 +1,7 @@
 package chat.revolt.api.routes.channel
 
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ULID
@@ -9,12 +10,14 @@ import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.MessagesInChannel
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
 
 suspend fun fetchMessagesFromChannel(
@@ -72,6 +75,11 @@ data class SendMessageBody(
     val attachments: List<String>?,
 )
 
+@kotlinx.serialization.Serializable
+data class EditMessageBody(
+    val content: String?,
+)
+
 suspend fun sendMessage(
     channelId: String,
     content: String,
@@ -95,6 +103,31 @@ suspend fun sendMessage(
         .bodyAsText()
 
     return response
+}
+
+suspend fun editMessage(
+    channelId: String,
+    messageId: String,
+    newContent: String? = null,
+) {
+    val response = RevoltHttp.patch("/channels/$channelId/messages/$messageId") {
+        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+
+        contentType(ContentType.Application.Json)
+        setBody(
+            EditMessageBody(
+                content = newContent
+            )
+        )
+    }
+        .bodyAsText()
+
+    try {
+        val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
+        throw Error(error.type)
+    } catch (e: SerializationException) {
+        // Not an error
+    }
 }
 
 suspend fun ackChannel(channelId: String, messageId: String = ULID.makeNext()) {

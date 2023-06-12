@@ -18,6 +18,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -57,6 +59,8 @@ fun MessageField(
     modifier: Modifier = Modifier,
     forceSendButton: Boolean = false,
     disabled: Boolean = false,
+    editMode: Boolean = false,
+    cancelEdit: () -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
     val placeholderResource = when (channelType) {
@@ -73,6 +77,7 @@ fun MessageField(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
     ) {
+
         BasicTextField(
             value = messageContent,
             onValueChange = onMessageContentChange,
@@ -118,15 +123,23 @@ fun MessageField(
                     contentPadding = PaddingValues(16.dp),
                     leadingIcon = {
                         Icon(
-                            Icons.Default.Add,
+                            when {
+                                editMode -> Icons.Default.Close
+                                else -> Icons.Default.Add
+                            },
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                             contentDescription = stringResource(id = R.string.add_attachment_alt),
                             modifier = Modifier
                                 .clip(CircleShape)
                                 .size(32.dp)
                                 .clickable {
-                                    focusRequester.freeFocus() // hide keyboard because it's annoying
-                                    onAddAttachment()
+                                    when {
+                                        editMode -> cancelEdit()
+                                        else -> {
+                                            focusRequester.freeFocus() // hide keyboard because it's annoying
+                                            onAddAttachment()
+                                        }
+                                    }
                                 }
                                 .padding(4.dp)
                                 .testTag("add_attachment")
@@ -143,7 +156,10 @@ fun MessageField(
                                 targetOffsetY = { it }
                             ) + fadeOut(animationSpec = RevoltTweenFloat)) {
                             Icon(
-                                Icons.Default.Send,
+                                when {
+                                    editMode -> Icons.Default.Edit
+                                    else -> Icons.Default.Send
+                                },
                                 tint = MaterialTheme.colorScheme.primary,
                                 contentDescription = stringResource(id = R.string.send_alt),
                                 modifier = Modifier

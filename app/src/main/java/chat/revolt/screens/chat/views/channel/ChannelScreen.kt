@@ -404,7 +404,9 @@ fun ChannelScreen(
                     R.string.unknown
                 ),
                 forceSendButton = viewModel.pendingAttachments.isNotEmpty(),
-                disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage
+                disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage,
+                editMode = viewModel.editingMessage != null,
+                cancelEdit = viewModel::cancelEditingMessage,
             )
         }
     }
