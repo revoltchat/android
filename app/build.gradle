@@ -195,6 +195,11 @@ dependencies {
     implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
     implementation "androidx.media3:media3-datasource-okhttp:$media3_version"
     implementation "androidx.media3:media3-ui:$media3_version"
+
+    // Debug-only dependencies
+
+    // LeakCanary - memory leak detection
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.11'
 }
 
 kapt {
