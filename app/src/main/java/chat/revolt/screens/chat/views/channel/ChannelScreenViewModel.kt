@@ -46,16 +46,13 @@ class ChannelScreenViewModel : ViewModel() {
     var activeChannel by mutableStateOf<Channel?>(null)
 
     var renderableMessages = mutableStateListOf<Message>()
-
-    private fun setRenderableMessages(messages: List<Message>) {
-        renderableMessages.clear()
-        renderableMessages.addAll(messages)
-    }
-
     var typingUsers = mutableStateListOf<String>()
 
-    var messageContent by mutableStateOf("")
+    var isSendingMessage by mutableStateOf(false)
+    var hasNoMoreMessages by mutableStateOf(false)
 
+    var pendingMessageContent by mutableStateOf("")
+    var pendingReplies = mutableStateListOf<SendMessageReply>()
     var pendingAttachments = mutableStateListOf<FileArgs>()
 
     private fun popAttachmentBatch() {
@@ -63,30 +60,29 @@ class ChannelScreenViewModel : ViewModel() {
             pendingAttachments.drop(MAX_ATTACHMENTS_PER_MESSAGE) as SnapshotStateList<FileArgs>
     }
 
-    var sendingMessage by mutableStateOf(false)
-
-    var replies = mutableStateListOf<SendMessageReply>()
+    private fun setRenderableMessages(messages: List<Message>) {
+        renderableMessages.clear()
+        renderableMessages.addAll(messages)
+    }
 
     private fun addReply(reply: SendMessageReply) {
-        if (replies.any { it.id == reply.id }) return
-        replies.add(reply)
+        if (pendingReplies.any { it.id == reply.id }) return
+        pendingReplies.add(reply)
     }
 
     fun toggleReplyMentionFor(reply: SendMessageReply) {
-        val index = replies.indexOf(reply)
+        val index = pendingReplies.indexOf(reply)
         val newReply = SendMessageReply(
             reply.id,
             !reply.mention
         )
 
-        replies[index] = newReply
+        pendingReplies[index] = newReply
     }
 
     private fun clearInReplyTo() {
-        replies.clear()
+        pendingReplies.clear()
     }
-
-    var noMoreMessages by mutableStateOf(false)
 
     fun fetchOlderMessages() {
         if (activeChannel == null) {
@@ -107,7 +103,7 @@ class ChannelScreenViewModel : ViewModel() {
                 }
             ).let {
                 if (it.messages.isNullOrEmpty() || it.messages.size < 50) {
-                    noMoreMessages = true
+                    hasNoMoreMessages = true
                 }
 
                 it.messages?.forEach { message ->
@@ -142,7 +138,7 @@ class ChannelScreenViewModel : ViewModel() {
     }
 
     fun sendPendingMessage() {
-        sendingMessage = true
+        isSendingMessage = true
 
         viewModelScope.launch {
             val attachmentIds = arrayListOf<String>()
@@ -165,13 +161,13 @@ class ChannelScreenViewModel : ViewModel() {
 
             sendMessage(
                 activeChannel!!.id!!,
-                messageContent.trimIndent(),
+                pendingMessageContent.trimIndent(),
                 attachments = if (attachmentIds.isEmpty()) null else attachmentIds,
-                replies = replies
+                replies = pendingReplies
             )
 
-            messageContent = ""
-            noMoreMessages = false
+            pendingMessageContent = ""
+            hasNoMoreMessages = false
             popAttachmentBatch()
             clearInReplyTo()
         }

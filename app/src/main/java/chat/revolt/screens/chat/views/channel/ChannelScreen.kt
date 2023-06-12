@@ -223,7 +223,7 @@ fun ChannelScreen(
                 .collect {
                     if (it) {
                         coroutineScope.launch {
-                            if (viewModel.noMoreMessages) return@launch
+                            if (viewModel.hasNoMoreMessages) return@launch
                             viewModel.fetchOlderMessages()
                         }
                     }
@@ -284,7 +284,7 @@ fun ChannelScreen(
                         },
                         canReply = true,
                         onReply = {
-                            if (viewModel.replies.size >= 5) {
+                            if (viewModel.pendingReplies.size >= 5) {
                                 Toast.makeText(
                                     context,
                                     context.getString(R.string.too_many_replies, 5),
@@ -298,7 +298,7 @@ fun ChannelScreen(
                 }
 
                 item {
-                    if (viewModel.noMoreMessages) {
+                    if (viewModel.hasNoMoreMessages) {
                         Text(
                             text = stringResource(R.string.start_of_conversation),
                             modifier = Modifier
@@ -373,10 +373,10 @@ fun ChannelScreen(
                 )
                 .clip(MaterialTheme.shapes.medium)
         ) {
-            AnimatedVisibility(visible = viewModel.replies.isNotEmpty()) {
+            AnimatedVisibility(visible = viewModel.pendingReplies.isNotEmpty()) {
                 ReplyManager(
-                    replies = viewModel.replies,
-                    onRemove = { viewModel.replies.remove(it) },
+                    replies = viewModel.pendingReplies,
+                    onRemove = { viewModel.pendingReplies.remove(it) },
                     onToggleMention = viewModel::toggleReplyMentionFor
                 )
             }
@@ -384,15 +384,15 @@ fun ChannelScreen(
             AnimatedVisibility(visible = viewModel.pendingAttachments.isNotEmpty()) {
                 AttachmentManager(
                     attachments = viewModel.pendingAttachments,
-                    uploading = viewModel.sendingMessage,
+                    uploading = viewModel.isSendingMessage,
                     onRemove = { viewModel.pendingAttachments.remove(it) }
                 )
             }
 
             MessageField(
-                messageContent = viewModel.messageContent,
+                messageContent = viewModel.pendingMessageContent,
                 onMessageContentChange = {
-                    viewModel.messageContent = it
+                    viewModel.pendingMessageContent = it
                 },
                 onSendMessage = viewModel::sendPendingMessage,
                 onAddAttachment = {
@@ -403,7 +403,7 @@ fun ChannelScreen(
                     R.string.unknown
                 ),
                 forceSendButton = viewModel.pendingAttachments.isNotEmpty(),
-                disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.sendingMessage
+                disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage
             )
         }
     }
