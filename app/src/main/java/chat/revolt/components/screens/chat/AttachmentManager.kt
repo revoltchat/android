@@ -1,15 +1,27 @@
 package chat.revolt.components.screens.chat
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -23,44 +35,57 @@ import java.io.File
 fun AttachmentManager(
     attachments: List<FileArgs>,
     uploading: Boolean,
+    uploadProgress: Float = 0f,
     onRemove: (FileArgs) -> Unit,
 ) {
-    Row(
+    val animatedProgress by animateFloatAsState(
+        targetValue = uploadProgress,
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+        label = "Upload progress"
+    )
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
-        AnimatedVisibility(uploading) {
-            CircularProgressIndicator(
-                modifier = Modifier.padding(4.dp),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
+        Row(
+            modifier = Modifier
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+
+            attachments.forEach { attachment ->
+                Row(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable {
+                            onRemove(attachment)
+                        }
+                        .background(
+                            color = MaterialTheme.colorScheme.background,
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .padding(8.dp)
+                ) {
+                    Text(attachment.filename, maxLines = 1)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = stringResource(R.string.remove_attachment_alt)
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+            }
         }
 
-        attachments.forEach { attachment ->
-            Row(
+        AnimatedVisibility(visible = uploading) {
+            LinearProgressIndicator(
+                progress = animatedProgress,
                 modifier = Modifier
-                    .padding(4.dp)
-                    .clip(MaterialTheme.shapes.small)
-                    .clickable {
-                        onRemove(attachment)
-                    }
-                    .background(
-                        color = MaterialTheme.colorScheme.background,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(8.dp)
-            ) {
-                Text(attachment.filename, maxLines = 1)
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    Icons.Default.Close,
-                    contentDescription = stringResource(R.string.remove_attachment_alt)
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
+                    .fillMaxWidth()
+            )
         }
     }
 }

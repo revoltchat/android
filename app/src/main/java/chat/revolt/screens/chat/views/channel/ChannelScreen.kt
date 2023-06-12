@@ -385,7 +385,8 @@ fun ChannelScreen(
                 AttachmentManager(
                     attachments = viewModel.pendingAttachments,
                     uploading = viewModel.isSendingMessage,
-                    onRemove = { viewModel.pendingAttachments.remove(it) }
+                    uploadProgress = viewModel.pendingUploadProgress,
+                    onRemove = { viewModel.pendingAttachments.remove(it) },
                 )
             }
 

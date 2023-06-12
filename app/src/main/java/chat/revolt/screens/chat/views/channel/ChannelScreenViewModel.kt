@@ -2,10 +2,11 @@ package chat.revolt.screens.chat.views.channel
 
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chat.revolt.api.RevoltAPI
@@ -55,9 +56,11 @@ class ChannelScreenViewModel : ViewModel() {
     var pendingReplies = mutableStateListOf<SendMessageReply>()
     var pendingAttachments = mutableStateListOf<FileArgs>()
 
+    var pendingUploadProgress by mutableFloatStateOf(0f)
+
     private fun popAttachmentBatch() {
         pendingAttachments =
-            pendingAttachments.drop(MAX_ATTACHMENTS_PER_MESSAGE) as SnapshotStateList<FileArgs>
+            pendingAttachments.drop(MAX_ATTACHMENTS_PER_MESSAGE).toMutableStateList()
     }
 
     private fun setRenderableMessages(messages: List<Message>) {
@@ -142,14 +145,20 @@ class ChannelScreenViewModel : ViewModel() {
 
         viewModelScope.launch {
             val attachmentIds = arrayListOf<String>()
+            val takenAttachments = pendingAttachments.take(MAX_ATTACHMENTS_PER_MESSAGE)
+            val totalTaken = takenAttachments.size
 
-            pendingAttachments.take(MAX_ATTACHMENTS_PER_MESSAGE).forEach {
+            takenAttachments.forEachIndexed { index, it ->
                 try {
                     val id = uploadToAutumn(
                         it.file,
                         it.filename,
                         "attachments",
-                        ContentType.parse(it.contentType)
+                        ContentType.parse(it.contentType),
+                        onProgress = { current, total ->
+                            pendingUploadProgress =
+                                ((current.toFloat() / total.toFloat()) / totalTaken.toFloat()) + (index.toFloat() / totalTaken.toFloat())
+                        }
                     )
                     Log.d("ChannelScreen", "Uploaded attachment with id $id")
                     attachmentIds.add(id)
@@ -168,6 +177,8 @@ class ChannelScreenViewModel : ViewModel() {
 
             pendingMessageContent = ""
             hasNoMoreMessages = false
+            isSendingMessage = false
+            pendingUploadProgress = 0f
             popAttachmentBatch()
             clearInReplyTo()
         }
