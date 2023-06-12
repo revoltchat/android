@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -83,23 +84,26 @@ fun SelfUserOverview() {
                 userId = selfUser.id ?: ULID.makeSpecial(0),
                 avatar = selfUser.avatar,
                 size = 48.dp,
-                presence = presenceFromStatus(selfUser.status?.presence ?: "offline"),
+                presence = presenceFromStatus(selfUser.status?.presence ?: "Offline"),
             )
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Text(text = AnnotatedString.Builder().apply {
-                if (selfUser.displayName != null) {
-                    pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                    append(selfUser.displayName)
+            Text(
+                text = AnnotatedString.Builder().apply {
+                    if (selfUser.displayName != null) {
+                        pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                        append(selfUser.displayName)
+                        pop()
+                        append("\n")
+                    }
+                    append("${selfUser.username}")
+                    pushStyle(SpanStyle(fontWeight = FontWeight.ExtraLight))
+                    append("#${selfUser.discriminator}")
                     pop()
-                    append("\n")
-                }
-                append("${selfUser.username}")
-                pushStyle(SpanStyle(fontWeight = FontWeight.ExtraLight))
-                append("#${selfUser.discriminator}")
-                pop()
-            }.toAnnotatedString())
+                }.toAnnotatedString(),
+                color = if (profile?.background != null) Color.White else LocalContentColor.current,
+            )
         }
     }
 }
