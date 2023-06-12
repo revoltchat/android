@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chat.revolt.api.RevoltAPI
@@ -42,97 +43,53 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 
 class ChannelScreenViewModel : ViewModel() {
-    private var _channel by mutableStateOf<Channel?>(null)
-    val channel: Channel?
-        get() = _channel
+    var activeChannel by mutableStateOf<Channel?>(null)
 
-    private var _renderableMessages = mutableStateListOf<Message>()
-    val renderableMessages: List<Message>
-        get() = _renderableMessages
+    var renderableMessages = mutableStateListOf<Message>()
 
     private fun setRenderableMessages(messages: List<Message>) {
-        _renderableMessages.clear()
-        _renderableMessages.addAll(messages)
+        renderableMessages.clear()
+        renderableMessages.addAll(messages)
     }
 
-    private var _typingUsers = mutableStateListOf<String>()
-    val typingUsers: List<String>
-        get() = _typingUsers
+    var typingUsers = mutableStateListOf<String>()
 
-    private var _messageContent by mutableStateOf("")
-    val messageContent: String
-        get() = _messageContent
+    var messageContent by mutableStateOf("")
 
-    fun setMessageContent(content: String) {
-        _messageContent = content
-    }
-
-    private var _attachments = mutableStateListOf<FileArgs>()
-    val attachments: List<FileArgs>
-        get() = _attachments
-
-    private fun setAttachments(attachments: List<FileArgs>) {
-        _attachments.clear()
-        _attachments.addAll(attachments)
-    }
-
-    fun addAttachment(fileArgs: FileArgs) {
-        _attachments.add(fileArgs)
-    }
-
-    fun removeAttachment(fileArgs: FileArgs) {
-        _attachments.remove(fileArgs)
-    }
+    var pendingAttachments = mutableStateListOf<FileArgs>()
 
     private fun popAttachmentBatch() {
-        setAttachments(_attachments.drop(MAX_ATTACHMENTS_PER_MESSAGE))
+        pendingAttachments =
+            pendingAttachments.drop(MAX_ATTACHMENTS_PER_MESSAGE) as SnapshotStateList<FileArgs>
     }
 
-    private var _sendingMessage by mutableStateOf(false)
-    val sendingMessage: Boolean
-        get() = _sendingMessage
+    var sendingMessage by mutableStateOf(false)
 
-    private fun setSendingMessage(sending: Boolean) {
-        _sendingMessage = sending
-    }
+    var replies = mutableStateListOf<SendMessageReply>()
 
-    private var _replies = mutableStateListOf<SendMessageReply>()
-    val replies: List<SendMessageReply>
-        get() = _replies
-
-    fun addInReplyTo(reply: SendMessageReply) {
-        if (_replies.any { it.id == reply.id }) return
-        _replies.add(reply)
-    }
-
-    fun removeReply(reply: SendMessageReply) {
-        _replies.remove(reply)
+    private fun addReply(reply: SendMessageReply) {
+        if (replies.any { it.id == reply.id }) return
+        replies.add(reply)
     }
 
     fun toggleReplyMentionFor(reply: SendMessageReply) {
-        val index = _replies.indexOf(reply)
+        val index = replies.indexOf(reply)
         val newReply = SendMessageReply(
             reply.id,
             !reply.mention
         )
 
-        _replies[index] = newReply
+        replies[index] = newReply
     }
 
     private fun clearInReplyTo() {
-        _replies.clear()
+        replies.clear()
     }
 
-    private var _noMoreMessages by mutableStateOf(false)
-    val noMoreMessages: Boolean
-        get() = _noMoreMessages
-
-    private fun setNoMoreMessages() {
-        _noMoreMessages = true
-    }
+    var noMoreMessages by mutableStateOf(false)
 
     fun fetchOlderMessages() {
-        if (channel == null) {
+        if (activeChannel == null) {
             return
         }
 
@@ -140,7 +97,7 @@ class ChannelScreenViewModel : ViewModel() {
             val messages = arrayListOf<Message>()
 
             fetchMessagesFromChannel(
-                channel!!.id!!,
+                activeChannel!!.id!!,
                 limit = 50,
                 true,
                 before = if (renderableMessages.isNotEmpty()) {
@@ -150,7 +107,7 @@ class ChannelScreenViewModel : ViewModel() {
                 }
             ).let {
                 if (it.messages.isNullOrEmpty() || it.messages.size < 50) {
-                    setNoMoreMessages()
+                    noMoreMessages = true
                 }
 
                 it.messages?.forEach { message ->
@@ -170,13 +127,13 @@ class ChannelScreenViewModel : ViewModel() {
         viewModelScope.launch {
             if (id !in RevoltAPI.channelCache) {
                 val channel = fetchSingleChannel(id)
-                _channel = channel
+                activeChannel = channel
                 RevoltAPI.channelCache[id] = channel
             } else {
-                _channel = RevoltAPI.channelCache[id]
+                activeChannel = RevoltAPI.channelCache[id]
             }
 
-            if (_channel?.lastMessageID != null) {
+            if (activeChannel?.lastMessageID != null) {
                 ackNewest()
             } else {
                 Log.d("ChannelScreen", "No last message ID, not acking.")
@@ -185,12 +142,12 @@ class ChannelScreenViewModel : ViewModel() {
     }
 
     fun sendPendingMessage() {
-        setSendingMessage(true)
+        sendingMessage = true
 
         viewModelScope.launch {
             val attachmentIds = arrayListOf<String>()
 
-            attachments.take(MAX_ATTACHMENTS_PER_MESSAGE).forEach {
+            pendingAttachments.take(MAX_ATTACHMENTS_PER_MESSAGE).forEach {
                 try {
                     val id = uploadToAutumn(
                         it.file,
@@ -207,16 +164,16 @@ class ChannelScreenViewModel : ViewModel() {
             }
 
             sendMessage(
-                channel!!.id!!,
-                messageContent,
+                activeChannel!!.id!!,
+                messageContent.trimIndent(),
                 attachments = if (attachmentIds.isEmpty()) null else attachmentIds,
                 replies = replies
             )
 
-            _messageContent = ""
+            messageContent = ""
+            noMoreMessages = false
             popAttachmentBatch()
             clearInReplyTo()
-            setSendingMessage(false)
         }
     }
 
@@ -268,7 +225,7 @@ class ChannelScreenViewModel : ViewModel() {
             }.onEach {
                 when (it) {
                     is MessageFrame -> {
-                        if (it.channel != channel?.id) return@onEach
+                        if (it.channel != activeChannel?.id) return@onEach
 
                         addUserIfUnknown(it.author!!)
                         regroupMessages(listOf(it) + renderableMessages)
@@ -276,7 +233,7 @@ class ChannelScreenViewModel : ViewModel() {
                     }
 
                     is MessageUpdateFrame -> {
-                        if (it.channel != channel?.id) return@onEach
+                        if (it.channel != activeChannel?.id) return@onEach
 
                         val messageFrame =
                             RevoltJson.decodeFromJsonElement(MessageFrame.serializer(), it.data)
@@ -298,7 +255,7 @@ class ChannelScreenViewModel : ViewModel() {
                     }
 
                     is MessageDeleteFrame -> {
-                        if (it.channel != channel?.id) return@onEach
+                        if (it.channel != activeChannel?.id) return@onEach
 
                         val newRenderableMessages = renderableMessages.filter { currentMsg ->
                             currentMsg.id != it.id
@@ -307,18 +264,18 @@ class ChannelScreenViewModel : ViewModel() {
                     }
 
                     is ChannelStartTypingFrame -> {
-                        if (it.id != channel?.id) return@onEach
-                        if (_typingUsers.contains(it.user)) return@onEach
+                        if (it.id != activeChannel?.id) return@onEach
+                        if (typingUsers.contains(it.user)) return@onEach
 
                         addUserIfUnknown(it.user)
-                        _typingUsers.add(it.user)
+                        typingUsers.add(it.user)
                     }
 
                     is ChannelStopTypingFrame -> {
-                        if (it.id != channel?.id) return@onEach
-                        if (!_typingUsers.contains(it.user)) return@onEach
+                        if (it.id != activeChannel?.id) return@onEach
+                        if (!typingUsers.contains(it.user)) return@onEach
 
-                        _typingUsers.remove(it.user)
+                        typingUsers.remove(it.user)
                     }
 
                     is RealtimeSocketFrames.Reconnected -> {
@@ -337,7 +294,7 @@ class ChannelScreenViewModel : ViewModel() {
             UiCallbacks.uiCallbackFlow.onEach {
                 when (it) {
                     is UiCallback.ReplyToMessage -> {
-                        addInReplyTo(
+                        addReply(
                             SendMessageReply(
                                 id = it.messageId,
                                 mention = false
@@ -359,21 +316,24 @@ class ChannelScreenViewModel : ViewModel() {
             Log.d("ChannelScreen", "Cancelling channel ack")
         }
 
-        if (channel?.lastMessageID == null) return
+        if (activeChannel?.lastMessageID == null) return
 
-        RevoltAPI.unreads.processExternalAck(channel!!.id!!, channel!!.lastMessageID!!)
+        RevoltAPI.unreads.processExternalAck(
+            activeChannel!!.id!!,
+            activeChannel!!.lastMessageID!!
+        )
 
         debouncedChannelAck = viewModelScope.launch {
             delay(1000)
-            if (channel?.lastMessageID == null) return@launch
-            ackChannel(channel!!.id!!, channel!!.lastMessageID!!)
+            if (activeChannel?.lastMessageID == null) return@launch
+            ackChannel(activeChannel!!.id!!, activeChannel!!.lastMessageID!!)
 
             Log.d("ChannelScreen", "Acking channel")
         }
     }
 
     fun replyToMessage(message: Message) {
-        addInReplyTo(
+        addReply(
             SendMessageReply(
                 id = message.id!!,
                 mention = false

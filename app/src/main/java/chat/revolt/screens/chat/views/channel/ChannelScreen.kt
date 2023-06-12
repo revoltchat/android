@@ -88,7 +88,7 @@ fun ChannelScreen(
     onToggleDrawer: () -> Unit,
     viewModel: ChannelScreenViewModel = viewModel()
 ) {
-    val channel = viewModel.channel
+    val channel = viewModel.activeChannel
 
     val context = LocalContext.current
     val lazyListState = rememberLazyListState()
@@ -114,7 +114,7 @@ fun ChannelScreen(
                         context.contentResolver.openInputStream(it)?.copyTo(output)
                     }
 
-                    viewModel.addAttachment(
+                    viewModel.pendingAttachments.add(
                         FileArgs(
                             file = mFile,
                             contentType = file.type ?: "application/octet-stream",
@@ -376,22 +376,24 @@ fun ChannelScreen(
             AnimatedVisibility(visible = viewModel.replies.isNotEmpty()) {
                 ReplyManager(
                     replies = viewModel.replies,
-                    onRemove = viewModel::removeReply,
+                    onRemove = { viewModel.replies.remove(it) },
                     onToggleMention = viewModel::toggleReplyMentionFor
                 )
             }
 
-            AnimatedVisibility(visible = viewModel.attachments.isNotEmpty()) {
+            AnimatedVisibility(visible = viewModel.pendingAttachments.isNotEmpty()) {
                 AttachmentManager(
-                    attachments = viewModel.attachments,
+                    attachments = viewModel.pendingAttachments,
                     uploading = viewModel.sendingMessage,
-                    onRemove = viewModel::removeAttachment
+                    onRemove = { viewModel.pendingAttachments.remove(it) }
                 )
             }
 
             MessageField(
                 messageContent = viewModel.messageContent,
-                onMessageContentChange = viewModel::setMessageContent,
+                onMessageContentChange = {
+                    viewModel.messageContent = it
+                },
                 onSendMessage = viewModel::sendPendingMessage,
                 onAddAttachment = {
                     pickFileLauncher.launch(arrayOf("*/*"))
@@ -400,8 +402,8 @@ fun ChannelScreen(
                 channelName = channel.name ?: ChannelUtils.resolveDMName(channel) ?: stringResource(
                     R.string.unknown
                 ),
-                forceSendButton = viewModel.attachments.isNotEmpty(),
-                disabled = viewModel.attachments.isNotEmpty() && viewModel.sendingMessage
+                forceSendButton = viewModel.pendingAttachments.isNotEmpty(),
+                disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.sendingMessage
             )
         }
     }
