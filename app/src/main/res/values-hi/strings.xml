@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">वापस</string>
+    <string name="ok">ठीक है</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="community_guidelines">समुदाय दिशानिर्देश</string>
+    <string name="share">शेयर करे</string>
+    <string name="password_forgot_instructions">अपना ईमेल दर्ज करें और हम आपको अपना पासवर्ड रीसेट करने के निर्देश भेजेंगे।</string>
+    <string name="send_email">ईमेल भेजें</string>
+    <string name="register_email">ईमेल</string>
+    <string name="mfa_recovery_header">एक पुनर्प्राप्ति कोड दर्ज करें</string>
+    <string name="next">अगला</string>
+    <string name="privacy_policy">गोपनीयता नीति</string>
+</resources>

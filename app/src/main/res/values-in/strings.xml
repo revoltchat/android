@@ -59,7 +59,6 @@
     <string name="typing_several">Beberapa orang sedang mengetik</string>
     <string name="badge_bot_alt">Bot</string>
     <string name="mfa_recovery_lead">Masukkan salah satu kode pemulihanmu.</string>
-    <string name="comingsoon_body">Fitur yang sedang kamu coba akses belum siap, tapi kami sedang menyiapkannya supaya sempurna..</string>
     <string name="remove_attachment_alt">Hapus lampiran</string>
     <string name="reply_mention_on">\@ aktif</string>
     <string name="reply_mention_off">\@ nonaktif</string>
@@ -169,7 +168,7 @@
     <string name="settings_feedback_message">Pesan</string>
     <string name="settings_feedback_error">Terjadi kesalahan ketika mengirimkan masukan kamu. Silakan coba lagi nanti.</string>
     <string name="settings_feedback_disabled_title">Masukan tidak tersedia</string>
-    <string name="settings_feedback_introduction">Masukan apa saja yang kamu berikan kepada Revolt sangat kami apresiasi dan seluruh masukan dibaca oleh tim pengembang aplikasi Android kami.</string>
+    <string name="settings_feedback_introduction">Masukan apa pun yang kamu berikan kepada Revolt sangat kami apresiasi dan seluruh masukan dibaca oleh tim pengembang aplikasi Android kami.</string>
     <string name="settings_feedback_category">Kategori</string>
     <string name="settings_feedback_category_satisfaction">Masukan umum</string>
     <string name="settings_feedback_category_feature">Permintaan fitur</string>
@@ -202,4 +201,24 @@
     <string name="settings_appearance_theme_m3dynamic_unsupported">Material You (tidak didukung)</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">Perangkatmu tidak mendukung Material You.</string>
     <string name="settings_feedback">Masukan</string>
+    <string name="too_many_replies">Kamu hanya bisa membalas %1$d pesan dalam waktu yang sama.</string>
+    <string name="next">Lanjut →</string>
+    <string name="token_invalid_toast">Kamu telah keluar. Silakan masuk lagi.</string>
+    <string name="mfa_interstitial_lead">Autentikasi dua faktor aktif pada akunmu supaya lebih aman.</string>
+    <string name="mfa_type_otp">Gunakan sandi sekali guna</string>
+    <string name="no_active_channel">Kamu tidak berada dalam saluran saat ini.</string>
+    <string name="message_context_sheet_actions_react">Reaksi</string>
+    <string name="invite_error_invalid_invite">Tidak dapat menemukan undangan dengan kode tersebut.</string>
+    <string name="media_viewer_title_image">%1$s</string>
+    <string name="media_viewer_title_video">%1$s</string>
+    <string name="spark_sidebar_settings_tutorial_acknowledge">Baiklah</string>
+    <string name="spark_sidebar_settings_tutorial">Pengaturan terdapat di sidebar</string>
+    <string name="spark_sidebar_settings_tutorial_description_1">Kamu dapat membuka sidebar dengan menggeser dari sisi kiri layar.</string>
+    <string name="spark_sidebar_settings_tutorial_description_2">Kemudian ketuk dan tahan gambar profil kamu untuk membuka pengaturan.</string>
+    <string name="settings_appearance_theme_amoled">Hitam</string>
+    <string name="invite_error_no_invite">Kode undangan tidak ditentukan.</string>
+    <string name="direct_messages">Pesan Langsung</string>
+    <string name="lets_go">Ayo mulai</string>
+    <string name="community_guidelines">Pedoman Komunitas</string>
+    <string name="reply_message_empty_has_attachments">Kirimkan lampiran</string>
 </resources>

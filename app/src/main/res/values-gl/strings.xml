@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="back">De volta</string>
+    <string name="back">← Atrás</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancelar</string>
     <string name="share">Compartir</string>
-    <string name="lets_go">Veña</string>
-    <string name="loading">Conseguindo información, quédate aí…</string>
+    <string name="lets_go">Imos aló</string>
+    <string name="loading">Recabando información, agarda un intre…</string>
     <string name="terms_of_service">Condicións de servicio</string>
     <string name="community_guidelines">Directrices da comunidade</string>
     <string name="email">Correo Electrónico</string>
@@ -19,7 +19,7 @@
     <string name="password_manager_hint">Usas un xestor de contrasinais\?</string>
     <string name="register_heading">Benvido á Revolt</string>
     <string name="register_instructions">É como un lugar para saír, reunirse e falar de cousas. A mellor parte, está en internet.</string>
-    <string name="next">Seguindo</string>
+    <string name="next">Seguinte →</string>
     <string name="privacy_policy">Política de Privacidade</string>
     <string name="login_onboarding_heading">Busca a túa comunidade, conecta co mundo.</string>
     <string name="login_onboarding_body">Revolt é unha das mellores formas de estar conectado cos teus amigos e comunidade, en calquera lugar e en calquera momento.</string>

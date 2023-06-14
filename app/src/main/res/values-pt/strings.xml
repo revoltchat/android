@@ -41,7 +41,6 @@
     <string name="mfa_password_lead">Insere a tua palavra-passe para continuares.</string>
     <string name="about">Sobre</string>
     <string name="app_full_name">O Revolt no Android</string>
-    <string name="comingsoon_heading">Aah, encontraste-me!</string>
     <string name="typing_many">%1$s estão a escrever…</string>
     <string name="send_alt">Enviar</string>
     <string name="add_attachment_alt">Adicionar anexo</string>
@@ -191,7 +190,6 @@
     <string name="mfa_totp_header">Insere um código de seis dígitos</string>
     <string name="mfa_recovery_lead">Insere um dos teus códigos de recuperação.</string>
     <string name="oss_attribution">Atribuições OSS</string>
-    <string name="comingsoon_body">A funcionalidade que tentaste aceder ainda não está pronta, mas estamos progressivamente a trabalhar em aperfeiçoá-la.</string>
     <string name="comingsoon_toast">Desculpa, esta funcionalidade ainda não está pronta.</string>
     <string name="typing_one">%1$s está a escrever…</string>
     <string name="typing_several">Várias pessoas estão a escrever</string>
@@ -237,4 +235,5 @@
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">O Material You não é suportado por este dispositivo.</string>
     <string name="settings_feedback_introduction">Qualquer feedback que tenhas para o Revolt é imensamente valorizado, e todo ele é lido pela equipa de desenvolvimento da nossa aplicação Android.</string>
     <string name="onboarding_changeable">Mas se mudares de ideias, podes sempre mudá-lo nas tuas Definições de Utilizador.</string>
+    <string name="direct_messages">Mensagens diretas</string>
 </resources>

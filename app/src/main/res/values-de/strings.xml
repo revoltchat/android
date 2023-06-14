@@ -50,7 +50,6 @@
     <string name="onboarding_others">Andere werden dich mit diesem Namen finden, erkennen und erwähnen.</string>
     <string name="onboarding_changeable">Wenn du es dir jedoch anders überlegst, kannst du deinen Nutzernamen jederzeit in deinen Einstellungen ändern.</string>
     <string name="oss_attribution">Namensnennung von Open-Source-Software</string>
-    <string name="comingsoon_body">Die Funktion, auf die du zugreifen Möchtest, ist im Moment noch nicht bereit, aber wir arbeiten stets daran, sie zu perfektionieren.</string>
     <string name="typing_one">%1$s tippt…</string>
     <string name="reply_mention_off">\@ AUS</string>
     <string name="reply_mention_on">\@ AN</string>
@@ -92,7 +91,6 @@
     <string name="token_invalid_toast">Du wurdest abgemeldet. Melde dich bitte erneut an.</string>
     <string name="mfa_recovery_lead">Gebe einen von deinen Wiederherstellungscodes ein.</string>
     <string name="about">Über</string>
-    <string name="comingsoon_heading">Gah, du hast mich gefunden!</string>
     <string name="typing_several">Mehrere Leute tippen</string>
     <string name="add_attachment_alt">Anhang hinzufügen</string>
     <string name="password">Passwort</string>
@@ -236,4 +234,6 @@
     <string name="no_channels_body">Es sind keine Kanäle in diesem Server. Nicht mal ein Willkommenskanal. Wie unfreundlich.</string>
     <string name="time_rift_heading">Möglicherweise fehlen an dieser Stelle Nachrichten.</string>
     <string name="reply_message_not_cached">Unbekannte Nachricht, tippe um zu springen</string>
+    <string name="direct_messages">Direktnachrichten</string>
+    <string name="login_onboarding_heading">Finden deine Community, verbinden dich mit der Welt.</string>
 </resources>

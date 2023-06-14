@@ -28,12 +28,11 @@
     <string name="onboarding_others">Інші будуть знаходити, впізнавати та згадувати вас по цьому імені.</string>
     <string name="message_context_sheet_actions_delete_confirm">Ви впевнені, що бажаєте видалити це повідомлення\?</string>
     <string name="message_context_sheet_actions_copy_id">Скопіювати ID</string>
-    <string name="message_context_sheet_actions_copy_id_copied">Скопійовано ID повідомлення до буфера обміну</string>
-    <string name="channel_context_sheet_actions_copy_id_copied">Скопійовано ID каналу до буфера обміну</string>
-    <string name="server_context_sheet_actions_copy_id_copied">Скопійовано ID сервера до буфера обміну</string>
+    <string name="message_context_sheet_actions_copy_id_copied">ID повідомлення скопійовано</string>
+    <string name="channel_context_sheet_actions_copy_id_copied">ID каналу скопійовано</string>
+    <string name="server_context_sheet_actions_copy_id_copied">ID сервера скопійовано</string>
     <string name="login_onboarding_body">Revolt — це один з найкращих шляхів залишатися на зв\'язку з друзями та спільнотою будь-де та будь-коли.</string>
     <string name="onboarding_changeable">Проте, якщо ви зміните свою думку, ви завжди можете змінити його у своїх налаштуваннях.</string>
-    <string name="comingsoon_body">Функція, якою ви намагаєтесь скористатись, ще не готова, але ми постійно працюємо над її вдосконаленням..</string>
     <string name="register_instructions">Це як місце, де можна позависати, зібратися разом і поговорити про різні речі. Найкраще те, що це в інтернеті.</string>
     <string name="no_channels_body">На цьому сервері зовсім відсутні канали. Нема навіть каналу з вітанням. Як грубо.</string>
     <string name="no_connection_message">Ви не підключені до інтернету. Будь ласка, перевірте своє підключення то спробуйте ще раз.</string>
@@ -77,7 +76,7 @@
     <string name="register_email_verification_hint">Ми надішлемо вам лист для підтвердження вашого акаунту.</string>
     <string name="instructions_at_mail">Ми надіслали подальші кроки на %1$s.</string>
     <string name="verify_then_choose_username">Підтвердьте свою пошту, після чого ви оберете ім\'я користувача.</string>
-    <string name="oss_attribution">OSS Атрибуція</string>
+    <string name="oss_attribution">Атрибуції відкритого ПЗ</string>
     <string name="reply_mention_on">\@ ввімкнуте</string>
     <string name="reply_mention_off">\@ вимкнуте</string>
     <string name="onboarding_username">Ім\'я користувача</string>
@@ -168,7 +167,7 @@
     <string name="message_context_sheet_actions_delete_confirm_yes">Так</string>
     <string name="message_context_sheet_actions_delete_confirm_no">Ні</string>
     <string name="message_context_sheet_actions_copy_link">Скопіювати посилання</string>
-    <string name="message_context_sheet_actions_copy_link_copied">Скопійовано посилання на повідомлення до буфера обміну</string>
+    <string name="message_context_sheet_actions_copy_link_copied">Посилання на повідомлення скопійовано</string>
     <string name="message_context_sheet_actions_react">Відреагувати</string>
     <string name="message_context_sheet_actions_report">Поскаржитись</string>
     <string name="message_context_sheet_actions_mark_unread">Позначити як непрочитане</string>
@@ -233,8 +232,8 @@
     <string name="settings_feedback_category_other">Інше</string>
     <string name="settings_feedback_message">Повідомлення</string>
     <string name="settings_feedback_disabled_title">Відгуки недоступні</string>
-    <string name="comingsoon_heading">Йой, ти знайшов мене!</string>
     <string name="settings_feedback_category_ux">Користувацький інтерфейс (UX/UI)</string>
     <string name="back">← Назад</string>
     <string name="reply_message_not_cached">Невідоме повідомлення, натисніть для переходу</string>
+    <string name="direct_messages">Особисті повідомлення</string>
 </resources>
