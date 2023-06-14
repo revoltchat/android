@@ -205,6 +205,8 @@ class ChannelScreenViewModel : ViewModel() {
             pendingMessageContent = ""
             isSendingMessage = false
         }
+
+        cancelEditingMessage()
     }
 
     private suspend fun regroupMessages(newMessages: List<Message> = renderableMessages) {
