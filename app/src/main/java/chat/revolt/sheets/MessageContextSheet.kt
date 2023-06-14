@@ -67,7 +67,7 @@ fun MessageContextSheet(
     val clipboardManager = LocalClipboardManager.current
     val coroutineScope = rememberCoroutineScope()
 
-    var showShareSheet by remember { mutableStateOf(false) };
+    var showShareSheet by remember { mutableStateOf(false) }
 
     if (showShareSheet) {
         val shareSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
