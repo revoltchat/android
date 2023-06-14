@@ -172,7 +172,8 @@ fun RowScope.ChannelList(
                         dmPartnerId = partner?.id,
                         dmPartnerName = partner?.let { p -> User.resolveDefaultName(p) },
                         dmPartnerStatus = presenceFromStatus(
-                            partner?.status?.presence ?: "Offline"
+                            status = partner?.status?.presence ?: "Offline",
+                            online = partner?.online ?: false
                         ),
                         onClick = {
                             onChannelClick(channel.id ?: return@DrawerChannel)

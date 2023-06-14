@@ -33,7 +33,9 @@ enum class Presence {
     Offline
 }
 
-fun presenceFromStatus(status: String): Presence {
+fun presenceFromStatus(status: String, online: Boolean = true): Presence {
+    if (!online) return Presence.Offline
+
     return when (status) {
         "Online" -> Presence.Online
         "Idle" -> Presence.Idle
@@ -45,10 +47,10 @@ fun presenceFromStatus(status: String): Presence {
 
 fun presenceColour(presence: Presence): Color {
     return when (presence) {
-        Presence.Online -> Color(0xff73b258)
-        Presence.Idle -> Color(0xffecc73c)
-        Presence.Dnd -> Color(0xffd24c41)
-        Presence.Focus -> Color(0xff69a2ef)
+        Presence.Online -> Color(0xFF00C853)
+        Presence.Idle -> Color(0xFFFFD600)
+        Presence.Dnd -> Color(0xFFD50000)
+        Presence.Focus -> Color(0xFF0091EA)
         Presence.Offline -> Color(0xff546e7a)
     }
 }
