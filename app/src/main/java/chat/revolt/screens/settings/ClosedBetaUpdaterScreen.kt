@@ -1,6 +1,7 @@
 package chat.revolt.screens.settings
 
 import android.net.Uri
+import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -83,7 +84,7 @@ data class UpdaterBody(
 data class UpdaterResponse(
     val outdated: Boolean,
     @SerialName("newest_build")
-    val newestBuild: Int,
+    val newestBuild: Int?,
     val token: String?,
 )
 
@@ -120,13 +121,14 @@ class ClosedBetaUpdaterScreenViewModel : ViewModel() {
                     delay(1000)
 
                     updateState = UpdateState.UpdateAvailable
-                    newestBuild = outdated.newestBuild
+                    newestBuild = outdated.newestBuild ?: -1
                     newestDownloadToken = outdated.token ?: ""
                 } else {
                     updateState = UpdateState.UpToDate
                 }
             } catch (e: Exception) {
                 updateState = UpdateState.ErrorChecking
+                Log.e("Updater", "Error checking for updates", e)
                 return@launch
             }
         }
