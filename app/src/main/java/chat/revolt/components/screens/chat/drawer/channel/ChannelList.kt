@@ -28,10 +28,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
+import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.User
+import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
 import chat.revolt.sheets.ChannelContextSheet
@@ -195,6 +197,20 @@ fun RowScope.ChannelList(
                         fontSize = 24.sp,
                         modifier = Modifier.padding(16.dp)
                     )
+                }
+
+                server?.banner?.let {
+                    item {
+                        RemoteImage(
+                            url = "$REVOLT_FILES/banners/${it.id}",
+                            description = null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                        )
+                    }
                 }
 
                 if (server?.channels?.isEmpty() == true) {
