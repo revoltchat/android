@@ -160,7 +160,7 @@ fun ChannelScreen(
     }
 
     if (messageContextSheetShown) {
-        val messageContextSheetState = rememberModalBottomSheetState()
+        val messageContextSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
         ModalBottomSheet(
             sheetState = messageContextSheetState,
