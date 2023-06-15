@@ -32,6 +32,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
+import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
@@ -39,10 +40,20 @@ import chat.revolt.components.generic.presenceFromStatus
 @Composable
 fun SelfUserOverview() {
     val selfUser = RevoltAPI.userCache[RevoltAPI.selfId] ?: return
+
+    UserOverview(selfUser)
+}
+
+@Composable
+fun UserOverview(user: User) {
     var profile by remember { mutableStateOf<Profile?>(null) }
 
-    LaunchedEffect(selfUser) {
-        profile = fetchUserProfile(selfUser.id ?: ULID.makeSpecial(0))
+    LaunchedEffect(user) {
+        try {
+            profile = fetchUserProfile(user.id ?: ULID.makeSpecial(0))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     Box(
@@ -80,26 +91,26 @@ fun SelfUserOverview() {
                 .fillMaxWidth()
         ) {
             UserAvatar(
-                username = selfUser.displayName ?: stringResource(id = R.string.unknown),
-                userId = selfUser.id ?: ULID.makeSpecial(0),
-                avatar = selfUser.avatar,
+                username = user.displayName ?: stringResource(id = R.string.unknown),
+                userId = user.id ?: ULID.makeSpecial(0),
+                avatar = user.avatar,
                 size = 48.dp,
-                presence = presenceFromStatus(selfUser.status?.presence ?: "Offline"),
+                presence = presenceFromStatus(user.status?.presence ?: "Offline"),
             )
 
             Spacer(modifier = Modifier.width(12.dp))
 
             Text(
                 text = AnnotatedString.Builder().apply {
-                    if (selfUser.displayName != null) {
+                    if (user.displayName != null) {
                         pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                        append(selfUser.displayName)
+                        append(user.displayName)
                         pop()
                         append("\n")
                     }
-                    append("${selfUser.username}")
+                    append("${user.username}")
                     pushStyle(SpanStyle(fontWeight = FontWeight.ExtraLight))
-                    append("#${selfUser.discriminator}")
+                    append("#${user.discriminator}")
                     pop()
                 }.toAnnotatedString(),
                 color = if (profile?.background != null) Color.White else LocalContentColor.current,
