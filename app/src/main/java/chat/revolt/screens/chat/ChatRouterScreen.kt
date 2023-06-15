@@ -190,6 +190,9 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
     var showServerContextSheet by remember { mutableStateOf(false) }
     var serverContextSheetTarget by remember { mutableStateOf("") }
 
+    var showUserContextSheet by remember { mutableStateOf(false) }
+    var userContextSheetTarget by remember { mutableStateOf("") }
+
     BackHandler(enabled = drawerState.isClosed) {
         scope.launch {
             drawerState.open()
@@ -319,6 +322,21 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
         ) {
             Column {
                 Text(text = "this is server context sheet for $serverContextSheetTarget")
+            }
+        }
+    }
+
+    if (showUserContextSheet) {
+        val userContextSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = userContextSheetState,
+            onDismissRequest = {
+                showUserContextSheet = false
+            },
+        ) {
+            Column {
+                Text(text = "this is user context sheet for $userContextSheetTarget")
             }
         }
     }
@@ -473,7 +491,11 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                                             if (drawerState.isOpen) drawerState.close()
                                             else drawerState.open()
                                         }
-                                    }
+                                    },
+                                    onUserSheetOpenFor = { target ->
+                                        userContextSheetTarget = target
+                                        showUserContextSheet = true
+                                    },
                                 )
                             }
                         }

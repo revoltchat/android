@@ -107,6 +107,7 @@ fun UserAvatar(
                 url = "$REVOLT_BASE/users/${userId}/default_avatar",
                 description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
+                    .clip(CircleShape)
                     .size(size)
                     .then(
                         if (onLongClick != null || onClick != null) Modifier
@@ -115,8 +116,7 @@ fun UserAvatar(
                                 onLongClick = { onLongClick?.invoke() }
                             )
                         else Modifier
-                    )
-                    .clip(CircleShape),
+                    ),
             )
         }
 

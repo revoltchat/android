@@ -128,6 +128,7 @@ fun Message(
     truncate: Boolean = false,
     parse: (MessageSchema) -> SpannableStringBuilder = { SpannableStringBuilder(it.content) },
     onMessageContextMenu: () -> Unit = {},
+    onAvatarClick: () -> Unit = {},
     canReply: Boolean = false,
     onReply: () -> Unit = {},
 ) {
@@ -198,7 +199,8 @@ fun Message(
                             username = User.resolveDefaultName(author),
                             userId = author.id ?: message.id ?: ULID.makeSpecial(0),
                             avatar = author.avatar,
-                            rawUrl = message.masquerade?.avatar?.let { asJanuaryProxyUrl(it) }
+                            rawUrl = message.masquerade?.avatar?.let { asJanuaryProxyUrl(it) },
+                            onClick = onAvatarClick,
                         )
                     }
                 } else {
