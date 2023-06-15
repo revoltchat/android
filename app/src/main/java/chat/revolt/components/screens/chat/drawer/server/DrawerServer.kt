@@ -2,8 +2,9 @@ package chat.revolt.components.screens.chat.drawer.server
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -20,11 +21,13 @@ import chat.revolt.api.REVOLT_FILES
 import chat.revolt.components.generic.IconPlaceholder
 import chat.revolt.components.generic.RemoteImage
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DrawerServer(
     iconId: String?,
     serverName: String,
     hasUnreads: Boolean,
+    onLongClick: () -> Unit,
     onClick: () -> Unit
 ) {
     val unreadIndicatorAlpha = animateFloatAsState(
@@ -43,13 +46,17 @@ fun DrawerServer(
                     .padding(8.dp)
                     .size(48.dp)
                     .clip(CircleShape)
-                    .clickable(onClick = onClick),
+                    .combinedClickable(
+                        onClick = onClick,
+                        onLongClick = onLongClick
+                    ),
                 description = serverName
             )
         } else {
             IconPlaceholder(
                 name = serverName,
                 onClick = onClick,
+                onLongClick = onLongClick,
                 modifier = Modifier
                     .padding(8.dp)
                     .size(48.dp)

@@ -1,33 +1,52 @@
 package chat.revolt.components.screens.chat.drawer.channel
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
+import chat.revolt.activities.RevoltTweenDp
+import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
@@ -37,8 +56,12 @@ import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
 import chat.revolt.sheets.ChannelContextSheet
+import kotlin.math.max
 
-@OptIn(ExperimentalMaterial3Api::class)
+const val BANNER_HEIGHT_COMPACT = 56
+const val BANNER_HEIGHT_EXPANDED = 128
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun RowScope.ChannelList(
     serverId: String,
@@ -46,7 +69,27 @@ fun RowScope.ChannelList(
     currentChannel: String?,
     onChannelClick: (String) -> Unit,
     onSpecialClick: (String) -> Unit,
+    onServerSheetOpenFor: (String) -> Unit,
 ) {
+    val lazyListState = rememberLazyListState()
+    val enableSmallBanner by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemScrollOffset > 40 ||
+                    lazyListState.firstVisibleItemIndex > 0
+        }
+    }
+
+    val bannerHeight by animateDpAsState(
+        targetValue = if (enableSmallBanner) BANNER_HEIGHT_COMPACT.dp else BANNER_HEIGHT_EXPANDED.dp,
+        animationSpec = RevoltTweenDp,
+        label = "Banner Height"
+    )
+    val bannerImageOpacity by animateFloatAsState(
+        targetValue = if (enableSmallBanner) 0f else 1f,
+        animationSpec = RevoltTweenFloat,
+        label = "Banner Image Opacity"
+    )
+
     var channelContextSheetShown by remember { mutableStateOf(false) }
     var channelContextSheetTarget by remember { mutableStateOf("") }
 
@@ -87,17 +130,30 @@ fun RowScope.ChannelList(
             Modifier
                 .weight(1f)
                 .fillMaxSize(),
+            state = lazyListState,
         ) {
             if (serverId == "home") {
-                item(
+                stickyHeader(
                     key = "header"
                 ) {
-                    Text(
-                        text = stringResource(R.string.direct_messages),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontSize = 24.sp,
-                        modifier = Modifier.padding(16.dp)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 8.dp, top = 0.dp, bottom = 8.dp)
+                            .alpha(0.9f)
+                            .height(BANNER_HEIGHT_COMPACT.dp + 8.dp) // due to padding in Text
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                            .weight(1f)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.direct_messages),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontSize = 16.sp,
+                            modifier = Modifier
+                                .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp)
+                        )
+                    }
                 }
 
                 item(
@@ -189,28 +245,110 @@ fun RowScope.ChannelList(
             } else {
                 val server = RevoltAPI.serverCache[serverId]
 
-                item {
-                    Text(
-                        text = server?.name
-                            ?: stringResource(R.string.unknown),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontSize = 24.sp,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
+                stickyHeader {
+                    Box(
+                        contentAlignment = Alignment.BottomStart,
+                        modifier = Modifier
+                            .then(
+                                // if there is no banner, we change the design slightly.
+                                // instead of there being a banner card we make a "classic"
+                                // sticky header á la Google Messages
+                                if (server?.banner != null) {
+                                    Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
+                                } else {
+                                    Modifier.padding(
+                                        start = 0.dp,
+                                        end = 8.dp,
+                                        top = 0.dp,
+                                        bottom = 0.dp
+                                    )
+                                }
+                            )
+                            .fillMaxWidth()
+                    ) {
+                        if (server?.banner != null) {
+                            Box(modifier = Modifier.height(bannerHeight)) {
+                                Box(
+                                    modifier = Modifier
+                                        .alpha(max(0.95f, bannerImageOpacity))
+                                        .fillMaxSize()
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(MaterialTheme.colorScheme.surface)
+                                )
 
-                server?.banner?.let {
-                    item {
-                        RemoteImage(
-                            url = "$REVOLT_FILES/banners/${it.id}",
-                            description = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                        )
+                                RemoteImage(
+                                    url = "$REVOLT_FILES/banners/${server.banner.id}",
+                                    description = null,
+                                    modifier = Modifier
+                                        .alpha(bannerImageOpacity)
+                                        .fillMaxSize()
+                                        .clip(RoundedCornerShape(16.dp))
+                                )
+
+                                Box(
+                                    modifier = Modifier
+                                        .alpha(bannerImageOpacity)
+                                        .fillMaxSize()
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(
+                                            Brush.verticalGradient(
+                                                listOf(
+                                                    Color.Transparent,
+                                                    Color.Black.copy(alpha = 0.3f)
+                                                )
+                                            )
+                                        )
+                                )
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .alpha(0.9f)
+                                    .height(BANNER_HEIGHT_COMPACT.dp + 8.dp) // due to padding in Text
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                            )
+                        }
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = (server?.name
+                                    ?: stringResource(R.string.unknown)),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontSize = 16.sp,
+                                modifier = Modifier
+                                    .then(
+                                        if (server?.banner != null) {
+                                            Modifier.padding(16.dp)
+                                        } else {
+                                            Modifier.padding(
+                                                start = 24.dp,
+                                                end = 24.dp,
+                                                top = 16.dp,
+                                                bottom = 16.dp
+                                            )
+                                        }
+                                    )
+                                    .weight(1f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            IconButton(onClick = {
+                                onServerSheetOpenFor(serverId)
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = stringResource(
+                                        id = R.string.settings
+                                    )
+                                )
+                            }
+                        }
                     }
+
                 }
 
                 if (server?.channels?.isEmpty() == true) {
@@ -242,8 +380,8 @@ fun RowScope.ChannelList(
                         server?.channels?.get(it)?.let { channelId ->
                             RevoltAPI.channelCache[channelId]?.let { ch ->
                                 DrawerChannel(
-                                    name = ch.name!!,
-                                    channelType = ch.channelType!!,
+                                    name = ch.name ?: stringResource(R.string.unknown),
+                                    channelType = ch.channelType ?: ChannelType.TextChannel,
                                     selected = currentDestination == "channel/{channelId}" && currentChannel == ch.id,
                                     hasUnread = ch.lastMessageID?.let { lastMessageID ->
                                         RevoltAPI.unreads.hasUnread(

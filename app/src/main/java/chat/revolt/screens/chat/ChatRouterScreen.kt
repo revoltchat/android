@@ -187,6 +187,9 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
     var showStatusSheet by remember { mutableStateOf(false) }
     var showAddServerSheet by remember { mutableStateOf(false) }
 
+    var showServerContextSheet by remember { mutableStateOf(false) }
+    var serverContextSheetTarget by remember { mutableStateOf("") }
+
     BackHandler(enabled = drawerState.isClosed) {
         scope.launch {
             drawerState.open()
@@ -304,6 +307,22 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
         }
     }
 
+
+    if (showServerContextSheet) {
+        val serverContextSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = serverContextSheetState,
+            onDismissRequest = {
+                showServerContextSheet = false
+            },
+        ) {
+            Column {
+                Text(text = "this is server context sheet for $serverContextSheetTarget")
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -385,6 +404,10 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                                             hasUnreads = RevoltAPI.unreads.serverHasUnread(
                                                 server.id
                                             ),
+                                            onLongClick = {
+                                                serverContextSheetTarget = server.id
+                                                showServerContextSheet = true
+                                            },
                                         ) {
                                             viewModel.navigateToServer(
                                                 server.id,
@@ -421,6 +444,10 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                                     onSpecialClick = { destination ->
                                         viewModel.navigateToSpecial(destination, navController)
                                         scope.launch { drawerState.close() }
+                                    },
+                                    onServerSheetOpenFor = { target ->
+                                        serverContextSheetTarget = target
+                                        showServerContextSheet = true
                                     },
                                 )
                             }

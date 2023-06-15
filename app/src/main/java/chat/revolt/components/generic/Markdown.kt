@@ -78,7 +78,7 @@ fun UIMarkdown(
                 memberMap = mapOf(),
                 userMap = RevoltAPI.userCache.toMap(),
                 channelMap = RevoltAPI.channelCache.mapValues { ch ->
-                    ch.value.name ?: ch.value.id!!
+                    ch.value.name ?: ch.value.id ?: "{this does not exist 🤫}"
                 },
                 emojiMap = RevoltAPI.emojiCache,
                 serverId = null
