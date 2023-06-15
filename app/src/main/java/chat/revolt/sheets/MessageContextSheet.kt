@@ -100,6 +100,7 @@ fun MessageContextSheet(
                 ) {
                     if (message.content.isNullOrEmpty()) {
                         coroutineScope.launch {
+                            shareSheetState.hide()
                             onHideSheet()
                             Toast.makeText(
                                 context,
@@ -116,6 +117,9 @@ fun MessageContextSheet(
                         Toast.LENGTH_SHORT
                     ).show()
 
+                    coroutineScope.launch {
+                        shareSheetState.hide()
+                    }
                     coroutineScope.launch {
                         clipboardManager.setText(AnnotatedString(message.content))
                         onHideSheet()
@@ -145,6 +149,9 @@ fun MessageContextSheet(
                         ).show()
 
                         coroutineScope.launch {
+                            shareSheetState.hide()
+                        }
+                        coroutineScope.launch {
                             onHideSheet()
                         }
 
@@ -164,6 +171,9 @@ fun MessageContextSheet(
                         Toast.LENGTH_SHORT
                     ).show()
 
+                    coroutineScope.launch {
+                        shareSheetState.hide()
+                    }
                     coroutineScope.launch {
                         onHideSheet()
                     }
@@ -193,6 +203,9 @@ fun MessageContextSheet(
                         Toast.LENGTH_SHORT
                     ).show()
 
+                    coroutineScope.launch {
+                        shareSheetState.hide()
+                    }
                     coroutineScope.launch {
                         onHideSheet()
                     }
