@@ -1,5 +1,6 @@
 package chat.revolt.components.screens.chat.drawer.channel
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -45,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
+import chat.revolt.activities.RevoltTweenColour
 import chat.revolt.activities.RevoltTweenDp
 import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.api.REVOLT_FILES
@@ -88,6 +91,11 @@ fun RowScope.ChannelList(
         targetValue = if (enableSmallBanner) 0f else 1f,
         animationSpec = RevoltTweenFloat,
         label = "Banner Image Opacity"
+    )
+    val bannerTextColour by animateColorAsState(
+        targetValue = if (enableSmallBanner) LocalContentColor.current else Color.White,
+        animationSpec = RevoltTweenColour,
+        label = "Banner Text Colour"
     )
 
     var channelContextSheetShown by remember { mutableStateOf(false) }
@@ -317,6 +325,11 @@ fun RowScope.ChannelList(
                                 text = (server?.name
                                     ?: stringResource(R.string.unknown)),
                                 style = MaterialTheme.typography.labelLarge,
+                                color = if (server?.banner != null) {
+                                    bannerTextColour
+                                } else {
+                                    LocalContentColor.current
+                                },
                                 fontSize = 16.sp,
                                 modifier = Modifier
                                     .then(
