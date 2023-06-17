@@ -3,7 +3,7 @@
 
     <style name="Code.TextAppearance" parent="">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">@color/foreground</item>
         <item name="android:fontFamily">@font/jetbrainsmono_regular</item>
     </style>
 
