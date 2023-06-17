@@ -20,11 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.internals.WebCompat
+import chat.revolt.api.internals.solidColor
+import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.Embed
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.UIMarkdown
@@ -50,7 +52,7 @@ fun RegularEmbed(
                 .fillMaxHeight()
                 .background(
                     embed.colour?.let { WebCompat.parseColour(it) }
-                        ?: MaterialTheme.colorScheme.primary
+                        ?: Brush.solidColor(MaterialTheme.colorScheme.primary)
                 )
         )
 

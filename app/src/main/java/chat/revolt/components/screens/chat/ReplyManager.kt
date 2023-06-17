@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
@@ -88,14 +89,16 @@ fun ManageableReply(
 
         Text(
             text = authorName(message = replyMessage),
-            fontSize = 12.sp,
             modifier = Modifier
                 .clickable {
                     onToggleMention()
                 }
                 .padding(4.dp),
-            color = authorColour(message = replyMessage),
-            fontWeight = FontWeight.Bold,
+            style = LocalTextStyle.current.copy(
+                brush = authorColour(message = replyMessage),
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
+            )
         )
 
         Text(

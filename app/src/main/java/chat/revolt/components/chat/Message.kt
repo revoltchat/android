@@ -28,11 +28,13 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -50,6 +52,7 @@ import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.WebCompat
+import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.User
@@ -58,11 +61,11 @@ import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.api.schemas.Message as MessageSchema
 
 @Composable
-fun authorColour(message: MessageSchema): Color {
+fun authorColour(message: MessageSchema): Brush {
     return if (message.masquerade?.colour != null) {
         WebCompat.parseColour(message.masquerade.colour)
     } else {
-        LocalContentColor.current
+        Brush.solidColor(LocalContentColor.current)
     }
 }
 
@@ -212,8 +215,15 @@ fun Message(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = authorName(message),
-                                fontWeight = FontWeight.Bold,
-                                color = authorColour(message),
+                                style = LocalTextStyle.current.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    brush = if (message.author == RevoltAPI.selfId) Brush.horizontalGradient(
+                                        listOf(
+                                            Color.Magenta,
+                                            Color.Cyan,
+                                        ),
+                                    ) else authorColour(message),
+                                ),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
