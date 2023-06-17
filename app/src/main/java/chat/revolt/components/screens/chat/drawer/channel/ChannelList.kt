@@ -356,7 +356,12 @@ fun RowScope.ChannelList(
                                     imageVector = Icons.Default.MoreVert,
                                     contentDescription = stringResource(
                                         id = R.string.settings
-                                    )
+                                    ),
+                                    tint = if (server?.banner != null) {
+                                        bannerTextColour
+                                    } else {
+                                        LocalContentColor.current
+                                    }
                                 )
                             }
                         }
