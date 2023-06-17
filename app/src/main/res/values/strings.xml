@@ -179,6 +179,9 @@
     <string name="server_context_sheet_actions_copy_id_copied">Copied server ID to clipboard</string>
     <string name="server_context_sheet_actions_mark_read">Mark as read</string>
 
+    <string name="user_context_sheet_category_bio">Bio</string>
+    <string name="user_context_sheet_bio_empty">This user hasn\'t set a bio yet.</string>
+
     <string name="add_server_sheet_title">Add a server</string>
     <string name="add_server_sheet_join_by_invite">Join by invite code or link</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Invite code or link</string>

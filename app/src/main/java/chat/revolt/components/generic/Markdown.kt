@@ -3,6 +3,8 @@ package chat.revolt.components.generic
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
 import android.util.Log
+import android.util.TypedValue
+import android.view.ViewGroup
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -96,7 +98,12 @@ fun UIMarkdown(
 
                 setTextColor(foregroundColor.toArgb())
                 setMaxLines(maxLines)
-                setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, fontSize.value)
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.value)
+
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
             }
         },
         modifier = modifier,

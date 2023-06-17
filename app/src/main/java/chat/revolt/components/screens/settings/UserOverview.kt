@@ -50,12 +50,19 @@ fun UserOverview(user: User) {
 
     LaunchedEffect(user) {
         try {
-            profile = fetchUserProfile(user.id ?: ULID.makeSpecial(0))
+            if (profile == null) {
+                profile = fetchUserProfile(user.id ?: ULID.makeSpecial(0))
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
+    RawUserOverview(user, profile)
+}
+
+@Composable
+fun RawUserOverview(user: User, profile: Profile? = null) {
     Box(
         contentAlignment = Alignment.BottomStart,
     ) {
