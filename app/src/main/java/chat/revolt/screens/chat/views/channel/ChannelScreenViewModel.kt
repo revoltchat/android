@@ -274,7 +274,13 @@ class ChannelScreenViewModel : ViewModel() {
                         if (it.channel != activeChannel?.id) return@onEach
 
                         addUserIfUnknown(it.author!!)
-                        activeChannel?.server?.let { s -> fetchMember(s, it.author) }
+                        activeChannel?.server?.let { s ->
+                            try {
+                                fetchMember(s, it.author)
+                            } catch (e: Exception) {
+                                Log.e("ChannelScreen", "Failed to fetch member", e)
+                            }
+                        }
                         regroupMessages(listOf(it) + renderableMessages)
                         ackNewest()
                     }
