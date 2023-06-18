@@ -73,13 +73,13 @@ fun UserContextSheet(
         RawUserOverview(user, profile)
 
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 8.dp)
         ) {
             member?.roles?.let {
                 Text(
                     text = stringResource(id = R.string.user_context_sheet_category_roles),
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(bottom = 10.dp)
+                    modifier = Modifier.padding(vertical = 10.dp)
                 )
 
                 FlowRow(
@@ -117,7 +117,7 @@ fun UserContextSheet(
             Text(
                 text = stringResource(id = R.string.user_context_sheet_category_bio),
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(bottom = 10.dp, top = 20.dp)
+                modifier = Modifier.padding(vertical = 10.dp)
             )
 
             if (profile?.content != null) {
