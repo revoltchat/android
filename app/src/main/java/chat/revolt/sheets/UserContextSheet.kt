@@ -2,9 +2,7 @@ package chat.revolt.sheets
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,6 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.Members
+import chat.revolt.api.internals.RvxDummyMemberAPI
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
 import chat.revolt.components.generic.UIMarkdown
@@ -31,9 +31,15 @@ import chat.revolt.components.screens.settings.RawUserOverview
 @Composable
 fun UserContextSheet(
     userId: String,
+    serverId: String? = null,
     onHideSheet: suspend () -> Unit,
 ) {
     val user = RevoltAPI.userCache[userId]
+
+    @OptIn(RvxDummyMemberAPI::class)
+    val member = serverId?.let { Members.getMember(it, userId) }
+
+    val server = RevoltAPI.serverCache[serverId]
 
     var profile by remember { mutableStateOf<Profile?>(null) }
 
@@ -52,31 +58,37 @@ fun UserContextSheet(
     }
 
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState())
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
     ) {
         RawUserOverview(user, profile)
-        Text(
-            text = stringResource(id = R.string.user_context_sheet_category_bio),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(bottom = 10.dp, start = 16.dp, top = 20.dp, end = 16.dp)
-        )
 
-        if (profile?.content != null) {
-            UIMarkdown(
-                text = profile!!.content!!,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-        } else if (profile != null) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
             Text(
-                text = stringResource(id = R.string.user_context_sheet_bio_empty),
-                modifier = Modifier.padding(horizontal = 16.dp)
+                text = "sheet for ${server?.name ?: "serverless (omg jamstack reference??)"}",
             )
-        } else {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-                CircularProgressIndicator()
+
+            Text(
+                text = stringResource(id = R.string.user_context_sheet_category_bio),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = 10.dp, top = 20.dp)
+            )
+
+            if (profile?.content != null) {
+                UIMarkdown(
+                    text = profile!!.content!!,
+                )
+            } else if (profile != null) {
+                Text(
+                    text = stringResource(id = R.string.user_context_sheet_bio_empty),
+                )
+            } else {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+                    CircularProgressIndicator()
+                }
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }

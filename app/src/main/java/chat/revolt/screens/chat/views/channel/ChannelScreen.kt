@@ -86,7 +86,7 @@ fun ChannelScreen(
     navController: NavController,
     channelId: String,
     onToggleDrawer: () -> Unit,
-    onUserSheetOpenFor: (String) -> Unit,
+    onUserSheetOpenFor: (String, String?) -> Unit,
     viewModel: ChannelScreenViewModel = viewModel()
 ) {
     val channel = viewModel.activeChannel
@@ -285,7 +285,7 @@ fun ChannelScreen(
                         },
                         onAvatarClick = {
                             message.author?.let { author ->
-                                onUserSheetOpenFor(author)
+                                onUserSheetOpenFor(author, channel.server)
                             }
                         },
                         canReply = true,

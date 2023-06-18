@@ -193,6 +193,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
 
     var showUserContextSheet by remember { mutableStateOf(false) }
     var userContextSheetTarget by remember { mutableStateOf("") }
+    var userContextSheetServer by remember { mutableStateOf<String?>(null) }
 
     BackHandler(enabled = drawerState.isClosed) {
         scope.launch {
@@ -338,6 +339,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
         ) {
             UserContextSheet(
                 userId = userContextSheetTarget,
+                serverId = userContextSheetServer,
                 onHideSheet = {
                     userContextSheetState.hide()
                 }
@@ -496,8 +498,10 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                                             else drawerState.open()
                                         }
                                     },
-                                    onUserSheetOpenFor = { target ->
+                                    onUserSheetOpenFor = { target, server ->
                                         userContextSheetTarget = target
+                                        userContextSheetServer = server
+
                                         showUserContextSheet = true
                                     },
                                 )
