@@ -1,7 +1,5 @@
 package chat.revolt.sheets
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +31,7 @@ import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
+import chat.revolt.components.chat.RoleChip
 import chat.revolt.components.generic.UIMarkdown
 import chat.revolt.components.screens.settings.RawUserOverview
 
@@ -89,26 +87,11 @@ fun UserContextSheet(
                     it.forEach { roleId ->
                         val role = server?.roles?.get(roleId)
                         role?.let {
-                            Box(
-                                modifier = Modifier
-                                    .border(
-                                        border = BorderStroke(
-                                            width = 1.dp,
-                                            brush = role.colour?.let { WebCompat.parseColour(it) }
-                                                ?: Brush.solidColor(LocalContentColor.current),
-                                        ),
-                                        shape = MaterialTheme.shapes.small
-                                    )
-                                    .padding(8.dp)
-                            ) {
-                                Text(
-                                    text = role.name ?: roleId,
-                                    style = LocalTextStyle.current.copy(
-                                        brush = role.colour?.let { WebCompat.parseColour(it) }
-                                            ?: Brush.solidColor(LocalContentColor.current)
-                                    )
-                                )
-                            }
+                            RoleChip(
+                                label = role.name ?: roleId,
+                                brush = role.colour?.let { WebCompat.parseColour(it) }
+                                    ?: Brush.solidColor(LocalContentColor.current)
+                            )
                         }
                     }
                 }
