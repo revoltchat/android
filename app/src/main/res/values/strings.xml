@@ -181,6 +181,7 @@
 
     <string name="user_context_sheet_category_bio">Bio</string>
     <string name="user_context_sheet_bio_empty">This user hasn\'t set a bio yet.</string>
+    <string name="user_context_sheet_category_roles">Roles</string>
 
     <string name="add_server_sheet_title">Add a server</string>
     <string name="add_server_sheet_join_by_invite">Join by invite code or link</string>

@@ -1,12 +1,19 @@
 package chat.revolt.sheets
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,17 +24,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.Members
-import chat.revolt.api.internals.RvxDummyMemberAPI
+import chat.revolt.api.internals.WebCompat
+import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
 import chat.revolt.components.generic.UIMarkdown
 import chat.revolt.components.screens.settings.RawUserOverview
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun UserContextSheet(
     userId: String,
@@ -36,7 +46,6 @@ fun UserContextSheet(
 ) {
     val user = RevoltAPI.userCache[userId]
 
-    @OptIn(RvxDummyMemberAPI::class)
     val member = serverId?.let { Members.getMember(it, userId) }
 
     val server = RevoltAPI.serverCache[serverId]
@@ -66,9 +75,44 @@ fun UserContextSheet(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(
-                text = "sheet for ${server?.name ?: "serverless (omg jamstack reference??)"}",
-            )
+            member?.roles?.let {
+                Text(
+                    text = stringResource(id = R.string.user_context_sheet_category_roles),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
+
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    it.forEach { roleId ->
+                        val role = server?.roles?.get(roleId)
+                        role?.let {
+                            Box(
+                                modifier = Modifier
+                                    .border(
+                                        border = BorderStroke(
+                                            width = 1.dp,
+                                            brush = role.colour?.let { WebCompat.parseColour(it) }
+                                                ?: Brush.solidColor(LocalContentColor.current),
+                                        ),
+                                        shape = MaterialTheme.shapes.small
+                                    )
+                                    .padding(8.dp)
+                            ) {
+                                Text(
+                                    text = role.name ?: roleId,
+                                    style = LocalTextStyle.current.copy(
+                                        brush = role.colour?.let { WebCompat.parseColour(it) }
+                                            ?: Brush.solidColor(LocalContentColor.current)
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
 
             Text(
                 text = stringResource(id = R.string.user_context_sheet_category_bio),

@@ -23,7 +23,7 @@ import kotlinx.serialization.builtins.ListSerializer
 suspend fun fetchMessagesFromChannel(
     channelId: String,
     limit: Int = 50,
-    include_users: Boolean = false,
+    includeUsers: Boolean = false,
     before: String? = null,
     after: String? = null,
     nearby: String? = null,
@@ -33,7 +33,7 @@ suspend fun fetchMessagesFromChannel(
         headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
 
         parameter("limit", limit)
-        parameter("include_users", include_users)
+        parameter("include_users", includeUsers)
 
         if (before != null) parameter("before", before)
         if (after != null) parameter("after", after)
@@ -42,7 +42,7 @@ suspend fun fetchMessagesFromChannel(
     }
         .bodyAsText()
 
-    if (include_users) {
+    if (includeUsers) {
         return RevoltJson.decodeFromString(
             MessagesInChannel.serializer(),
             response

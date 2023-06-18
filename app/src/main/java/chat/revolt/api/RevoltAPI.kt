@@ -92,7 +92,6 @@ val mainHandler = Handler(Looper.getMainLooper())
 object RevoltAPI {
     const val TOKEN_HEADER_NAME = "x-session-token"
 
-    // FIXME discount caching solutions! LRU would be better but this is fine for now
     val userCache = mutableStateMapOf<String, User>()
     val serverCache = mutableStateMapOf<String, Server>()
     val channelCache = mutableStateMapOf<String, ChannelSchema>()

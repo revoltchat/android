@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.internals.Members
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.realtime.RealtimeSocketFrames
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
@@ -27,6 +28,7 @@ import chat.revolt.api.routes.channel.sendMessage
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.routes.microservices.autumn.MAX_ATTACHMENTS_PER_MESSAGE
 import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
+import chat.revolt.api.routes.server.fetchMember
 import chat.revolt.api.routes.user.addUserIfUnknown
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Message
@@ -101,7 +103,7 @@ class ChannelScreenViewModel : ViewModel() {
             fetchMessagesFromChannel(
                 activeChannel!!.id!!,
                 limit = 50,
-                true,
+                includeUsers = true,
                 before = if (renderableMessages.isNotEmpty()) {
                     renderableMessages.last().id
                 } else {
@@ -118,6 +120,18 @@ class ChannelScreenViewModel : ViewModel() {
                         RevoltAPI.messageCache[message.id!!] = message
                     }
                     messages.add(message)
+                }
+
+                it.users?.forEach { user ->
+                    if (!RevoltAPI.userCache.containsKey(user.id)) {
+                        RevoltAPI.userCache[user.id!!] = user
+                    }
+                }
+
+                it.members?.forEach { member ->
+                    if (!Members.hasMember(member.id.server, member.id.user)) {
+                        Members.addMember(member.id.server, member)
+                    }
                 }
             }
 
@@ -260,6 +274,7 @@ class ChannelScreenViewModel : ViewModel() {
                         if (it.channel != activeChannel?.id) return@onEach
 
                         addUserIfUnknown(it.author!!)
+                        activeChannel?.server?.let { s -> fetchMember(s, it.author) }
                         regroupMessages(listOf(it) + renderableMessages)
                         ackNewest()
                     }

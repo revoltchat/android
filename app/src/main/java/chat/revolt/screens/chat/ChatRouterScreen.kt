@@ -54,6 +54,7 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
+import chat.revolt.api.routes.server.fetchMembers
 import chat.revolt.api.schemas.User
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.chat.DisconnectedNotice
@@ -101,12 +102,12 @@ class ChatRouterViewModel @Inject constructor(
         }
     }
 
-    private fun setCurrentServer(serverId: String, save: Boolean = true) {
+    private suspend fun setCurrentServer(serverId: String, save: Boolean = true) {
         currentServer = serverId
 
-        if (save) viewModelScope.launch {
-            kvStorage.set("currentServer", serverId)
-        }
+        if (save) kvStorage.set("currentServer", serverId)
+
+        if (serverId != "home") fetchMembers(serverId, includeOffline = false, pure = false)
     }
 
     private fun setSaveCurrentChannel(channelId: String) {
@@ -129,13 +130,17 @@ class ChatRouterViewModel @Inject constructor(
                     popUpTo(route)
                 }
             }
-            setCurrentServer("home")
+            viewModelScope.launch {
+                setCurrentServer("home")
+            }
             return
         }
 
         val channelId = RevoltAPI.serverCache[serverId]?.channels?.firstOrNull()
 
-        setCurrentServer(serverId, channelId != null)
+        viewModelScope.launch {
+            setCurrentServer(serverId, channelId != null)
+        }
 
         if (channelId != null) {
             navigateToChannel(channelId, navController)
