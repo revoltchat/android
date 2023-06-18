@@ -200,9 +200,15 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
     var userContextSheetTarget by remember { mutableStateOf("") }
     var userContextSheetServer by remember { mutableStateOf<String?>(null) }
 
-    BackHandler(enabled = drawerState.isClosed) {
-        scope.launch {
-            drawerState.open()
+    val drawerBackHandler = remember {
+        {
+            scope.launch {
+                if (drawerState.isOpen) {
+                    drawerState.close()
+                } else {
+                    drawerState.open()
+                }
+            }
         }
     }
 
@@ -488,10 +494,17 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                 Column(Modifier.fillMaxSize()) {
                     NavHost(navController = navController, startDestination = "home") {
                         composable("home") {
+                            BackHandler {
+                                drawerBackHandler()
+                            }
                             HomeScreen(navController = topNav)
                         }
 
                         composable("channel/{channelId}") { backStackEntry ->
+                            BackHandler {
+                                drawerBackHandler()
+                            }
+
                             val channelId = backStackEntry.arguments?.getString("channelId")
                             if (channelId != null) {
                                 ChannelScreen(
@@ -514,6 +527,10 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                         }
 
                         composable("no_current_channel") {
+                            BackHandler {
+                                drawerBackHandler()
+                            }
+
                             NoCurrentChannelScreen()
                         }
 
