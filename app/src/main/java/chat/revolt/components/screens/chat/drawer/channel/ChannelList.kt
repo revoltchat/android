@@ -1,5 +1,8 @@
 package chat.revolt.components.screens.chat.drawer.channel
 
+import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -46,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import chat.revolt.R
 import chat.revolt.activities.RevoltTweenColour
 import chat.revolt.activities.RevoltTweenDp
@@ -55,10 +59,11 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.User
-import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
 import chat.revolt.sheets.ChannelContextSheet
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlin.math.max
 
 const val BANNER_HEIGHT_COMPACT = 56
@@ -284,9 +289,28 @@ fun RowScope.ChannelList(
                                         .background(MaterialTheme.colorScheme.surface)
                                 )
 
-                                RemoteImage(
-                                    url = "$REVOLT_FILES/banners/${server.banner.id}",
-                                    description = null,
+                                // *** ANDROIDVIEW RATIONALE ***
+                                // Compose w/ Glide looks super laggy when resizing, because
+                                // it tries to refetch the image every time. (luckily from cache)
+                                // This is a temporary workaround until Glide can be resized
+                                // without refetching in Compose.
+                                AndroidView(
+                                    factory = { ctx ->
+                                        AppCompatImageView(ctx).apply {
+                                            scaleType = ImageView.ScaleType.CENTER_CROP
+
+                                            Glide.with(this)
+                                                .load("$REVOLT_FILES/banners/${server.banner.id}")
+                                                .transition(DrawableTransitionOptions.withCrossFade())
+                                                .into(this)
+                                        }
+                                    },
+                                    update = {
+                                        it.layoutParams = ViewGroup.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.MATCH_PARENT
+                                        )
+                                    },
                                     modifier = Modifier
                                         .alpha(bannerImageOpacity)
                                         .fillMaxSize()
