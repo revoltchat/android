@@ -246,7 +246,6 @@ fun InviteScreen(
                                         viewModel.joinInvite(inviteCode)
                                     },
                                     modifier = Modifier
-                                        .weight(1f)
                                         .testTag("accept_invite")
                                 ) {
                                     Text(text = stringResource(id = R.string.invite_join))
@@ -257,7 +256,6 @@ fun InviteScreen(
                                 TextButton(
                                     onClick = onFinish,
                                     modifier = Modifier
-                                        .weight(1f)
                                         .testTag("decline_invite")
                                 ) {
                                     Text(text = stringResource(id = R.string.invite_cancel))
