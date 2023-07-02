@@ -60,6 +60,7 @@ import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.MessageField
+import chat.revolt.components.chat.SystemMessage
 import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelHeader
 import chat.revolt.components.screens.chat.ReplyManager
@@ -244,63 +245,66 @@ fun ChannelScreen(
                     items = viewModel.renderableMessages,
                     key = { it.id!! }
                 ) { message ->
-                    Message(
-                        message,
-                        parse = {
-                            val parser = MarkdownParser()
-                                .addRules(
-                                    SimpleMarkdownRules.createEscapeRule(),
-                                    UserMentionRule(),
-                                    ChannelMentionRule(),
-                                    CustomEmoteRule(),
-                                )
-                                .addRules(
-                                    createCodeRule(context, codeBlockColor.toArgb()),
-                                    createInlineCodeRule(context, codeBlockColor.toArgb()),
-                                )
-                                .addRules(
-                                    SimpleMarkdownRules.createSimpleMarkdownRules(
-                                        includeEscapeRule = false
+                    when {
+                        message.system != null -> SystemMessage(message)
+                        else -> Message(
+                            message,
+                            parse = {
+                                val parser = MarkdownParser()
+                                    .addRules(
+                                        SimpleMarkdownRules.createEscapeRule(),
+                                        UserMentionRule(),
+                                        ChannelMentionRule(),
+                                        CustomEmoteRule(),
+                                    )
+                                    .addRules(
+                                        createCodeRule(context, codeBlockColor.toArgb()),
+                                        createInlineCodeRule(context, codeBlockColor.toArgb()),
+                                    )
+                                    .addRules(
+                                        SimpleMarkdownRules.createSimpleMarkdownRules(
+                                            includeEscapeRule = false
+                                        )
+                                    )
+
+                                SimpleRenderer.render(
+                                    source = it.content ?: "",
+                                    parser = parser,
+                                    initialState = MarkdownState(0),
+                                    renderContext = MarkdownContext(
+                                        memberMap = mapOf(),
+                                        userMap = RevoltAPI.userCache.toMap(),
+                                        channelMap = RevoltAPI.channelCache.mapValues { ch ->
+                                            ch.value.name ?: ch.value.id ?: "#DeletedChannel"
+                                        },
+                                        emojiMap = RevoltAPI.emojiCache,
+                                        serverId = channel.server ?: "",
                                     )
                                 )
-
-                            SimpleRenderer.render(
-                                source = it.content ?: "",
-                                parser = parser,
-                                initialState = MarkdownState(0),
-                                renderContext = MarkdownContext(
-                                    memberMap = mapOf(),
-                                    userMap = RevoltAPI.userCache.toMap(),
-                                    channelMap = RevoltAPI.channelCache.mapValues { ch ->
-                                        ch.value.name ?: ch.value.id ?: "#DeletedChannel"
-                                    },
-                                    emojiMap = RevoltAPI.emojiCache,
-                                    serverId = channel.server ?: "",
-                                )
-                            )
-                        },
-                        onMessageContextMenu = {
-                            messageContextSheetShown = true
-                            messageContextSheetTarget = message.id ?: ""
-                        },
-                        onAvatarClick = {
-                            message.author?.let { author ->
-                                onUserSheetOpenFor(author, channel.server)
-                            }
-                        },
-                        canReply = true,
-                        onReply = {
-                            if (viewModel.pendingReplies.size >= 5) {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.too_many_replies, 5),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                return@Message
-                            }
-                            viewModel.replyToMessage(message)
-                        },
-                    )
+                            },
+                            onMessageContextMenu = {
+                                messageContextSheetShown = true
+                                messageContextSheetTarget = message.id ?: ""
+                            },
+                            onAvatarClick = {
+                                message.author?.let { author ->
+                                    onUserSheetOpenFor(author, channel.server)
+                                }
+                            },
+                            canReply = true,
+                            onReply = {
+                                if (viewModel.pendingReplies.size >= 5) {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.too_many_replies, 5),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    return@Message
+                                }
+                                viewModel.replyToMessage(message)
+                            },
+                        )
+                    }
                 }
 
                 item {

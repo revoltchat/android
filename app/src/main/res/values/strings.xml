@@ -134,6 +134,18 @@
     <string name="reply_message_not_cached">Unknown message, tap to jump</string>
     <string name="reply_message_empty_has_attachments">Sent attachments</string>
 
+    <string name="system_message_ownership_changed_alt">Ownership changed</string>
+    <string name="system_message_channel_icon_changed_alt">Channel icon changed</string>
+    <string name="system_message_channel_description_changed_alt">Channel description changed</string>
+    <string name="system_message_channel_renamed_alt">Channel renamed</string>
+    <string name="system_message_user_removed_alt">User removed</string>
+    <string name="system_message_user_added_alt">User added</string>
+    <string name="system_message_user_banned_alt">User banned</string>
+    <string name="system_message_user_kicked_alt">User kicked</string>
+    <string name="system_message_user_left_alt">User left</string>
+    <string name="system_message_user_joined_alt">User joined</string>
+    <string name="system_message_text_alt">System message</string>
+
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="x_days_ago">%1$d days ago</string>

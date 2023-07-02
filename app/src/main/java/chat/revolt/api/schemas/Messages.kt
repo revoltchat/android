@@ -95,5 +95,10 @@ data class Masquerade(
 @Serializable
 data class SystemInfo(
     val type: String? = null,
-    val id: String? = null
+    val id: String? = null,
+    val name: String? = null,
+    val by: String? = null,
+    val from: String? = null,
+    val to: String? = null,
+    val content: String? = null,
 )
