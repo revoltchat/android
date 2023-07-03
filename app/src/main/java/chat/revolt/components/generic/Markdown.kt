@@ -29,6 +29,7 @@ import chat.revolt.internals.markdown.CustomEmoteRule
 import chat.revolt.internals.markdown.MarkdownContext
 import chat.revolt.internals.markdown.MarkdownParser
 import chat.revolt.internals.markdown.MarkdownState
+import chat.revolt.internals.markdown.TimestampRule
 import chat.revolt.internals.markdown.UserMentionRule
 import chat.revolt.internals.markdown.createCodeRule
 import chat.revolt.internals.markdown.createInlineCodeRule
@@ -61,6 +62,7 @@ fun UIMarkdown(
                 UserMentionRule(),
                 ChannelMentionRule(),
                 CustomEmoteRule(),
+                TimestampRule(),
             )
             .addRules(
                 createCodeRule(context, codeBlockColor.toArgb()),
