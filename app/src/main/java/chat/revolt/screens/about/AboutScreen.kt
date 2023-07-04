@@ -2,32 +2,45 @@ package chat.revolt.screens.about
 
 import android.os.Build
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,23 +51,24 @@ import chat.revolt.api.REVOLT_BASE
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.routes.misc.Root
 import chat.revolt.api.routes.misc.getRootRoute
+import chat.revolt.api.settings.GlobalState
 import chat.revolt.components.generic.PageHeader
+import chat.revolt.ui.theme.Theme
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import java.net.URI
 
 class AboutViewModel(
 ) : ViewModel() {
-    private val _root = mutableStateOf<Root?>(null)
-    val root: State<Root?>
-        get() = _root
+    var root by mutableStateOf<Root?>(null)
+    var selectedTabIndex by mutableStateOf(0)
 
     fun getDebugInformation(): Map<String, String> {
         return mapOf(
             "App ID" to BuildConfig.APPLICATION_ID,
             "App Version" to BuildConfig.VERSION_NAME,
             "API Host" to URI(REVOLT_BASE).host,
-            "API Version" to (root.value?.revolt ?: "Unknown"),
+            "API Version" to (root?.revolt ?: "Unknown"),
             "Runtime SDK" to Build.VERSION.SDK_INT.toString(),
             "Model" to "${Build.MANUFACTURER} ${
                 Build.DEVICE.replaceFirstChar {
@@ -66,7 +80,7 @@ class AboutViewModel(
 
     init {
         viewModelScope.launch {
-            _root.value = getRootRoute().copy()
+            root = getRootRoute().copy()
         }
     }
 }
@@ -149,6 +163,63 @@ fun AboutScreen(
             showBackButton = true,
             onBackButtonClicked = { navController.popBackStack() })
 
+        // TODO this should be a reusable "tabs" component
+        when (GlobalState.theme) {
+            Theme.M3Dynamic -> AndroidView(
+                factory = {
+                    com.google.android.material.tabs.TabLayout(it).apply {
+                        tabMode = com.google.android.material.tabs.TabLayout.MODE_FIXED
+                        tabGravity = com.google.android.material.tabs.TabLayout.GRAVITY_FILL
+
+                        addTab(newTab().setText(it.getString(R.string.about_tab_version)))
+                        addTab(newTab().setText(it.getString(R.string.about_tab_details)))
+
+                        addOnTabSelectedListener(object :
+                            com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+                            override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
+                                viewModel.selectedTabIndex = tab?.position ?: 0
+                            }
+
+                            override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
+                            }
+
+                            override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
+                            }
+                        })
+                    }
+                },
+                update = {
+                    it.getTabAt(viewModel.selectedTabIndex)?.select()
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            else -> TabRow(selectedTabIndex = viewModel.selectedTabIndex) {
+                Tab(
+                    selected = viewModel.selectedTabIndex == 0,
+                    onClick = { viewModel.selectedTabIndex = 0 },
+                    text = {
+                        Text(
+                            text = stringResource(R.string.about_tab_version),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                )
+                Tab(
+                    selected = viewModel.selectedTabIndex == 1,
+                    onClick = { viewModel.selectedTabIndex = 1 },
+                    text = {
+                        Text(
+                            text = stringResource(R.string.about_tab_details),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                )
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -157,22 +228,58 @@ fun AboutScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            if (viewModel.root.value == null) {
-                Text(
-                    text = stringResource(R.string.loading),
-                    color = MaterialTheme.colorScheme.onBackground.copy(
-                        alpha = 0.5f
-                    ),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Normal
-                    )
+            if (viewModel.root == null) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(48.dp)
                 )
             } else {
-                DebugInfo(viewModel)
-                TextButton(onClick = ::copyDebugInformation) {
-                    Text(text = stringResource(id = R.string.copy))
+                when (viewModel.selectedTabIndex) {
+                    0 -> {
+                        Image(
+                            painter = painterResource(R.drawable.revolt_logo_wide),
+                            contentDescription = stringResource(R.string.about_full_name),
+                            colorFilter = ColorFilter.tint(LocalContentColor.current)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = stringResource(R.string.about_full_name),
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = BuildConfig.VERSION_NAME,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Normal
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        Text(
+                            text = stringResource(R.string.about_brought_to_you_by),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Light
+                            ),
+                            color = LocalContentColor.current.copy(
+                                alpha = 0.5f
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    1 -> {
+                        DebugInfo(viewModel)
+                        TextButton(onClick = ::copyDebugInformation) {
+                            Text(text = stringResource(id = R.string.copy))
+                        }
+                    }
                 }
             }
         }
