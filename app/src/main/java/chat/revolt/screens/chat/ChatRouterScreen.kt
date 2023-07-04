@@ -350,10 +350,7 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
         ) {
             UserContextSheet(
                 userId = userContextSheetTarget,
-                serverId = userContextSheetServer,
-                onHideSheet = {
-                    userContextSheetState.hide()
-                }
+                serverId = userContextSheetServer
             )
         }
     }

@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -56,7 +57,7 @@ import java.net.URI
 class AboutViewModel(
 ) : ViewModel() {
     var root by mutableStateOf<Root?>(null)
-    var selectedTabIndex by mutableStateOf(0)
+    var selectedTabIndex by mutableIntStateOf(0)
 
     fun getDebugInformation(): Map<String, String> {
         return mapOf(

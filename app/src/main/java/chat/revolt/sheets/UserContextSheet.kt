@@ -38,8 +38,7 @@ import chat.revolt.components.screens.settings.RawUserOverview
 @Composable
 fun UserContextSheet(
     userId: String,
-    serverId: String? = null,
-    onHideSheet: suspend () -> Unit,
+    serverId: String? = null
 ) {
     val user = RevoltAPI.userCache[userId]
 
