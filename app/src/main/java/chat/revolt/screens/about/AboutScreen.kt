@@ -18,8 +18,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,9 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,9 +47,8 @@ import chat.revolt.api.REVOLT_BASE
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.routes.misc.Root
 import chat.revolt.api.routes.misc.getRootRoute
-import chat.revolt.api.settings.GlobalState
 import chat.revolt.components.generic.PageHeader
-import chat.revolt.ui.theme.Theme
+import chat.revolt.components.generic.PrimaryTabs
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import java.net.URI
@@ -163,62 +158,13 @@ fun AboutScreen(
             showBackButton = true,
             onBackButtonClicked = { navController.popBackStack() })
 
-        // TODO this should be a reusable "tabs" component
-        when (GlobalState.theme) {
-            Theme.M3Dynamic -> AndroidView(
-                factory = {
-                    com.google.android.material.tabs.TabLayout(it).apply {
-                        tabMode = com.google.android.material.tabs.TabLayout.MODE_FIXED
-                        tabGravity = com.google.android.material.tabs.TabLayout.GRAVITY_FILL
-
-                        addTab(newTab().setText(it.getString(R.string.about_tab_version)))
-                        addTab(newTab().setText(it.getString(R.string.about_tab_details)))
-
-                        addOnTabSelectedListener(object :
-                            com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
-                            override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
-                                viewModel.selectedTabIndex = tab?.position ?: 0
-                            }
-
-                            override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
-                            }
-
-                            override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
-                            }
-                        })
-                    }
-                },
-                update = {
-                    it.getTabAt(viewModel.selectedTabIndex)?.select()
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            else -> TabRow(selectedTabIndex = viewModel.selectedTabIndex) {
-                Tab(
-                    selected = viewModel.selectedTabIndex == 0,
-                    onClick = { viewModel.selectedTabIndex = 0 },
-                    text = {
-                        Text(
-                            text = stringResource(R.string.about_tab_version),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                )
-                Tab(
-                    selected = viewModel.selectedTabIndex == 1,
-                    onClick = { viewModel.selectedTabIndex = 1 },
-                    text = {
-                        Text(
-                            text = stringResource(R.string.about_tab_details),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                )
-            }
-        }
+        PrimaryTabs(
+            tabs = listOf(
+                stringResource(R.string.about_tab_version),
+                stringResource(R.string.about_tab_details)
+            ),
+            currentIndex = viewModel.selectedTabIndex,
+            onTabSelected = { viewModel.selectedTabIndex = it })
 
         Column(
             modifier = Modifier
