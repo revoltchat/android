@@ -17,9 +17,15 @@ import chat.revolt.api.realtime.frames.receivable.MessageUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.PongFrame
 import chat.revolt.api.realtime.frames.receivable.ReadyFrame
 import chat.revolt.api.realtime.frames.receivable.ServerCreateFrame
+import chat.revolt.api.realtime.frames.receivable.ServerDeleteFrame
+import chat.revolt.api.realtime.frames.receivable.ServerMemberJoinFrame
+import chat.revolt.api.realtime.frames.receivable.ServerMemberLeaveFrame
+import chat.revolt.api.realtime.frames.receivable.ServerMemberUpdateFrame
+import chat.revolt.api.realtime.frames.receivable.ServerUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.UserUpdateFrame
 import chat.revolt.api.realtime.frames.sendable.AuthorizationFrame
 import chat.revolt.api.realtime.frames.sendable.PingFrame
+import chat.revolt.api.routes.server.fetchMember
 import io.ktor.client.plugins.websocket.ws
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
@@ -286,6 +292,97 @@ object RealtimeSocket {
                 )
 
                 RevoltAPI.wsFrameChannel.send(channelStopTypingFrame)
+            }
+
+            "ServerUpdate" -> {
+                val serverUpdateFrame =
+                    RevoltJson.decodeFromString(ServerUpdateFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received server update frame for ${serverUpdateFrame.id}."
+                )
+
+                val existing = RevoltAPI.serverCache[serverUpdateFrame.id]
+                    ?: return // if we don't have the server no point in updating it
+
+                var updated =
+                    existing.mergeWithPartial(serverUpdateFrame.data)
+
+                serverUpdateFrame.clear?.forEach {
+                    when (it) {
+                        "Icon" -> updated = updated.copy(icon = null)
+                        "Banner" -> updated = updated.copy(banner = null)
+                        "Description" -> updated = updated.copy(description = null)
+                        else -> Log.e("RealtimeSocket", "Unknown server clear field: $it")
+                    }
+                }
+
+                RevoltAPI.serverCache[serverUpdateFrame.id] = updated
+            }
+
+            "ServerDelete" -> {
+                val serverDeleteFrame =
+                    RevoltJson.decodeFromString(ServerDeleteFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received server delete frame for ${serverDeleteFrame.id}."
+                )
+
+                RevoltAPI.serverCache.remove(serverDeleteFrame.id)
+            }
+
+            "ServerMemberUpdate" -> {
+                val serverMemberUpdateFrame =
+                    RevoltJson.decodeFromString(ServerMemberUpdateFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received server member update frame for ${serverMemberUpdateFrame.id.user} in ${serverMemberUpdateFrame.id.server}."
+                )
+
+                val existing = RevoltAPI.members.getMember(
+                    serverMemberUpdateFrame.id.server,
+                    serverMemberUpdateFrame.id.user
+                )
+                    ?: return // if we don't have the member no point in updating them
+
+                var updated = existing.mergeWithPartial(serverMemberUpdateFrame.data)
+
+                serverMemberUpdateFrame.clear?.forEach {
+                    when (it) {
+                        "Avatar" -> updated = updated.copy(avatar = null)
+                        "Nickname" -> updated = updated.copy(nickname = null)
+                        else -> Log.e("RealtimeSocket", "Unknown server member clear field: $it")
+                    }
+                }
+
+                RevoltAPI.members.setMember(serverMemberUpdateFrame.id.server, updated)
+            }
+
+            "ServerMemberJoin" -> {
+                val serverMemberJoinFrame =
+                    RevoltJson.decodeFromString(ServerMemberJoinFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received server member join frame for ${serverMemberJoinFrame.user} in ${serverMemberJoinFrame.id}."
+                )
+
+                val member = fetchMember(serverMemberJoinFrame.id, serverMemberJoinFrame.user)
+
+                RevoltAPI.members.setMember(serverMemberJoinFrame.id, member)
+            }
+
+            "ServerMemberLeave" -> {
+                val serverMemberLeaveFrame =
+                    RevoltJson.decodeFromString(ServerMemberLeaveFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received server member leave frame for ${serverMemberLeaveFrame.user} in ${serverMemberLeaveFrame.id}."
+                )
+
+                RevoltAPI.members.removeMember(
+                    serverMemberLeaveFrame.id,
+                    serverMemberLeaveFrame.user
+                )
             }
 
             "Authenticated" -> {

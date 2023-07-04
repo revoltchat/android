@@ -5,6 +5,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import chat.revolt.BuildConfig
+import chat.revolt.api.internals.Members
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.user.fetchSelf
@@ -98,6 +99,8 @@ object RevoltAPI {
     val emojiCache = mutableStateMapOf<String, Emoji>()
     val messageCache = mutableStateMapOf<String, Message>()
 
+    val members = Members()
+
     val unreads = Unreads()
 
     var selfId: String? = null
@@ -182,6 +185,7 @@ object RevoltAPI {
         emojiCache.clear()
         messageCache.clear()
 
+        members.clear()
         unreads.clear()
 
         socketCoroutine?.cancel()

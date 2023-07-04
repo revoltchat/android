@@ -20,7 +20,26 @@ data class Server(
     val flags: Long? = null,
     val analytics: Boolean? = null,
     val discoverable: Boolean? = null,
-)
+) {
+    fun mergeWithPartial(other: Server): Server {
+        return Server(
+            id = other.id ?: id,
+            owner = other.owner ?: owner,
+            name = other.name ?: name,
+            description = other.description ?: description,
+            channels = other.channels ?: channels,
+            categories = other.categories ?: categories,
+            systemMessages = other.systemMessages ?: systemMessages,
+            roles = other.roles ?: roles,
+            defaultPermissions = other.defaultPermissions ?: defaultPermissions,
+            icon = other.icon ?: icon,
+            banner = other.banner ?: banner,
+            flags = other.flags ?: flags,
+            analytics = other.analytics ?: analytics,
+            discoverable = other.discoverable ?: discoverable,
+        )
+    }
+}
 
 @Serializable
 data class Category(

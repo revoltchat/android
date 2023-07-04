@@ -1,9 +1,13 @@
 package chat.revolt.api.schemas
 
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 @Serializable
 data class MessagesInChannel(
@@ -29,7 +33,17 @@ data class Member(
     val avatar: AutumnResource? = null,
     val roles: List<String>? = null,
     val nickname: String? = null
-)
+) {
+    fun mergeWithPartial(other: Member): Member {
+        return Member(
+            id = other.id,
+            joinedAt = other.joinedAt ?: joinedAt,
+            avatar = other.avatar ?: avatar,
+            roles = other.roles ?: roles,
+            nickname = other.nickname ?: nickname
+        )
+    }
+}
 
 @Serializable
 data class Channel(

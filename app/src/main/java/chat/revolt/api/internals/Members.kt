@@ -2,7 +2,7 @@ package chat.revolt.api.internals
 
 import chat.revolt.api.schemas.Member
 
-object Members {
+class Members {
     // memberCache (mapping of serverId to userId to member)
     private val memberCache = mutableMapOf<String, MutableMap<String, Member>>()
 
@@ -14,11 +14,19 @@ object Members {
         return memberCache[serverId]?.containsKey(userId) ?: false
     }
 
-    fun addMember(serverId: String, member: Member) {
+    fun setMember(serverId: String, member: Member) {
         if (!memberCache.containsKey(serverId)) {
             memberCache[serverId] = mutableMapOf()
         }
-        
+
         memberCache[serverId]?.set(member.id.user, member)
+    }
+
+    fun removeMember(serverId: String, userId: String) {
+        memberCache[serverId]?.remove(userId)
+    }
+
+    fun clear() {
+        memberCache.clear()
     }
 }

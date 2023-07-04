@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
-import chat.revolt.api.internals.Members
 import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
@@ -44,7 +43,7 @@ fun UserContextSheet(
 ) {
     val user = RevoltAPI.userCache[userId]
 
-    val member = serverId?.let { Members.getMember(it, userId) }
+    val member = serverId?.let { RevoltAPI.members.getMember(it, userId) }
 
     val server = RevoltAPI.serverCache[serverId]
 

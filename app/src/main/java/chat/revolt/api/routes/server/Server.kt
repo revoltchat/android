@@ -4,7 +4,6 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
-import chat.revolt.api.internals.Members
 import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
 import io.ktor.client.request.get
@@ -54,8 +53,8 @@ suspend fun fetchMembers(
     }
 
     membersResponse.members.forEach { member ->
-        if (!Members.hasMember(serverId, member.id.user)) {
-            Members.addMember(serverId, member)
+        if (!RevoltAPI.members.hasMember(serverId, member.id.user)) {
+            RevoltAPI.members.setMember(serverId, member)
         }
     }
 
@@ -81,8 +80,8 @@ suspend fun fetchMember(serverId: String, userId: String, pure: Boolean = false)
     val member = RevoltJson.decodeFromString(Member.serializer(), response.bodyAsText())
 
     if (!pure) {
-        if (!Members.hasMember(serverId, member.id.user)) {
-            Members.addMember(serverId, member)
+        if (!RevoltAPI.members.hasMember(serverId, member.id.user)) {
+            RevoltAPI.members.setMember(serverId, member)
         }
     }
 

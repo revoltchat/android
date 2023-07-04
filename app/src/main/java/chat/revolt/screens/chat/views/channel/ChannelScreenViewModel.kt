@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
-import chat.revolt.api.internals.Members
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.realtime.RealtimeSocketFrames
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
@@ -129,8 +128,8 @@ class ChannelScreenViewModel : ViewModel() {
                 }
 
                 it.members?.forEach { member ->
-                    if (!Members.hasMember(member.id.server, member.id.user)) {
-                        Members.addMember(member.id.server, member)
+                    if (!RevoltAPI.members.hasMember(member.id.server, member.id.user)) {
+                        RevoltAPI.members.setMember(member.id.server, member)
                     }
                 }
             }
