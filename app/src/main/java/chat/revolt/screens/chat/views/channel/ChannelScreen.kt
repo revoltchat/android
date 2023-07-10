@@ -1,5 +1,7 @@
 package chat.revolt.screens.chat.views.channel
 
+import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -58,9 +61,13 @@ import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.routes.microservices.autumn.FileArgs
+import chat.revolt.api.settings.FeatureFlag
+import chat.revolt.api.settings.FeatureFlags
+import chat.revolt.api.settings.FilePickerFeatureFlagVariates
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.MessageField
 import chat.revolt.components.chat.SystemMessage
+import chat.revolt.components.media.InbuiltMediaPicker
 import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelHeader
 import chat.revolt.components.screens.chat.ReplyManager
@@ -81,6 +88,7 @@ import com.discord.simpleast.core.simple.SimpleRenderer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileNotFoundException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,27 +112,43 @@ fun ChannelScreen(
     var messageContextSheetShown by remember { mutableStateOf(false) }
     var messageContextSheetTarget by remember { mutableStateOf("") }
 
+    val focusManager = LocalFocusManager.current
+
+    fun processFileUri(uri: Uri, pickerIdentifier: String? = null) {
+        DocumentFile.fromSingleUri(context, uri)?.let { file ->
+            val mFile = File(context.cacheDir, file.name ?: "attachment")
+
+            mFile.outputStream().use { output ->
+                @Suppress("Recycle")
+                context.contentResolver.openInputStream(uri)?.copyTo(output)
+            }
+
+            // If the file is already pending and was picked from the inbuilt picker, remove it.
+            // This is so you can "toggle" the file in the picker.
+            // If the file was picked via DocumentsUI we don't want toggling functionality as
+            // if you specifically opened it from DocumentsUI you probably want to send it anyway.
+            if (viewModel.pendingAttachments.any { it.pickerIdentifier == pickerIdentifier }) {
+                viewModel.pendingAttachments.removeIf { it.pickerIdentifier == pickerIdentifier }
+                return
+            }
+
+            viewModel.pendingAttachments.add(
+                FileArgs(
+                    file = mFile,
+                    contentType = file.type ?: "application/octet-stream",
+                    filename = file.name ?: "attachment",
+                    pickerIdentifier = pickerIdentifier
+                )
+            )
+        }
+    }
+
     val pickFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments()
     ) { uriList ->
-        uriList.let { uris ->
-            uris.forEach {
-                DocumentFile.fromSingleUri(context, it)?.let { file ->
-                    val mFile = File(context.cacheDir, file.name ?: "attachment")
-
-                    mFile.outputStream().use { output ->
-                        @Suppress("Recycle")
-                        context.contentResolver.openInputStream(it)?.copyTo(output)
-                    }
-
-                    viewModel.pendingAttachments.add(
-                        FileArgs(
-                            file = mFile,
-                            contentType = file.type ?: "application/octet-stream",
-                            filename = file.name ?: "attachment"
-                        )
-                    )
-                }
+        uriList.let { list ->
+            list.forEach { uri ->
+                processFileUri(uri)
             }
         }
     }
@@ -409,7 +433,21 @@ fun ChannelScreen(
                 },
                 onSendMessage = viewModel::sendPendingMessage,
                 onAddAttachment = {
-                    pickFileLauncher.launch(arrayOf("*/*"))
+                    val isTiramisu = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+                    @FeatureFlag("TiramisuFilePicker")
+                    when {
+                        FeatureFlags.filePickerType == FilePickerFeatureFlagVariates.TiramisuMediaPermissions
+                                && isTiramisu -> {
+                            focusManager.clearFocus()
+                            viewModel.inbuiltFilePickerOpen = !viewModel.inbuiltFilePickerOpen
+                        }
+
+                        FeatureFlags.filePickerType == FilePickerFeatureFlagVariates.DocumentsUI
+                                || !isTiramisu -> {
+                            pickFileLauncher.launch(arrayOf("*/*"))
+                        }
+                    }
                 },
                 channelType = channel.channelType,
                 channelName = channel.name ?: ChannelUtils.resolveDMName(channel) ?: stringResource(
@@ -419,7 +457,46 @@ fun ChannelScreen(
                 disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage,
                 editMode = viewModel.editingMessage != null,
                 cancelEdit = viewModel::cancelEditingMessage,
+                onFocusChange = { nowFocused ->
+                    if (nowFocused && viewModel.inbuiltFilePickerOpen) {
+                        viewModel.inbuiltFilePickerOpen = false
+                    }
+                },
             )
+
+            AnimatedVisibility(visible = viewModel.inbuiltFilePickerOpen) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    InbuiltMediaPicker(
+                        onOpenDocumentsUi = {
+                            pickFileLauncher.launch(arrayOf("*/*"))
+                            viewModel.inbuiltFilePickerOpen = false
+                        },
+                        onClose = {
+                            viewModel.inbuiltFilePickerOpen = false
+                        },
+                        onMediaSelected = { media ->
+                            try {
+                                processFileUri(
+                                    media.uri,
+                                    pickerIdentifier = media.uri.lastPathSegment
+                                )
+                            } catch (e: Exception) {
+                                if (e is FileNotFoundException) {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.file_picker_cannot_attach_file_invalid),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        },
+                        pendingMedia = viewModel.pendingAttachments
+                            .filterNot { it.pickerIdentifier == null }
+                            .map { it.pickerIdentifier!! },
+                        disabled = viewModel.isSendingMessage,
+                    )
+                }
+            }
         }
     }
 }

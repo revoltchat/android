@@ -31,6 +31,7 @@ import chat.revolt.api.routes.server.fetchMember
 import chat.revolt.api.routes.user.addUserIfUnknown
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Message
+import chat.revolt.api.settings.FeatureFlag
 import chat.revolt.callbacks.UiCallback
 import chat.revolt.callbacks.UiCallbacks
 import io.ktor.http.ContentType
@@ -57,6 +58,9 @@ class ChannelScreenViewModel : ViewModel() {
     var pendingMessageContent by mutableStateOf("")
     var pendingReplies = mutableStateListOf<SendMessageReply>()
     var pendingAttachments = mutableStateListOf<FileArgs>()
+
+    @FeatureFlag("TiramisuFilePicker")
+    var inbuiltFilePickerOpen by mutableStateOf(false)
 
     var pendingUploadProgress by mutableFloatStateOf(0f)
 

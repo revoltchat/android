@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
@@ -61,6 +62,7 @@ fun MessageField(
     disabled: Boolean = false,
     editMode: Boolean = false,
     cancelEdit: () -> Unit = {},
+    onFocusChange: (Boolean) -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
     val placeholderResource = when (channelType) {
@@ -74,7 +76,7 @@ fun MessageField(
     val sendButtonVisible = (messageContent.isNotBlank() || forceSendButton) && !disabled
 
     Row(
-        modifier = modifier
+        modifier = Modifier
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
     ) {
 
@@ -85,9 +87,12 @@ fun MessageField(
             enabled = !disabled,
             textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            modifier = Modifier
+            modifier = modifier
                 .weight(1f)
-                .focusRequester(focusRequester),
+                .focusRequester(focusRequester)
+                .onFocusChanged { state ->
+                    onFocusChange(state.isFocused)
+                },
             keyboardOptions = KeyboardOptions.Default,
             keyboardActions = KeyboardActions.Default,
             decorationBox = @Composable { innerTextField ->

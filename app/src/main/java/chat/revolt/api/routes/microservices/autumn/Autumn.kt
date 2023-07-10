@@ -5,11 +5,15 @@ import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.schemas.AutumnError
 import chat.revolt.api.schemas.AutumnId
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.plugins.onUpload
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import java.io.File
 
 const val MAX_ATTACHMENTS_PER_MESSAGE = 5
@@ -18,6 +22,7 @@ data class FileArgs(
     val file: File,
     val filename: String,
     val contentType: String,
+    val pickerIdentifier: String? = null
 )
 
 suspend fun uploadToAutumn(

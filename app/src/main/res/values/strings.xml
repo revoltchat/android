@@ -285,6 +285,13 @@
     <string name="media_viewer_share_video">Share video</string>
     <string name="media_viewer_share_image">Share image</string>
 
+    <string name="file_picker_cannot_attach_file_invalid">This file is invalid and cannot be attached.</string>
+    <string name="file_picker_permission_request_header">We need your permission to access photos and videos</string>
+    <string name="file_picker_permission_request_body">You will be able to attach photos and videos to your messages afterwards.</string>
+    <string name="file_picker_permission_request_cta">Allow access</string>
+    <string name="file_picker_chip_documents">Attach a file</string>
+    <string name="file_picker_chip_camera">Take a photo</string>
+
     <string name="spark_sidebar_settings_tutorial">The settings are in the sidebar</string>
     <string name="spark_sidebar_settings_tutorial_description_1">You can open the sidebar by swiping from the left edge of the screen.</string>
     <string name="spark_sidebar_settings_tutorial_description_2">Then long tap your profile picture to open the settings.</string>
