@@ -9,6 +9,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +17,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -38,35 +41,58 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import kotlin.time.Duration.Companion.milliseconds
 
 data class Media(
     val uri: Uri,
     val width: Int,
     val height: Int,
+    val duration: Long?,
     val aspectRatio: Float = width.toFloat() / height.toFloat()
 )
+
+private fun Long.formatAsLengthDuration(): String {
+    val asDuration = this.milliseconds
+
+    val components = asDuration.toComponents { days, hours, minutes, seconds, _ ->
+        listOfNotNull(
+            if (days > 0) "$days:" else null,
+            if (hours > 0) "$hours".padStart(2, '0') + ":" else null,
+            "$minutes".padStart(2, '0') + ":",
+            "$seconds".padStart(2, '0'),
+        )
+    }
+
+    return components.joinToString(separator = "")
+}
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalGlideComposeApi::class)
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun InbuiltMediaPicker(
     onOpenDocumentsUi: () -> Unit,
+    onOpenCamera: () -> Unit,
     onClose: () -> Unit,
     onMediaSelected: (Media) -> Unit,
     pendingMedia: List<String>,
@@ -91,7 +117,9 @@ fun InbuiltMediaPicker(
         if (mediaPermissionState.allPermissionsGranted) {
             val projection = arrayOf(
                 MediaStore.Images.ImageColumns._ID,
-                MediaStore.Images.ImageColumns.RESOLUTION
+                MediaStore.Images.ImageColumns.RESOLUTION,
+                MediaStore.Images.ImageColumns.MIME_TYPE,
+                MediaStore.Video.VideoColumns.DURATION
             )
 
             val selection: String? = null
@@ -115,9 +143,22 @@ fun InbuiltMediaPicker(
                             cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID))
                         val resolution =
                             cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.RESOLUTION))
+
+                        val isVideo =
+                            cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.MIME_TYPE))
+                                .startsWith("video")
+
+                        val durationColumn =
+                            cursor.getColumnIndex(MediaStore.Video.VideoColumns.DURATION)
+                        val videoDuration = if (isVideo && durationColumn != -1) {
+                            cursor.getLong(durationColumn)
+                        } else {
+                            null
+                        }
+
                         val contentUri =
                             ContentUris.withAppendedId(
-                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                MediaStore.Files.getContentUri("external"),
                                 id
                             )
 
@@ -127,7 +168,8 @@ fun InbuiltMediaPicker(
                             Media(
                                 uri = contentUri,
                                 width = resolution.split("×")[0].toInt(),
-                                height = resolution.split("×")[1].toInt()
+                                height = resolution.split("×")[1].toInt(),
+                                duration = videoDuration
                             )
                         )
                     } catch (e: Exception) {
@@ -207,6 +249,7 @@ fun InbuiltMediaPicker(
                     Row(
                         modifier = Modifier
                             .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         AssistChip(
                             onClick = {
@@ -218,7 +261,27 @@ fun InbuiltMediaPicker(
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_paperclip_24dp),
-                                    contentDescription = null // see label
+                                    contentDescription = null, // see label
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .padding(2.dp)
+                                )
+                            }
+                        )
+                        AssistChip(
+                            onClick = {
+                                onOpenCamera()
+                            },
+                            label = {
+                                Text(text = stringResource(id = R.string.file_picker_chip_camera))
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_camera_24dp),
+                                    contentDescription = null, // see label
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .padding(2.dp)
                                 )
                             }
                         )
@@ -232,19 +295,20 @@ fun InbuiltMediaPicker(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         content = {
                             items(images.size) { image ->
-                                GlideImage(
-                                    model = images[image].uri.toString(),
-                                    contentDescription = null,
+                                val imageIsSelected by derivedStateOf { images[image].uri.lastPathSegment in pendingMedia }
+
+                                val borderSize by animateDpAsState(
+                                    targetValue = if (imageIsSelected) 2.dp else 0.dp,
+                                    animationSpec = tween(),
+                                    label = "Media picker image border size #$image"
+                                )
+
+                                Box(
                                     modifier = Modifier
-                                        .clip(MaterialTheme.shapes.medium)
-                                        .then(
-                                            if (images[image].uri.lastPathSegment in pendingMedia) {
-                                                Modifier.border(
-                                                    width = 2.dp,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                    shape = MaterialTheme.shapes.medium
-                                                )
-                                            } else Modifier
+                                        .border(
+                                            width = borderSize,
+                                            color = if (borderSize > 0.dp) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium
                                         )
                                         .then(
                                             if (disabled) {
@@ -257,7 +321,31 @@ fun InbuiltMediaPicker(
                                         )
                                         .width(100.dp)
                                         .aspectRatio(images[image].aspectRatio),
-                                )
+                                ) {
+                                    GlideImage(
+                                        model = images[image].uri.toString(),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .clip(MaterialTheme.shapes.medium)
+                                            .fillMaxSize(),
+                                    )
+
+                                    if (images[image].duration != null) {
+                                        Text(
+                                            text = "▶ ${images[image].duration!!.formatAsLengthDuration()}",
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 12.sp,
+                                            modifier = Modifier
+                                                .padding(4.dp)
+                                                .background(
+                                                    MaterialTheme.colorScheme.surfaceVariant,
+                                                    MaterialTheme.shapes.small
+                                                )
+                                                .align(Alignment.BottomStart)
+                                                .padding(4.dp)
+                                        )
+                                    }
+                                }
                             }
                         },
                         modifier = Modifier.fillMaxSize()

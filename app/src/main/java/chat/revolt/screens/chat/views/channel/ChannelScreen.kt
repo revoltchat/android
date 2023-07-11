@@ -471,6 +471,14 @@ fun ChannelScreen(
                             pickFileLauncher.launch(arrayOf("*/*"))
                             viewModel.inbuiltFilePickerOpen = false
                         },
+                        onOpenCamera = {
+                            Toast.makeText(
+                                context,
+                                "This will open the camera one day",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            viewModel.inbuiltFilePickerOpen = false
+                        },
                         onClose = {
                             viewModel.inbuiltFilePickerOpen = false
                         },
