@@ -1,7 +1,10 @@
 package chat.revolt.screens.chat.views.channel
 
+import android.content.ContentValues
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -148,6 +152,17 @@ fun ChannelScreen(
     ) { uriList ->
         uriList.let { list ->
             list.forEach { uri ->
+                processFileUri(uri)
+            }
+        }
+    }
+
+    val capturedPhotoUri = rememberSaveable { mutableStateOf<Uri?>(null) }
+    val pickCameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { uriUpdated ->
+        if (uriUpdated) {
+            capturedPhotoUri.value?.let { uri ->
                 processFileUri(uri)
             }
         }
@@ -472,11 +487,26 @@ fun ChannelScreen(
                             viewModel.inbuiltFilePickerOpen = false
                         },
                         onOpenCamera = {
-                            Toast.makeText(
-                                context,
-                                "This will open the camera one day",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            // Create a new content URI to store the captured image.
+                            val contentResolver = context.contentResolver
+                            val contentValues = ContentValues().apply {
+                                put(
+                                    MediaStore.MediaColumns.DISPLAY_NAME,
+                                    "RVL_${System.currentTimeMillis()}.jpg"
+                                )
+                                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                                put(
+                                    MediaStore.MediaColumns.RELATIVE_PATH,
+                                    Environment.DIRECTORY_PICTURES
+                                )
+                            }
+
+                            capturedPhotoUri.value = contentResolver.insert(
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                contentValues
+                            )
+
+                            pickCameraLauncher.launch(capturedPhotoUri.value)
                             viewModel.inbuiltFilePickerOpen = false
                         },
                         onClose = {

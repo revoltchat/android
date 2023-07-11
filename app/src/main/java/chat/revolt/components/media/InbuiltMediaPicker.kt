@@ -118,8 +118,9 @@ fun InbuiltMediaPicker(
             val projection = arrayOf(
                 MediaStore.Images.ImageColumns._ID,
                 MediaStore.Images.ImageColumns.RESOLUTION,
+                MediaStore.Images.ImageColumns.ORIENTATION,
                 MediaStore.Images.ImageColumns.MIME_TYPE,
-                MediaStore.Video.VideoColumns.DURATION
+                MediaStore.Video.VideoColumns.DURATION,
             )
 
             val selection: String? = null
@@ -143,6 +144,10 @@ fun InbuiltMediaPicker(
                             cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID))
                         val resolution =
                             cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.RESOLUTION))
+                        val orientation =
+                            cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.ORIENTATION))
+
+                        val swapDimensions = orientation == 90 || orientation == 270
 
                         val isVideo =
                             cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.MIME_TYPE))
@@ -164,11 +169,13 @@ fun InbuiltMediaPicker(
 
                         if (resolution == null) continue
 
+                        val (width, height) = resolution.split("×").map { it.toInt() }
+
                         images.add(
                             Media(
                                 uri = contentUri,
-                                width = resolution.split("×")[0].toInt(),
-                                height = resolution.split("×")[1].toInt(),
+                                width = if (swapDimensions) height else width,
+                                height = if (swapDimensions) width else height,
                                 duration = videoDuration
                             )
                         )
