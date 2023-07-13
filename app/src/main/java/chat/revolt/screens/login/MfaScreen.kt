@@ -1,13 +1,16 @@
 package chat.revolt.screens.login
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -22,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -178,7 +182,7 @@ fun MfaScreen(
                     textAlign = TextAlign.Center
                 ),
                 modifier = Modifier
-                    .padding(horizontal = 20.dp, vertical = 10.dp)
+                    .padding(horizontal = 20.dp)
                     .fillMaxWidth(),
             )
 
@@ -216,7 +220,20 @@ fun MfaScreen(
             allowedAuthTypes.forEach { authType ->
                 when (authType) {
                     "Totp" -> {
-                        CollapsibleCard(title = stringResource(R.string.mfa_totp_header)) {
+                        CollapsibleCard(header = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ux_mfa_totp),
+                                    contentDescription = null, // See label
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                        .padding(end = 10.dp)
+                                )
+                                Text(stringResource(R.string.mfa_totp_header))
+                            }
+                        }) {
                             Column(
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -258,7 +275,20 @@ fun MfaScreen(
                     }
 
                     "Recovery" -> {
-                        CollapsibleCard(title = stringResource(R.string.mfa_recovery_header)) {
+                        CollapsibleCard(header = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ux_mfa_restore),
+                                    contentDescription = null, // See label
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                        .padding(end = 10.dp)
+                                )
+                                Text(stringResource(R.string.mfa_recovery_header))
+                            }
+                        }) {
                             Column(
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
