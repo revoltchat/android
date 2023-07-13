@@ -76,8 +76,8 @@ class LoginViewModel @Inject constructor(
     val mfaResponse: EmailPasswordAssessment?
         get() = _mfaResponse
 
-    private suspend fun loadSettings() {
-        SyncedSettings.fetch()
+    private suspend fun loadSettings(token: String) {
+        SyncedSettings.fetch(token)
         GlobalState.hydrateWithSettings(SyncedSettings)
     }
 
@@ -111,8 +111,8 @@ class LoginViewModel @Inject constructor(
                             return@launch
                         }
 
-                        loadSettings()
                         RevoltAPI.loginAs(token)
+                        loadSettings(token)
 
                         _navigateTo = "home"
                     } catch (e: Error) {

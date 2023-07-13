@@ -1,6 +1,7 @@
 package chat.revolt.api.settings
 
 import androidx.compose.runtime.mutableStateOf
+import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.routes.sync.getKeys
 import chat.revolt.api.routes.sync.setKey
@@ -16,9 +17,9 @@ object SyncedSettings {
     val android: AndroidSpecificSettings
         get() = _android.value
 
-    suspend fun fetch() {
+    suspend fun fetch(revoltToken: String = RevoltAPI.sessionToken) {
         try {
-            val settings = getKeys("ordering", "android")
+            val settings = getKeys("ordering", "android", revoltToken = revoltToken)
 
             settings["ordering"]?.let {
                 _ordering.value = RevoltJson.decodeFromString(

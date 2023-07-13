@@ -75,8 +75,8 @@ class MfaScreenViewModel @Inject constructor(
         _recoveryCode = code
     }
 
-    private suspend fun loadSettings() {
-        SyncedSettings.fetch()
+    private suspend fun loadSettings(token: String) {
+        SyncedSettings.fetch(token)
         GlobalState.hydrateWithSettings(SyncedSettings)
     }
 
@@ -93,9 +93,11 @@ class MfaScreenViewModel @Inject constructor(
                 )
 
                 try {
-                    loadSettings()
-                    RevoltAPI.loginAs(response.firstUserHints!!.token)
-                    kvStorage.set("sessionToken", response.firstUserHints.token)
+                    val token = response.firstUserHints!!.token
+
+                    RevoltAPI.loginAs(token)
+                    loadSettings(token)
+                    kvStorage.set("sessionToken", token)
 
                     _navigateToHome = true
                 } catch (e: Error) {
@@ -119,9 +121,11 @@ class MfaScreenViewModel @Inject constructor(
                 )
 
                 try {
-                    loadSettings()
-                    RevoltAPI.loginAs(response.firstUserHints!!.token)
-                    kvStorage.set("sessionToken", response.firstUserHints.token)
+                    val token = response.firstUserHints!!.token
+
+                    RevoltAPI.loginAs(token)
+                    loadSettings(token)
+                    kvStorage.set("sessionToken", token)
 
                     _navigateToHome = true
                 } catch (e: Error) {

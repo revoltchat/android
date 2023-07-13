@@ -16,9 +16,9 @@ import kotlinx.serialization.json.JsonArray
 @Serializable
 data class SyncedSetting(val timestamp: Long, val value: String)
 
-suspend fun getKeys(vararg keys: String): Map<String, SyncedSetting> {
+suspend fun getKeys(vararg keys: String, revoltToken: String): Map<String, SyncedSetting> {
     val response = RevoltHttp.post("/sync/settings/fetch") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+        headers.append(RevoltAPI.TOKEN_HEADER_NAME, revoltToken)
 
         // format: {"keys": ["key1", "key2"]}
         setBody(
@@ -48,6 +48,10 @@ suspend fun getKeys(vararg keys: String): Map<String, SyncedSetting> {
                 .replace("\\\\", "\\") // the revolt API is so scuffed i can't even make this up
         )
     }
+}
+
+suspend fun getKeys(vararg keys: String): Map<String, SyncedSetting> {
+    return getKeys(*keys, revoltToken = RevoltAPI.sessionToken)
 }
 
 suspend fun setKey(key: String, value: String) {
