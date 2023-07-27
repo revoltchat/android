@@ -178,7 +178,7 @@ fun ChannelScreen(
         viewModel.fetchChannel(channelId)
 
         coroutineScope.launch {
-            viewModel.listenForWsFrame()
+            viewModel.listenForWsFrames()
         }
 
         coroutineScope.launch {

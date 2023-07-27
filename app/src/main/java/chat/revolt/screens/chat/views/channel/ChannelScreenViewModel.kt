@@ -265,7 +265,7 @@ class ChannelScreenViewModel : ViewModel() {
         }
     }
 
-    suspend fun listenForWsFrame() {
+    suspend fun listenForWsFrames() {
         withContext(RevoltAPI.realtimeContext) {
             flow {
                 while (true) {
@@ -336,7 +336,7 @@ class ChannelScreenViewModel : ViewModel() {
 
                     is RealtimeSocketFrames.Reconnected -> {
                         Log.d("ChannelScreen", "Reconnected to WS.")
-                        listenForWsFrame()
+                        listenForWsFrames()
                     }
                 }
             }.catch {
