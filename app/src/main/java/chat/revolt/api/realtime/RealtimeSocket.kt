@@ -12,6 +12,7 @@ import chat.revolt.api.realtime.frames.receivable.ChannelAckFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelUpdateFrame
+import chat.revolt.api.realtime.frames.receivable.MessageAppendFrame
 import chat.revolt.api.realtime.frames.receivable.MessageFrame
 import chat.revolt.api.realtime.frames.receivable.MessageUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.PongFrame
@@ -174,6 +175,33 @@ object RealtimeSocket {
 
                     RevoltAPI.wsFrameChannel.send(messageFrame)
                 }
+            }
+
+            "MessageAppend" -> {
+                val messageAppendFrame =
+                    RevoltJson.decodeFromString(MessageAppendFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received message append frame for ${messageAppendFrame.id} in channel ${messageAppendFrame.channel}."
+                )
+
+                var message = RevoltAPI.messageCache[messageAppendFrame.id]
+
+                if (message == null) {
+                    Log.d(
+                        "RealtimeSocket",
+                        "Message ${messageAppendFrame.id} not found in cache. Will not append."
+                    )
+                    return
+                }
+
+                messageAppendFrame.append.embeds?.let {
+                    message = message!!.copy(embeds = message!!.embeds?.plus(it) ?: it)
+                }
+
+                RevoltAPI.messageCache[messageAppendFrame.id] = message!!
+
+                RevoltAPI.wsFrameChannel.send(messageAppendFrame)
             }
 
             "MessageUpdate" -> {

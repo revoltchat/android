@@ -19,6 +19,7 @@ import chat.revolt.api.internals.ULID
 import chat.revolt.api.realtime.RealtimeSocketFrames
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
+import chat.revolt.api.realtime.frames.receivable.MessageAppendFrame
 import chat.revolt.api.realtime.frames.receivable.MessageDeleteFrame
 import chat.revolt.api.realtime.frames.receivable.MessageFrame
 import chat.revolt.api.realtime.frames.receivable.MessageUpdateFrame
@@ -313,6 +314,24 @@ class ChannelScreenViewModel : ViewModel() {
                         regroupMessages(renderableMessages.map { currentMsg ->
                             if (currentMsg.id == it.id) {
                                 currentMsg.mergeWithPartial(messageFrame)
+                            } else {
+                                currentMsg
+                            }
+                        })
+                    }
+
+                    is MessageAppendFrame -> {
+                        if (it.channel != activeChannel?.id) return@onEach
+
+                        val hasMessage = renderableMessages.any { currentMsg ->
+                            currentMsg.id == it.id
+                        }
+
+                        if (!hasMessage) return@onEach
+
+                        regroupMessages(renderableMessages.map { currentMsg ->
+                            if (currentMsg.id == it.id) {
+                                RevoltAPI.messageCache[it.id] ?: currentMsg
                             } else {
                                 currentMsg
                             }
