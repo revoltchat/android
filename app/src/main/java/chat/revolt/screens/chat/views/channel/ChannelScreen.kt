@@ -470,6 +470,8 @@ fun ChannelScreen(
                 ),
                 forceSendButton = viewModel.pendingAttachments.isNotEmpty(),
                 disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage,
+                denied = viewModel.denyMessageField,
+                denyReason = stringResource(id = viewModel.denyMessageFieldReasonResource),
                 editMode = viewModel.editingMessage != null,
                 cancelEdit = viewModel::cancelEditingMessage,
                 onFocusChange = { nowFocused ->

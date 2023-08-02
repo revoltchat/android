@@ -61,6 +61,8 @@ fun MessageField(
     forceSendButton: Boolean = false,
     disabled: Boolean = false,
     editMode: Boolean = false,
+    denied: Boolean = false,
+    denyReason: String? = null,
     cancelEdit: () -> Unit = {},
     onFocusChange: (Boolean) -> Unit = {},
 ) {
@@ -73,7 +75,7 @@ fun MessageField(
         ChannelType.SavedMessages -> R.string.message_field_placeholder_notes
     }
 
-    val sendButtonVisible = (messageContent.isNotBlank() || forceSendButton) && !disabled
+    val sendButtonVisible = (messageContent.isNotBlank() || forceSendButton) && !disabled && !denied
 
     Row(
         modifier = Modifier
@@ -84,7 +86,7 @@ fun MessageField(
             value = messageContent,
             onValueChange = onMessageContentChange,
             singleLine = false,
-            enabled = !disabled,
+            enabled = !disabled && !denied,
             textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             modifier = modifier
@@ -104,14 +106,22 @@ fun MessageField(
                     visualTransformation = VisualTransformation.None,
                     interactionSource = remember { MutableInteractionSource() },
                     placeholder = {
-                        Text(
-                            text = stringResource(
-                                id = placeholderResource,
-                                channelName
-                            ),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                        if (denied) {
+                            Text(
+                                text = denyReason
+                                    ?: stringResource(R.string.message_field_denied_generic),
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(
+                                    id = placeholderResource,
+                                    channelName
+                                ),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     },
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
@@ -127,28 +137,30 @@ fun MessageField(
                     ),
                     contentPadding = PaddingValues(16.dp),
                     leadingIcon = {
-                        Icon(
-                            when {
-                                editMode -> Icons.Default.Close
-                                else -> Icons.Default.Add
-                            },
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                            contentDescription = stringResource(id = R.string.add_attachment_alt),
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .size(32.dp)
-                                .clickable {
-                                    when {
-                                        editMode -> cancelEdit()
-                                        else -> {
-                                            focusRequester.freeFocus() // hide keyboard because it's annoying
-                                            onAddAttachment()
+                        if (!denied) {
+                            Icon(
+                                when {
+                                    editMode -> Icons.Default.Close
+                                    else -> Icons.Default.Add
+                                },
+                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                contentDescription = stringResource(id = R.string.add_attachment_alt),
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .size(32.dp)
+                                    .clickable {
+                                        when {
+                                            editMode -> cancelEdit()
+                                            else -> {
+                                                focusRequester.freeFocus() // hide keyboard because it's annoying
+                                                onAddAttachment()
+                                            }
                                         }
                                     }
-                                }
-                                .padding(4.dp)
-                                .testTag("add_attachment")
-                        )
+                                    .padding(4.dp)
+                                    .testTag("add_attachment")
+                            )
+                        }
                     },
                     trailingIcon = {
                         AnimatedVisibility(sendButtonVisible,

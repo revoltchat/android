@@ -3,14 +3,18 @@ package chat.revolt.screens.chat.views.channel
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.internals.ChannelUtils
+import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.realtime.RealtimeSocketFrames
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
@@ -65,6 +69,9 @@ class ChannelScreenViewModel : ViewModel() {
     var pendingUploadProgress by mutableFloatStateOf(0f)
 
     var editingMessage by mutableStateOf<String?>(null)
+
+    var denyMessageField by mutableStateOf(false)
+    var denyMessageFieldReasonResource by mutableIntStateOf(R.string.message_field_denied_generic)
 
     private fun popAttachmentBatch() {
         pendingAttachments =
@@ -151,6 +158,8 @@ class ChannelScreenViewModel : ViewModel() {
             } else {
                 activeChannel = RevoltAPI.channelCache[id]
             }
+
+            checkShouldDenyMessageField()
 
             if (activeChannel?.lastMessageID != null) {
                 ackNewest()
@@ -408,5 +417,26 @@ class ChannelScreenViewModel : ViewModel() {
     fun cancelEditingMessage() {
         editingMessage = null
         pendingMessageContent = ""
+    }
+
+    private fun checkShouldDenyMessageField() {
+        // TODO Check for send message permission.
+        val hasPermission = true
+
+        if (activeChannel == null) return
+
+        val partnerId = ChannelUtils.resolveDMPartner(activeChannel!!) ?: return
+
+        denyMessageField = when {
+            partnerId == SpecialUsers.PLATFORM_MODERATION_USER -> true
+            !hasPermission -> true
+            else -> false
+        }
+
+        denyMessageFieldReasonResource = when {
+            partnerId == SpecialUsers.PLATFORM_MODERATION_USER -> R.string.message_field_denied_platform_moderation
+            !hasPermission -> R.string.message_field_denied_no_permission
+            else -> R.string.message_field_denied_generic
+        }
     }
 }

@@ -52,12 +52,16 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.ChannelUtils
+import chat.revolt.api.internals.DirectMessages
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.server.fetchMembers
+import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.User
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.chat.DisconnectedNotice
+import chat.revolt.components.generic.GroupIcon
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.drawer.channel.ChannelList
@@ -190,6 +194,8 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
         composition = sidebarSparkComposition,
     )
 
+    var showPlatformModDMHint by remember { mutableStateOf(false) }
+
     var showStatusSheet by remember { mutableStateOf(false) }
     var showAddServerSheet by remember { mutableStateOf(false) }
 
@@ -254,6 +260,16 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
             }
     }
 
+    LaunchedEffect(DirectMessages.unreadDMs()) {
+        snapshotFlow { DirectMessages.unreadDMs() }
+            .distinctUntilChanged()
+            .collect { _ ->
+                if (DirectMessages.hasPlatformModerationDM()) {
+                    showPlatformModDMHint = true
+                }
+            }
+    }
+
     if (showSidebarSpark.value) {
         AlertDialog(
             onDismissRequest = {},
@@ -282,6 +298,29 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                     showSidebarSpark.value = false
                 }) {
                     Text(stringResource(id = R.string.spark_sidebar_settings_tutorial_acknowledge))
+                }
+            }
+        )
+    }
+
+    if (showPlatformModDMHint) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = {
+                Text(stringResource(id = R.string.notice_platform_mod_dm_title))
+            },
+            text = {
+                Text(stringResource(id = R.string.notice_platform_mod_dm_description))
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPlatformModDMHint = false
+                    DirectMessages.getPlatformModerationDM()?.id?.let {
+                        viewModel.navigateToServer("home", navController)
+                        viewModel.navigateToChannel(it, navController)
+                    }
+                }) {
+                    Text(stringResource(id = R.string.notice_platform_mod_dm_acknowledge))
                 }
             }
         )
@@ -408,6 +447,68 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                                         .padding(8.dp)
                                         .size(48.dp)
                                 )
+
+                                DirectMessages.unreadDMs().forEach {
+                                    when (it.channelType) {
+                                        ChannelType.Group -> GroupIcon(
+                                            name = it.name ?: "?",
+                                            size = 48.dp,
+                                            onClick = {
+                                                it.id?.let { id ->
+                                                    viewModel.navigateToServer(
+                                                        "home",
+                                                        navController
+                                                    )
+                                                    viewModel.navigateToChannel(
+                                                        id,
+                                                        navController
+                                                    )
+                                                }
+                                            },
+                                            icon = it.icon,
+                                            modifier = Modifier
+                                                .padding(8.dp)
+                                                .size(48.dp)
+                                        )
+
+                                        else -> {
+                                            val partner =
+                                                if (it.channelType == ChannelType.DirectMessage) RevoltAPI.userCache[ChannelUtils.resolveDMPartner(
+                                                    it
+                                                )] else null
+
+                                            UserAvatar(
+                                                username = partner?.let { p ->
+                                                    User.resolveDefaultName(
+                                                        p
+                                                    )
+                                                } ?: it.name ?: "?",
+                                                presence = presenceFromStatus(
+                                                    partner?.status?.presence ?: ""
+                                                ),
+                                                userId = partner?.id ?: it.id ?: "",
+                                                avatar = partner?.avatar ?: it.icon,
+                                                size = 48.dp,
+                                                presenceSize = 16.dp,
+                                                onClick = {
+                                                    it.id?.let { id ->
+                                                        viewModel.navigateToServer(
+                                                            "home",
+                                                            navController
+                                                        )
+                                                        viewModel.navigateToChannel(
+                                                            id,
+                                                            navController
+                                                        )
+                                                    }
+                                                },
+                                                modifier = Modifier
+                                                    .padding(8.dp)
+                                                    .size(48.dp)
+                                            )
+                                        }
+                                    }
+                                }
 
                                 ServerDrawerSeparator()
 
