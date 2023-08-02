@@ -10,6 +10,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,6 +48,7 @@ import io.sentry.android.core.SentryAndroid
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,7 +60,8 @@ class MainActivity : FragmentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            AppEntrypoint()
+            val windowSizeClass = calculateWindowSizeClass(this)
+            AppEntrypoint(windowSizeClass)
         }
     }
 }
@@ -67,7 +72,7 @@ val RevoltTweenDp: FiniteAnimationSpec<Dp> = tween(400, easing = EaseInOutExpo)
 val RevoltTweenColour: FiniteAnimationSpec<Color> = tween(400, easing = EaseInOutExpo)
 
 @Composable
-fun AppEntrypoint() {
+fun AppEntrypoint(windowSizeClass: WindowSizeClass) {
     val navController = rememberNavController()
 
     RevoltTheme(
@@ -126,7 +131,7 @@ fun AppEntrypoint() {
                 }
                 composable("register/onboarding") { OnboardingScreen(navController) }
 
-                composable("chat") { ChatRouterScreen(navController) }
+                composable("chat") { ChatRouterScreen(navController, windowSizeClass) }
 
                 composable("settings") { SettingsScreen(navController) }
                 composable("settings/appearance") { AppearanceSettingsScreen(navController) }

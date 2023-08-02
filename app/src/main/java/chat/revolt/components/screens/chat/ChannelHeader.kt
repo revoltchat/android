@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,6 +32,7 @@ fun ChannelHeader(
     channel: Channel,
     onChannelClick: (String) -> Unit,
     onToggleDrawer: () -> Unit,
+    useDrawer: Boolean,
 ) {
     Row(
         modifier = Modifier
@@ -41,16 +43,25 @@ fun ChannelHeader(
             .padding(vertical = 4.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = {
-            onToggleDrawer()
-        }) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = stringResource(R.string.menu),
+        if (useDrawer) {
+            IconButton(onClick = {
+                onToggleDrawer()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = stringResource(R.string.menu),
+                )
+            }
+
+            Spacer(modifier = Modifier.width(4.dp))
+        } else {
+            // Compensate for the IconButton not increasing our height
+            Spacer(
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(12.dp)
             )
         }
-
-        Spacer(modifier = Modifier.width(4.dp))
 
         channel.channelType?.let {
             ChannelIcon(

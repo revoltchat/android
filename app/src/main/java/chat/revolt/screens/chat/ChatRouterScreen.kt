@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.DismissibleNavigationDrawer
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,6 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
@@ -181,7 +186,11 @@ class ChatRouterViewModel @Inject constructor(
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hiltViewModel()) {
+fun ChatRouterScreen(
+    topNav: NavController,
+    windowSizeClass: WindowSizeClass,
+    viewModel: ChatRouterViewModel = hiltViewModel()
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -205,6 +214,8 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
     var showUserContextSheet by remember { mutableStateOf(false) }
     var userContextSheetTarget by remember { mutableStateOf("") }
     var userContextSheetServer by remember { mutableStateOf<String?>(null) }
+
+    var useTabletAwareUI by remember { mutableStateOf(false) }
 
     val drawerBackHandler = remember {
         {
@@ -267,6 +278,14 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                 if (DirectMessages.hasPlatformModerationDM()) {
                     showPlatformModDMHint = true
                 }
+            }
+    }
+
+    LaunchedEffect(windowSizeClass) {
+        snapshotFlow { windowSizeClass }
+            .distinctUntilChanged()
+            .collect { sizeClass ->
+                useTabletAwareUI = sizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
             }
     }
 
@@ -408,241 +427,329 @@ fun ChatRouterScreen(topNav: NavController, viewModel: ChatRouterViewModel = hil
                 })
         }
 
-        DismissibleNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                DismissibleDrawerSheet(
-                    drawerContainerColor = Color.Transparent,
-                ) {
-                    Column(Modifier.fillMaxWidth()) {
-                        Row {
-                            Column(
+        if (useTabletAwareUI) {
+            Row {
+                Sidebar(
+                    viewModel = viewModel,
+                    navController = navController,
+                    onShowStatusSheet = {
+                        showStatusSheet = true
+                    },
+                    onShowServerContextSheet = {
+                        serverContextSheetTarget = it
+                        showServerContextSheet = true
+                    },
+                    onShowAddServerSheet = {
+                        showAddServerSheet = true
+                    },
+                    useDrawer = false,
+                )
+                ChannelNavigator(
+                    navController = navController,
+                    topNav = topNav,
+                    useDrawer = false,
+                    drawerBackHandler = {
+                        drawerBackHandler()
+                    },
+                    onShowUserContextSheet = { target, server ->
+                        userContextSheetTarget = target
+                        userContextSheetServer = server
+                        showUserContextSheet = true
+                    },
+                )
+            }
+        } else {
+            DismissibleNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    DismissibleDrawerSheet(
+                        drawerContainerColor = Color.Transparent,
+                    ) {
+                        Row(Modifier.fillMaxWidth()) {
+                            Sidebar(
+                                viewModel = viewModel,
+                                navController = navController,
+                                onShowStatusSheet = {
+                                    showStatusSheet = true
+                                },
+                                onShowServerContextSheet = {
+                                    serverContextSheetTarget = it
+                                    showServerContextSheet = true
+                                },
+                                onShowAddServerSheet = {
+                                    showAddServerSheet = true
+                                },
+                                drawerState = drawerState,
+                                useDrawer = true,
+                            )
+                        }
+                    }
+                },
+                content = {
+                    Row(Modifier.fillMaxSize()) {
+                        ChannelNavigator(
+                            navController = navController,
+                            topNav = topNav,
+                            useDrawer = true,
+                            drawerBackHandler = {
+                                drawerBackHandler()
+                            },
+                            drawerState = drawerState,
+                            onShowUserContextSheet = { target, server ->
+                                userContextSheetTarget = target
+                                userContextSheetServer = server
+                                showUserContextSheet = true
+                            },
+                        )
+                    }
+                })
+        }
+    }
+}
+
+@Composable
+fun RowScope.Sidebar(
+    viewModel: ChatRouterViewModel,
+    navController: NavHostController,
+    drawerState: DrawerState? = null,
+    onShowStatusSheet: () -> Unit,
+    onShowServerContextSheet: (String) -> Unit,
+    onShowAddServerSheet: () -> Unit,
+    useDrawer: Boolean = false,
+) {
+    val scope = rememberCoroutineScope()
+
+    Column(Modifier.then(if (useDrawer) Modifier.fillMaxWidth() else Modifier.weight(0.3f))) {
+        Row {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                UserAvatar(
+                    username = RevoltAPI.userCache[RevoltAPI.selfId]?.let {
+                        User.resolveDefaultName(
+                            it
+                        )
+                    }
+                        ?: "",
+                    presence = presenceFromStatus(
+                        RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence
+                            ?: ""
+                    ),
+                    userId = RevoltAPI.selfId ?: "",
+                    avatar = RevoltAPI.userCache[RevoltAPI.selfId]?.avatar,
+                    size = 48.dp,
+                    presenceSize = 16.dp,
+                    onClick = {
+                        viewModel.navigateToServer("home", navController)
+                    },
+                    onLongClick = onShowStatusSheet,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(48.dp)
+                )
+
+                DirectMessages.unreadDMs().forEach {
+                    when (it.channelType) {
+                        ChannelType.Group -> GroupIcon(
+                            name = it.name ?: "?",
+                            size = 48.dp,
+                            onClick = {
+                                it.id?.let { id ->
+                                    viewModel.navigateToServer(
+                                        "home",
+                                        navController
+                                    )
+                                    viewModel.navigateToChannel(
+                                        id,
+                                        navController
+                                    )
+                                }
+                            },
+                            icon = it.icon,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .size(48.dp)
+                        )
+
+                        else -> {
+                            val partner =
+                                if (it.channelType == ChannelType.DirectMessage) RevoltAPI.userCache[ChannelUtils.resolveDMPartner(
+                                    it
+                                )] else null
+
+                            UserAvatar(
+                                username = partner?.let { p ->
+                                    User.resolveDefaultName(
+                                        p
+                                    )
+                                } ?: it.name ?: "?",
+                                presence = presenceFromStatus(
+                                    partner?.status?.presence ?: ""
+                                ),
+                                userId = partner?.id ?: it.id ?: "",
+                                avatar = partner?.avatar ?: it.icon,
+                                size = 48.dp,
+                                presenceSize = 16.dp,
+                                onClick = {
+                                    it.id?.let { id ->
+                                        viewModel.navigateToServer(
+                                            "home",
+                                            navController
+                                        )
+                                        viewModel.navigateToChannel(
+                                            id,
+                                            navController
+                                        )
+                                    }
+                                },
                                 modifier = Modifier
-                                    .fillMaxHeight()
-                                    .verticalScroll(rememberScrollState()),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                UserAvatar(
-                                    username = RevoltAPI.userCache[RevoltAPI.selfId]?.let {
-                                        User.resolveDefaultName(
-                                            it
-                                        )
-                                    }
-                                        ?: "",
-                                    presence = presenceFromStatus(
-                                        RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence
-                                            ?: ""
-                                    ),
-                                    userId = RevoltAPI.selfId ?: "",
-                                    avatar = RevoltAPI.userCache[RevoltAPI.selfId]?.avatar,
-                                    size = 48.dp,
-                                    presenceSize = 16.dp,
-                                    onClick = {
-                                        viewModel.navigateToServer("home", navController)
-                                    },
-                                    onLongClick = {
-                                        showStatusSheet = true
-                                    },
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .size(48.dp)
-                                )
-
-                                DirectMessages.unreadDMs().forEach {
-                                    when (it.channelType) {
-                                        ChannelType.Group -> GroupIcon(
-                                            name = it.name ?: "?",
-                                            size = 48.dp,
-                                            onClick = {
-                                                it.id?.let { id ->
-                                                    viewModel.navigateToServer(
-                                                        "home",
-                                                        navController
-                                                    )
-                                                    viewModel.navigateToChannel(
-                                                        id,
-                                                        navController
-                                                    )
-                                                }
-                                            },
-                                            icon = it.icon,
-                                            modifier = Modifier
-                                                .padding(8.dp)
-                                                .size(48.dp)
-                                        )
-
-                                        else -> {
-                                            val partner =
-                                                if (it.channelType == ChannelType.DirectMessage) RevoltAPI.userCache[ChannelUtils.resolveDMPartner(
-                                                    it
-                                                )] else null
-
-                                            UserAvatar(
-                                                username = partner?.let { p ->
-                                                    User.resolveDefaultName(
-                                                        p
-                                                    )
-                                                } ?: it.name ?: "?",
-                                                presence = presenceFromStatus(
-                                                    partner?.status?.presence ?: ""
-                                                ),
-                                                userId = partner?.id ?: it.id ?: "",
-                                                avatar = partner?.avatar ?: it.icon,
-                                                size = 48.dp,
-                                                presenceSize = 16.dp,
-                                                onClick = {
-                                                    it.id?.let { id ->
-                                                        viewModel.navigateToServer(
-                                                            "home",
-                                                            navController
-                                                        )
-                                                        viewModel.navigateToChannel(
-                                                            id,
-                                                            navController
-                                                        )
-                                                    }
-                                                },
-                                                modifier = Modifier
-                                                    .padding(8.dp)
-                                                    .size(48.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                ServerDrawerSeparator()
-
-                                // This seems to confuse the formatter, here's what it does:
-                                // - Take the list of servers and filter them by the ones that are in the ordering.
-                                // - Sort the servers that are in the ordering using the ordering.
-                                // - Add the servers that aren't in the ordering to the end of the list.
-                                // - Sort the servers that aren't in the ordering by their ID (creation order).
-                                ((RevoltAPI.serverCache.values.filter {
-                                    SyncedSettings.ordering.servers.contains(
-                                        it.id
-                                    )
-                                }
-                                    .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }) + (RevoltAPI.serverCache.values.filter {
-                                    !SyncedSettings.ordering.servers.contains(
-                                        it.id
-                                    )
-                                }.sortedBy { it.id }
-                                        ))
-                                    .forEach { server ->
-                                        if (server.id == null || server.name == null) return@forEach
-
-                                        DrawerServer(
-                                            iconId = server.icon?.id,
-                                            serverName = server.name,
-                                            hasUnreads = RevoltAPI.unreads.serverHasUnread(
-                                                server.id
-                                            ),
-                                            onLongClick = {
-                                                serverContextSheetTarget = server.id
-                                                showServerContextSheet = true
-                                            },
-                                        ) {
-                                            viewModel.navigateToServer(
-                                                server.id,
-                                                navController
-                                            )
-                                        }
-                                    }
-
-                                DrawerServerlikeIcon(
-                                    onClick = {
-                                        showAddServerSheet = true
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Default.Add,
-                                        contentDescription = stringResource(id = R.string.server_plus_alt),
-                                        modifier = Modifier.padding(4.dp)
-                                    )
-                                }
-                            }
-
-                            Crossfade(
-                                targetState = viewModel.currentServer,
-                                label = "Channel List"
-                            ) {
-                                ChannelList(
-                                    serverId = it,
-                                    currentDestination = navController.currentDestination?.route,
-                                    currentChannel = viewModel.currentChannel,
-                                    onChannelClick = { channelId ->
-                                        viewModel.navigateToChannel(channelId, navController)
-                                        scope.launch { drawerState.close() }
-                                    },
-                                    onSpecialClick = { destination ->
-                                        viewModel.navigateToSpecial(destination, navController)
-                                        scope.launch { drawerState.close() }
-                                    },
-                                    onServerSheetOpenFor = { target ->
-                                        serverContextSheetTarget = target
-                                        showServerContextSheet = true
-                                    },
-                                )
-                            }
+                                    .padding(8.dp)
+                                    .size(48.dp)
+                            )
                         }
                     }
                 }
-            },
-            content = {
-                Column(Modifier.fillMaxSize()) {
-                    NavHost(navController = navController, startDestination = "home") {
-                        composable("home") {
-                            BackHandler {
-                                drawerBackHandler()
-                            }
-                            HomeScreen(navController = topNav)
-                        }
 
-                        composable("channel/{channelId}") { backStackEntry ->
-                            BackHandler {
-                                drawerBackHandler()
-                            }
+                ServerDrawerSeparator()
 
-                            val channelId = backStackEntry.arguments?.getString("channelId")
-                            if (channelId != null) {
-                                ChannelScreen(
-                                    navController = navController,
-                                    channelId = channelId,
-                                    onToggleDrawer = {
-                                        scope.launch {
-                                            if (drawerState.isOpen) drawerState.close()
-                                            else drawerState.open()
-                                        }
-                                    },
-                                    onUserSheetOpenFor = { target, server ->
-                                        userContextSheetTarget = target
-                                        userContextSheetServer = server
+                // This seems to confuse the formatter, here's what it does:
+                // - Take the list of servers and filter them by the ones that are in the ordering.
+                // - Sort the servers that are in the ordering using the ordering.
+                // - Add the servers that aren't in the ordering to the end of the list.
+                // - Sort the servers that aren't in the ordering by their ID (creation order).
+                ((RevoltAPI.serverCache.values.filter {
+                    SyncedSettings.ordering.servers.contains(
+                        it.id
+                    )
+                }
+                    .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }) + (RevoltAPI.serverCache.values.filter {
+                    !SyncedSettings.ordering.servers.contains(
+                        it.id
+                    )
+                }.sortedBy { it.id }
+                        ))
+                    .forEach { server ->
+                        if (server.id == null || server.name == null) return@forEach
 
-                                        showUserContextSheet = true
-                                    },
-                                )
-                            }
-                        }
-
-                        composable("no_current_channel") {
-                            BackHandler {
-                                drawerBackHandler()
-                            }
-
-                            NoCurrentChannelScreen()
-                        }
-
-                        dialog("report/message/{messageId}") { backStackEntry ->
-                            val messageId = backStackEntry.arguments?.getString("messageId")
-                            if (messageId != null) {
-                                ReportMessageDialog(
-                                    navController = navController,
-                                    messageId = messageId
-                                )
-                            }
+                        DrawerServer(
+                            iconId = server.icon?.id,
+                            serverName = server.name,
+                            hasUnreads = RevoltAPI.unreads.serverHasUnread(
+                                server.id
+                            ),
+                            onLongClick = {
+                                /*serverContextSheetTarget = server.id
+                                showServerContextSheet = true*/
+                                onShowServerContextSheet(server.id)
+                            },
+                        ) {
+                            viewModel.navigateToServer(
+                                server.id,
+                                navController
+                            )
                         }
                     }
+
+                DrawerServerlikeIcon(
+                    onClick = onShowAddServerSheet,
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(id = R.string.server_plus_alt),
+                        modifier = Modifier.padding(4.dp)
+                    )
                 }
-            })
+            }
+
+            Crossfade(
+                targetState = viewModel.currentServer,
+                label = "Channel List"
+            ) {
+                ChannelList(
+                    serverId = it,
+                    currentDestination = navController.currentDestination?.route,
+                    currentChannel = viewModel.currentChannel,
+                    onChannelClick = { channelId ->
+                        viewModel.navigateToChannel(channelId, navController)
+                        scope.launch { drawerState?.close() }
+                    },
+                    onSpecialClick = { destination ->
+                        viewModel.navigateToSpecial(destination, navController)
+                        scope.launch { drawerState?.close() }
+                    },
+                    onServerSheetOpenFor = { target ->
+                        onShowServerContextSheet(target)
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RowScope.ChannelNavigator(
+    navController: NavHostController,
+    topNav: NavController,
+    useDrawer: Boolean,
+    drawerBackHandler: () -> Unit,
+    drawerState: DrawerState? = null,
+    onShowUserContextSheet: (String, String?) -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+
+    Column(Modifier.then(if (useDrawer) Modifier.fillMaxSize() else Modifier.weight(0.7f))) {
+        NavHost(navController = navController, startDestination = "home") {
+            composable("home") {
+                BackHandler(enabled = useDrawer) {
+                    drawerBackHandler()
+                }
+                HomeScreen(navController = topNav)
+            }
+
+            composable("channel/{channelId}") { backStackEntry ->
+                BackHandler(enabled = useDrawer) {
+                    drawerBackHandler()
+                }
+
+                val channelId = backStackEntry.arguments?.getString("channelId")
+                if (channelId != null) {
+                    ChannelScreen(
+                        navController = navController,
+                        channelId = channelId,
+                        onToggleDrawer = {
+                            scope.launch {
+                                if (drawerState?.isOpen == true) drawerState.close()
+                                else drawerState?.open()
+                            }
+                        },
+                        onUserSheetOpenFor = { target, server ->
+                            onShowUserContextSheet(target, server)
+                        },
+                        useDrawer = useDrawer
+                    )
+                }
+            }
+
+            composable("no_current_channel") {
+                BackHandler(enabled = useDrawer) {
+                    drawerBackHandler()
+                }
+
+                NoCurrentChannelScreen()
+            }
+
+            dialog("report/message/{messageId}") { backStackEntry ->
+                val messageId = backStackEntry.arguments?.getString("messageId")
+                if (messageId != null) {
+                    ReportMessageDialog(
+                        navController = navController,
+                        messageId = messageId
+                    )
+                }
+            }
+        }
     }
 }

@@ -101,6 +101,7 @@ fun ChannelScreen(
     channelId: String,
     onToggleDrawer: () -> Unit,
     onUserSheetOpenFor: (String, String?) -> Unit,
+    useDrawer: Boolean,
     viewModel: ChannelScreenViewModel = viewModel()
 ) {
     val channel = viewModel.activeChannel
@@ -238,7 +239,8 @@ fun ChannelScreen(
             onChannelClick = {
                 channelInfoSheetShown = true
             },
-            onToggleDrawer = onToggleDrawer
+            onToggleDrawer = onToggleDrawer,
+            useDrawer = useDrawer,
         )
 
         val isScrolledToBottom = remember(lazyListState) {
