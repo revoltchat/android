@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +34,6 @@ import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.screens.splash.DisconnectedScreen
 import chat.revolt.persistence.KVStorage
-import chat.revolt.ui.theme.RevoltColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.request.get
@@ -163,9 +163,8 @@ fun SplashScreen(
 
     Column(
         modifier = Modifier
-            .background(color = RevoltColorScheme.background)
-            .fillMaxWidth()
-            .fillMaxHeight(),
+            .background(color = MaterialTheme.colorScheme.background)
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
