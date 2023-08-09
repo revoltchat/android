@@ -202,9 +202,19 @@
     <string name="channel_context_sheet_actions_copy_id_copied">Copied channel ID to clipboard</string>
     <string name="channel_context_sheet_actions_mark_read">Mark as read</string>
 
+    <string name="server_context_sheet_category_description">Description</string>
+    <string name="server_context_sheet_description_empty">There hasn\'t been a description set for this server yet.</string>
+    <string name="server_context_sheet_category_actions">Actions</string>
+
     <string name="server_context_sheet_actions_copy_id">Copy ID</string>
     <string name="server_context_sheet_actions_copy_id_copied">Copied server ID to clipboard</string>
     <string name="server_context_sheet_actions_mark_read">Mark as read</string>
+    <string name="server_context_sheet_actions_leave">Leave</string>
+    <string name="server_context_sheet_actions_leave_confirm">Leave %1$s?</string>
+    <string name="server_context_sheet_actions_leave_confirm_eyebrow">Until you get invited back, you won\'t be able to rejoin.</string>
+    <string name="server_context_sheet_actions_leave_confirm_yes">Leave</string>
+    <string name="server_context_sheet_actions_leave_confirm_no">Stay</string>
+    <string name="server_context_sheet_actions_leave_silently">Leave Silently</string>
 
     <string name="user_context_sheet_category_bio">Bio</string>
     <string name="user_context_sheet_bio_empty">This user hasn\'t set a bio yet.</string>

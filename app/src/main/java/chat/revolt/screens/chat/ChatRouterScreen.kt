@@ -79,6 +79,7 @@ import chat.revolt.screens.chat.views.HomeScreen
 import chat.revolt.screens.chat.views.NoCurrentChannelScreen
 import chat.revolt.screens.chat.views.channel.ChannelScreen
 import chat.revolt.sheets.AddServerSheet
+import chat.revolt.sheets.ServerContextSheet
 import chat.revolt.sheets.StatusSheet
 import chat.revolt.sheets.UserContextSheet
 import com.airbnb.lottie.RenderMode
@@ -392,9 +393,13 @@ fun ChatRouterScreen(
                 showServerContextSheet = false
             },
         ) {
-            Column {
-                Text(text = "this is server context sheet for $serverContextSheetTarget")
-            }
+            ServerContextSheet(
+                serverId = serverContextSheetTarget,
+                onHideSheet = {
+                    serverContextSheetState.hide()
+                    showServerContextSheet = false
+                },
+            )
         }
     }
 

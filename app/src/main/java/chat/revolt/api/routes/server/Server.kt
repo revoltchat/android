@@ -6,6 +6,7 @@ import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.put
@@ -86,4 +87,12 @@ suspend fun fetchMember(serverId: String, userId: String, pure: Boolean = false)
     }
 
     return member
+}
+
+suspend fun leaveOrDeleteServer(serverId: String, leaveSilently: Boolean = false) {
+    RevoltHttp.delete("/servers/$serverId") {
+        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+
+        parameter("leave_silently", leaveSilently)
+    }
 }
