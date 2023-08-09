@@ -5,7 +5,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -286,6 +286,7 @@ fun ChatRouterScreen(
             .distinctUntilChanged()
             .collect { sizeClass ->
                 useTabletAwareUI = sizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
+                        && sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
             }
     }
 
@@ -429,21 +430,24 @@ fun ChatRouterScreen(
 
         if (useTabletAwareUI) {
             Row {
-                Sidebar(
-                    viewModel = viewModel,
-                    navController = navController,
-                    onShowStatusSheet = {
-                        showStatusSheet = true
-                    },
-                    onShowServerContextSheet = {
-                        serverContextSheetTarget = it
-                        showServerContextSheet = true
-                    },
-                    onShowAddServerSheet = {
-                        showAddServerSheet = true
-                    },
-                    useDrawer = false,
-                )
+                DismissibleDrawerSheet(
+                    drawerContainerColor = Color.Transparent,
+                ) {
+                    Sidebar(
+                        viewModel = viewModel,
+                        navController = navController,
+                        onShowStatusSheet = {
+                            showStatusSheet = true
+                        },
+                        onShowServerContextSheet = {
+                            serverContextSheetTarget = it
+                            showServerContextSheet = true
+                        },
+                        onShowAddServerSheet = {
+                            showAddServerSheet = true
+                        },
+                    )
+                }
                 ChannelNavigator(
                     navController = navController,
                     topNav = topNav,
@@ -465,24 +469,21 @@ fun ChatRouterScreen(
                     DismissibleDrawerSheet(
                         drawerContainerColor = Color.Transparent,
                     ) {
-                        Row(Modifier.fillMaxWidth()) {
-                            Sidebar(
-                                viewModel = viewModel,
-                                navController = navController,
-                                onShowStatusSheet = {
-                                    showStatusSheet = true
-                                },
-                                onShowServerContextSheet = {
-                                    serverContextSheetTarget = it
-                                    showServerContextSheet = true
-                                },
-                                onShowAddServerSheet = {
-                                    showAddServerSheet = true
-                                },
-                                drawerState = drawerState,
-                                useDrawer = true,
-                            )
-                        }
+                        Sidebar(
+                            viewModel = viewModel,
+                            navController = navController,
+                            onShowStatusSheet = {
+                                showStatusSheet = true
+                            },
+                            onShowServerContextSheet = {
+                                serverContextSheetTarget = it
+                                showServerContextSheet = true
+                            },
+                            onShowAddServerSheet = {
+                                showAddServerSheet = true
+                            },
+                            drawerState = drawerState,
+                        )
                     }
                 },
                 content = {
@@ -508,18 +509,17 @@ fun ChatRouterScreen(
 }
 
 @Composable
-fun RowScope.Sidebar(
+fun Sidebar(
     viewModel: ChatRouterViewModel,
     navController: NavHostController,
     drawerState: DrawerState? = null,
     onShowStatusSheet: () -> Unit,
     onShowServerContextSheet: (String) -> Unit,
     onShowAddServerSheet: () -> Unit,
-    useDrawer: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
 
-    Column(Modifier.then(if (useDrawer) Modifier.fillMaxWidth() else Modifier.weight(0.3f))) {
+    Column(Modifier.fillMaxWidth()) {
         Row {
             Column(
                 modifier = Modifier
@@ -690,7 +690,7 @@ fun RowScope.Sidebar(
 }
 
 @Composable
-fun RowScope.ChannelNavigator(
+fun ChannelNavigator(
     navController: NavHostController,
     topNav: NavController,
     useDrawer: Boolean,
@@ -700,7 +700,7 @@ fun RowScope.ChannelNavigator(
 ) {
     val scope = rememberCoroutineScope()
 
-    Column(Modifier.then(if (useDrawer) Modifier.fillMaxSize() else Modifier.weight(0.7f))) {
+    Column(Modifier.fillMaxSize()) {
         NavHost(navController = navController, startDestination = "home") {
             composable("home") {
                 BackHandler(enabled = useDrawer) {
