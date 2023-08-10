@@ -1,6 +1,7 @@
 package chat.revolt.components.screens.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,9 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -29,13 +33,17 @@ import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
+import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SelfUserOverview() {
@@ -63,8 +71,36 @@ fun UserOverview(user: User) {
 
 @Composable
 fun RawUserOverview(user: User, profile: Profile? = null) {
+    val context = LocalContext.current
+    var teamMemberFlair by remember { mutableStateOf<Brush?>(null) }
+
+    LaunchedEffect(user) {
+        runBlocking(Dispatchers.IO) {
+            user.id?.let {
+                teamMemberFlair = SpecialUsers.teamFlairAsBrush(
+                    context,
+                    it
+                )
+            }
+        }
+    }
+
     Box(
         contentAlignment = Alignment.BottomStart,
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .clip(MaterialTheme.shapes.large)
+            .then(
+                if (user.id in SpecialUsers.TEAM_MEMBER_FLAIRS.keys) {
+                    Modifier
+                        .border(
+                            width = 4.dp,
+                            brush = teamMemberFlair
+                                ?: Brush.solidColor(Color.Transparent),
+                            shape = MaterialTheme.shapes.large,
+                        )
+                } else Modifier
+            )
     ) {
         profile?.background?.let { background ->
             RemoteImage(
