@@ -13,7 +13,7 @@ enum class InlineBadge {
     Bot,
     Bridge,
     PlatformModeration,
-    Developer
+    TeamMember
 }
 
 @Composable
@@ -29,14 +29,27 @@ fun InlineBadge(
             tint = colour,
             modifier = modifier
         )
+
         InlineBadge.Bridge -> Icon(
             painter = painterResource(id = R.drawable.ic_link_variant_24dp),
             contentDescription = stringResource(id = R.string.badge_masquerade_alt),
             tint = colour,
             modifier = modifier
         )
-        InlineBadge.PlatformModeration -> TODO()
-        InlineBadge.Developer -> TODO()
+
+        InlineBadge.PlatformModeration -> Icon(
+            painter = painterResource(id = R.drawable.ic_alert_decagram_24dp),
+            contentDescription = stringResource(id = R.string.badge_bot_alt),
+            tint = colour,
+            modifier = modifier
+        )
+
+        InlineBadge.TeamMember -> Icon(
+            painter = painterResource(id = R.drawable.ic_hammer_wrench_24dp),
+            contentDescription = stringResource(id = R.string.badge_team_member_alt),
+            tint = colour,
+            modifier = modifier
+        )
     }
 }
 
@@ -46,12 +59,12 @@ fun InlineBadges(
     bot: Boolean = false,
     bridge: Boolean = false,
     platformModeration: Boolean = false,
-    developer: Boolean = false,
+    teamMember: Boolean = false,
     colour: Color = Color.Unspecified,
     precedingIfAny: @Composable () -> Unit = {},
     followingIfAny: @Composable () -> Unit = {},
 ) {
-    val hasBadges = bot || bridge || platformModeration || developer
+    val hasBadges = bot || bridge || platformModeration || teamMember
 
     if (hasBadges) {
         precedingIfAny()
@@ -79,9 +92,9 @@ fun InlineBadges(
                 colour = colour
             )
         }
-        if (developer) {
+        if (teamMember) {
             InlineBadge(
-                badge = InlineBadge.Developer,
+                badge = InlineBadge.TeamMember,
                 modifier = modifier,
                 colour = colour
             )

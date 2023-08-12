@@ -50,6 +50,7 @@ import chat.revolt.activities.media.ImageViewActivity
 import chat.revolt.activities.media.VideoViewActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.internals.solidColor
@@ -231,6 +232,8 @@ fun Message(
                             InlineBadges(
                                 bot = author.bot != null && message.masquerade == null,
                                 bridge = message.masquerade != null && author.bot != null,
+                                platformModeration = author.id == SpecialUsers.PLATFORM_MODERATION_USER,
+                                teamMember = author.id in SpecialUsers.TEAM_MEMBER_FLAIRS.keys,
                                 colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                                 modifier = Modifier.size(16.dp),
                                 precedingIfAny = {

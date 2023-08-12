@@ -100,6 +100,8 @@
 
     <string name="badge_bot_alt">Bot</string>
     <string name="badge_masquerade_alt">From linked channel</string>
+    <string name="badge_platform_moderation_alt">Platform moderation</string>
+    <string name="badge_team_member_alt">Revolt team member</string>
 
     <string name="unknown">Unknown</string>
 
