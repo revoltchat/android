@@ -1,5 +1,7 @@
 package chat.revolt.screens.settings
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,11 +14,13 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -24,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
+import chat.revolt.activities.InviteActivity
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.SheetClickable
 import chat.revolt.components.screens.settings.SelfUserOverview
@@ -32,6 +37,8 @@ import chat.revolt.components.screens.settings.SelfUserOverview
 fun SettingsScreen(
     navController: NavController
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -150,6 +157,32 @@ fun SettingsScreen(
                 SheetClickable(
                     icon = { modifier ->
                         Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = stringResource(id = R.string.logout),
+                            modifier = modifier
+                        )
+                    },
+                    label = { textStyle ->
+                        Text(
+                            text = stringResource(id = R.string.settings_join_jenvolt),
+                            style = textStyle
+                        )
+                    },
+                    modifier = Modifier.testTag("settings_join_jenvolt")
+                ) {
+                    context.startActivity(
+                        Intent(
+                            context,
+                            InviteActivity::class.java
+                        )
+                            .setData(Uri.parse("https://rvlt.gg/jen"))
+                            .setAction(Intent.ACTION_VIEW)
+                    )
+                }
+
+                SheetClickable(
+                    icon = { modifier ->
+                        Icon(
                             imageVector = Icons.Default.Build,
                             contentDescription = stringResource(id = R.string.settings_feedback),
                             modifier = modifier
@@ -177,6 +210,7 @@ fun SettingsScreen(
                     label = { textStyle ->
                         Text(text = stringResource(id = R.string.logout), style = textStyle)
                     },
+                    dangerous = true,
                     modifier = Modifier.testTag("settings_view_logout")
                 ) {
                     Toast

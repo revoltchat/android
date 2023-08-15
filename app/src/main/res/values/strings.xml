@@ -333,6 +333,8 @@
     <string name="settings_appearance_theme_m3dynamic_unsupported">Material You (unsupported)</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">Material You is not supported on this device.</string>
 
+    <string name="settings_join_jenvolt">Join Jenvolt</string>
+
     <string name="settings_feedback">Feedback</string>
     <string name="settings_feedback_introduction">Any feedback you have for Revolt is greatly appreciated and all feedback is read by the development team of our Android app.</string>
     <string name="settings_feedback_category">Category</string>
