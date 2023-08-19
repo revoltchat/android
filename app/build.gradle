@@ -50,8 +50,8 @@ android {
         applicationId "chat.revolt"
         minSdk 24
         targetSdk 34
-        versionCode Integer.parseInt("000_005_002".replaceAll("_", ""), 10)
-        versionName "0.5.2"
+        versionCode Integer.parseInt("000_005_003".replaceAll("_", ""), 10)
+        versionName "0.5.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
