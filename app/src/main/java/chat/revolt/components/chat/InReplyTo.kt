@@ -44,7 +44,8 @@ fun InReplyTo(
         ?: stringResource(id = R.string.unknown)
 
     val contentColor = LocalContentColor.current
-    val usernameColor = message?.let { authorColour(it) } ?: Brush.solidColor(contentColor)
+    val usernameColor =
+        message?.let { authorColour(it) } ?: Brush.solidColor(contentColor)
 
     Box(
         modifier = modifier

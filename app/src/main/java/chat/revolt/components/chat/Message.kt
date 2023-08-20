@@ -35,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -50,6 +49,7 @@ import chat.revolt.activities.media.ImageViewActivity
 import chat.revolt.activities.media.VideoViewActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.WebCompat
@@ -66,7 +66,16 @@ fun authorColour(message: MessageSchema): Brush {
     return if (message.masquerade?.colour != null) {
         WebCompat.parseColour(message.masquerade.colour)
     } else {
-        Brush.solidColor(LocalContentColor.current)
+        val defaultColour = Brush.solidColor(LocalContentColor.current)
+
+        val serverId = RevoltAPI.channelCache[message.channel]?.server ?: return defaultColour
+
+        val highestRole = message.author?.let {
+            Roles.resolveHighestRole(serverId, it, withColour = true)
+        } ?: return defaultColour
+        
+        highestRole.colour?.let { WebCompat.parseColour(it) }
+            ?: defaultColour
     }
 }
 
@@ -171,7 +180,7 @@ fun Message(
                             replyMessage.author
                         )
                     }
-                        ?: false,
+                        ?: false
                 ) {
                     // TODO Add jump to message
                     if (replyMessage == null) {
@@ -218,12 +227,7 @@ fun Message(
                                 text = authorName(message),
                                 style = LocalTextStyle.current.copy(
                                     fontWeight = FontWeight.Bold,
-                                    brush = if (message.author == RevoltAPI.selfId) Brush.horizontalGradient(
-                                        listOf(
-                                            Color.Magenta,
-                                            Color.Cyan,
-                                        ),
-                                    ) else authorColour(message),
+                                    brush = authorColour(message),
                                 ),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis

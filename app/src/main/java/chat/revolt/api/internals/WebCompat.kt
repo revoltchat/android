@@ -16,6 +16,19 @@ fun Brush.Companion.solidColor(colour: Color) = linearGradient(
     )
 )
 
+// Some colours that are not present in Android's built-in list.
+// not exhaustive, but covers most of the ones I've seen in the wild
+// for the sake of all of us, please just use hex codes
+// reference: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+private val ADDITIONAL_WEB_COLOURS = mapOf(
+    "orange" to Color(0xFFFFA500),
+    "rebeccapurple" to Color(0xFF663399),
+    "transparent" to Color.Transparent,
+    "inherit" to Color.Unspecified,
+    "initial" to Color.Unspecified,
+    "unset" to Color.Unspecified,
+)
+
 object WebCompat {
     @Composable
     private fun parseLinearGradient(gradient: String): Brush {
@@ -59,15 +72,7 @@ object WebCompat {
                         )
                     }
 
-                    else -> parseFunctionColour(colourPart) ?: try {
-                        Color(android.graphics.Color.parseColor(colourPart))
-                    } catch (e: IllegalArgumentException) {
-                        Log.d(
-                            "WebCompat",
-                            "Failed to parse colour $colourPart in $gradient, falling back to LocalContentColor.current"
-                        )
-                        LocalContentColor.current
-                    }
+                    else -> parseFunctionColour(colourPart) ?: parseColourName(colourPart)
                 }
 
                 val stop = if (splitPart.size == 2) {
@@ -150,6 +155,28 @@ object WebCompat {
     }
 
     @Composable
+    private fun parseColourName(colour: String): Color {
+        return try {
+            val additionalWebColour = ADDITIONAL_WEB_COLOURS[colour]
+            if (additionalWebColour != null) {
+                Log.d(
+                    "WebCompat",
+                    "Parsed additional web colour $colour to $additionalWebColour"
+                )
+                return additionalWebColour
+            }
+
+            Color(android.graphics.Color.parseColor(colour))
+        } catch (e: IllegalArgumentException) {
+            Log.d(
+                "WebCompat",
+                "Failed to parse colour $colour, falling back to LocalContentColor.current"
+            )
+            LocalContentColor.current
+        }
+    }
+
+    @Composable
     fun parseColour(colour: String): Brush {
         when {
             colour.startsWith("var(") -> {
@@ -172,15 +199,7 @@ object WebCompat {
             }
 
             else -> {
-                return try {
-                    Brush.solidColor(Color(android.graphics.Color.parseColor(colour)))
-                } catch (e: IllegalArgumentException) {
-                    Log.d(
-                        "WebCompat",
-                        "Failed to parse colour $colour, falling back to LocalContentColor.current"
-                    )
-                    Brush.solidColor(LocalContentColor.current)
-                }
+                return Brush.solidColor(parseColourName(colour))
             }
         }
     }
