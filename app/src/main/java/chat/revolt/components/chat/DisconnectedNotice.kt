@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +26,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.realtime.DisconnectionState
+import chat.revolt.api.settings.GlobalState
+import chat.revolt.ui.theme.Theme
+
+private val NON_MATERIAL_COLOURS = mapOf(
+    DisconnectionState.Disconnected to (Color(0xff4E0C0C) to Color(0xffff1744)),
+    DisconnectionState.Reconnecting to (Color(0xff5B5300) to Color(0xffffea00)),
+    DisconnectionState.Connected to (Color(0xff0E2F10) to Color(0xff00e676)),
+)
 
 @Composable
 private fun DisconnectedNoticeBase(
@@ -89,10 +98,21 @@ fun DisconnectedNotice(
         }
     }
 
+    val materialColours = mapOf(
+        DisconnectionState.Disconnected to (MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError),
+        DisconnectionState.Reconnecting to (MaterialTheme.colorScheme.secondary to MaterialTheme.colorScheme.onSecondary),
+        DisconnectionState.Connected to (MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary),
+    )
+
+    val (background, foreground) = when (GlobalState.theme) {
+        Theme.M3Dynamic -> materialColours[state] ?: (Color.Unspecified to Color.Unspecified)
+        else -> NON_MATERIAL_COLOURS[state] ?: (Color.Unspecified to Color.Unspecified)
+    }
+
     when (state) {
         DisconnectionState.Disconnected -> DisconnectedNoticeBase(
-            background = Color(0xff4E0C0C),
-            foreground = Color(0xffff1744),
+            background = background,
+            foreground = foreground,
             icon = Icons.Default.Warning,
             text = stringResource(id = R.string.disconnected),
             canTapToRetry = true,
@@ -100,15 +120,15 @@ fun DisconnectedNotice(
         )
 
         DisconnectionState.Reconnecting -> DisconnectedNoticeBase(
-            background = Color(0xff5B5300),
-            foreground = Color(0xffffea00),
+            background = background,
+            foreground = foreground,
             icon = Icons.Default.Refresh,
             text = stringResource(id = R.string.reconnecting),
         )
 
         DisconnectionState.Connected -> DisconnectedNoticeBase(
-            background = Color(0xff0E2F10),
-            foreground = Color(0xff00e676),
+            background = background,
+            foreground = foreground,
             icon = Icons.Default.Done,
             text = stringResource(id = R.string.reconnected),
         )
