@@ -82,16 +82,18 @@ fun UserContextSheet(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    it.forEach { roleId ->
-                        val role = server?.roles?.get(roleId)
-                        role?.let {
-                            RoleChip(
-                                label = role.name ?: roleId,
-                                brush = role.colour?.let { WebCompat.parseColour(it) }
-                                    ?: Brush.solidColor(LocalContentColor.current)
-                            )
+                    it
+                        .map { roleId -> server?.roles?.get(roleId) }
+                        .sortedBy { it?.rank ?: 0.0 }
+                        .forEach { role ->
+                            role?.let {
+                                RoleChip(
+                                    label = role.name ?: "null",
+                                    brush = role.colour?.let { WebCompat.parseColour(it) }
+                                        ?: Brush.solidColor(LocalContentColor.current)
+                                )
+                            }
                         }
-                    }
                 }
             }
 
