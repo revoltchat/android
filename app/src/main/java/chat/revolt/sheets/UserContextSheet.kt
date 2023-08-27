@@ -51,7 +51,7 @@ fun UserContextSheet(
     LaunchedEffect(user) {
         try {
             user?.id?.let { fetchUserProfile(it) }?.let { profile = it }
-        } catch (e: Exception) {
+        } catch (e: Error) {
             e.printStackTrace()
         }
     }

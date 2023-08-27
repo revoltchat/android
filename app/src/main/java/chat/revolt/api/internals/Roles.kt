@@ -5,21 +5,20 @@ import chat.revolt.api.schemas.Role
 
 object Roles {
     // lowest rank = highest role
-    private fun resolveHighestRole(roles: List<Role?>): Role? {
-        return roles.minByOrNull { role ->
-            role?.rank ?: 0.0
-        }
-    }
-
-    private fun highestRoleWithColour(roles: List<Role?>): Role? {
+    private fun highestRoleWithPredicate(roles: List<Role?>, predicate: (Role) -> Boolean): Role? {
         return roles.filter { role ->
-            role?.colour != null
+            predicate(role!!)
         }.minByOrNull { role ->
             role?.rank ?: 0.0
         }
     }
 
-    fun resolveHighestRole(serverId: String, userId: String, withColour: Boolean = false): Role? {
+    fun resolveHighestRole(
+        serverId: String,
+        userId: String,
+        withColour: Boolean = false,
+        hoisted: Boolean = false
+    ): Role? {
         val server = RevoltAPI.serverCache[serverId] ?: return null
         val member = RevoltAPI.members.getMember(serverId, userId) ?: return null
 
@@ -27,10 +26,17 @@ object Roles {
             server.roles?.get(roleId)
         } ?: return null
 
-        return if (withColour) {
-            highestRoleWithColour(roles)
-        } else {
-            resolveHighestRole(roles)
+        return highestRoleWithPredicate(roles) { role ->
+            val hoistPredicate = if (hoisted) (role.hoist == true) else true
+            val colourPredicate = if (withColour) (role.colour != null) else true
+
+            hoistPredicate && colourPredicate
         }
+    }
+
+    fun inOrder(serverId: String, predicate: (Role) -> Boolean): List<Role> {
+        val server = RevoltAPI.serverCache[serverId] ?: return emptyList()
+
+        return server.roles?.values?.filter(predicate)?.sortedBy { it.rank } ?: emptyList()
     }
 }
