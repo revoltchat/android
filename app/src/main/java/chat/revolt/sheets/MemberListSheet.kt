@@ -246,7 +246,7 @@ fun MemberListMember(
             avatar = user.avatar,
             userId = user.id!!,
             presence = presenceFromStatus(
-                user.status?.presence ?: "",
+                user.status?.presence,
                 user.online ?: false
             )
         )

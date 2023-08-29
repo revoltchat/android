@@ -541,7 +541,6 @@ fun Sidebar(
                         ?: "",
                     presence = presenceFromStatus(
                         RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence
-                            ?: ""
                     ),
                     userId = RevoltAPI.selfId ?: "",
                     avatar = RevoltAPI.userCache[RevoltAPI.selfId]?.avatar,
@@ -592,7 +591,7 @@ fun Sidebar(
                                     )
                                 } ?: it.name ?: "?",
                                 presence = presenceFromStatus(
-                                    partner?.status?.presence ?: ""
+                                    partner?.status?.presence
                                 ),
                                 userId = partner?.id ?: it.id ?: "",
                                 avatar = partner?.avatar ?: it.icon,

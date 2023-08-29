@@ -47,7 +47,7 @@ fun StatusSheet(
                 userId = selfUser.id ?: ULID.makeSpecial(0),
                 avatar = selfUser.avatar,
                 size = 48.dp,
-                presence = presenceFromStatus(selfUser.status?.presence ?: "offline"),
+                presence = presenceFromStatus(selfUser.status?.presence),
             )
 
             Spacer(modifier = Modifier.width(12.dp))

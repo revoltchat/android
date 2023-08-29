@@ -33,11 +33,11 @@ enum class Presence {
     Offline
 }
 
-fun presenceFromStatus(status: String, online: Boolean = true): Presence {
+fun presenceFromStatus(status: String?, online: Boolean = true): Presence {
     if (!online) return Presence.Offline
 
     return when (status) {
-        "Online" -> Presence.Online
+        "Online", null -> Presence.Online
         "Idle" -> Presence.Idle
         "Busy" -> Presence.Dnd
         "Focus" -> Presence.Focus
