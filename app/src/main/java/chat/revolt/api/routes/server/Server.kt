@@ -54,7 +54,7 @@ suspend fun fetchMembers(
     }
 
     membersResponse.members.forEach { member ->
-        if (!RevoltAPI.members.hasMember(serverId, member.id.user)) {
+        if (!RevoltAPI.members.hasMember(serverId, member.id!!.user)) {
             RevoltAPI.members.setMember(serverId, member)
         }
     }
@@ -81,7 +81,7 @@ suspend fun fetchMember(serverId: String, userId: String, pure: Boolean = false)
     val member = RevoltJson.decodeFromString(Member.serializer(), response.bodyAsText())
 
     if (!pure) {
-        if (!RevoltAPI.members.hasMember(serverId, member.id.user)) {
+        if (!RevoltAPI.members.hasMember(serverId, member.id!!.user)) {
             RevoltAPI.members.setMember(serverId, member)
         }
     }

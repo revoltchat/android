@@ -140,7 +140,7 @@ class ChannelScreenViewModel : ViewModel() {
                 }
 
                 it.members?.forEach { member ->
-                    if (!RevoltAPI.members.hasMember(member.id.server, member.id.user)) {
+                    if (!RevoltAPI.members.hasMember(member.id!!.server, member.id.user)) {
                         RevoltAPI.members.setMember(member.id.server, member)
                     }
                 }

@@ -360,6 +360,7 @@ object RealtimeSocket {
             }
 
             "ServerMemberUpdate" -> {
+                Log.d("RealtimeSocket", "Received server member update frame. Raw: $rawFrame")
                 val serverMemberUpdateFrame =
                     RevoltJson.decodeFromString(ServerMemberUpdateFrame.serializer(), rawFrame)
                 Log.d(
@@ -382,6 +383,8 @@ object RealtimeSocket {
                         else -> Log.e("RealtimeSocket", "Unknown server member clear field: $it")
                     }
                 }
+
+                Log.d("RealtimeSocket", "Updated member: $updated")
 
                 RevoltAPI.members.setMember(serverMemberUpdateFrame.id.server, updated)
             }

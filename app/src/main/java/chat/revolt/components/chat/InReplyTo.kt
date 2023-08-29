@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.solidColor
-import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 
@@ -63,7 +62,7 @@ fun InReplyTo(
                     username = username,
                     userId = author?.id ?: "",
                     avatar = author?.avatar,
-                    rawUrl = message.masquerade?.avatar?.let { asJanuaryProxyUrl(it) },
+                    rawUrl = authorAvatarUrl(message),
                     size = 16.dp
                 )
 

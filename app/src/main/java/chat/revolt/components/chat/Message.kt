@@ -73,7 +73,7 @@ fun authorColour(message: MessageSchema): Brush {
         val highestRole = message.author?.let {
             Roles.resolveHighestRole(serverId, it, withColour = true)
         } ?: return defaultColour
-        
+
         highestRole.colour?.let { WebCompat.parseColour(it) }
             ?: defaultColour
     }
@@ -81,9 +81,32 @@ fun authorColour(message: MessageSchema): Brush {
 
 @Composable
 fun authorName(message: MessageSchema): String {
-    return message.masquerade?.name
+    if (message.masquerade?.name != null) {
+        return message.masquerade.name
+    }
+
+    val serverId =
+        RevoltAPI.channelCache[message.channel]?.server ?: return stringResource(R.string.unknown)
+    val member = message.author?.let { RevoltAPI.members.getMember(serverId, it) }
+        ?: return stringResource(R.string.unknown)
+
+    return member.nickname
         ?: RevoltAPI.userCache[message.author]?.let { User.resolveDefaultName(it) }
         ?: stringResource(R.string.unknown)
+}
+
+@Composable
+fun authorAvatarUrl(message: MessageSchema): String? {
+    if (message.masquerade?.avatar != null) {
+        return asJanuaryProxyUrl(message.masquerade.avatar)
+    }
+
+    val serverId =
+        RevoltAPI.channelCache[message.channel]?.server ?: return null
+    val member = message.author?.let { RevoltAPI.members.getMember(serverId, it) }
+        ?: return null
+
+    return member.avatar?.let { "$REVOLT_FILES/avatars/${it.id}?max_side=256" }
 }
 
 fun viewUrlInBrowser(ctx: android.content.Context, url: String) {
@@ -212,7 +235,7 @@ fun Message(
                             username = User.resolveDefaultName(author),
                             userId = author.id ?: message.id ?: ULID.makeSpecial(0),
                             avatar = author.avatar,
-                            rawUrl = message.masquerade?.avatar?.let { asJanuaryProxyUrl(it) },
+                            rawUrl = authorAvatarUrl(message),
                             onClick = onAvatarClick,
                         )
                     }

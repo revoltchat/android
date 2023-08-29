@@ -25,7 +25,7 @@ data class ServerUserChoice(
 @Serializable
 data class Member(
     @SerialName("_id")
-    val id: ServerUserChoice,
+    val id: ServerUserChoice? = null,
 
     @SerialName("joined_at")
     val joinedAt: String? = null,
@@ -36,7 +36,7 @@ data class Member(
 ) {
     fun mergeWithPartial(other: Member): Member {
         return Member(
-            id = other.id,
+            id = other.id ?: id,
             joinedAt = other.joinedAt ?: joinedAt,
             avatar = other.avatar ?: avatar,
             roles = other.roles ?: roles,

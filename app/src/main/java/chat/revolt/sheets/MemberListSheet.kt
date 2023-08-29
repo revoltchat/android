@@ -89,7 +89,7 @@ class MemberListSheetViewModel @Inject constructor(
             val defaultCategoryName = context.getString(R.string.status_online)
 
             memberList.forEach { member ->
-                val user = RevoltAPI.userCache[member.id.user] ?: run {
+                val user = RevoltAPI.userCache[member.id!!.user] ?: run {
                     Log.w(
                         "MemberListSheet",
                         "User ${member.id.user} found in member list of server $serverId but not in user cache"
@@ -201,7 +201,7 @@ fun MemberListSheet(
                         MemberListCategory(text = item.category, count = item.count)
                     }
 
-                    is MemberListItem.MemberItem -> item(key = item.member.id.user) {
+                    is MemberListItem.MemberItem -> item(key = item.member.id!!.user) {
                         MemberListMember(
                             member = item.member,
                             user = RevoltAPI.userCache[item.member.id.user]!!,
@@ -225,7 +225,7 @@ fun MemberListMember(
     serverId: String,
     onSelectUser: (String) -> Unit
 ) {
-    val highestColourRole = Roles.resolveHighestRole(serverId, member.id.user, true)
+    val highestColourRole = Roles.resolveHighestRole(serverId, member.id!!.user, true)
     val colour = highestColourRole?.colour?.let { WebCompat.parseColour(it) }
         ?: Brush.solidColor(LocalContentColor.current)
 

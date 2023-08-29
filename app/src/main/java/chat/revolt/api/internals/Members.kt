@@ -19,7 +19,7 @@ class Members {
             memberCache[serverId] = mutableMapOf()
         }
 
-        memberCache[serverId]?.set(member.id.user, member)
+        memberCache[serverId]?.set(member.id!!.user, member)
     }
 
     fun removeMember(serverId: String, userId: String) {
