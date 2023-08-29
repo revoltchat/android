@@ -250,7 +250,7 @@ fun ReportMessageDialog(
                                         userAddedContext.value
                                     )
                                     state.value = ReportFlowState.Done
-                                } catch (e: Exception) {
+                                } catch (e: Error) {
                                     state.value = ReportFlowState.Error
                                     Log.e("ReportMessageDialog", "Failed to report message", e)
                                     return@launch
