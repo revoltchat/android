@@ -47,11 +47,15 @@ fun UserContextSheet(
     val server = RevoltAPI.serverCache[serverId]
 
     var profile by remember { mutableStateOf<Profile?>(null) }
+    var profileNotFound by remember { mutableStateOf(false) }
 
     LaunchedEffect(user) {
         try {
             user?.id?.let { fetchUserProfile(it) }?.let { profile = it }
         } catch (e: Error) {
+            if (e.message == "NotFound") {
+                profileNotFound = true
+            }
             e.printStackTrace()
         }
     }
@@ -110,6 +114,12 @@ fun UserContextSheet(
             } else if (profile != null) {
                 Text(
                     text = stringResource(id = R.string.user_context_sheet_bio_empty),
+                    color = LocalContentColor.current.copy(alpha = 0.6f)
+                )
+            } else if (profileNotFound) {
+                Text(
+                    text = stringResource(id = R.string.user_context_sheet_bio_not_found),
+                    color = LocalContentColor.current.copy(alpha = 0.6f)
                 )
             } else {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {

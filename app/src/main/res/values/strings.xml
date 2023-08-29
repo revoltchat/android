@@ -227,6 +227,7 @@
 
     <string name="user_context_sheet_category_bio">Bio</string>
     <string name="user_context_sheet_bio_empty">This user hasn\'t set a bio yet.</string>
+    <string name="user_context_sheet_bio_not_found">This user\'s bio could not be fetched. Please verify you share a server or are friends.</string>
     <string name="user_context_sheet_category_roles">Roles</string>
 
     <string name="add_server_sheet_title">Add a server</string>
