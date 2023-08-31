@@ -1,8 +1,11 @@
 package chat.revolt.components.media
 
 import android.content.ContentValues
+import android.content.Intent
 import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -62,6 +65,10 @@ fun AudioPlayer(
     val isLoading = remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
+
+    val activityLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {}
 
     val player = remember {
         ExoPlayer.Builder(context).build().apply {
@@ -144,6 +151,20 @@ fun AudioPlayer(
                     ).show()
                 }
             }
+        }
+    }
+
+    fun shareUrl() {
+        showMenu.value = false
+
+        coroutineScope.launch {
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, url)
+            }
+
+            val shareIntent = Intent.createChooser(intent, null)
+            activityLauncher.launch(shareIntent)
         }
     }
 
@@ -265,7 +286,14 @@ fun AudioPlayer(
                             Text(text = stringResource(R.string.media_viewer_save))
                         }
                     )
-
+                    DropdownMenuItem(
+                        onClick = {
+                            shareUrl()
+                        },
+                        text = {
+                            Text(text = stringResource(R.string.media_viewer_share_url))
+                        }
+                    )
                 }
             }
         }
