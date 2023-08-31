@@ -2,11 +2,10 @@ package chat.revolt.components.chat
 
 import android.content.Intent
 import android.icu.text.DateFormat
-import android.icu.text.RelativeDateTimeFormatter
 import android.net.Uri
-import android.os.Build
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
+import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -123,29 +122,19 @@ fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnReso
 
 
 fun formatLongAsTime(
-    time: Long,
-    context: android.content.Context,
+    time: Long
 ): String {
     val date = java.util.Date(time)
 
     val withinLastWeek = System.currentTimeMillis() - time < 604800000
 
     return if (withinLastWeek) {
-        val howManyDays = (System.currentTimeMillis() - time) / 86400000
-
-        val relativeDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            RelativeDateTimeFormatter.getInstance()
-                .format(
-                    -howManyDays.toDouble(),
-                    RelativeDateTimeFormatter.RelativeDateTimeUnit.DAY
-                )
-        } else {
-            when (howManyDays.toInt()) {
-                0 -> context.getString(R.string.today)
-                1 -> context.getString(R.string.yesterday)
-                else -> context.getString(R.string.x_days_ago, howManyDays)
-            }
-        }
+        val relativeDate = DateUtils.getRelativeTimeSpanString(
+            time,
+            System.currentTimeMillis(),
+            DateUtils.DAY_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_ALL
+        )
         val relativeTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(date)
 
         "$relativeDate $relativeTime"
@@ -271,7 +260,7 @@ fun Message(
                             Spacer(modifier = Modifier.width(5.dp))
 
                             Text(
-                                text = formatLongAsTime(ULID.asTimestamp(message.id!!), context),
+                                text = formatLongAsTime(ULID.asTimestamp(message.id!!)),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                                 maxLines = 1,
