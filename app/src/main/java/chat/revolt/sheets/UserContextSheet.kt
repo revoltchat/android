@@ -31,7 +31,7 @@ import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
 import chat.revolt.components.chat.RoleChip
-import chat.revolt.components.generic.UIMarkdown
+import chat.revolt.components.generic.WebMarkdown
 import chat.revolt.components.screens.settings.RawUserOverview
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -107,9 +107,10 @@ fun UserContextSheet(
                 modifier = Modifier.padding(vertical = 10.dp)
             )
 
-            if (profile?.content != null) {
-                UIMarkdown(
+            if (profile?.content.isNullOrBlank().not()) {
+                WebMarkdown(
                     text = profile!!.content!!,
+                    maskLoading = true
                 )
             } else if (profile != null) {
                 Text(
