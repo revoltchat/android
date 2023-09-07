@@ -4,6 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'com.mikepenz.aboutlibraries.plugin'
     id 'com.google.dagger.hilt.android'
+    id 'com.google.devtools.ksp'
     id "io.sentry.android.gradle" version "3.4.2"
 
     id 'kotlin-kapt'
@@ -169,6 +170,7 @@ dependencies {
     // Glide - Image Loading
     implementation "com.github.bumptech.glide:glide:$glide_version"
     implementation "com.github.bumptech.glide:compose:1.0.0-beta1-SNAPSHOT"
+    ksp "com.github.bumptech.glide:ksp:$glide_version"
 
     // AboutLibraries - automated OSS library attribution
     implementation "com.mikepenz:aboutlibraries-compose:$aboutlibraries_version"
