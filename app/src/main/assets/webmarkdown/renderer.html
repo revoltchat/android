@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title></title>
+    <style>
+        @font-face {
+            font-family: "Inter";
+            src: url("/_android_res/font/inter_regular.ttf");
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: "Inter";
+            src: url("/_android_res/font/inter_bold.ttf");
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: "JetBrains Mono";
+            src: url("/_android_res/font/jetbrainsmono_regular.ttf");
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        body, html {
+            font-family: "Inter", sans-serif;
+            margin: 0;
+            padding: 0;
+            color: {content};
+        }
+
+        a:link, a:visited {
+            color: {primary};
+            text-decoration: none;
+        }
+
+        pre, code {
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        #markdown {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        #markdown img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<div id="markdown"></div>
+<script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+<script>
+    window.addEventListener("load", () => {
+        const style = document.querySelector("style")
+        style.innerHTML = style.innerHTML
+            .replaceAll("{content}", Bridge.getContentColour())
+            .replaceAll("{primary}", Bridge.getPrimaryColour())
+
+        const converter = new showdown.Converter()
+
+        converter.setFlavor("github")
+        converter.setOption("tables", true)
+        converter.setOption("emoji", true)
+        converter.setOption("disableForced4SpacesIndentedSublists", true)
+        converter.setOption("noHeaderId", true)
+        converter.setOption("simpleLineBreaks", true)
+        converter.setOption("strikethrough", true)
+        converter.setOption("tasklists", true)
+
+        const markdown = document.querySelector("#markdown")
+        const html = converter.makeHtml(Bridge.getMarkdown())
+        markdown.innerHTML = DOMPurify.sanitize(html)
+
+        Bridge.onLoaded()
+    })
+</script>
+</body>
+</html>
