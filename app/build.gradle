@@ -43,6 +43,11 @@ def property(String fileName, String propertyName, String fallbackEnv = null) {
     }
 }
 
+// Calls property but with revoltbuild.properties as the first argument
+def buildproperty(String propertyName, String fallbackEnv = null) {
+    return property('revoltbuild.properties', propertyName, fallbackEnv)
+}
+
 android {
     compileSdk 34
 
@@ -66,17 +71,21 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn', 'RVX_SENTRY_DSN')}\""
-            buildConfigField "Boolean", "ANALYSIS_ENABLED", "${property('revoltbuild.properties', 'analysis.enabled', 'RVX_ANALYSIS_ENABLED')}"
-            buildConfigField "String", "ANALYSIS_BASEURL", "\"${property('revoltbuild.properties', 'analysis.base_url', 'RVX_ANALYSIS_BASEURL')}\""
+            buildConfigField "String", "SENTRY_DSN", "\"${buildproperty('sentry.dsn', 'RVX_SENTRY_DSN')}\""
+            buildConfigField "Boolean", "ANALYSIS_ENABLED", "${buildproperty('analysis.enabled', 'RVX_ANALYSIS_ENABLED')}"
+            buildConfigField "String", "ANALYSIS_BASEURL", "\"${buildproperty('analysis.base_url', 'RVX_ANALYSIS_BASEURL')}\""
         }
 
         debug {
-            buildConfigField "String", "SENTRY_DSN", "\"${property('revoltbuild.properties', 'sentry.dsn', 'RVX_SENTRY_DSN')}\""
-            buildConfigField "Boolean", "ANALYSIS_ENABLED", "${property('revoltbuild.properties', 'analysis.enabled', 'RVX_ANALYSIS_ENABLED')}"
-            buildConfigField "String", "ANALYSIS_BASEURL", "\"${property('revoltbuild.properties', 'analysis.base_url', 'RVX_ANALYSIS_BASEURL')}\""
-
             pseudoLocalesEnabled true
+
+            applicationIdSuffix ".debug"
+            versionNameSuffix '+debug'
+            resValue "string", "app_name", buildproperty('build.debug.app_name', 'RVX_DEBUG_APP_NAME')
+
+            buildConfigField "String", "SENTRY_DSN", "\"${buildproperty('sentry.dsn', 'RVX_SENTRY_DSN')}\""
+            buildConfigField "Boolean", "ANALYSIS_ENABLED", "${buildproperty('analysis.enabled', 'RVX_ANALYSIS_ENABLED')}"
+            buildConfigField "String", "ANALYSIS_BASEURL", "\"${buildproperty('analysis.base_url', 'RVX_ANALYSIS_BASEURL')}\""
         }
     }
     compileOptions {
@@ -107,7 +116,7 @@ android {
 }
 
 sentry {
-    autoUploadProguardMapping = property('revoltbuild.properties', 'sentry.upload_mappings', 'RVX_SENTRY_UPLOAD_MAPPINGS') == 'true'
+    autoUploadProguardMapping = buildproperty('sentry.upload_mappings', 'RVX_SENTRY_UPLOAD_MAPPINGS') == 'true'
 }
 
 dependencies {
