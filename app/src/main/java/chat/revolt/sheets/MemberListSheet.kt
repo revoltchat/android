@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -55,6 +56,7 @@ import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -127,26 +129,29 @@ class MemberListSheetViewModel @Inject constructor(
             }
 
             // Online
-            fullItemList.add(
-                MemberListItem.CategoryItem(
-                    defaultCategoryName,
-                    categories[defaultCategoryName]?.size ?: 0
+            if (!categories[defaultCategoryName].isNullOrEmpty()) {
+                fullItemList.add(
+                    MemberListItem.CategoryItem(
+                        defaultCategoryName,
+                        categories[defaultCategoryName]?.size ?: 0
+                    )
                 )
-            )
-            categories[defaultCategoryName]?.forEach { member ->
-                fullItemList.add(MemberListItem.MemberItem(member))
+                categories[defaultCategoryName]?.forEach { member ->
+                    fullItemList.add(MemberListItem.MemberItem(member))
+                }
             }
 
             // Offline
-            if (categories[offlineCategoryName].isNullOrEmpty()) return@launch
-            fullItemList.add(
-                MemberListItem.CategoryItem(
-                    offlineCategoryName,
-                    categories[offlineCategoryName]?.size ?: 0
+            if (!categories[offlineCategoryName].isNullOrEmpty()) {
+                fullItemList.add(
+                    MemberListItem.CategoryItem(
+                        offlineCategoryName,
+                        categories[offlineCategoryName]?.size ?: 0
+                    )
                 )
-            )
-            categories[offlineCategoryName]?.forEach { member ->
-                fullItemList.add(MemberListItem.MemberItem(member))
+                categories[offlineCategoryName]?.forEach { member ->
+                    fullItemList.add(MemberListItem.MemberItem(member))
+                }
             }
         }
     }
@@ -161,8 +166,11 @@ fun MemberListSheet(
     var showUserContextSheet by remember { mutableStateOf(false) }
     var userContextSheetTarget by remember { mutableStateOf("") }
 
-    LaunchedEffect(serverId) {
-        viewModel.fetchMemberList(serverId)
+    // We use LaunchedEffect to make sure that this is called every time any of the users status changes
+    LaunchedEffect(RevoltAPI.userCache) {
+        snapshotFlow { RevoltAPI.userCache }.distinctUntilChanged().collect {
+            viewModel.fetchMemberList(serverId)
+        }
     }
 
     if (showUserContextSheet) {
