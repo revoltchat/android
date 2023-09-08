@@ -2,6 +2,7 @@ package chat.revolt.screens.chat
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -66,6 +67,7 @@ import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.server.fetchMembers
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.User
+import chat.revolt.api.settings.FeatureFlag
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.chat.DisconnectedNotice
 import chat.revolt.components.generic.GroupIcon
@@ -93,6 +95,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.sentry.Sentry
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -181,12 +184,38 @@ class ChatRouterViewModel @Inject constructor(
         }
     }
 
+    @FeatureFlag("ClosedBetaAccessControl")
+    private var hardCrashCounter = 0
+
     fun navigateToChannel(channelId: String, navController: NavController, pure: Boolean = false) {
         if (!pure) setSaveCurrentChannel(channelId)
 
-        navController.navigate("channel/$channelId") {
-            navController.graph.startDestinationRoute?.let { route ->
-                popUpTo(route)
+        // Only allow access to closed beta users, currently "has access to #beta-chat in Jenvolt"
+        @FeatureFlag("ClosedBetaAccessControl")
+        if (RevoltAPI.channelCache.size > 0 && !RevoltAPI.channelCache.containsKey("01H7X2KRB0CA4QDSMB4N7WGERF")) {
+            hardCrashCounter++
+
+            navController.navigate("no_current_channel") {
+                navController.graph.startDestinationRoute?.let { route ->
+                    popUpTo(route)
+                }
+            }
+
+            if (hardCrashCounter > 2) {
+                Toast.makeText(
+                    context,
+                    "You do not have access to the closed beta.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Sentry.init("") // we are about to crash on purpose, let's not send this to Sentry
+                throw IllegalStateException()
+            }
+        } else {
+            // Navigate as normal
+            navController.navigate("channel/$channelId") {
+                navController.graph.startDestinationRoute?.let { route ->
+                    popUpTo(route)
+                }
             }
         }
     }
