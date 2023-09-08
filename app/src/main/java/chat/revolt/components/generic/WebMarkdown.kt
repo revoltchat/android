@@ -49,6 +49,7 @@ private fun argbAsCssColour(argb: Int): String {
 fun WebMarkdown(
     text: String,
     maskLoading: Boolean = false,
+    simpleLineBreaks: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val contentColour = LocalContentColor.current
@@ -128,7 +129,7 @@ fun WebMarkdown(
                 }
 
                 loadUrl(
-                    "https://app.revolt.chat/_android_assets/webmarkdown/renderer.html",
+                    "$REVOLT_APP/_android_assets/webmarkdown/renderer.html",
                 )
 
                 settings.apply {
@@ -164,6 +165,11 @@ fun WebMarkdown(
                         fun getPrimaryColour(): String {
                             return argbAsCssColour(materialColourScheme.primary.toArgb())
                         }
+
+                        @JavascriptInterface
+                        fun shouldUseSimpleLineBreaks(): Boolean {
+                            return simpleLineBreaks
+                        }
                     },
                     "Bridge"
                 )
@@ -174,6 +180,9 @@ fun WebMarkdown(
                     LayoutParams.WRAP_CONTENT
                 )
             }
+        },
+        update = {
+            it.evaluateJavascript("renderMarkdown()", null)
         }
     )
 }

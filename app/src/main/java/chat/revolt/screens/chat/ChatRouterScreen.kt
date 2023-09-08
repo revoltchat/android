@@ -1,5 +1,7 @@
 package chat.revolt.screens.chat
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -73,12 +75,14 @@ import chat.revolt.components.screens.chat.drawer.channel.ChannelList
 import chat.revolt.components.screens.chat.drawer.server.DrawerServer
 import chat.revolt.components.screens.chat.drawer.server.DrawerServerlikeIcon
 import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
+import chat.revolt.internals.Changelogs
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
 import chat.revolt.screens.chat.views.HomeScreen
 import chat.revolt.screens.chat.views.NoCurrentChannelScreen
 import chat.revolt.screens.chat.views.channel.ChannelScreen
 import chat.revolt.sheets.AddServerSheet
+import chat.revolt.sheets.ChangelogSheet
 import chat.revolt.sheets.ServerContextSheet
 import chat.revolt.sheets.StatusSheet
 import chat.revolt.sheets.UserContextSheet
@@ -88,26 +92,40 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
+@SuppressLint("StaticFieldLeak")
 class ChatRouterViewModel @Inject constructor(
-    private val kvStorage: KVStorage
+    private val kvStorage: KVStorage,
+    @ApplicationContext val context: Context
 ) : ViewModel() {
     var currentServer by mutableStateOf("home")
     var currentChannel by mutableStateOf<String?>(null)
     var sidebarSparkDisplayed by mutableStateOf(true)
+    var latestChangelogRead by mutableStateOf(true)
+    var latestChangelog by mutableStateOf("")
+
+    private val changelogs = Changelogs(context, kvStorage)
 
     init {
         viewModelScope.launch {
             currentServer = kvStorage.get("currentServer") ?: "home"
             currentChannel = kvStorage.get("currentChannel")
+
             sidebarSparkDisplayed = if (kvStorage.getBoolean("sidebarSpark") == null) {
                 false
             } else {
                 kvStorage.getBoolean("sidebarSpark")!!
+            }
+
+            latestChangelogRead = changelogs.hasSeenLatest()
+            latestChangelog = changelogs.index.latest
+            if (!latestChangelogRead) {
+                changelogs.markAsSeen()
             }
         }
     }
@@ -289,6 +307,22 @@ fun ChatRouterScreen(
                 useTabletAwareUI = sizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
                         && sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
             }
+    }
+
+    if (!viewModel.latestChangelogRead) {
+        val changelogSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = changelogSheetState,
+            onDismissRequest = {
+                viewModel.latestChangelogRead = true
+            },
+        ) {
+            ChangelogSheet(
+                version = viewModel.latestChangelog,
+                new = true
+            )
+        }
     }
 
     if (showSidebarSpark.value) {

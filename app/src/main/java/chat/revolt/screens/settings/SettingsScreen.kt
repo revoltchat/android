@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
@@ -153,6 +154,25 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, top = 20.dp)
                 )
+
+                SheetClickable(
+                    icon = { modifier ->
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = stringResource(id = R.string.settings_changelogs),
+                            modifier = modifier
+                        )
+                    },
+                    label = { textStyle ->
+                        Text(
+                            text = stringResource(id = R.string.settings_changelogs),
+                            style = textStyle
+                        )
+                    },
+                    modifier = Modifier.testTag("settings_view_changelogs")
+                ) {
+                    navController.navigate("settings/changelogs")
+                }
 
                 SheetClickable(
                     icon = { modifier ->

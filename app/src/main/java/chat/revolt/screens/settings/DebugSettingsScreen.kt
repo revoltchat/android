@@ -38,6 +38,12 @@ class DebugSettingsScreenViewModel @Inject constructor(
     fun forgetAllSparks() {
         this.forgetSidebarSparkShown()
     }
+
+    fun forgetLatestChangelog() {
+        viewModelScope.launch {
+            kvStorage.remove("latestChangelogRead")
+        }
+    }
 }
 
 @Composable
@@ -77,6 +83,19 @@ fun DebugSettingsScreen(
                 }
                 ElevatedButton(onClick = { viewModel.forgetAllSparks() }) {
                     Text("Forget all sparks")
+                }
+            }
+
+            Text(
+                text = "Changelogs",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(bottom = 10.dp)
+            )
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState())
+            ) {
+                ElevatedButton(onClick = { viewModel.forgetLatestChangelog() }) {
+                    Text("Mark latest changelog as unread")
                 }
             }
         }

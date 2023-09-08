@@ -359,4 +359,9 @@
 
     <string name="settings_feedback_disabled_title">Feedback unavailable</string>
     <string name="settings_feedback_disabled_message">Feedback is not available on this build of Revolt. Support for this build is limited. (Build: %1$s %2$s)</string>
+
+    <string name="settings_changelogs">Changelogs</string>
+    <string name="settings_changelogs_new_header">What\'s been cooking ✨</string>
+    <string name="settings_changelogs_historical_version_header">Changelog for %1$s</string>
+    <string name="settings_changelogs_historical_version_header_placeholder">that version</string>
 </resources>
