@@ -85,10 +85,12 @@ fun authorName(message: MessageSchema): String {
     }
 
     val serverId =
-        RevoltAPI.channelCache[message.channel]?.server ?: return stringResource(R.string.unknown)
+        RevoltAPI.channelCache[message.channel]?.server
+            ?: return RevoltAPI.userCache[message.author]?.let { User.resolveDefaultName(it) }
+                ?: stringResource(R.string.unknown)
+
     val member = message.author?.let { RevoltAPI.members.getMember(serverId, it) }
         ?: return stringResource(R.string.unknown)
-
     return member.nickname
         ?: RevoltAPI.userCache[message.author]?.let { User.resolveDefaultName(it) }
         ?: stringResource(R.string.unknown)
