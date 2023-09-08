@@ -44,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chat.revolt.R
+import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.WebCompat
@@ -252,6 +253,7 @@ fun MemberListMember(
                 ?: user.username
                 ?: user.id!!,
             avatar = user.avatar,
+            rawUrl = member.avatar?.let { "$REVOLT_FILES/avatars/${it.id}?max_side=256" },
             userId = user.id!!,
             presence = presenceFromStatus(
                 user.status?.presence,
