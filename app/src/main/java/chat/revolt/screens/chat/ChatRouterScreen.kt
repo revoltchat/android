@@ -2,6 +2,8 @@ package chat.revolt.screens.chat
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -58,6 +60,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
@@ -99,6 +102,7 @@ import io.sentry.Sentry
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
@@ -208,6 +212,14 @@ class ChatRouterViewModel @Inject constructor(
                     Toast.LENGTH_SHORT
                 ).show()
                 Sentry.init("") // we are about to crash on purpose, let's not send this to Sentry
+
+                val intent = Intent(Intent.ACTION_DELETE)
+                    .setData(Uri.parse("package:${BuildConfig.APPLICATION_ID}"))
+                    .setFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK
+                    )
+                context.startActivity(intent) // i'm just messing with the user at this point, they know what they did
+
                 throw IllegalStateException()
             }
         } else {
