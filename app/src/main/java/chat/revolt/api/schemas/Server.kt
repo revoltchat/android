@@ -59,16 +59,16 @@ data class SystemMessages(
 @Serializable
 data class Role(
     val name: String? = null,
-    val permissions: DefaultPermissions? = null,
+    val permissions: PermissionDescription? = null,
     val colour: String? = null,
     val hoist: Boolean? = null,
     val rank: Double? = null
 )
 
 @Serializable
-data class DefaultPermissions(
-    val a: Long? = null,
-    val d: Long? = null
+data class PermissionDescription(
+    val a: Long,
+    val d: Long
 )
 
 @Serializable

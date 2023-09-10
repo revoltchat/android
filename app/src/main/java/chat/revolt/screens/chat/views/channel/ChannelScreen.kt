@@ -274,6 +274,10 @@ fun ChannelScreen(
                 }
         }
 
+        LaunchedEffect(viewModel.activeChannel, RevoltAPI.channelCache, RevoltAPI.serverCache) {
+            viewModel.checkShouldDenyMessageField()
+        }
+
         Box(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.BottomEnd

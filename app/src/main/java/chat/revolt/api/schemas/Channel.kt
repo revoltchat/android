@@ -1,5 +1,6 @@
 package chat.revolt.api.schemas
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -32,7 +33,9 @@ data class Member(
 
     val avatar: AutumnResource? = null,
     val roles: List<String>? = null,
-    val nickname: String? = null
+    val nickname: String? = null,
+
+    val timeout: String? = null,
 ) {
     fun mergeWithPartial(other: Member): Member {
         return Member(
@@ -40,8 +43,13 @@ data class Member(
             joinedAt = other.joinedAt ?: joinedAt,
             avatar = other.avatar ?: avatar,
             roles = other.roles ?: roles,
-            nickname = other.nickname ?: nickname
+            nickname = other.nickname ?: nickname,
+            timeout = other.timeout ?: timeout,
         )
+    }
+
+    fun timeoutTimestamp(): Instant? {
+        return timeout?.let { Instant.parse(it) }
     }
 }
 
@@ -63,9 +71,9 @@ data class Channel(
     val permissions: Long? = null,
     val server: String? = null,
     @SerialName("role_permissions")
-    val rolePermissions: Map<String, DefaultPermissions>? = null,
+    val rolePermissions: Map<String, PermissionDescription>? = null,
     @SerialName("default_permissions")
-    val defaultPermissions: DefaultPermissions? = null,
+    val defaultPermissions: PermissionDescription? = null,
     val nsfw: Boolean? = null,
     val type: String? = null, // this is _only_ used for websocket events!
 ) {

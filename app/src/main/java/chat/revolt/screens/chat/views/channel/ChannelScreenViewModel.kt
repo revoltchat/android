@@ -14,8 +14,11 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ChannelUtils
+import chat.revolt.api.internals.PermissionBit
+import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
+import chat.revolt.api.internals.hasPermission
 import chat.revolt.api.realtime.RealtimeSocketFrames
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
@@ -159,8 +162,6 @@ class ChannelScreenViewModel : ViewModel() {
             } else {
                 activeChannel = RevoltAPI.channelCache[id]
             }
-
-            checkShouldDenyMessageField()
 
             if (activeChannel?.lastMessageID != null) {
                 ackNewest()
@@ -438,13 +439,19 @@ class ChannelScreenViewModel : ViewModel() {
         pendingMessageContent = ""
     }
 
-    private fun checkShouldDenyMessageField() {
-        // TODO Check for send message permission.
-        val hasPermission = true
-
+    suspend fun checkShouldDenyMessageField() {
         if (activeChannel == null) return
 
-        val partnerId = ChannelUtils.resolveDMPartner(activeChannel!!) ?: return
+        val selfUser = RevoltAPI.userCache[RevoltAPI.selfId] ?: return
+        val selfMember =
+            activeChannel?.server?.let { RevoltAPI.members.getMember(it, selfUser.id!!) }
+                ?: fetchMember(activeChannel!!.server!!, selfUser.id!!)
+
+        val hasPermission =
+            Roles.permissionFor(activeChannel!!, selfUser, selfMember)
+                .hasPermission(PermissionBit.SendMessage)
+
+        val partnerId = ChannelUtils.resolveDMPartner(activeChannel!!)
 
         denyMessageField = when {
             partnerId == SpecialUsers.PLATFORM_MODERATION_USER -> true
