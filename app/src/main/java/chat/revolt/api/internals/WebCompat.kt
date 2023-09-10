@@ -103,10 +103,6 @@ object WebCompat {
                 throw IllegalArgumentException("Invalid colour format: $colourString")
             }
         } catch (e: Exception) {
-            Log.d(
-                "WebCompat",
-                "Failed to parse colour $colourString, falling back to LocalContentColor.current"
-            )
             null
         }
     }
