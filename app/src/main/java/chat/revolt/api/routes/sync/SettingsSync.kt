@@ -56,8 +56,6 @@ suspend fun getKeys(vararg keys: String): Map<String, SyncedSetting> {
 
 suspend fun setKey(key: String, value: String) {
     RevoltHttp.post("/sync/settings/set") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-
         parameter("timestamp", System.currentTimeMillis())
 
         // format: {"key": "value"}

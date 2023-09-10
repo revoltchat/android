@@ -21,9 +21,7 @@ data class FetchMembersResponse(
 )
 
 suspend fun ackServer(serverId: String) {
-    RevoltHttp.put("/servers/$serverId/ack") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-    }
+    RevoltHttp.put("/servers/$serverId/ack")
 }
 
 suspend fun fetchMembers(
@@ -32,8 +30,6 @@ suspend fun fetchMembers(
     pure: Boolean = false
 ): FetchMembersResponse {
     val response = RevoltHttp.get("/servers/$serverId/members") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-
         parameter("exclude_offline", !includeOffline)
     }
 
@@ -67,9 +63,7 @@ suspend fun fetchMembers(
 }
 
 suspend fun fetchMember(serverId: String, userId: String, pure: Boolean = false): Member {
-    val response = RevoltHttp.get("/servers/$serverId/members/$userId") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-    }
+    val response = RevoltHttp.get("/servers/$serverId/members/$userId")
 
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), response.bodyAsText())
@@ -91,8 +85,6 @@ suspend fun fetchMember(serverId: String, userId: String, pure: Boolean = false)
 
 suspend fun leaveOrDeleteServer(serverId: String, leaveSilently: Boolean = false) {
     RevoltHttp.delete("/servers/$serverId") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-
         parameter("leave_silently", leaveSilently)
     }
 }

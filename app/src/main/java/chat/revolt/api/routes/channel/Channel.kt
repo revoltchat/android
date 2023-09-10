@@ -1,6 +1,5 @@
 package chat.revolt.api.routes.channel
 
-import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
@@ -30,8 +29,6 @@ suspend fun fetchMessagesFromChannel(
     sort: String? = null
 ): MessagesInChannel {
     val response = RevoltHttp.get("/channels/$channelId/messages") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-
         parameter("limit", limit)
         parameter("include_users", includeUsers)
 
@@ -88,8 +85,6 @@ suspend fun sendMessage(
     attachments: List<String>? = null,
 ): String {
     val response = RevoltHttp.post("/channels/$channelId/messages") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-
         contentType(ContentType.Application.Json)
         setBody(
             SendMessageBody(
@@ -111,8 +106,6 @@ suspend fun editMessage(
     newContent: String? = null,
 ) {
     val response = RevoltHttp.patch("/channels/$channelId/messages/$messageId") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-
         contentType(ContentType.Application.Json)
         setBody(
             EditMessageBody(
@@ -131,15 +124,11 @@ suspend fun editMessage(
 }
 
 suspend fun ackChannel(channelId: String, messageId: String = ULID.makeNext()) {
-    RevoltHttp.put("/channels/$channelId/ack/$messageId") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-    }
+    RevoltHttp.put("/channels/$channelId/ack/$messageId")
 }
 
 suspend fun fetchSingleChannel(channelId: String): Channel {
-    val response = RevoltHttp.get("/channels/$channelId") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-    }
+    val response = RevoltHttp.get("/channels/$channelId")
         .bodyAsText()
 
     return RevoltJson.decodeFromString(

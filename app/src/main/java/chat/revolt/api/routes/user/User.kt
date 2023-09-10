@@ -11,9 +11,7 @@ import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.SerializationException
 
 suspend fun fetchSelf(): User {
-    val response = RevoltHttp.get("/users/@me") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-    }
+    val response = RevoltHttp.get("/users/@me")
         .bodyAsText()
 
     try {
@@ -36,9 +34,7 @@ suspend fun fetchSelf(): User {
 }
 
 suspend fun fetchUser(id: String): User {
-    val res = RevoltHttp.get("/users/$id") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-    }
+    val res = RevoltHttp.get("/users/$id")
 
     if (res.status.value == 404) {
         return User.getPlaceholder(id)
@@ -73,9 +69,7 @@ suspend fun addUserIfUnknown(id: String) {
 }
 
 suspend fun fetchUserProfile(id: String): Profile {
-    val res = RevoltHttp.get("/users/$id/profile") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
-    }
+    val res = RevoltHttp.get("/users/$id/profile")
 
     val response = res.bodyAsText()
 

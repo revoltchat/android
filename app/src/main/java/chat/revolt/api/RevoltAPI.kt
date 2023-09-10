@@ -83,6 +83,15 @@ val RevoltHttp = HttpClient(OkHttp) {
 
     install(Logging) { level = LogLevel.INFO }
 
+    engine {
+        addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .header(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+                .build()
+            chain.proceed(request)
+        }
+    }
+
     defaultRequest {
         url(REVOLT_BASE)
         header("User-Agent", buildUserAgent())

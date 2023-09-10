@@ -1,12 +1,19 @@
 package chat.revolt.api.routes.safety
 
-import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
-import chat.revolt.api.schemas.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import chat.revolt.api.schemas.ContentReportReason
+import chat.revolt.api.schemas.FullMessageReport
+import chat.revolt.api.schemas.FullServerReport
+import chat.revolt.api.schemas.FullUserReport
+import chat.revolt.api.schemas.MessageReport
+import chat.revolt.api.schemas.ServerReport
+import chat.revolt.api.schemas.UserReport
+import chat.revolt.api.schemas.UserReportReason
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.SerializationException
 
 suspend fun putMessageReport(
@@ -24,7 +31,6 @@ suspend fun putMessageReport(
     )
 
     val response = RevoltHttp.post("/safety/report") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
         setBody(
             RevoltJson.encodeToString(
                 FullMessageReport.serializer(),
@@ -57,7 +63,6 @@ suspend fun putServerReport(
     )
 
     val response = RevoltHttp.post("/safety/report") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
         setBody(
             RevoltJson.encodeToString(
                 FullServerReport.serializer(),
@@ -90,7 +95,6 @@ suspend fun putUserReport(
     )
 
     val response = RevoltHttp.post("/safety/report") {
-        headers.append(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
         setBody(
             RevoltJson.encodeToString(
                 FullUserReport.serializer(),
