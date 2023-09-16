@@ -65,6 +65,11 @@ android {
         }
 
         resourceConfigurations += ["en", "de", "fr", "id", "b+es+419", "bn", "ca", "es", "gl", "in", "pt-rBR", "pt", "ru", "tr", "uk", "zh-rCN"]
+        externalNativeBuild {
+            cmake {
+                cppFlags ''
+            }
+        }
     }
 
     buildTypes {
@@ -114,6 +119,12 @@ android {
         disable 'MissingTranslation'
     }
     namespace 'chat.revolt'
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '3.22.1'
+        }
+    }
 }
 
 sentry {

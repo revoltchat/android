@@ -81,6 +81,7 @@ import chat.revolt.components.screens.chat.drawer.server.DrawerServer
 import chat.revolt.components.screens.chat.drawer.server.DrawerServerlikeIcon
 import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
 import chat.revolt.internals.Changelogs
+import chat.revolt.ndk.Pipebomb
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
 import chat.revolt.screens.chat.views.HomeScreen
@@ -188,16 +189,13 @@ class ChatRouterViewModel @Inject constructor(
         }
     }
 
-    @FeatureFlag("ClosedBetaAccessControl")
-    private var hardCrashCounter = 0
-
     fun navigateToChannel(channelId: String, navController: NavController, pure: Boolean = false) {
         if (!pure) setSaveCurrentChannel(channelId)
 
         // Only allow access to closed beta users, currently "has access to #beta-chat in Jenvolt"
         @FeatureFlag("ClosedBetaAccessControl")
         if (RevoltAPI.channelCache.size > 0 && !RevoltAPI.channelCache.containsKey("01H7X2KRB0CA4QDSMB4N7WGERF")) {
-            hardCrashCounter++
+            Pipebomb.incrementHardCrashCounter()
 
             navController.navigate("no_current_channel") {
                 navController.graph.startDestinationRoute?.let { route ->
@@ -205,7 +203,7 @@ class ChatRouterViewModel @Inject constructor(
                 }
             }
 
-            if (hardCrashCounter > 2) {
+            if (Pipebomb.checkHardCrash()) {
                 Toast.makeText(
                     context,
                     "You do not have access to the closed beta.",
@@ -220,7 +218,7 @@ class ChatRouterViewModel @Inject constructor(
                     )
                 context.startActivity(intent) // i'm just messing with the user at this point, they know what they did
 
-                throw IllegalStateException()
+                Pipebomb.doHardCrash()
             }
         } else {
             // Navigate as normal

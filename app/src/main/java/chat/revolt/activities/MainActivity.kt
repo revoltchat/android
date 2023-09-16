@@ -26,6 +26,7 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import chat.revolt.BuildConfig
 import chat.revolt.api.settings.GlobalState
+import chat.revolt.ndk.NativeLibraries
 import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
@@ -63,6 +64,12 @@ class MainActivity : FragmentActivity() {
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
             AppEntrypoint(windowSizeClass)
+        }
+    }
+
+    companion object {
+        init {
+            NativeLibraries.init()
         }
     }
 }
