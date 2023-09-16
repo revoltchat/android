@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -447,45 +448,61 @@ fun ChannelScreen(
                 )
             }
 
-            MessageField(
-                messageContent = viewModel.pendingMessageContent,
-                onMessageContentChange = {
-                    viewModel.pendingMessageContent = it
-                },
-                onSendMessage = viewModel::sendPendingMessage,
-                onAddAttachment = {
-                    val isTiramisu = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+            Crossfade(
+                viewModel.denyMessageField,
+                label = "denyMessageField switch"
+            ) { denyMessageField ->
+                if (denyMessageField) {
+                    Text(
+                        text = stringResource(id = viewModel.denyMessageFieldReasonResource),
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.Center
+                    )
+                } else {
+                    MessageField(
+                        messageContent = viewModel.pendingMessageContent,
+                        onMessageContentChange = {
+                            viewModel.pendingMessageContent = it
+                        },
+                        onSendMessage = viewModel::sendPendingMessage,
+                        onAddAttachment = {
+                            val isTiramisu = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 
-                    @FeatureFlag("TiramisuFilePicker")
-                    when {
-                        FeatureFlags.filePickerType == FilePickerFeatureFlagVariates.TiramisuMediaPermissions
-                                && isTiramisu -> {
-                            focusManager.clearFocus()
-                            viewModel.inbuiltFilePickerOpen = !viewModel.inbuiltFilePickerOpen
-                        }
+                            @FeatureFlag("TiramisuFilePicker")
+                            when {
+                                FeatureFlags.filePickerType == FilePickerFeatureFlagVariates.TiramisuMediaPermissions
+                                        && isTiramisu -> {
+                                    focusManager.clearFocus()
+                                    viewModel.inbuiltFilePickerOpen =
+                                        !viewModel.inbuiltFilePickerOpen
+                                }
 
-                        FeatureFlags.filePickerType == FilePickerFeatureFlagVariates.DocumentsUI
-                                || !isTiramisu -> {
-                            pickFileLauncher.launch(arrayOf("*/*"))
-                        }
-                    }
-                },
-                channelType = channel.channelType,
-                channelName = channel.name ?: ChannelUtils.resolveDMName(channel) ?: stringResource(
-                    R.string.unknown
-                ),
-                forceSendButton = viewModel.pendingAttachments.isNotEmpty(),
-                disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage,
-                denied = viewModel.denyMessageField,
-                denyReason = stringResource(id = viewModel.denyMessageFieldReasonResource),
-                editMode = viewModel.editingMessage != null,
-                cancelEdit = viewModel::cancelEditingMessage,
-                onFocusChange = { nowFocused ->
-                    if (nowFocused && viewModel.inbuiltFilePickerOpen) {
-                        viewModel.inbuiltFilePickerOpen = false
-                    }
-                },
-            )
+                                FeatureFlags.filePickerType == FilePickerFeatureFlagVariates.DocumentsUI
+                                        || !isTiramisu -> {
+                                    pickFileLauncher.launch(arrayOf("*/*"))
+                                }
+                            }
+                        },
+                        channelType = channel.channelType,
+                        channelName = channel.name ?: ChannelUtils.resolveDMName(channel)
+                        ?: stringResource(
+                            R.string.unknown
+                        ),
+                        forceSendButton = viewModel.pendingAttachments.isNotEmpty(),
+                        disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage,
+                        editMode = viewModel.editingMessage != null,
+                        cancelEdit = viewModel::cancelEditingMessage,
+                        onFocusChange = { nowFocused ->
+                            if (nowFocused && viewModel.inbuiltFilePickerOpen) {
+                                viewModel.inbuiltFilePickerOpen = false
+                            }
+                        },
+                    )
+                }
+            }
 
             AnimatedVisibility(visible = viewModel.inbuiltFilePickerOpen) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

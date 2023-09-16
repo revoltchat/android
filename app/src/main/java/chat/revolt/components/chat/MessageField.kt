@@ -61,8 +61,6 @@ fun MessageField(
     forceSendButton: Boolean = false,
     disabled: Boolean = false,
     editMode: Boolean = false,
-    denied: Boolean = false,
-    denyReason: String? = null,
     cancelEdit: () -> Unit = {},
     onFocusChange: (Boolean) -> Unit = {},
 ) {
@@ -75,7 +73,7 @@ fun MessageField(
         ChannelType.SavedMessages -> R.string.message_field_placeholder_notes
     }
 
-    val sendButtonVisible = (messageContent.isNotBlank() || forceSendButton) && !disabled && !denied
+    val sendButtonVisible = (messageContent.isNotBlank() || forceSendButton) && !disabled
 
     Row(
         modifier = Modifier
@@ -86,7 +84,7 @@ fun MessageField(
             value = messageContent,
             onValueChange = onMessageContentChange,
             singleLine = false,
-            enabled = !disabled && !denied,
+            enabled = !disabled,
             textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             modifier = modifier
@@ -106,13 +104,6 @@ fun MessageField(
                     visualTransformation = VisualTransformation.None,
                     interactionSource = remember { MutableInteractionSource() },
                     placeholder = {
-                        if (denied) {
-                            Text(
-                                text = denyReason
-                                    ?: stringResource(R.string.message_field_denied_generic),
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        } else {
                             Text(
                                 text = stringResource(
                                     id = placeholderResource,
@@ -121,7 +112,6 @@ fun MessageField(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
-                        }
                     },
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
@@ -137,7 +127,6 @@ fun MessageField(
                     ),
                     contentPadding = PaddingValues(16.dp),
                     leadingIcon = {
-                        if (!denied) {
                             Icon(
                                 when {
                                     editMode -> Icons.Default.Close
@@ -160,7 +149,6 @@ fun MessageField(
                                     .padding(4.dp)
                                     .testTag("add_attachment")
                             )
-                        }
                     },
                     trailingIcon = {
                         AnimatedVisibility(sendButtonVisible,
