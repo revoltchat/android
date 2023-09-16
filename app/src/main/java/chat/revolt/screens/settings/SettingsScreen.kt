@@ -2,7 +2,6 @@ package chat.revolt.screens.settings
 
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,17 +25,39 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.activities.InviteActivity
+import chat.revolt.api.RevoltAPI
+import chat.revolt.api.settings.GlobalState
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.SheetClickable
 import chat.revolt.components.screens.settings.SelfUserOverview
+import chat.revolt.persistence.KVStorage
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
+
+@HiltViewModel
+class SettingsScreenViewModel @Inject constructor(
+    private val kvStorage: KVStorage
+) : ViewModel() {
+    fun logout() {
+        runBlocking {
+            kvStorage.remove("sessionToken")
+            GlobalState.reset()
+            RevoltAPI.logout()
+        }
+    }
+}
 
 @Composable
 fun SettingsScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: SettingsScreenViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
 
@@ -233,13 +254,12 @@ fun SettingsScreen(
                     dangerous = true,
                     modifier = Modifier.testTag("settings_view_logout")
                 ) {
-                    Toast
-                        .makeText(
-                            navController.context,
-                            "Not implemented yet",
-                            Toast.LENGTH_SHORT
-                        )
-                        .show()
+                    viewModel.logout()
+                    navController.navigate("login/greeting") {
+                        popUpTo("chat") {
+                            inclusive = true
+                        }
+                    }
                 }
             }
         }

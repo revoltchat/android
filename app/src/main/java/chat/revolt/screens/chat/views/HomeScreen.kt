@@ -1,58 +1,55 @@
 package chat.revolt.screens.chat.views
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import chat.revolt.R
-import chat.revolt.api.RevoltAPI
-import chat.revolt.api.settings.GlobalState
 import chat.revolt.components.generic.PageHeader
-import chat.revolt.components.screens.home.LinkOnHome
-import chat.revolt.persistence.KVStorage
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
-
-@HiltViewModel
-class HomeScreenViewModel @Inject constructor(
-    private val kvStorage: KVStorage
-) : ViewModel() {
-    fun logout() {
-        runBlocking {
-            kvStorage.remove("sessionToken")
-            GlobalState.reset()
-            RevoltAPI.logout()
-        }
-    }
-}
 
 @Composable
-fun HomeScreen(navController: NavController, viewModel: HomeScreenViewModel = hiltViewModel()) {
+fun HomeScreen(navController: NavController) {
+    val catTransition = rememberInfiniteTransition(label = "cat")
+    val catRotation by catTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(10000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "catRotation"
+    )
+
     Column(
         modifier = Modifier.safeDrawingPadding()
     ) {
         PageHeader(text = stringResource(id = R.string.home))
-
-        LinkOnHome(
-            heading = stringResource(id = R.string.logout),
-            icon = Icons.Default.Close,
-            onClick = {
-                viewModel.logout()
-                navController.navigate("login/greeting") {
-                    popUpTo("chat") {
-                        inclusive = true
-                    }
-                }
-            },
-            modifier = Modifier.testTag("logout_from_home")
-        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = "🐈",
+                fontSize = 100.sp,
+                modifier = Modifier.rotate(catRotation),
+            )
+        }
     }
 }
