@@ -443,7 +443,7 @@ class ChannelScreenViewModel : ViewModel() {
         if (activeChannel == null) return
 
         val selfUser = RevoltAPI.userCache[RevoltAPI.selfId] ?: return
-        val selfMember =
+        val selfMember = if (activeChannel!!.server == null) null else
             activeChannel?.server?.let { RevoltAPI.members.getMember(it, selfUser.id!!) }
                 ?: fetchMember(activeChannel!!.server!!, selfUser.id!!)
 
