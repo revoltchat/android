@@ -2,7 +2,6 @@ package chat.revolt.components.generic
 
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
-import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.util.TypedValue
 import android.view.ViewGroup
@@ -25,6 +24,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.internals.markdown.LongClickLinkMovementMethod
 import chat.revolt.internals.markdown.MarkdownContext
 import chat.revolt.internals.markdown.MarkdownParser
 import chat.revolt.internals.markdown.MarkdownState
@@ -97,7 +97,7 @@ fun UIMarkdown(
                 setMaxLines(maxLines)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.value)
 
-                movementMethod = LinkMovementMethod.getInstance()
+                movementMethod = LongClickLinkMovementMethod.instance
 
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,

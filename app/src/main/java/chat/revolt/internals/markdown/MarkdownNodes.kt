@@ -37,9 +37,18 @@ class UserMentionNode(private val userId: String) : Node<MarkdownContext>() {
 
 class ChannelMentionNode(private val channelId: String) : Node<MarkdownContext>() {
     override fun render(builder: SpannableStringBuilder, renderContext: MarkdownContext) {
-        builder.append(
-            renderContext.channelMap[channelId]?.let { "#$it" }
-                ?: "<#${channelId}>"
+        val content = renderContext.channelMap[channelId]?.let { "#$it" }
+            ?: "<#$channelId>"
+
+        builder.append(content)
+        builder.setSpan(
+            LinkSpan(
+                "revolt-android://link-action/channel?channel=$channelId",
+                drawBackground = true
+            ),
+            builder.length - content.length,
+            builder.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
     }
 }

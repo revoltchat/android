@@ -6,7 +6,6 @@ import android.net.Uri
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
 import android.text.format.DateUtils
-import android.text.method.LinkMovementMethod
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -59,6 +58,7 @@ import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
+import chat.revolt.internals.markdown.LongClickLinkMovementMethod
 import chat.revolt.api.schemas.Message as MessageSchema
 
 @Composable
@@ -294,7 +294,7 @@ fun Message(
                                     textSize = 16f
                                     typeface = ResourcesCompat.getFont(ctx, R.font.inter)
 
-                                    movementMethod = LinkMovementMethod.getInstance()
+                                    movementMethod = LongClickLinkMovementMethod.instance
 
                                     setTextColor(contentColor.toArgb())
                                 }

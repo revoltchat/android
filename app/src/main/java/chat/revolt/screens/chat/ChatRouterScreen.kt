@@ -28,6 +28,7 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -49,7 +50,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -91,6 +94,7 @@ import chat.revolt.screens.chat.views.NoCurrentChannelScreen
 import chat.revolt.screens.chat.views.channel.ChannelScreen
 import chat.revolt.sheets.AddServerSheet
 import chat.revolt.sheets.ChangelogSheet
+import chat.revolt.sheets.LinkInfoSheet
 import chat.revolt.sheets.ServerContextSheet
 import chat.revolt.sheets.StatusSheet
 import chat.revolt.sheets.UserContextSheet
@@ -275,6 +279,11 @@ fun ChatRouterScreen(
     var userContextSheetTarget by remember { mutableStateOf("") }
     var userContextSheetServer by remember { mutableStateOf<String?>(null) }
 
+    var showChannelUnavailableAlert by remember { mutableStateOf(false) }
+
+    var showLinkInfoSheet by remember { mutableStateOf(false) }
+    var linkInfoSheetUrl by remember { mutableStateOf("") }
+
     var useTabletAwareUI by remember { mutableStateOf(false) }
 
     val drawerBackHandler = remember {
@@ -358,6 +367,27 @@ fun ChatRouterScreen(
                         userContextSheetTarget = action.userId
                         userContextSheetServer = action.serverId
                         showUserContextSheet = true
+                    }
+
+                    is Action.SwitchChannel -> {
+                        val resolvedChannel = RevoltAPI.channelCache[action.channelId]
+
+                        if (resolvedChannel == null) {
+                            showChannelUnavailableAlert = true
+                            return@let
+                        }
+
+                        viewModel.navigateToChannel(action.channelId, navController)
+                        if (resolvedChannel.server != null) {
+                            viewModel.navigateToServer(resolvedChannel.server, navController)
+                        } else {
+                            viewModel.navigateToServer("home", navController)
+                        }
+                    }
+
+                    is Action.LinkInfo -> {
+                        linkInfoSheetUrl = action.url
+                        showLinkInfoSheet = true
                     }
                 }
             }
@@ -504,6 +534,60 @@ fun ChatRouterScreen(
             UserContextSheet(
                 userId = userContextSheetTarget,
                 serverId = userContextSheetServer
+            )
+        }
+    }
+
+    if (showChannelUnavailableAlert) {
+        AlertDialog(
+            onDismissRequest = {
+                showChannelUnavailableAlert = false
+            },
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_lock_alert_24dp),
+                    contentDescription = null, // decorative
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = {
+                Text(
+                    text = stringResource(id = R.string.channel_link_invalid),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = R.string.channel_link_invalid_description),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showChannelUnavailableAlert = false
+                }) {
+                    Text(text = stringResource(id = R.string.ok))
+                }
+            }
+        )
+    }
+
+    if (showLinkInfoSheet) {
+        val linkInfoSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = linkInfoSheetState,
+            onDismissRequest = {
+                showLinkInfoSheet = false
+            },
+        ) {
+            LinkInfoSheet(
+                url = linkInfoSheetUrl,
+                onDismiss = {
+                    showLinkInfoSheet = false
+                }
             )
         }
     }

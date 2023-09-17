@@ -3,7 +3,6 @@ package chat.revolt.internals.markdown
 import android.content.Intent
 import android.net.Uri
 import android.text.TextPaint
-import android.text.style.ClickableSpan
 import android.view.View
 import androidx.browser.customtabs.CustomTabsIntent
 import chat.revolt.activities.InviteActivity
@@ -15,7 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 class LinkSpan(private val url: String, private val drawBackground: Boolean = false) :
-    ClickableSpan() {
+    LongClickableSpan() {
     override fun onClick(widget: View) {
         val uri = Uri.parse(url)
 
@@ -49,6 +48,14 @@ class LinkSpan(private val url: String, private val drawBackground: Boolean = fa
                         ActionChannel.send(Action.OpenUserSheet(userId!!, serverId))
                     }
                 }
+
+                "channel" -> {
+                    val channelId = uri.getQueryParameter("channel")
+
+                    runBlocking(Dispatchers.IO) {
+                        ActionChannel.send(Action.SwitchChannel(channelId!!))
+                    }
+                }
             }
 
             return
@@ -59,6 +66,12 @@ class LinkSpan(private val url: String, private val drawBackground: Boolean = fa
             .build()
 
         customTab.launchUrl(widget.context, Uri.parse(url))
+    }
+
+    override fun onLongClick(view: View?) {
+        runBlocking(Dispatchers.IO) {
+            ActionChannel.send(Action.LinkInfo(url))
+        }
     }
 
     override fun updateDrawState(ds: TextPaint) {
