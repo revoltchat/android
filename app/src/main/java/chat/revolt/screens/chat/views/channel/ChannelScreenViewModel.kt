@@ -177,6 +177,7 @@ class ChannelScreenViewModel : ViewModel() {
             return
         }
 
+        if (isSendingMessage) return
         isSendingMessage = true
 
         viewModelScope.launch {
