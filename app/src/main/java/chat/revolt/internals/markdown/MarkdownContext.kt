@@ -16,5 +16,6 @@ data class MarkdownContext(
     val userMap: Map<String, User>,
     val channelMap: Map<String, String>,
     val emojiMap: Map<String, Emoji>,
-    val serverId: String?
+    val serverId: String?,
+    val useLargeEmojis: Boolean,
 )

@@ -94,6 +94,7 @@ import chat.revolt.screens.chat.views.NoCurrentChannelScreen
 import chat.revolt.screens.chat.views.channel.ChannelScreen
 import chat.revolt.sheets.AddServerSheet
 import chat.revolt.sheets.ChangelogSheet
+import chat.revolt.sheets.EmoteInfoSheet
 import chat.revolt.sheets.LinkInfoSheet
 import chat.revolt.sheets.ServerContextSheet
 import chat.revolt.sheets.StatusSheet
@@ -284,6 +285,9 @@ fun ChatRouterScreen(
     var showLinkInfoSheet by remember { mutableStateOf(false) }
     var linkInfoSheetUrl by remember { mutableStateOf("") }
 
+    var showEmoteInfoSheet by remember { mutableStateOf(false) }
+    var emoteInfoSheetTarget by remember { mutableStateOf("") }
+
     var useTabletAwareUI by remember { mutableStateOf(false) }
 
     val drawerBackHandler = remember {
@@ -388,6 +392,11 @@ fun ChatRouterScreen(
                     is Action.LinkInfo -> {
                         linkInfoSheetUrl = action.url
                         showLinkInfoSheet = true
+                    }
+
+                    is Action.EmoteInfo -> {
+                        emoteInfoSheetTarget = action.emoteId
+                        showEmoteInfoSheet = true
                     }
                 }
             }
@@ -587,6 +596,24 @@ fun ChatRouterScreen(
                 url = linkInfoSheetUrl,
                 onDismiss = {
                     showLinkInfoSheet = false
+                }
+            )
+        }
+    }
+
+    if (showEmoteInfoSheet) {
+        val emoteInfoSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = emoteInfoSheetState,
+            onDismissRequest = {
+                showEmoteInfoSheet = false
+            },
+        ) {
+            EmoteInfoSheet(
+                id = emoteInfoSheetTarget,
+                onDismiss = {
+                    showEmoteInfoSheet = false
                 }
             )
         }

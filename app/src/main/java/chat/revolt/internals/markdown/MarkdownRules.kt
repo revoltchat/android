@@ -36,14 +36,14 @@ class ChannelMentionRule<S> :
     }
 }
 
-class CustomEmoteRule<S> :
+class CustomEmoteRule<S>(private val context: Context) :
     Rule<MarkdownContext, CustomEmoteNode, S>(Pattern.compile("^:([0-9A-Z]{26}):")) {
     override fun parse(
         matcher: Matcher,
         parser: Parser<MarkdownContext, in CustomEmoteNode, S>,
         state: S
     ): ParseSpec<MarkdownContext, S> {
-        return ParseSpec.createTerminal(CustomEmoteNode(matcher.group(1)!!), state)
+        return ParseSpec.createTerminal(CustomEmoteNode(matcher.group(1)!!, context), state)
     }
 }
 
@@ -200,7 +200,7 @@ fun MarkdownParser.addRevoltRules(context: Context): MarkdownParser {
     return addRules(
         UserMentionRule(),
         ChannelMentionRule(),
-        CustomEmoteRule(),
+        CustomEmoteRule(context),
         TimestampRule(context),
         NamedLinkRule(),
         LinkRule(),

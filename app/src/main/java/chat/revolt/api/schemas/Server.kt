@@ -79,6 +79,7 @@ data class Emoji(
     val creatorID: String? = null,
     val name: String? = null,
     val animated: Boolean? = null,
+    val nsfw: Boolean? = null,
     val type: String? = null, // this is _only_ used for websocket events!
 )
 

@@ -1,8 +1,14 @@
 package chat.revolt.internals.markdown
 
+import android.content.Context
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import chat.revolt.api.REVOLT_FILES
+import com.bumptech.glide.Glide
 import com.discord.simpleast.core.node.Node
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlin.math.min
 
 class UserMentionNode(private val userId: String) : Node<MarkdownContext>() {
     override fun render(builder: SpannableStringBuilder, renderContext: MarkdownContext) {
@@ -45,12 +51,49 @@ class ChannelMentionNode(private val channelId: String) : Node<MarkdownContext>(
     }
 }
 
-class CustomEmoteNode(private val emoteId: String) : Node<MarkdownContext>() {
+class CustomEmoteNode(private val emoteId: String, private val context: Context) :
+    Node<MarkdownContext>() {
     override fun render(builder: SpannableStringBuilder, renderContext: MarkdownContext) {
-        builder.append(
-            renderContext.emojiMap[emoteId]?.let { ":${it.name}:" }
-                ?: ":${emoteId}:"
-        )
+        val content = renderContext.emojiMap[emoteId]?.let { ":${it.name}:" }
+            ?: ":${emoteId}:"
+        val emoteUrl = "$REVOLT_FILES/emojis/$emoteId"
+
+        val density = context.resources.displayMetrics.density.toInt()
+
+        builder.append(content)
+        runBlocking(Dispatchers.IO) {
+            val drawable = Glide.with(context)
+                .asDrawable()
+                .load(emoteUrl)
+                .submit()
+                .get()
+
+            val targetSize = if (renderContext.useLargeEmojis) 48 else 28
+            val maxWidth = if (renderContext.useLargeEmojis) 58 else 38
+
+            val wantWidth = min(
+                (drawable.intrinsicWidth * (targetSize * density)) / drawable.intrinsicHeight,
+                maxWidth * density
+            )
+            val wantHeight = targetSize * density
+
+            builder.setSpan(
+                EmoteSpan(
+                    drawable.apply {
+                        setBounds(0, 0, wantWidth, wantHeight)
+                    }
+                ),
+                builder.length - content.length,
+                builder.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            builder.setSpan(
+                EmoteClickableSpan(emoteId),
+                builder.length - content.length,
+                builder.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
     }
 }
 

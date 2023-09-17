@@ -325,6 +325,10 @@ fun ChannelScreen(
                                         },
                                         emojiMap = RevoltAPI.emojiCache,
                                         serverId = channel.server ?: "",
+                                        // check if message consists solely of one *or more* custom emotes
+                                        useLargeEmojis = it.content?.matches(
+                                            Regex("(:([0-9A-Z]{26}):)+")
+                                        ) == true
                                     )
                                 )
                             },

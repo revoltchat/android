@@ -80,7 +80,8 @@ fun UIMarkdown(
                     ch.value.name ?: ch.value.id ?: "{this does not exist 🤫}"
                 },
                 emojiMap = RevoltAPI.emojiCache,
-                serverId = null
+                serverId = null,
+                useLargeEmojis = false
             )
         )
 

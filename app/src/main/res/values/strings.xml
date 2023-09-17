@@ -187,6 +187,9 @@
     <string name="channel_link_invalid">You can\'t view this channel</string>
     <string name="channel_link_invalid_description">This channel may have been deleted or you may not have permission to view it.</string>
 
+    <string name="emote_info_from_server">from %1$s</string>
+    <string name="emote_info_from_server_unknown">from a private server</string>
+
     <string name="channel_info_sheet_description">Channel description</string>
     <string name="channel_info_sheet_description_empty">There hasn\'t been a description set for this channel yet.</string>
     <string name="channel_info_sheet_options">Options</string>
