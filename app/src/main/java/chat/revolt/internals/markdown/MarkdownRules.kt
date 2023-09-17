@@ -67,6 +67,42 @@ class TimestampRule<S> :
     }
 }
 
+const val RE_LINK =
+    "<?https?://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,4}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)>?"
+
+class LinkRule<S> : Rule<MarkdownContext, Node<MarkdownContext>, S>(
+    Pattern.compile("^$RE_LINK")
+) {
+    override fun parse(
+        matcher: Matcher,
+        parser: Parser<MarkdownContext, in Node<MarkdownContext>, S>,
+        state: S
+    ): ParseSpec<MarkdownContext, S> {
+        val url = matcher.group(0)!!.trimStart('<').trimEnd('>')
+        return ParseSpec.createTerminal(
+            LinkNode(url),
+            state
+        )
+    }
+}
+
+class NamedLinkRule<S> : Rule<MarkdownContext, Node<MarkdownContext>, S>(
+    Pattern.compile("^\\[([^]]+)]\\(($RE_LINK)\\)")
+) {
+    override fun parse(
+        matcher: Matcher,
+        parser: Parser<MarkdownContext, in Node<MarkdownContext>, S>,
+        state: S
+    ): ParseSpec<MarkdownContext, S> {
+        val content = matcher.group(1)!!
+        val url = matcher.group(2)!!.trimStart('<').trimEnd('>')
+        return ParseSpec.createTerminal(
+            LinkNode(content, url),
+            state
+        )
+    }
+}
+
 fun <RC, S> createInlineCodeRule(context: Context, backgroundColor: Int): Rule<RC, Node<RC>, S> {
     return CodeRules.createInlineCodeRule(
         { listOf(TextAppearanceSpan(context, R.style.Code_TextAppearance)) },
@@ -155,4 +191,15 @@ fun <RC> createCodeRule(
             )
         }
     }
+}
+
+fun MarkdownParser.addRevoltRules(): MarkdownParser {
+    return addRules(
+        UserMentionRule(),
+        ChannelMentionRule(),
+        CustomEmoteRule(),
+        TimestampRule(),
+        NamedLinkRule(),
+        LinkRule(),
+    )
 }

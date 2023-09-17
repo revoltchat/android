@@ -2,6 +2,7 @@ package chat.revolt.components.generic
 
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.util.TypedValue
 import android.view.ViewGroup
@@ -24,13 +25,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
-import chat.revolt.internals.markdown.ChannelMentionRule
-import chat.revolt.internals.markdown.CustomEmoteRule
 import chat.revolt.internals.markdown.MarkdownContext
 import chat.revolt.internals.markdown.MarkdownParser
 import chat.revolt.internals.markdown.MarkdownState
-import chat.revolt.internals.markdown.TimestampRule
-import chat.revolt.internals.markdown.UserMentionRule
+import chat.revolt.internals.markdown.addRevoltRules
 import chat.revolt.internals.markdown.createCodeRule
 import chat.revolt.internals.markdown.createInlineCodeRule
 import com.discord.simpleast.core.simple.SimpleMarkdownRules
@@ -58,12 +56,9 @@ fun UIMarkdown(
     LaunchedEffect(text) {
         val parser = MarkdownParser()
             .addRules(
-                SimpleMarkdownRules.createEscapeRule(),
-                UserMentionRule(),
-                ChannelMentionRule(),
-                CustomEmoteRule(),
-                TimestampRule(),
+                SimpleMarkdownRules.createEscapeRule()
             )
+            .addRevoltRules()
             .addRules(
                 createCodeRule(context, codeBlockColor.toArgb()),
                 createInlineCodeRule(context, codeBlockColor.toArgb()),
@@ -101,6 +96,8 @@ fun UIMarkdown(
                 setTextColor(foregroundColor.toArgb())
                 setMaxLines(maxLines)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.value)
+
+                movementMethod = LinkMovementMethod.getInstance()
 
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,

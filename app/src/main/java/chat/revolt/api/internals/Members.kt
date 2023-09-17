@@ -29,4 +29,13 @@ class Members {
     fun clear() {
         memberCache.clear()
     }
+
+    /**
+     * Returns a Map of userId to server-nickname for the given serverId.
+     */
+    fun markdownMemberMapFor(serverId: String): Map<String, String> {
+        return memberCache[serverId]?.mapNotNull { (userId, member) ->
+            member.nickname?.let { userId to member.nickname }
+        }?.toMap() ?: emptyMap()
+    }
 }

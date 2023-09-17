@@ -77,13 +77,10 @@ import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelHeader
 import chat.revolt.components.screens.chat.ReplyManager
 import chat.revolt.components.screens.chat.TypingIndicator
-import chat.revolt.internals.markdown.ChannelMentionRule
-import chat.revolt.internals.markdown.CustomEmoteRule
 import chat.revolt.internals.markdown.MarkdownContext
 import chat.revolt.internals.markdown.MarkdownParser
 import chat.revolt.internals.markdown.MarkdownState
-import chat.revolt.internals.markdown.TimestampRule
-import chat.revolt.internals.markdown.UserMentionRule
+import chat.revolt.internals.markdown.addRevoltRules
 import chat.revolt.internals.markdown.createCodeRule
 import chat.revolt.internals.markdown.createInlineCodeRule
 import chat.revolt.sheets.ChannelInfoSheet
@@ -300,11 +297,8 @@ fun ChannelScreen(
                                 val parser = MarkdownParser()
                                     .addRules(
                                         SimpleMarkdownRules.createEscapeRule(),
-                                        UserMentionRule(),
-                                        ChannelMentionRule(),
-                                        CustomEmoteRule(),
-                                        TimestampRule(),
                                     )
+                                    .addRevoltRules()
                                     .addRules(
                                         createCodeRule(context, codeBlockColor.toArgb()),
                                         createInlineCodeRule(context, codeBlockColor.toArgb()),
@@ -320,7 +314,11 @@ fun ChannelScreen(
                                     parser = parser,
                                     initialState = MarkdownState(0),
                                     renderContext = MarkdownContext(
-                                        memberMap = mapOf(),
+                                        memberMap = viewModel.activeChannel?.server?.let { serverId ->
+                                            RevoltAPI.members.markdownMemberMapFor(
+                                                serverId
+                                            )
+                                        } ?: mapOf(),
                                         userMap = RevoltAPI.userCache.toMap(),
                                         channelMap = RevoltAPI.channelCache.mapValues { ch ->
                                             ch.value.name ?: ch.value.id ?: "#DeletedChannel"

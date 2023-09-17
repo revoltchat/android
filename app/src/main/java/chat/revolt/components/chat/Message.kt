@@ -6,6 +6,7 @@ import android.net.Uri
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
 import android.text.format.DateUtils
+import android.text.method.LinkMovementMethod
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -292,6 +293,8 @@ fun Message(
                                     ellipsize = TextUtils.TruncateAt.END
                                     textSize = 16f
                                     typeface = ResourcesCompat.getFont(ctx, R.font.inter)
+
+                                    movementMethod = LinkMovementMethod.getInstance()
 
                                     setTextColor(contentColor.toArgb())
                                 }

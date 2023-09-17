@@ -1,6 +1,7 @@
 package chat.revolt.internals.markdown
 
 import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.format.DateUtils
 import android.util.Log
 import com.discord.simpleast.core.node.Node
@@ -100,5 +101,17 @@ class TimestampNode(private val timestamp: Long, private val modifier: String? =
             Log.e("TimestampNode", "Failed to parse timestamp", e)
             builder.append("<invalid timestamp>")
         }
+    }
+}
+
+class LinkNode(val content: String, val url: String = content) : Node<MarkdownContext>() {
+    override fun render(builder: SpannableStringBuilder, renderContext: MarkdownContext) {
+        builder.append(content)
+        builder.setSpan(
+            LinkSpan(url),
+            builder.length - content.length,
+            builder.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
     }
 }
