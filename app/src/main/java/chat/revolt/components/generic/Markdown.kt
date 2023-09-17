@@ -112,12 +112,11 @@ fun UIMarkdown(
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun UIMarkdownPreview() {
-    // Will not render in side preview but will render on device
     UIMarkdown(
-        text = "Hello, **world**!",
+        text = "Hello, **world**! <@01F1WKM5TK2V6KCZWR6DGBJDTZ> [link](https://google.com) `code`\n\n```kt\nfun main() {\n    println(\"Hello, world!\")\n}\n```",
         fontSize = 16.sp,
     )
 }
