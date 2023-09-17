@@ -72,6 +72,8 @@ import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.User
 import chat.revolt.api.settings.FeatureFlag
 import chat.revolt.api.settings.SyncedSettings
+import chat.revolt.callbacks.Action
+import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.chat.DisconnectedNotice
 import chat.revolt.components.generic.GroupIcon
 import chat.revolt.components.generic.UserAvatar
@@ -346,6 +348,20 @@ fun ChatRouterScreen(
                 useTabletAwareUI = sizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
                         && sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
             }
+    }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            ActionChannel.receive().let { action ->
+                when (action) {
+                    is Action.OpenUserSheet -> {
+                        userContextSheetTarget = action.userId
+                        userContextSheetServer = action.serverId
+                        showUserContextSheet = true
+                    }
+                }
+            }
+        }
     }
 
     if (!viewModel.latestChangelogRead) {

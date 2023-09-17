@@ -14,10 +14,23 @@ import java.util.Locale
 
 class UserMentionNode(private val userId: String) : Node<MarkdownContext>() {
     override fun render(builder: SpannableStringBuilder, renderContext: MarkdownContext) {
-        builder.append(
-            renderContext.memberMap[userId]?.let { "@$it" }
-                ?: renderContext.userMap[userId]?.let { "@${it.username}" }
-                ?: "<@${userId}>"
+        val content = renderContext.memberMap[userId]?.let { "@$it" }
+            ?: renderContext.userMap[userId]?.let { "@${it.username}" }
+            ?: "<@${userId}>"
+
+        builder.append(content)
+        builder.setSpan(
+            LinkSpan(
+                "revolt-android://link-action/user?user=$userId${
+                    renderContext.serverId?.let {
+                        "&server=$it"
+                    }.orEmpty()
+                }",
+                drawBackground = true
+            ),
+            builder.length - content.length,
+            builder.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
     }
 }
