@@ -47,21 +47,24 @@ class CustomEmoteRule<S> :
     }
 }
 
-class TimestampRule<S> :
-    Rule<MarkdownContext, TimestampNode, S>(Pattern.compile("^<t:([0-9]+?)(:[tTDfFR])?>")) {
+class TimestampRule<S>(private val context: Context) :
+    Rule<MarkdownContext, Node<MarkdownContext>, S>(Pattern.compile("^<t:([0-9]+?)(:[tTDfFR])?>")) {
     override fun parse(
         matcher: Matcher,
-        parser: Parser<MarkdownContext, in TimestampNode, S>,
+        parser: Parser<MarkdownContext, in Node<MarkdownContext>, S>,
         state: S
     ): ParseSpec<MarkdownContext, S> {
         return ParseSpec.createTerminal(
-            TimestampNode(
-                try {
-                    matcher.group(1)!!.toLong()
-                } catch (e: NumberFormatException) {
-                    -1
-                },
-                matcher.group(2)
+            StyleNode.wrapText(
+                resolveTimestamp(
+                    try {
+                        matcher.group(1)!!.toLong()
+                    } catch (e: NumberFormatException) {
+                        -1
+                    },
+                    matcher.group(2)
+                ),
+                listOf(TextAppearanceSpan(context, R.style.Code_TextAppearance))
             ), state
         )
     }
@@ -193,12 +196,12 @@ fun <RC> createCodeRule(
     }
 }
 
-fun MarkdownParser.addRevoltRules(): MarkdownParser {
+fun MarkdownParser.addRevoltRules(context: Context): MarkdownParser {
     return addRules(
         UserMentionRule(),
         ChannelMentionRule(),
         CustomEmoteRule(),
-        TimestampRule(),
+        TimestampRule(context),
         NamedLinkRule(),
         LinkRule(),
     )

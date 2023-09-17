@@ -298,7 +298,7 @@ fun ChannelScreen(
                                     .addRules(
                                         SimpleMarkdownRules.createEscapeRule(),
                                     )
-                                    .addRevoltRules()
+                                    .addRevoltRules(context)
                                     .addRules(
                                         createCodeRule(context, codeBlockColor.toArgb()),
                                         createInlineCodeRule(context, codeBlockColor.toArgb()),
