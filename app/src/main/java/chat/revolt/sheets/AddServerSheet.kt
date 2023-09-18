@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -58,8 +59,14 @@ fun AddServerSheet() {
         Spacer(modifier = Modifier.height(4.dp))
 
         LinkOnHome(
-            heading = stringResource(id = R.string.add_server_sheet_join_by_invite),
-            icon = Icons.Default.ExitToApp,
+            heading = { Text(stringResource(id = R.string.add_server_sheet_join_by_invite)) },
+            icon = { modifier ->
+                Icon(
+                    imageVector = Icons.Default.ExitToApp,
+                    contentDescription = stringResource(id = R.string.add_server_sheet_join_by_invite),
+                    modifier = modifier
+                )
+            },
             onClick = {
                 joinFromInviteModalOpen.value = true
             }
@@ -68,8 +75,14 @@ fun AddServerSheet() {
         Spacer(modifier = Modifier.height(4.dp))
 
         LinkOnHome(
-            heading = stringResource(id = R.string.add_server_sheet_create_new),
-            icon = Icons.Default.Build,
+            heading = { Text(stringResource(id = R.string.add_server_sheet_create_new)) },
+            icon = { modifier ->
+                Icon(
+                    imageVector = Icons.Default.Build,
+                    contentDescription = stringResource(id = R.string.add_server_sheet_create_new),
+                    modifier = modifier
+                )
+            },
             onClick = {
                 Toast.makeText(
                     context,

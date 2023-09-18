@@ -1,7 +1,5 @@
 package chat.revolt.screens.settings
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,7 +12,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,7 +27,6 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
-import chat.revolt.activities.InviteActivity
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.components.generic.PageHeader
@@ -59,8 +55,6 @@ fun SettingsScreen(
     navController: NavController,
     viewModel: SettingsScreenViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -193,32 +187,6 @@ fun SettingsScreen(
                     modifier = Modifier.testTag("settings_view_changelogs")
                 ) {
                     navController.navigate("settings/changelogs")
-                }
-
-                SheetClickable(
-                    icon = { modifier ->
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = stringResource(id = R.string.logout),
-                            modifier = modifier
-                        )
-                    },
-                    label = { textStyle ->
-                        Text(
-                            text = stringResource(id = R.string.settings_join_jenvolt),
-                            style = textStyle
-                        )
-                    },
-                    modifier = Modifier.testTag("settings_join_jenvolt")
-                ) {
-                    context.startActivity(
-                        Intent(
-                            context,
-                            InviteActivity::class.java
-                        )
-                            .setData(Uri.parse("https://rvlt.gg/jen"))
-                            .setAction(Intent.ACTION_VIEW)
-                    )
                 }
 
                 SheetClickable(

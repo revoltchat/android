@@ -108,6 +108,9 @@
     <string name="home">Home</string>
     <string name="menu">Menu</string>
     <string name="logout">Log out</string>
+    
+    <string name="home_join_jenvolt">Join Jenvolt</string>
+    <string name="home_join_jenvolt_description">Jenvolt is the developer-run space for all things Android app and more. Support, feedback go here. Maybe you will get to try out new features! 👀</string>
 
     <string name="server_plus_alt">Add server</string>
 
@@ -346,8 +349,6 @@
     <string name="settings_appearance_theme_m3dynamic">Material You</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported">Material You (unsupported)</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">Material You is not supported on this device.</string>
-
-    <string name="settings_join_jenvolt">Join Jenvolt</string>
 
     <string name="settings_feedback">Feedback</string>
     <string name="settings_feedback_introduction">Any feedback you have for Revolt is greatly appreciated and all feedback is read by the development team of our Android app.</string>
