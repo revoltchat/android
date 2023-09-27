@@ -430,7 +430,7 @@ fun RowScope.ChannelList(
                                             ch.id!!,
                                             lastMessageID
                                         )
-                                    } ?: true,
+                                    } ?: false,
                                     onClick = {
                                         onChannelClick(ch.id ?: return@DrawerChannel)
                                     },
