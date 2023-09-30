@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,8 +53,8 @@ import chat.revolt.api.schemas.ChannelType
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageField(
-    messageContent: String,
-    onMessageContentChange: (String) -> Unit,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
     onAddAttachment: () -> Unit,
     onSendMessage: () -> Unit,
     channelType: ChannelType,
@@ -73,16 +75,23 @@ fun MessageField(
         ChannelType.SavedMessages -> R.string.message_field_placeholder_notes
     }
 
-    val sendButtonVisible = (messageContent.isNotBlank() || forceSendButton) && !disabled
+    val sendButtonVisible = (value.text.isNotBlank() || forceSendButton) && !disabled
+
+    LaunchedEffect(editMode) {
+        if (editMode) {
+            focusRequester.requestFocus()
+        } else {
+            focusRequester.freeFocus()
+        }
+    }
 
     Row(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
     ) {
-
         BasicTextField(
-            value = messageContent,
-            onValueChange = onMessageContentChange,
+            value = value,
+            onValueChange = onValueChange,
             singleLine = false,
             enabled = !disabled,
             textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
@@ -97,21 +106,21 @@ fun MessageField(
             keyboardActions = KeyboardActions.Default,
             decorationBox = @Composable { innerTextField ->
                 TextFieldDefaults.DecorationBox(
-                    value = messageContent,
+                    value = value.text,
                     innerTextField = innerTextField,
                     enabled = !disabled,
                     singleLine = false,
                     visualTransformation = VisualTransformation.None,
                     interactionSource = remember { MutableInteractionSource() },
                     placeholder = {
-                            Text(
-                                text = stringResource(
-                                    id = placeholderResource,
-                                    channelName
-                                ),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
+                        Text(
+                            text = stringResource(
+                                id = placeholderResource,
+                                channelName
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     },
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
@@ -127,28 +136,28 @@ fun MessageField(
                     ),
                     contentPadding = PaddingValues(16.dp),
                     leadingIcon = {
-                            Icon(
-                                when {
-                                    editMode -> Icons.Default.Close
-                                    else -> Icons.Default.Add
-                                },
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                                contentDescription = stringResource(id = R.string.add_attachment_alt),
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .size(32.dp)
-                                    .clickable {
-                                        when {
-                                            editMode -> cancelEdit()
-                                            else -> {
-                                                focusRequester.freeFocus() // hide keyboard because it's annoying
-                                                onAddAttachment()
-                                            }
+                        Icon(
+                            when {
+                                editMode -> Icons.Default.Close
+                                else -> Icons.Default.Add
+                            },
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            contentDescription = stringResource(id = R.string.add_attachment_alt),
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(32.dp)
+                                .clickable {
+                                    when {
+                                        editMode -> cancelEdit()
+                                        else -> {
+                                            focusRequester.freeFocus() // hide keyboard because it's annoying
+                                            onAddAttachment()
                                         }
                                     }
-                                    .padding(4.dp)
-                                    .testTag("add_attachment")
-                            )
+                                }
+                                .padding(4.dp)
+                                .testTag("add_attachment")
+                        )
                     },
                     trailingIcon = {
                         AnimatedVisibility(sendButtonVisible,
@@ -186,8 +195,8 @@ fun MessageField(
 @Composable
 fun MessageFieldPreview() {
     MessageField(
-        messageContent = "Hello world!",
-        onMessageContentChange = {},
+        value = TextFieldValue("Hello world!"),
+        onValueChange = {},
         onSendMessage = {},
         onAddAttachment = {},
         channelType = ChannelType.TextChannel,

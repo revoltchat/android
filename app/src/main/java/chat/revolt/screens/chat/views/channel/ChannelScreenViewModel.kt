@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chat.revolt.R
@@ -64,6 +65,7 @@ class ChannelScreenViewModel : ViewModel() {
     var hasNoMoreMessages by mutableStateOf(false)
 
     var pendingMessageContent by mutableStateOf("")
+    var textSelection by mutableStateOf(TextRange(0))
     var pendingReplies = mutableStateListOf<SendMessageReply>()
     var pendingAttachments = mutableStateListOf<FileArgs>()
 
@@ -394,6 +396,7 @@ class ChannelScreenViewModel : ViewModel() {
                             msg.id == it.messageId
                         } ?: return@onEach
                         pendingMessageContent = message.content ?: ""
+                        textSelection = TextRange(message.content?.length ?: 0)
                     }
                 }
             }.catch {

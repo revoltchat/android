@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
@@ -172,6 +173,13 @@ fun ChannelScreen(
         animationSpec = RevoltTweenDp,
         label = "ScrollDownFABPadding"
     )
+
+    val fieldContent = remember(viewModel.pendingMessageContent, viewModel.textSelection) {
+        TextFieldValue(
+            viewModel.pendingMessageContent,
+            viewModel.textSelection
+        )
+    }
 
     LaunchedEffect(channelId) {
         viewModel.fetchChannel(channelId)
@@ -465,9 +473,10 @@ fun ChannelScreen(
                     )
                 } else {
                     MessageField(
-                        messageContent = viewModel.pendingMessageContent,
-                        onMessageContentChange = {
-                            viewModel.pendingMessageContent = it
+                        value = fieldContent,
+                        onValueChange = {
+                            viewModel.pendingMessageContent = it.text
+                            viewModel.textSelection = it.selection
                         },
                         onSendMessage = viewModel::sendPendingMessage,
                         onAddAttachment = {
