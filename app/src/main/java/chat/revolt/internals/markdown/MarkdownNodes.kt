@@ -5,6 +5,7 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import chat.revolt.api.REVOLT_FILES
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.discord.simpleast.core.node.Node
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -56,19 +57,38 @@ class CustomEmoteNode(private val emoteId: String, private val context: Context)
     override fun render(builder: SpannableStringBuilder, renderContext: MarkdownContext) {
         val content = renderContext.emojiMap[emoteId]?.let { ":${it.name}:" }
             ?: ":${emoteId}:"
-        val emoteUrl = "$REVOLT_FILES/emojis/$emoteId"
+        val isGif = renderContext.emojiMap[emoteId]?.animated ?: false
+        val emoteUrl = "$REVOLT_FILES/emojis/$emoteId/emote${if (isGif) ".gif" else ".png"}"
 
         val density = context.resources.displayMetrics.density.toInt()
 
         builder.append(content)
         runBlocking(Dispatchers.IO) {
-            val drawable = Glide.with(context)
-                .asDrawable()
-                .load(emoteUrl)
-                .submit()
-                .get()
+            val drawable = try {
+                Glide.with(context)
+                    .asDrawable()
+                    .load(emoteUrl)
+                    .submit()
+                    .get()
+            } catch (e: Exception) {
+                null
+            }.also {
+                if (it == null) {
+                    builder.replace(
+                        builder.length - content.length,
+                        builder.length,
+                        content
+                    )
+                }
+            } ?: return@runBlocking
 
-            val targetSize = if (renderContext.useLargeEmojis) 48 else 28
+            if (drawable is GifDrawable) {
+                drawable.apply {
+                    start()
+                }
+            }
+
+            val targetSize = if (renderContext.useLargeEmojis) 48 else 22
             val maxWidth = if (renderContext.useLargeEmojis) 58 else 38
 
             val wantWidth = min(

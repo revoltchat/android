@@ -31,6 +31,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -283,26 +284,28 @@ fun Message(
                         }
                     }
 
-                    message.content?.let {
-                        if (message.content.isBlank()) return@let // if only an attachment is sent
+                    key(message.content) {
+                        message.content?.let {
+                            if (message.content.isBlank()) return@let // if only an attachment is sent
 
-                        AndroidView(
-                            factory = { ctx ->
-                                androidx.appcompat.widget.AppCompatTextView(ctx).apply {
-                                    maxLines = if (truncate) 1 else Int.MAX_VALUE
-                                    ellipsize = TextUtils.TruncateAt.END
-                                    textSize = 16f
-                                    typeface = ResourcesCompat.getFont(ctx, R.font.inter)
+                            AndroidView(
+                                factory = { ctx ->
+                                    androidx.appcompat.widget.AppCompatTextView(ctx).apply {
+                                        maxLines = if (truncate) 1 else Int.MAX_VALUE
+                                        ellipsize = TextUtils.TruncateAt.END
+                                        textSize = 16f
+                                        typeface = ResourcesCompat.getFont(ctx, R.font.inter)
 
-                                    movementMethod = LongClickLinkMovementMethod.instance
+                                        movementMethod = LongClickLinkMovementMethod.instance
 
-                                    setTextColor(contentColor.toArgb())
+                                        setTextColor(contentColor.toArgb())
+                                    }
+                                },
+                                update = {
+                                    it.text = parse(message)
                                 }
-                            },
-                            update = {
-                                it.text = parse(message)
-                            }
-                        )
+                            )
+                        }
                     }
 
                     message.attachments?.let {
