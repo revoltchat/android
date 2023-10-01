@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
@@ -16,10 +17,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +45,8 @@ import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.server.leaveOrDeleteServer
+import chat.revolt.api.schemas.ServerFlags
+import chat.revolt.api.schemas.has
 import chat.revolt.components.generic.IconPlaceholder
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.SheetClickable
@@ -198,11 +203,32 @@ fun ServerContextSheet(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Text(
-                    text = server.name ?: stringResource(R.string.unknown),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontSize = 16.sp
-                )
+                CompositionLocalProvider(LocalContentColor provides Color.White) {
+                    if (server.flags has ServerFlags.Official) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_revolt_decagram_24dp),
+                            contentDescription = stringResource(R.string.server_flag_official),
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(24.dp)
+                        )
+                    }
+                    if (server.flags has ServerFlags.Verified) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_check_decagram_24dp),
+                            contentDescription = stringResource(R.string.server_flag_verified),
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(24.dp)
+                        )
+                    }
+
+                    Text(
+                        text = server.name ?: stringResource(R.string.unknown),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontSize = 16.sp
+                    )
+                }
             }
         }
 
