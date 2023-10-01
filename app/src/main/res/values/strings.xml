@@ -108,7 +108,7 @@
     <string name="home">Home</string>
     <string name="menu">Menu</string>
     <string name="logout">Log out</string>
-    
+
     <string name="home_join_jenvolt">Join Jenvolt</string>
     <string name="home_join_jenvolt_description">Jenvolt is the developer-run space for all things Android app and more. Support, feedback go here. Maybe you will get to try out new features! 👀</string>
 
@@ -234,6 +234,8 @@
     <string name="server_context_sheet_actions_leave_confirm_no">Stay</string>
     <string name="server_context_sheet_actions_leave_silently">Leave Silently</string>
 
+    <string name="user_context_sheet_user_not_found">Can\'t resolve this user</string>
+    <string name="user_context_sheet_user_not_found_description">This user may have been deleted or you may not have permission to view them.</string>
     <string name="user_context_sheet_category_bio">Bio</string>
     <string name="user_context_sheet_bio_empty">This user hasn\'t set a bio yet.</string>
     <string name="user_context_sheet_bio_not_found">This user\'s bio could not be fetched. Please verify you share a server or are friends.</string>

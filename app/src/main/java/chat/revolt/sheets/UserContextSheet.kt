@@ -62,7 +62,16 @@ fun UserContextSheet(
 
     if (user == null) {
         // TODO fetch user in this scenario
-        Text(text = "not in user cache, but for now there's always this message")
+        Column(Modifier.padding(16.dp)) {
+            Text(
+                text = stringResource(R.string.user_context_sheet_user_not_found),
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Text(
+                text = stringResource(R.string.user_context_sheet_user_not_found_description),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
         return
     }
 
