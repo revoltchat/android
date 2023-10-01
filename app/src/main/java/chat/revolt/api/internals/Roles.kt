@@ -53,7 +53,7 @@ object Roles {
         if (user.privileged == true) return PermissionBit.GrantAllSafe.value
         if (server.owner == member.id?.user) return PermissionBit.GrantAllSafe.value
 
-        var calculated = server.defaultPermissions ?: 0L
+        var calculated = server.defaultPermissions ?: BitDefaults.Server
 
         member.roles?.forEach { roleId ->
             val role = server.roles?.get(roleId) ?: return@forEach
@@ -82,7 +82,6 @@ object Roles {
                 val server = RevoltAPI.serverCache[channel.server]
                 // FIXME this is a stupid patch to prevent it from showing "no permission" on a channel on launch
                     ?: return PermissionBit.GrantAllSafe.value
-
 
                 if (server.owner == user?.id) return PermissionBit.GrantAllSafe.value
 
