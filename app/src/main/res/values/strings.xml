@@ -187,6 +187,9 @@
     <string name="copy">Copy</string>
     <string name="copied">Copied to clipboard</string>
 
+    <string name="server_flag_official">Official Server</string>
+    <string name="server_flag_verified">Verified Server</string>
+
     <string name="channel_link_invalid">You can\'t view this channel</string>
     <string name="channel_link_invalid_description">This channel may have been deleted or you may not have permission to view it.</string>
 

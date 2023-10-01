@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,6 +47,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,7 +62,9 @@ import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.schemas.ChannelType
+import chat.revolt.api.schemas.ServerFlags
 import chat.revolt.api.schemas.User
+import chat.revolt.api.schemas.has
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
 import chat.revolt.sheets.ChannelContextSheet
@@ -345,6 +351,37 @@ fun RowScope.ChannelList(
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
+                            Spacer(Modifier.width(16.dp))
+
+                            if (server?.flags has ServerFlags.Official) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_revolt_decagram_24dp),
+                                    contentDescription = stringResource(R.string.server_flag_official),
+                                    tint = if (server?.banner != null) {
+                                        bannerTextColour
+                                    } else {
+                                        LocalContentColor.current
+                                    },
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .size(24.dp)
+                                )
+                            }
+                            if (server?.flags has ServerFlags.Verified) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_check_decagram_24dp),
+                                    contentDescription = stringResource(R.string.server_flag_verified),
+                                    tint = if (server?.banner != null) {
+                                        bannerTextColour
+                                    } else {
+                                        LocalContentColor.current
+                                    },
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .size(24.dp)
+                                )
+                            }
+
                             Text(
                                 text = (server?.name
                                     ?: stringResource(R.string.unknown)),
@@ -358,10 +395,15 @@ fun RowScope.ChannelList(
                                 modifier = Modifier
                                     .then(
                                         if (server?.banner != null) {
-                                            Modifier.padding(16.dp)
+                                            Modifier.padding(
+                                                start = 0.dp,
+                                                end = 16.dp,
+                                                top = 16.dp,
+                                                bottom = 16.dp
+                                            )
                                         } else {
                                             Modifier.padding(
-                                                start = 24.dp,
+                                                start = 0.dp,
                                                 end = 24.dp,
                                                 top = 16.dp,
                                                 bottom = 16.dp

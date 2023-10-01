@@ -41,6 +41,16 @@ data class Server(
     }
 }
 
+enum class ServerFlags(val value: Long) {
+    Official(1L shl 0),
+    Verified(1L shl 1),
+}
+
+infix fun Long?.has(flag: ServerFlags): Boolean {
+    if (this == null) return false
+    return this and flag.value == flag.value
+}
+
 @Serializable
 data class Category(
     val id: String? = null,
