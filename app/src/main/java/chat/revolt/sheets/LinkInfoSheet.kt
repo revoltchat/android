@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -45,6 +46,7 @@ fun LinkInfoSheet(url: String, onDismiss: () -> Unit) {
         Box(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
+                .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp))
                 .clickable(onClick = {
                     if (url.startsWith("revolt-android://")) return@clickable
