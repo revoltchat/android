@@ -3,9 +3,16 @@ package chat.revolt.components.chat
 import android.content.Intent
 import android.icu.text.DateFormat
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.text.Selection
 import android.text.SpannableStringBuilder
+import android.text.SpannedString
 import android.text.TextUtils
 import android.text.format.DateUtils
+import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.text.toSpannable
 import chat.revolt.R
 import chat.revolt.activities.media.ImageViewActivity
 import chat.revolt.activities.media.VideoViewActivity
@@ -59,7 +67,7 @@ import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
-import chat.revolt.internals.markdown.LongClickLinkMovementMethod
+import chat.revolt.internals.markdown.LongClickableSpan
 import chat.revolt.api.schemas.Message as MessageSchema
 
 @Composable
@@ -296,7 +304,77 @@ fun Message(
                                         textSize = 16f
                                         typeface = ResourcesCompat.getFont(ctx, R.font.inter)
 
-                                        movementMethod = LongClickLinkMovementMethod.instance
+                                        setOnTouchListener(object : OnTouchListener {
+                                            private var longClickHandler: Handler? = null
+                                            private var isLongPressed = false
+
+                                            override fun onTouch(
+                                                widget: View?,
+                                                event: MotionEvent?
+                                            ): Boolean {
+                                                if (longClickHandler == null) {
+                                                    longClickHandler =
+                                                        Handler(Looper.getMainLooper())
+                                                }
+                                                if (event == null) return false
+
+                                                val action = event.action
+                                                if (action == MotionEvent.ACTION_CANCEL) {
+                                                    longClickHandler?.removeCallbacksAndMessages(
+                                                        null
+                                                    )
+                                                }
+                                                if (action == MotionEvent.ACTION_UP ||
+                                                    action == MotionEvent.ACTION_DOWN
+                                                ) {
+                                                    var x = event.x.toInt()
+                                                    var y = event.y.toInt()
+                                                    x -= (widget as androidx.appcompat.widget.AppCompatTextView).totalPaddingLeft
+                                                    y -= widget.totalPaddingTop
+                                                    x += widget.scrollX
+                                                    y += widget.scrollY
+
+                                                    val spannedString = widget.text as SpannedString
+
+                                                    val layout = widget.layout
+                                                    val line = layout.getLineForVertical(y)
+                                                    val off = layout.getOffsetForHorizontal(
+                                                        line,
+                                                        x.toFloat()
+                                                    )
+                                                    val link = spannedString.getSpans(
+                                                        off, off,
+                                                        LongClickableSpan::class.java
+                                                    )
+                                                    if (link.isNotEmpty()) {
+                                                        if (action == MotionEvent.ACTION_UP) {
+                                                            longClickHandler?.removeCallbacksAndMessages(
+                                                                null
+                                                            )
+                                                            if (!isLongPressed) {
+                                                                link[0].onClick(widget)
+                                                            }
+                                                            isLongPressed = false
+                                                        } else {
+                                                            Selection.setSelection(
+                                                                spannedString.toSpannable(),
+                                                                spannedString.getSpanStart(link[0]),
+                                                                spannedString.getSpanEnd(link[0])
+                                                            )
+                                                            longClickHandler?.postDelayed(
+                                                                {
+                                                                    link[0].onLongClick(widget)
+                                                                    isLongPressed = true
+                                                                },
+                                                                250L
+                                                            )
+                                                        }
+                                                        return true
+                                                    }
+                                                }
+                                                return false
+                                            }
+                                        })
 
                                         setTextColor(contentColor.toArgb())
                                     }

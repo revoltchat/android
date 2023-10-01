@@ -20,7 +20,8 @@ class LongClickLinkMovementMethod : LinkMovementMethod() {
     private var longClickHandler: Handler? = null
     private var isLongPressed = false
     override fun onTouchEvent(
-        widget: TextView, buffer: Spannable,
+        widget: TextView,
+        buffer: Spannable,
         event: MotionEvent
     ): Boolean {
         val action = event.action
