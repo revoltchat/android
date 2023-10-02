@@ -7,6 +7,7 @@ import chat.revolt.api.internals.ULID
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.MessagesInChannel
+import chat.revolt.api.schemas.User
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
@@ -133,6 +134,16 @@ suspend fun fetchSingleChannel(channelId: String): Channel {
 
     return RevoltJson.decodeFromString(
         Channel.serializer(),
+        response
+    )
+}
+
+suspend fun fetchGroupParticipants(channelId: String): List<User> {
+    val response = RevoltHttp.get("/channels/$channelId/members")
+        .bodyAsText()
+
+    return RevoltJson.decodeFromString(
+        ListSerializer(User.serializer()),
         response
     )
 }

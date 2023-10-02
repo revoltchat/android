@@ -52,7 +52,8 @@ fun ChannelInfoSheet(
             }
         ) {
             MemberListSheet(
-                serverId = channel?.server ?: ""
+                channelId = channelId,
+                serverId = channel?.server,
             )
         }
     }
@@ -100,22 +101,28 @@ fun ChannelInfoSheet(
             modifier = Modifier.padding(bottom = 4.dp)
         )
 
-        SheetClickable(
-            icon = { modifier ->
-                Icon(
-                    imageVector = Icons.Default.List,
-                    contentDescription = null,
-                    modifier = modifier
-                )
-            },
-            label = { style ->
-                Text(
-                    text = stringResource(id = R.string.channel_info_sheet_options_members),
-                    style = style
-                )
+        when (channel.channelType) {
+            ChannelType.TextChannel, ChannelType.VoiceChannel, ChannelType.Group -> {
+                SheetClickable(
+                    icon = { modifier ->
+                        Icon(
+                            imageVector = Icons.Default.List,
+                            contentDescription = null,
+                            modifier = modifier
+                        )
+                    },
+                    label = { style ->
+                        Text(
+                            text = stringResource(id = R.string.channel_info_sheet_options_members),
+                            style = style
+                        )
+                    }
+                ) {
+                    memberListSheetShown = true
+                }
             }
-        ) {
-            memberListSheetShown = true
+
+            else -> {}
         }
 
         SheetClickable(

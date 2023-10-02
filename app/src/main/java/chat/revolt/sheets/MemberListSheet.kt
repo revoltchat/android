@@ -46,13 +46,17 @@ import androidx.lifecycle.viewModelScope
 import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.PermissionBit
 import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.WebCompat
+import chat.revolt.api.internals.hasPermission
 import chat.revolt.api.internals.solidColor
+import chat.revolt.api.routes.channel.fetchGroupParticipants
 import chat.revolt.api.routes.server.fetchMembers
 import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.PageHeader
+import chat.revolt.components.generic.Presence
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,6 +71,7 @@ val DO_NOT_FETCH_OFFLINE_MEMBERS_SERVERS = listOf(
 
 sealed class MemberListItem {
     data class MemberItem(val member: Member) : MemberListItem()
+    data class UserItem(val user: User) : MemberListItem()
     data class CategoryItem(val category: String, val count: Int) : MemberListItem()
 }
 
@@ -77,14 +82,16 @@ class MemberListSheetViewModel @Inject constructor(
 ) : ViewModel() {
     val fullItemList = mutableStateListOf<MemberListItem>()
 
-    fun fetchMemberList(
-        serverId: String
+    fun fetchServerMemberList(
+        serverId: String,
+        channelId: String
     ) {
         viewModelScope.launch {
             val memberList = fetchMembers(
                 serverId = serverId,
                 includeOffline = serverId !in DO_NOT_FETCH_OFFLINE_MEMBERS_SERVERS
             ).members
+            val channel = RevoltAPI.channelCache[channelId] ?: return@launch
 
             val categories = mutableMapOf<String, List<Member>>()
 
@@ -113,6 +120,12 @@ class MemberListSheetViewModel @Inject constructor(
                     highestHoistedRole.name ?: context.getString(R.string.unknown)
                 } else {
                     defaultCategoryName
+                }
+
+                if (!Roles.permissionFor(channel, user, member)
+                        .hasPermission(PermissionBit.ViewChannel)
+                ) {
+                    return@forEach
                 }
 
                 categories[category] = (categories[category] ?: listOf()) + member
@@ -156,12 +169,60 @@ class MemberListSheetViewModel @Inject constructor(
             }
         }
     }
+
+    fun fetchGroupMemberList(channelId: String) {
+        viewModelScope.launch {
+            val userList = fetchGroupParticipants(channelId)
+
+            val onlinePredicate = { user: User ->
+                presenceFromStatus(
+                    user.status?.presence,
+                    user.online ?: false
+                ) != Presence.Offline
+            }
+            val offlinePredicate = { user: User ->
+                presenceFromStatus(
+                    user.status?.presence,
+                    user.online ?: false
+                ) == Presence.Offline
+            }
+
+            fullItemList.clear()
+
+            if (userList.count(onlinePredicate) > 0) {
+                fullItemList.add(
+                    MemberListItem.CategoryItem(
+                        context.getString(R.string.status_online),
+                        userList.count(onlinePredicate)
+                    )
+                )
+
+                userList.filter(onlinePredicate).forEach { user ->
+                    fullItemList.add(MemberListItem.UserItem(user))
+                }
+            }
+
+            if (userList.count(offlinePredicate) > 0) {
+                fullItemList.add(
+                    MemberListItem.CategoryItem(
+                        context.getString(R.string.status_offline),
+                        userList.count(offlinePredicate)
+                    )
+                )
+
+                userList.filter(offlinePredicate).forEach { user ->
+                    fullItemList.add(MemberListItem.UserItem(user))
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MemberListSheet(
-    serverId: String,
+    channelId: String,
+    serverId: String? = null,
     viewModel: MemberListSheetViewModel = hiltViewModel()
 ) {
     var showUserContextSheet by remember { mutableStateOf(false) }
@@ -170,7 +231,11 @@ fun MemberListSheet(
     // We use LaunchedEffect to make sure that this is called every time any of the users status changes
     LaunchedEffect(RevoltAPI.userCache) {
         snapshotFlow { RevoltAPI.userCache }.distinctUntilChanged().collect {
-            viewModel.fetchMemberList(serverId)
+            if (serverId != null) {
+                viewModel.fetchServerMemberList(serverId, channelId)
+            } else {
+                viewModel.fetchGroupMemberList(channelId)
+            }
         }
     }
 
@@ -211,9 +276,21 @@ fun MemberListSheet(
                     }
 
                     is MemberListItem.MemberItem -> item(key = item.member.id!!.user) {
-                        MemberListMember(
-                            member = item.member,
+                        MemberListMemberUser(
                             user = RevoltAPI.userCache[item.member.id.user]!!,
+                            member = item.member,
+                            serverId = serverId,
+                            onSelectUser = {
+                                userContextSheetTarget = it
+                                showUserContextSheet = true
+                            }
+                        )
+                    }
+
+                    is MemberListItem.UserItem -> item(key = item.user.id!!) {
+                        MemberListMemberUser(
+                            user = item.user,
+                            member = null,
                             serverId = serverId,
                             onSelectUser = {
                                 userContextSheetTarget = it
@@ -228,32 +305,38 @@ fun MemberListSheet(
 }
 
 @Composable
-fun MemberListMember(
-    member: Member,
+fun MemberListMemberUser(
     user: User,
-    serverId: String,
+    member: Member?,
+    serverId: String?,
     onSelectUser: (String) -> Unit
 ) {
-    val highestColourRole = Roles.resolveHighestRole(serverId, member.id!!.user, true)
+    val highestColourRole = serverId?.let {
+        Roles.resolveHighestRole(
+            it,
+            user.id!!,
+            true
+        )
+    }
     val colour = highestColourRole?.colour?.let { WebCompat.parseColour(it) }
         ?: Brush.solidColor(LocalContentColor.current)
 
     Row(
         modifier = Modifier
             .clickable {
-                onSelectUser(member.id.user)
+                onSelectUser(user.id!!)
             }
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         UserAvatar(
-            username = member.nickname
+            username = member?.nickname
                 ?: user.displayName
                 ?: user.username
                 ?: user.id!!,
             avatar = user.avatar,
-            rawUrl = member.avatar?.let { "$REVOLT_FILES/avatars/${it.id}?max_side=256" },
+            rawUrl = member?.avatar?.let { "$REVOLT_FILES/avatars/${it.id}?max_side=256" },
             userId = user.id!!,
             presence = presenceFromStatus(
                 user.status?.presence,
@@ -264,7 +347,7 @@ fun MemberListMember(
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = member.nickname
+            text = member?.nickname
                 ?: user.displayName
                 ?: user.username
                 ?: user.id,
