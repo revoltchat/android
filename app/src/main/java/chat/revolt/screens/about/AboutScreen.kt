@@ -50,6 +50,7 @@ import chat.revolt.api.routes.misc.Root
 import chat.revolt.api.routes.misc.getRootRoute
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.PrimaryTabs
+import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import java.net.URI
@@ -140,11 +141,14 @@ fun AboutScreen(
 
     fun copyDebugInformation() {
         clipboardManager.setText(AnnotatedString(RevoltJson.encodeToString(viewModel.getDebugInformation())))
-        Toast.makeText(
-            context,
-            context.getString(R.string.copied),
-            Toast.LENGTH_SHORT
-        ).show()
+
+        if (Platform.needsShowClipboardNotification()) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.copied),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     Column(

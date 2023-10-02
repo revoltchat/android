@@ -51,6 +51,7 @@ import chat.revolt.components.generic.IconPlaceholder
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.SheetClickable
 import chat.revolt.components.generic.UIMarkdown
+import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
 @Composable
@@ -269,11 +270,14 @@ fun ServerContextSheet(
             if (server.id == null) return@SheetClickable
 
             clipboardManager.setText(AnnotatedString(server.id))
-            Toast.makeText(
-                context,
-                context.getString(R.string.server_context_sheet_actions_copy_id_copied),
-                Toast.LENGTH_SHORT
-            ).show()
+
+            if (Platform.needsShowClipboardNotification()) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.server_context_sheet_actions_copy_id_copied),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
             coroutineScope.launch {
                 onHideSheet()

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.components.generic.SheetClickable
+import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
 @Composable
@@ -64,11 +65,14 @@ fun ChannelContextSheet(
             if (channel.id == null) return@SheetClickable
 
             clipboardManager.setText(AnnotatedString(channel.id))
-            Toast.makeText(
-                context,
-                context.getString(R.string.channel_context_sheet_actions_copy_id_copied),
-                Toast.LENGTH_SHORT
-            ).show()
+
+            if (Platform.needsShowClipboardNotification()) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.channel_context_sheet_actions_copy_id_copied),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
             coroutineScope.launch {
                 onHideSheet()

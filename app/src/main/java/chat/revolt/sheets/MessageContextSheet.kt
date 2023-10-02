@@ -42,6 +42,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.SheetClickable
+import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,11 +112,13 @@ fun MessageContextSheet(
                         return@SheetClickable
                     }
 
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.copied),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    if (Platform.needsShowClipboardNotification()) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.copied),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
 
                     coroutineScope.launch {
                         shareSheetState.hide()
@@ -165,11 +168,13 @@ fun MessageContextSheet(
                         "$REVOLT_APP/server/${server?.id}/channel/${message.channel}/${message.id}"
 
                     clipboardManager.setText(AnnotatedString(messageLink))
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.message_context_sheet_actions_copy_link_copied),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    if (Platform.needsShowClipboardNotification()) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.message_context_sheet_actions_copy_link_copied),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
 
                     coroutineScope.launch {
                         shareSheetState.hide()
@@ -197,11 +202,14 @@ fun MessageContextSheet(
                     if (message.id == null) return@SheetClickable
 
                     clipboardManager.setText(AnnotatedString(message.id))
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.message_context_sheet_actions_copy_id_copied),
-                        Toast.LENGTH_SHORT
-                    ).show()
+
+                    if (Platform.needsShowClipboardNotification()) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.message_context_sheet_actions_copy_id_copied),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
 
                     coroutineScope.launch {
                         shareSheetState.hide()
