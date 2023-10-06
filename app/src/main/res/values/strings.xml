@@ -91,12 +91,23 @@
     <string name="typing_several">Several people are typing</string>
 
     <string name="send_alt">Send</string>
+    <string name="pick_emoji_alt">Pick emoji</string>
     <string name="add_attachment_alt">Add attachment</string>
     <string name="remove_attachment_alt">Remove attachment</string>
     <string name="remove_reply_alt">Remove reply</string>
     <string name="reply_mention_on">\@ on</string>
     <string name="reply_mention_off">\@ off</string>
     <string name="too_many_replies">You can only reply to %1$d messages at a time.</string>
+
+    <string name="emoji_category_smileys">Smileys &amp; Emotions</string>
+    <string name="emoji_category_people">People &amp; Body</string>
+    <string name="emoji_category_animals">Animals &amp; Nature</string>
+    <string name="emoji_category_food">Food &amp; Drink</string>
+    <string name="emoji_category_travel">Travel &amp; Places</string>
+    <string name="emoji_category_activities">Activities</string>
+    <string name="emoji_category_objects">Objects</string>
+    <string name="emoji_category_symbols">Symbols</string>
+    <string name="emoji_category_flags">Flags</string>
 
     <string name="badge_bot_alt">Bot</string>
     <string name="badge_masquerade_alt">From linked channel</string>

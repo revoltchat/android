@@ -1,17 +1,21 @@
 package chat.revolt.components.chat
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -39,11 +43,13 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.activities.RevoltTweenFloat
@@ -56,6 +62,7 @@ fun MessageField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     onAddAttachment: () -> Unit,
+    onPickEmoji: () -> Unit,
     onSendMessage: () -> Unit,
     channelType: ChannelType,
     channelName: String,
@@ -160,29 +167,59 @@ fun MessageField(
                         )
                     },
                     trailingIcon = {
-                        AnimatedVisibility(sendButtonVisible,
-                            enter = slideInVertically(
-                                animationSpec = RevoltTweenInt,
-                                initialOffsetY = { it }
-                            ) + fadeIn(animationSpec = RevoltTweenFloat),
-                            exit = slideOutVertically(
-                                animationSpec = RevoltTweenInt,
-                                targetOffsetY = { it }
-                            ) + fadeOut(animationSpec = RevoltTweenFloat)) {
+                        Row {
                             Icon(
-                                when {
-                                    editMode -> Icons.Default.Edit
-                                    else -> Icons.Default.Send
-                                },
-                                tint = MaterialTheme.colorScheme.primary,
-                                contentDescription = stringResource(id = R.string.send_alt),
+                                painter = painterResource(R.drawable.ic_emoticon_24dp),
+                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                contentDescription = stringResource(id = R.string.pick_emoji_alt),
                                 modifier = Modifier
                                     .clip(CircleShape)
                                     .size(32.dp)
-                                    .clickable { onSendMessage() }
+                                    .clickable {
+                                        focusRequester.freeFocus() // hide keyboard because it's annoying
+                                        onPickEmoji()
+                                    }
                                     .padding(4.dp)
-                                    .testTag("send_message")
+                                    .testTag("pick_emoji")
                             )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            AnimatedVisibility(sendButtonVisible,
+                                enter = expandIn(initialSize = { full ->
+                                    IntSize(
+                                        0,
+                                        full.height
+                                    )
+                                }) + slideInHorizontally(
+                                    animationSpec = RevoltTweenInt,
+                                    initialOffsetX = { -it }
+                                ) + fadeIn(animationSpec = RevoltTweenFloat),
+                                exit = shrinkOut(targetSize = { full ->
+                                    IntSize(
+                                        0,
+                                        full.height
+                                    )
+                                }) + slideOutHorizontally(
+                                    animationSpec = RevoltTweenInt,
+                                    targetOffsetX = { it }
+                                ) + fadeOut(animationSpec = RevoltTweenFloat)) {
+                                Icon(
+                                    when {
+                                        editMode -> Icons.Default.Edit
+                                        else -> Icons.Default.Send
+                                    },
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    contentDescription = stringResource(id = R.string.send_alt),
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .clip(CircleShape)
+                                        .clickable { onSendMessage() }
+                                        .size(32.dp)
+                                        .padding(4.dp)
+                                        .testTag("send_message")
+                                )
+                            }
                         }
                     }
                 )
@@ -199,6 +236,7 @@ fun MessageFieldPreview() {
         onValueChange = {},
         onSendMessage = {},
         onAddAttachment = {},
+        onPickEmoji = {},
         channelType = ChannelType.TextChannel,
         channelName = "general"
     )

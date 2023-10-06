@@ -15,9 +15,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -73,6 +75,7 @@ import chat.revolt.api.settings.FilePickerFeatureFlagVariates
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.MessageField
 import chat.revolt.components.chat.SystemMessage
+import chat.revolt.components.emoji.EmojiPicker
 import chat.revolt.components.media.InbuiltMediaPicker
 import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelHeader
@@ -131,7 +134,10 @@ fun ChannelScreen(
             // This is so you can "toggle" the file in the picker.
             // If the file was picked via DocumentsUI we don't want toggling functionality as
             // if you specifically opened it from DocumentsUI you probably want to send it anyway.
-            if (viewModel.pendingAttachments.any { it.pickerIdentifier == pickerIdentifier }) {
+            if (
+                pickerIdentifier != null &&
+                viewModel.pendingAttachments.any { it.pickerIdentifier == pickerIdentifier }
+            ) {
                 viewModel.pendingAttachments.removeIf { it.pickerIdentifier == pickerIdentifier }
                 return
             }
@@ -487,14 +493,25 @@ fun ChannelScreen(
                                 FeatureFlags.filePickerType == FilePickerFeatureFlagVariates.TiramisuMediaPermissions
                                         && isTiramisu -> {
                                     focusManager.clearFocus()
-                                    viewModel.inbuiltFilePickerOpen =
-                                        !viewModel.inbuiltFilePickerOpen
+                                    if (viewModel.currentBottomPane == BottomPane.InbuiltMediaPicker) {
+                                        viewModel.currentBottomPane = BottomPane.None
+                                    } else {
+                                        viewModel.currentBottomPane = BottomPane.InbuiltMediaPicker
+                                    }
                                 }
 
                                 FeatureFlags.filePickerType == FilePickerFeatureFlagVariates.DocumentsUI
                                         || !isTiramisu -> {
                                     pickFileLauncher.launch(arrayOf("*/*"))
                                 }
+                            }
+                        },
+                        onPickEmoji = {
+                            focusManager.clearFocus()
+                            if (viewModel.currentBottomPane == BottomPane.EmojiPicker) {
+                                viewModel.currentBottomPane = BottomPane.None
+                            } else {
+                                viewModel.currentBottomPane = BottomPane.EmojiPicker
                             }
                         },
                         channelType = channel.channelType,
@@ -507,20 +524,20 @@ fun ChannelScreen(
                         editMode = viewModel.editingMessage != null,
                         cancelEdit = viewModel::cancelEditingMessage,
                         onFocusChange = { nowFocused ->
-                            if (nowFocused && viewModel.inbuiltFilePickerOpen) {
-                                viewModel.inbuiltFilePickerOpen = false
+                            if (nowFocused && viewModel.currentBottomPane != BottomPane.None) {
+                                viewModel.currentBottomPane = BottomPane.None
                             }
                         },
                     )
                 }
             }
 
-            AnimatedVisibility(visible = viewModel.inbuiltFilePickerOpen) {
+            AnimatedVisibility(visible = viewModel.currentBottomPane == BottomPane.InbuiltMediaPicker) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     InbuiltMediaPicker(
                         onOpenDocumentsUi = {
                             pickFileLauncher.launch(arrayOf("*/*"))
-                            viewModel.inbuiltFilePickerOpen = false
+                            viewModel.currentBottomPane = BottomPane.None
                         },
                         onOpenCamera = {
                             // Create a new content URI to store the captured image.
@@ -543,10 +560,10 @@ fun ChannelScreen(
                             )
 
                             pickCameraLauncher.launch(capturedPhotoUri.value)
-                            viewModel.inbuiltFilePickerOpen = false
+                            viewModel.currentBottomPane = BottomPane.None
                         },
                         onClose = {
-                            viewModel.inbuiltFilePickerOpen = false
+                            viewModel.currentBottomPane = BottomPane.None
                         },
                         onMediaSelected = { media ->
                             try {
@@ -569,6 +586,17 @@ fun ChannelScreen(
                             .map { it.pickerIdentifier!! },
                         disabled = viewModel.isSendingMessage,
                     )
+                }
+            }
+
+            AnimatedVisibility(visible = viewModel.currentBottomPane == BottomPane.EmojiPicker) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.5f)
+                        .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                ) {
+                    EmojiPicker(onEmojiSelected = viewModel::putAtCursorPosition)
                 }
             }
         }

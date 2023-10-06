@@ -55,6 +55,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 
+sealed class BottomPane {
+    data object None : BottomPane()
+
+    @FeatureFlag("TiramisuFilePicker")
+    data object InbuiltMediaPicker : BottomPane()
+    data object EmojiPicker : BottomPane()
+}
+
 class ChannelScreenViewModel : ViewModel() {
     var activeChannel by mutableStateOf<Channel?>(null)
 
@@ -69,8 +77,7 @@ class ChannelScreenViewModel : ViewModel() {
     var pendingReplies = mutableStateListOf<SendMessageReply>()
     var pendingAttachments = mutableStateListOf<FileArgs>()
 
-    @FeatureFlag("TiramisuFilePicker")
-    var inbuiltFilePickerOpen by mutableStateOf(false)
+    var currentBottomPane by mutableStateOf<BottomPane>(BottomPane.None)
 
     var pendingUploadProgress by mutableFloatStateOf(0f)
 
@@ -441,6 +448,25 @@ class ChannelScreenViewModel : ViewModel() {
     fun cancelEditingMessage() {
         editingMessage = null
         pendingMessageContent = ""
+    }
+
+    fun putAtCursorPosition(content: String) {
+        val currentContent = pendingMessageContent
+        val currentSelection = textSelection
+
+        // if out of bounds, just append
+        if (currentSelection.start > currentContent.length) {
+            pendingMessageContent = currentContent + content
+            textSelection = TextRange(currentContent.length + content.length)
+            return
+        }
+
+        val newContent = currentContent.substring(0, currentSelection.start) +
+                content +
+                currentContent.substring(currentSelection.end)
+
+        pendingMessageContent = newContent
+        textSelection = TextRange(currentSelection.start + content.length)
     }
 
     suspend fun checkShouldDenyMessageField() {
