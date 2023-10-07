@@ -1,5 +1,6 @@
 package chat.revolt.components.emoji
 
+import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,6 +30,7 @@ import chat.revolt.internals.EmojiPickerItem
 fun EmojiPicker(
     onEmojiSelected: (String) -> Unit,
 ) {
+    val view = LocalView.current
     val metadata = remember { EmojiMetadata() }
     val pickerList = remember(metadata) { metadata.flatPickerList() }
     val spanCount = 9 // https://github.com/googlefonts/emoji-metadata/#readme
@@ -62,6 +65,7 @@ fun EmojiPicker(
                                 .clip(CircleShape)
                                 .clickable {
                                     onEmojiSelected(item.emoji)
+                                    view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                                 }
                                 .aspectRatio(1f)
                                 .weight(1f),
