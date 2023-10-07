@@ -69,6 +69,8 @@ import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.routes.microservices.autumn.FileArgs
+import chat.revolt.api.schemas.Channel
+import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.settings.FeatureFlag
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.FilePickerFeatureFlagVariates
@@ -188,6 +190,7 @@ fun ChannelScreen(
     }
 
     LaunchedEffect(channelId) {
+        viewModel.activeChannelId = channelId
         viewModel.fetchChannel(channelId)
 
         coroutineScope.launch {
@@ -236,18 +239,17 @@ fun ChannelScreen(
         }
     }
 
-    if (channel?.channelType == null) {
-        CircularProgressIndicator()
-        return
-    }
-
     Column(
         modifier = Modifier
             .imePadding()
             .safeDrawingPadding()
     ) {
         ChannelHeader(
-            channel = channel,
+            channel = channel ?: Channel(
+                id = channelId,
+                name = stringResource(R.string.loading),
+                channelType = ChannelType.TextChannel
+            ),
             onChannelClick = {
                 channelInfoSheetShown = true
             },
@@ -338,7 +340,7 @@ fun ChannelScreen(
                                             ch.value.name ?: ch.value.id ?: "#DeletedChannel"
                                         },
                                         emojiMap = RevoltAPI.emojiCache,
-                                        serverId = channel.server ?: "",
+                                        serverId = channel?.server ?: "",
                                         // check if message consists solely of one *or more* custom emotes
                                         useLargeEmojis = it.content?.matches(
                                             Regex("(:([0-9A-Z]{26}):)+")
@@ -352,7 +354,7 @@ fun ChannelScreen(
                             },
                             onAvatarClick = {
                                 message.author?.let { author ->
-                                    onUserSheetOpenFor(author, channel.server)
+                                    onUserSheetOpenFor(author, channel?.server)
                                 }
                             },
                             canReply = true,
@@ -514,11 +516,12 @@ fun ChannelScreen(
                                 viewModel.currentBottomPane = BottomPane.EmojiPicker
                             }
                         },
-                        channelType = channel.channelType,
-                        channelName = channel.name ?: ChannelUtils.resolveDMName(channel)
-                        ?: stringResource(
-                            R.string.unknown
-                        ),
+                        channelType = channel?.channelType ?: ChannelType.TextChannel,
+                        channelName = channel?.name
+                            ?: channel?.let { ChannelUtils.resolveDMName(it) }
+                            ?: stringResource(
+                                R.string.unknown
+                            ),
                         forceSendButton = viewModel.pendingAttachments.isNotEmpty(),
                         disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage,
                         editMode = viewModel.editingMessage != null,

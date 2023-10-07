@@ -65,6 +65,7 @@ sealed class BottomPane {
 
 class ChannelScreenViewModel : ViewModel() {
     var activeChannel by mutableStateOf<Channel?>(null)
+    var activeChannelId by mutableStateOf<String?>(null)
 
     var renderableMessages = mutableStateListOf<Message>()
     var typingUsers = mutableStateListOf<String>()
@@ -116,15 +117,13 @@ class ChannelScreenViewModel : ViewModel() {
     }
 
     fun fetchOlderMessages() {
-        if (activeChannel == null) {
-            return
-        }
+        if (activeChannelId == null) return
 
         viewModelScope.launch {
             val messages = arrayListOf<Message>()
 
             fetchMessagesFromChannel(
-                activeChannel!!.id!!,
+                activeChannelId!!,
                 limit = 50,
                 includeUsers = true,
                 before = if (renderableMessages.isNotEmpty()) {
