@@ -64,7 +64,40 @@ android {
             useSupportLibrary true
         }
 
-        resourceConfigurations += ["en", "de", "fr", "id", "b+es+419", "bn", "ca", "es", "gl", "in", "pt-rBR", "pt", "ru", "tr", "uk", "zh-rCN"]
+        // Please keep this list sorted alphabetically.
+        resourceConfigurations += ['b+es+419',
+                                   'be',
+                                   'bg',
+                                   'bn',
+                                   'ca',
+                                   'ckb',
+                                   'cs',
+                                   'de',
+                                   'el',
+                                   'en',
+                                   'es',
+                                   'fi',
+                                   'fil',
+                                   'fr',
+                                   'gl',
+                                   'hi',
+                                   'hr',
+                                   'hu',
+                                   'id',
+                                   'in',
+                                   'ja',
+                                   'nb-rNO',
+                                   'nl',
+                                   'pl',
+                                   'pt',
+                                   'pt-rBR',
+                                   'ro',
+                                   'ru',
+                                   'si',
+                                   'tr',
+                                   'uk',
+                                   'zh-rCN']
+
         externalNativeBuild {
             cmake {
                 cppFlags ''
