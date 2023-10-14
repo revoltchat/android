@@ -381,12 +381,12 @@ fun ChatRouterScreen(
                             return@let
                         }
 
-                        viewModel.navigateToChannel(action.channelId, navController)
                         if (resolvedChannel.server != null) {
                             viewModel.navigateToServer(resolvedChannel.server, navController)
                         } else {
                             viewModel.navigateToServer("home", navController)
                         }
+                        viewModel.navigateToChannel(action.channelId, navController)
                     }
 
                     is Action.LinkInfo -> {
