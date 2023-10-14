@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="comingsoon_body">Erişmeye çalıştığın özellik henüz hazır değil, ancak onu mükemmel hale getirmek için durmadan çalışıyoruz.</string>
     <string name="mfa_type_recovery">Bir kurtarma kodu kullan</string>
     <string name="password_forgot_instructions">E-postanı gir, size şifreni nasıl sıfırlayacağınla ilgili talimatları göndereceğiz.</string>
     <string name="register_password_rules">Sekiz veya daha fazla, yaygın olanlar kötüdür. Semboller ve sayılar önerilir.</string>
@@ -60,7 +59,6 @@
     <string name="onboarding_lead">Kullanıcı adı seçme zamanı!</string>
     <string name="onboarding_changeable">Ancak fikrini değiştirirsen kullanıcı adını istediğin zaman Kullanıcı Ayarlarından değiştirebilirsin.</string>
     <string name="oss_attribution">OSS Atıf</string>
-    <string name="comingsoon_heading">Beni buldun!</string>
     <string name="remove_reply_alt">Alıntılamayı kaldır</string>
     <string name="too_many_replies">Aynı anda yalnızca %1$d iletiyi yanıtlayabilirsin.</string>
     <string name="mfa_totp_lead">Kimlik doğrulama uygulamandan altı haneli kodu gir.</string>
@@ -237,4 +235,5 @@
     <string name="reply_message_empty_has_attachments">Ek dosyalar gönder</string>
     <string name="settings_appearance_theme_amoled">Saf Siyah</string>
     <string name="settings_feedback_category_satisfaction">Genel amaçlı geri bildirim</string>
+    <string name="direct_messages">Direkt Mesajlar</string>
 </resources>

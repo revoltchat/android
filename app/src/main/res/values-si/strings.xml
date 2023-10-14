@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">← ආපසු</string>
+    <string name="next">ඊළඟ →</string>
+    <string name="ok">හරි</string>
+    <string name="cancel">අවලංගු</string>
+    <string name="share">බෙදාගන්න</string>
+</resources>

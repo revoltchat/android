@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="next">Další →</string>
+    <string name="back">← Zpět</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Zrušit</string>
+    <string name="share">Sdílet</string>
+    <string name="lets_go">Jdeme na to</string>
+    <string name="loading">Načítání informací, vydržte…</string>
+    <string name="privacy_policy">Ochrana údajů</string>
+    <string name="community_guidelines">Pravidla komunity</string>
+    <string name="login_onboarding_body">Revolt je jedním z nejlepších způsobů, jak můžete zůstat ve spojení se svými přáteli a komunitou, kdekoli, kdykoli.</string>
+    <string name="password">Heslo</string>
+    <string name="login">Přihlásit se</string>
+    <string name="signup">Registrace</string>
+    <string name="resend">Znovu poslat</string>
+    <string name="send_email">Poslat e-mail</string>
+    <string name="password_forgot">Zapomněli jste heslo\?</string>
+    <string name="password_manager_hint">Používáte správce hesel\?</string>
+    <string name="password_forgot_heading">Zapomněli jste heslo\?</string>
+    <string name="password_forgot_instructions">Zadejte svůj e-mail, my vám na něj pošleme návod, jak můžete resetovat své heslo.</string>
+    <string name="register_heading">Víteje v Revoltu</string>
+    <string name="terms_of_service">Podmínky služby</string>
+    <string name="email">E-mail</string>
+    <string name="login_heading">Pojďme se přihlásit</string>
+    <string name="login_onboarding_heading">Najděte svou komunitu, spojte se se světem.</string>
+    <string name="resend_verification">Znovu poslat ověřovací e-mail</string>
+</resources>

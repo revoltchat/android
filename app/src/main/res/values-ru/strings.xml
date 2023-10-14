@@ -32,8 +32,7 @@
     <string name="mfa_password_header">Введение пароля</string>
     <string name="about">О нас</string>
     <string name="app_full_name">Revolt на Android</string>
-    <string name="oss_attribution">OSS Атрибуция</string>
-    <string name="comingsoon_heading">Ой, ты нашел меня!</string>
+    <string name="oss_attribution">Атрибуции открытого ПО</string>
     <string name="typing_one">%1$s пишет…</string>
     <string name="typing_many">%1$s пишут…</string>
     <string name="typing_several">Несколько человек пишет</string>
@@ -77,12 +76,12 @@
     <string name="message_context_sheet_actions_delete_confirm_yes">Да</string>
     <string name="message_context_sheet_actions_delete_confirm_no">Нет</string>
     <string name="message_context_sheet_actions_copy_id">Скопировать ID</string>
-    <string name="message_context_sheet_actions_copy_id_copied">Скопировано ID сообщения в буфер обмена</string>
+    <string name="message_context_sheet_actions_copy_id_copied">ID сообщения скопирован</string>
     <string name="message_context_sheet_actions_react">Отреагировать</string>
     <string name="message_context_sheet_actions_report">Пожаловаться</string>
     <string name="message_context_sheet_actions_mark_unread">Пометить как непрочитанное</string>
     <string name="channel_context_sheet_actions_copy_id">Скопировать ID</string>
-    <string name="channel_context_sheet_actions_copy_id_copied">Скопировано ID канала в буфер обмена</string>
+    <string name="channel_context_sheet_actions_copy_id_copied">ID канала скопирован</string>
     <string name="channel_context_sheet_actions_mark_read">Пометить как прочитанный</string>
     <string name="server_context_sheet_actions_mark_read">Пометить как прочитанный</string>
     <string name="add_server_sheet_title">Добавить сервер</string>
@@ -127,7 +126,7 @@
     <string name="settings_feedback_category_feature">Запрос функций</string>
     <string name="settings_feedback_category_bug">Сообщить об ошибке</string>
     <string name="settings_feedback_category_ux">Пользовательский интерфейс (UI/UX)</string>
-    <string name="settings_feedback_category_performance">Продуктивность</string>
+    <string name="settings_feedback_category_performance">Производительность</string>
     <string name="settings_feedback_category_other">Другое</string>
     <string name="settings_feedback_message">Сообщение</string>
     <string name="settings_feedback_error">Возникла ошибка при отправке вашего отзыва. Пожалуйста, попробуйте ещё раз позже.</string>
@@ -153,7 +152,6 @@
     <string name="mfa_totp_lead">Введите шестизначный код из приложения аутентификации.</string>
     <string name="mfa_recovery_header">Ввод кода восстановления</string>
     <string name="mfa_password_lead">Введите ваш пароль, чтобы продолжить.</string>
-    <string name="comingsoon_body">Функция, которую вы пытаетесь использовать, ещё не готова, но мы постоянно работаем над её улучшением..</string>
     <string name="comingsoon_toast">Простите, но эта функция ещё не готова.</string>
     <string name="remove_reply_alt">Убрать ответ</string>
     <string name="reply_mention_on">\@ включён</string>
@@ -184,9 +182,9 @@
     <string name="message_context_sheet_actions_delete">Удалить</string>
     <string name="message_context_sheet_actions_delete_confirm">Вы уверены, что хотите удалить это сообщение\?</string>
     <string name="message_context_sheet_actions_copy_link">Скопировать ссылку</string>
-    <string name="message_context_sheet_actions_copy_link_copied">Скопировано ссылку на сообщение в буфер обмена</string>
+    <string name="message_context_sheet_actions_copy_link_copied">Ссылка на сообщение скопирована</string>
     <string name="server_context_sheet_actions_copy_id">Скопировать ID</string>
-    <string name="server_context_sheet_actions_copy_id_copied">Скопировано ID сервера в буфер обмена</string>
+    <string name="server_context_sheet_actions_copy_id_copied">ID сервера скопирован</string>
     <string name="add_server_sheet_join_by_invite">Войдите по коду приглашения или ссылке</string>
     <string name="add_server_sheet_join_by_invite_modal_description">Введите ссылку, например rvlt.gg/Testers, или код приглашения, например Testers</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Код приглашения или ссылка</string>
@@ -237,4 +235,5 @@
     <string name="settings_feedback_category_security">Безопасность</string>
     <string name="settings_feedback_message_too_long">Сообщение слишком длинное. Пожалуйста, сократите его до %1$d символов или меньше.</string>
     <string name="settings_feedback_disabled_message">Отзывы недоступны на этой версии Revolt. Поддержка этой версии ограничена. (Версия: %1$s %2$s)</string>
+    <string name="direct_messages">Личные сообщения</string>
 </resources>
