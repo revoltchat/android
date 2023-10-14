@@ -598,6 +598,7 @@ fun ChannelScreen(
                         .fillMaxWidth()
                         .fillMaxHeight(0.5f)
                         .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                        .padding(4.dp)
                 ) {
                     EmojiPicker(onEmojiSelected = viewModel::putAtCursorPosition)
                 }

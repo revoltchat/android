@@ -76,6 +76,28 @@ class EmojiMetadata {
         return list
     }
 
+    /**
+     * Returns a map of category to start and end index of the category in the flat picker list.
+     */
+    fun categorySpans(flatPickerList: List<EmojiPickerItem>): Map<EmojiCategory, Pair<Int, Int>> {
+        val map = mutableMapOf<EmojiCategory, Pair<Int, Int>>()
+        var start = 0
+        var end = 0
+
+        for (item in flatPickerList) {
+            if (item is EmojiPickerItem.Category) {
+                if (start != end) {
+                    map[flatPickerList[start].let { it as EmojiPickerItem.Category }.category] =
+                        Pair(start, end)
+                }
+                start = end
+            }
+            end++
+        }
+
+        return map
+    }
+
     init {
         metadata = initMetadata(RevoltApplication.instance.applicationContext)
     }
