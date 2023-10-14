@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -591,8 +592,12 @@ fun ChannelScreen(
                     )
                 }
             }
-
+ 
             AnimatedVisibility(visible = viewModel.currentBottomPane == BottomPane.EmojiPicker) {
+                BackHandler(enabled = viewModel.currentBottomPane == BottomPane.EmojiPicker) {
+                    viewModel.currentBottomPane = BottomPane.None
+                }
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
