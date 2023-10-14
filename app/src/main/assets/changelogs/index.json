@@ -6,9 +6,9 @@
       "date": "2023-09-08"
     },
     "6001": {
-      "summary": "Placeholder for 6001 summary",
+      "summary": "Links, mentions, channels and emotes in messages, permissions",
       "version": "0.6.1",
-      "date": "2023-10-XX"
+      "date": "2023-10-03"
     }
   },
   "latest": "6001"
