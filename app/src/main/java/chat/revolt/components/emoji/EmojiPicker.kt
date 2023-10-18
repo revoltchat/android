@@ -2,53 +2,75 @@ package chat.revolt.components.emoji
 
 import android.util.TypedValue
 import android.view.HapticFeedbackConstants
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
+import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.generic.IconPlaceholder
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.internals.Category
-import chat.revolt.internals.EmojiMetadata
+import chat.revolt.internals.EmojiImpl
 import chat.revolt.internals.EmojiPickerItem
+import chat.revolt.internals.FitzpatrickSkinTone
 import chat.revolt.internals.UnicodeEmojiSection
 import kotlinx.coroutines.launch
 
@@ -58,13 +80,18 @@ fun EmojiPicker(
     onEmojiSelected: (String) -> Unit,
 ) {
     val view = LocalView.current
-    val metadata = remember { EmojiMetadata() }
-    val pickerList = remember(metadata) { metadata.flatPickerList() }
-    val servers = remember(metadata) { metadata.serversWithEmotes() }
-    val categorySpans = remember(pickerList) { metadata.categorySpans(pickerList) }
+    val focusManager = LocalFocusManager.current
+
+    val emojiImpl = remember { EmojiImpl() }
+    val pickerList = remember(emojiImpl) { emojiImpl.flatPickerList() }
+    val servers = remember(emojiImpl) { emojiImpl.serversWithEmotes() }
+    val categorySpans = remember(pickerList) { emojiImpl.categorySpans(pickerList) }
+
     val gridState = rememberLazyGridState()
     val categoryRowScrollState = rememberScrollState()
+
     val scope = rememberCoroutineScope()
+
     val spanCount = 9 // https://github.com/googlefonts/emoji-metadata/#readme
 
     // The current category is the one that the user is currently looking at.
@@ -98,10 +125,154 @@ fun EmojiPicker(
         categoryRowScrollState.animateScrollTo(offset * px)
     }
 
+    var currentSkinTone by remember { mutableStateOf(FitzpatrickSkinTone.None) }
+    var showSkinToneMenu by remember { mutableStateOf(false) }
+    val skinToneMenuAreaWeight by animateFloatAsState(
+        if (showSkinToneMenu) 1f else .15f,
+        animationSpec = RevoltTweenFloat,
+        label = "skinToneMenuAreaWeight"
+    )
+    val skinToneMenuCloseHintIconOpacity by animateFloatAsState(
+        if (showSkinToneMenu) 1f else 0f,
+        animationSpec = RevoltTweenFloat,
+        label = "skinToneMenuCloseHintIconOpacity"
+    )
+
+    val skinSample = remember(pickerList) {
+        pickerList
+            .filterIsInstance<EmojiPickerItem.UnicodeEmoji>()
+            .first { it.character == "\uD83E\uDEF0" }
+    }
+
+    var searchQuery by remember { mutableStateOf("Search not implemented yet") }
+    val searchFieldOpacity by animateFloatAsState(
+        if (showSkinToneMenu) 0f else 1f,
+        animationSpec = RevoltTweenFloat,
+        label = "searchFieldOpacity"
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(37.dp)
+        ) {
+            BasicTextField(
+                value = searchQuery,
+                onValueChange = {
+                    searchQuery = it
+                },
+                textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                readOnly = showSkinToneMenu,
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth(.9f)
+                    .alpha(searchFieldOpacity)
+                    .align(Alignment.CenterStart)
+            ) { innerTextField ->
+                Box(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    innerTextField()
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .height(37.dp)
+                    .fillMaxWidth(skinToneMenuAreaWeight)
+                    .align(Alignment.CenterEnd),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(Modifier.weight(1f))
+
+                AnimatedVisibility(
+                    showSkinToneMenu
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        FitzpatrickSkinTone.entries.forEach { skinTone ->
+                            Text(
+                                emojiImpl.applyFitzpatrickSkinTone(
+                                    skinSample,
+                                    skinTone
+                                ),
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .requiredSize(24.dp)
+                                    .clip(CircleShape)
+                                    .clickable(
+                                        onClickLabel = when (skinTone) {
+                                            FitzpatrickSkinTone.None -> stringResource(R.string.emoji_picker_skin_tone_none)
+                                            FitzpatrickSkinTone.Light -> stringResource(R.string.emoji_picker_skin_tone_fitzpatrick_1_2)
+                                            FitzpatrickSkinTone.MediumLight -> stringResource(R.string.emoji_picker_skin_tone_fitzpatrick_3)
+                                            FitzpatrickSkinTone.Medium -> stringResource(R.string.emoji_picker_skin_tone_fitzpatrick_4)
+                                            FitzpatrickSkinTone.MediumDark -> stringResource(R.string.emoji_picker_skin_tone_fitzpatrick_5)
+                                            FitzpatrickSkinTone.Dark -> stringResource(R.string.emoji_picker_skin_tone_fitzpatrick_6)
+                                        }
+                                    ) {
+                                        currentSkinTone = skinTone
+                                        showSkinToneMenu = false
+                                        focusManager.clearFocus() // this prevents the text field Z-below from gaining focus
+                                    }
+                                    .aspectRatio(1f),
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.width(4.dp))
+
+                Box(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .requiredSize(24.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            showSkinToneMenu = !showSkinToneMenu
+                        }
+                        .aspectRatio(1f)
+                ) {
+                    Text(
+                        emojiImpl.applyFitzpatrickSkinTone(
+                            skinSample,
+                            currentSkinTone
+                        ),
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .requiredSize(24.dp)
+                            .clip(CircleShape)
+                            .aspectRatio(1f)
+                            .alpha(1f - skinToneMenuCloseHintIconOpacity),
+                        textAlign = TextAlign.Center
+                    )
+                    Icon(
+                        imageVector = if (LocalLayoutDirection.current == LayoutDirection.Rtl) {
+                            Icons.Default.KeyboardArrowLeft
+                        } else {
+                            Icons.Default.KeyboardArrowRight
+                        },
+                        contentDescription = stringResource(R.string.emoji_picker_close_skin_tone_menu),
+                        tint = LocalContentColor.current,
+                        modifier = Modifier
+                            .alpha(skinToneMenuCloseHintIconOpacity)
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(4.dp))
+
         Row(
             modifier = Modifier
                 .horizontalScroll(categoryRowScrollState)
@@ -221,14 +392,25 @@ fun EmojiPicker(
                                 .clip(CircleShape)
                                 .clickable {
                                     view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                                    onEmojiSelected(item.emoji)
+                                    onEmojiSelected(
+                                        emojiImpl.applyFitzpatrickSkinTone(
+                                            item,
+                                            currentSkinTone
+                                        )
+                                    )
                                 }
                                 .aspectRatio(1f)
                                 .weight(1f),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
                         ) {
-                            Text(item.emoji, style = LocalTextStyle.current.copy(fontSize = 20.sp))
+                            Text(
+                                emojiImpl.applyFitzpatrickSkinTone(
+                                    item,
+                                    currentSkinTone
+                                ),
+                                style = LocalTextStyle.current.copy(fontSize = 20.sp)
+                            )
                         }
                     }
 

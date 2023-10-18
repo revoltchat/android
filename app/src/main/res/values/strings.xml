@@ -343,6 +343,14 @@
     <string name="file_picker_chip_documents">Attach a file</string>
     <string name="file_picker_chip_camera">Take a photo</string>
 
+    <string name="emoji_picker_close_skin_tone_menu">Close skin tone menu</string>
+    <string name="emoji_picker_skin_tone_none">No skin tone</string>
+    <string name="emoji_picker_skin_tone_fitzpatrick_1_2">Light skin tone</string>
+    <string name="emoji_picker_skin_tone_fitzpatrick_3">Medium-light skin tone</string>
+    <string name="emoji_picker_skin_tone_fitzpatrick_4">Medium skin tone</string>
+    <string name="emoji_picker_skin_tone_fitzpatrick_5">Medium-dark skin tone</string>
+    <string name="emoji_picker_skin_tone_fitzpatrick_6">Dark skin tone</string>
+
     <string name="spark_sidebar_settings_tutorial">The settings are in the sidebar</string>
     <string name="spark_sidebar_settings_tutorial_description_1">You can open the sidebar by swiping from the left edge of the screen.</string>
     <string name="spark_sidebar_settings_tutorial_description_2">Then long tap your profile picture to open the settings.</string>

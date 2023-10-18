@@ -24,6 +24,15 @@ data class EmojiGroup(
     val emoji: List<Emoji>,
 )
 
+enum class FitzpatrickSkinTone(val modifierCodepoint: Int?) {
+    None(null),
+    Light(0x1F3FB),
+    MediumLight(0x1F3FC),
+    Medium(0x1F3FD),
+    MediumDark(0x1F3FE),
+    Dark(0x1F3FF),
+}
+
 enum class UnicodeEmojiSection(val googleName: String, val nameResource: Int) {
     Smileys("Smileys and emotions", R.string.emoji_category_smileys),
     People("People", R.string.emoji_category_people),
@@ -43,11 +52,16 @@ sealed class Category {
 
 sealed class EmojiPickerItem {
     data class Section(val category: Category) : EmojiPickerItem()
-    data class UnicodeEmoji(val emoji: String) : EmojiPickerItem()
+    data class UnicodeEmoji(
+        val character: String,
+        val hasSkinTones: Boolean,
+        val alternates: List<List<Long>>,
+    ) : EmojiPickerItem()
+
     data class ServerEmote(val emote: chat.revolt.api.schemas.Emoji) : EmojiPickerItem()
 }
 
-class EmojiMetadata {
+class EmojiImpl {
     private var metadata: List<EmojiGroup>
 
     private fun initMetadata(context: Context): List<EmojiGroup> {
@@ -94,7 +108,13 @@ class EmojiMetadata {
             list.add(EmojiPickerItem.Section(Category.UnicodeEmojiCategory(category)))
             list.addAll(group.emoji.map { emoji ->
                 EmojiPickerItem.UnicodeEmoji(
-                    emoji.base.joinToString("") { String(Character.toChars(it.toInt())) }
+                    emoji.base.joinToString("") { String(Character.toChars(it.toInt())) },
+                    emoji.alternates.any { alternate ->
+                        alternate.any { codepoint ->
+                            codepoint in 0x1F3FB..0x1F3FF
+                        }
+                    },
+                    emoji.alternates
                 )
             })
         }
@@ -143,6 +163,31 @@ class EmojiMetadata {
         }
 
         return output
+    }
+
+    /**
+     * All of our unicode emoji are the base variant with no modifiers applied by default.
+     * This function returns the unicode emoji with the modifier from the specified skin type applied.
+     */
+    fun applyFitzpatrickSkinTone(
+        item: EmojiPickerItem.UnicodeEmoji,
+        skinType: FitzpatrickSkinTone
+    ): String {
+        if (!item.hasSkinTones || skinType == FitzpatrickSkinTone.None) return item.character
+
+        // HACK: We simply find the modifier version from metadata that
+        // contains the skin tone modifier codepoint.
+        val modifier = item.alternates.maxByOrNull { alternate ->
+            // HACK HACK: We find the alternate with the most frequency of our skin tone modifier.
+            // This is because some emoji have multiple skin tone modifier and we are taking the
+            // easy way here by only allowing a single skin tone change. This is not ideal.
+            // Users are encouraged to use the system emoji keyboard to get the full range of
+            // skin tone modifiers.
+            alternate.count { it == skinType.modifierCodepoint?.toLong() }
+        }
+
+        return modifier?.joinToString("") { String(Character.toChars(it.toInt())) }
+            ?: item.character
     }
 
     init {
