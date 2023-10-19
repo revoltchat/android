@@ -7,7 +7,6 @@ plugins {
     id 'com.google.devtools.ksp'
     id "io.sentry.android.gradle" version "3.4.2"
 
-    id 'kotlin-kapt'
     id 'kotlin-parcelize'
 }
 
@@ -209,7 +208,7 @@ dependencies {
     // Hilt - Dependency Injection
     implementation "com.google.dagger:hilt-android:$hilt_version"
     implementation "androidx.hilt:hilt-navigation-compose:1.1.0-alpha01"
-    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+    ksp "com.google.dagger:hilt-compiler:$hilt_version"
 
     // Glide - Image Loading
     implementation "com.github.bumptech.glide:glide:$glide_version"
@@ -258,8 +257,4 @@ dependencies {
 
     // LeakCanary - memory leak detection
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.11'
-}
-
-kapt {
-    correctErrorTypes true
 }
