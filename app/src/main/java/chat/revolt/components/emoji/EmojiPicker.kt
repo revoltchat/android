@@ -12,6 +12,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -29,8 +31,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
@@ -41,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -144,11 +149,49 @@ fun EmojiPicker(
             .first { it.character == "\uD83E\uDEF0" }
     }
 
-    var searchQuery by remember { mutableStateOf("Search not implemented yet") }
+    var searchQuery by remember { mutableStateOf("") }
     val searchFieldOpacity by animateFloatAsState(
         if (showSkinToneMenu) 0f else 1f,
         animationSpec = RevoltTweenFloat,
         label = "searchFieldOpacity"
+    )
+
+    val searchResults = remember { mutableStateListOf<EmojiPickerItem>() }
+    LaunchedEffect(searchQuery) {
+        searchResults.clear()
+        if (searchQuery.isBlank()) return@LaunchedEffect
+        searchResults.addAll(emojiImpl.searchForEmoji(searchQuery))
+        gridState.scrollToItem(0)
+    }
+
+    val onServerEmoteInfo: (String) -> Unit = {
+        view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        scope.launch {
+            ActionChannel.send(
+                Action.EmoteInfo(
+                    it
+                )
+            )
+        }
+    }
+    val onEmojiClick: (EmojiPickerItem) -> Unit = {
+        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        when (it) {
+            is EmojiPickerItem.UnicodeEmoji -> onEmojiSelected(
+                emojiImpl.applyFitzpatrickSkinTone(
+                    it,
+                    currentSkinTone
+                )
+            )
+
+            is EmojiPickerItem.ServerEmote -> onEmojiSelected(":${it.emote.id}:")
+            else -> {}
+        }
+    }
+    val clearQueryButtonOpacity = animateFloatAsState(
+        if (searchQuery.isNotEmpty()) 1f else 0f,
+        animationSpec = RevoltTweenFloat,
+        label = "clearQueryButtonOpacity"
     )
 
     Column(
@@ -178,9 +221,27 @@ fun EmojiPicker(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.small)
                         .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.CenterStart
                 ) {
                     innerTextField()
+
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.emoji_picker_clear_search),
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .padding(4.dp)
+                            .size(24.dp)
+                            .then(
+                                if (searchQuery.isNotEmpty()) Modifier.clickable {
+                                    searchQuery = ""
+                                    focusManager.clearFocus() // this prevents the text field Z-below from gaining focus
+                                } else Modifier
+                            )
+                            .align(Alignment.CenterEnd)
+                            .alpha(clearQueryButtonOpacity.value)
+                    )
                 }
             }
 
@@ -273,100 +334,103 @@ fun EmojiPicker(
 
         Spacer(Modifier.height(4.dp))
 
-        Row(
-            modifier = Modifier
-                .horizontalScroll(categoryRowScrollState)
-                .height(37.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            servers.forEach { server ->
-                Column(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable {
-                            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                            scope.launch {
-                                val index =
-                                    pickerList.indexOfFirst { it is EmojiPickerItem.Section && it.category is Category.ServerEmoteCategory && it.category.server == server }
-                                gridState.animateScrollToItem(index)
+        AnimatedVisibility(searchResults.isEmpty()) {
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(categoryRowScrollState)
+                    .height(37.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                servers.forEach { server ->
+                    Column(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .clickable {
+                                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                scope.launch {
+                                    val index =
+                                        pickerList.indexOfFirst { it is EmojiPickerItem.Section && it.category is Category.ServerEmoteCategory && it.category.server == server }
+                                    gridState.animateScrollToItem(index)
+                                }
                             }
+                            .then(
+                                if (currentCategory.value is Category.ServerEmoteCategory && (currentCategory.value as Category.ServerEmoteCategory).server == server) {
+                                    Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                                } else {
+                                    Modifier
+                                }
+                            )
+                            .aspectRatio(1f)
+                            .padding(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        if (server.icon == null) {
+                            IconPlaceholder(
+                                name = server.name ?: stringResource(R.string.unknown),
+                                fontSize = 16.sp,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .fillMaxSize()
+                            )
+                        } else {
+                            RemoteImage(
+                                url = "$REVOLT_FILES/icons/${server.icon.id}/icon.gif?max_side=64",
+                                description = server.name,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .fillMaxSize()
+                            )
                         }
-                        .then(
-                            if (currentCategory.value is Category.ServerEmoteCategory && (currentCategory.value as Category.ServerEmoteCategory).server == server) {
-                                Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                            } else {
-                                Modifier
+                    }
+                }
+                UnicodeEmojiSection.entries.forEach { category ->
+                    Column(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .clickable {
+                                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                scope.launch {
+                                    val index =
+                                        pickerList.indexOfFirst { it is EmojiPickerItem.Section && it.category is Category.UnicodeEmojiCategory && it.category.definition == category }
+                                    gridState.animateScrollToItem(index)
+                                }
                             }
-                        )
-                        .aspectRatio(1f)
-                        .padding(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    if (server.icon == null) {
-                        IconPlaceholder(
-                            name = server.name ?: stringResource(R.string.unknown),
-                            fontSize = 16.sp,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .fillMaxSize()
-                        )
-                    } else {
-                        RemoteImage(
-                            url = "$REVOLT_FILES/icons/${server.icon.id}/icon.gif?max_side=64",
-                            description = server.name,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .fillMaxSize()
+                            .then(
+                                if (currentCategory.value is Category.UnicodeEmojiCategory && (currentCategory.value as Category.UnicodeEmojiCategory).definition == category) {
+                                    Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                                } else {
+                                    Modifier
+                                }
+                            )
+                            .aspectRatio(1f)
+                            .padding(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Icon(
+                            painter = when (category) {
+                                UnicodeEmojiSection.Smileys -> painterResource(R.drawable.ic_emoticon_24dp)
+                                UnicodeEmojiSection.People -> painterResource(R.drawable.ic_human_greeting_variant_24dp)
+                                UnicodeEmojiSection.Animals -> painterResource(R.drawable.ic_snake_24dp)
+                                UnicodeEmojiSection.Food -> painterResource(R.drawable.ic_glass_mug_variant_24dp)
+                                UnicodeEmojiSection.Travel -> painterResource(R.drawable.ic_train_bus_24dp)
+                                UnicodeEmojiSection.Activities -> painterResource(R.drawable.ic_skate_24dp)
+                                UnicodeEmojiSection.Objects -> painterResource(R.drawable.ic_table_chair_24dp)
+                                UnicodeEmojiSection.Symbols -> painterResource(R.drawable.ic_symbol_24dp)
+                                UnicodeEmojiSection.Flags -> painterResource(R.drawable.ic_flag_24dp)
+                            },
+                            contentDescription = null,
+                            tint = if (currentCategory.value is Category.UnicodeEmojiCategory && (currentCategory.value as Category.UnicodeEmojiCategory).definition == category) {
+                                MaterialTheme.colorScheme.primary
+                            } else LocalContentColor.current
                         )
                     }
                 }
             }
-            UnicodeEmojiSection.entries.forEach { category ->
-                Column(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable {
-                            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                            scope.launch {
-                                val index =
-                                    pickerList.indexOfFirst { it is EmojiPickerItem.Section && it.category is Category.UnicodeEmojiCategory && it.category.definition == category }
-                                gridState.animateScrollToItem(index)
-                            }
-                        }
-                        .then(
-                            if (currentCategory.value is Category.UnicodeEmojiCategory && (currentCategory.value as Category.UnicodeEmojiCategory).definition == category) {
-                                Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                            } else {
-                                Modifier
-                            }
-                        )
-                        .aspectRatio(1f)
-                        .padding(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Icon(
-                        painter = when (category) {
-                            UnicodeEmojiSection.Smileys -> painterResource(R.drawable.ic_emoticon_24dp)
-                            UnicodeEmojiSection.People -> painterResource(R.drawable.ic_human_greeting_variant_24dp)
-                            UnicodeEmojiSection.Animals -> painterResource(R.drawable.ic_snake_24dp)
-                            UnicodeEmojiSection.Food -> painterResource(R.drawable.ic_glass_mug_variant_24dp)
-                            UnicodeEmojiSection.Travel -> painterResource(R.drawable.ic_train_bus_24dp)
-                            UnicodeEmojiSection.Activities -> painterResource(R.drawable.ic_skate_24dp)
-                            UnicodeEmojiSection.Objects -> painterResource(R.drawable.ic_table_chair_24dp)
-                            UnicodeEmojiSection.Symbols -> painterResource(R.drawable.ic_symbol_24dp)
-                            UnicodeEmojiSection.Flags -> painterResource(R.drawable.ic_flag_24dp)
-                        },
-                        contentDescription = null,
-                        tint = if (currentCategory.value is Category.UnicodeEmojiCategory && (currentCategory.value as Category.UnicodeEmojiCategory).definition == category) {
-                            MaterialTheme.colorScheme.primary
-                        } else LocalContentColor.current
-                    )
-                }
-            }
         }
+
         LazyVerticalGrid(
             state = gridState,
             columns = GridCells.Fixed(spanCount),
@@ -374,8 +438,67 @@ fun EmojiPicker(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.fillMaxSize()
         ) {
+            if (searchResults.isNotEmpty()) {
+                item(
+                    key = "searchResultsHeader",
+                    span = {
+                        GridItemSpan(spanCount)
+                    },
+                ) {
+                    Text(
+                        text = stringResource(R.string.emoji_picker_search_results_header),
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    )
+                }
+            }
+
+            // Search results do not get a key, this is intentional.
+            items(
+                searchResults.size,
+                span = {
+                    val item = searchResults[it]
+                    when (item) {
+                        is EmojiPickerItem.UnicodeEmoji -> GridItemSpan(1)
+                        is EmojiPickerItem.ServerEmote -> GridItemSpan(1)
+                        is EmojiPickerItem.Section -> GridItemSpan(spanCount)
+                    }
+                }
+            ) { index ->
+                PickerItem(
+                    item = searchResults[index],
+                    skinToneFactory = { emojiImpl.applyFitzpatrickSkinTone(it, currentSkinTone) },
+                    onClick = onEmojiClick,
+                    onServerEmoteInfo = onServerEmoteInfo,
+                    lesserHeaders = true
+                )
+            }
+
+            if (searchResults.isNotEmpty()) {
+                item(
+                    key = "searchResultsFooter",
+                    span = {
+                        GridItemSpan(spanCount)
+                    },
+                ) {
+                    Divider()
+                }
+            }
+
             items(
                 pickerList.size,
+                key = {
+                    when (val item = pickerList[it]) {
+                        is EmojiPickerItem.UnicodeEmoji -> item.character
+                        is EmojiPickerItem.ServerEmote -> item.emote.id ?: it
+                        is EmojiPickerItem.Section -> when (val category = item.category) {
+                            is Category.UnicodeEmojiCategory -> category.definition.googleName
+                            is Category.ServerEmoteCategory -> category.server.id ?: it
+                        }
+                    }
+                },
                 span = {
                     val item = pickerList[it]
                     when (item) {
@@ -385,88 +508,88 @@ fun EmojiPicker(
                     }
                 }
             ) { index ->
-                when (val item = pickerList[index]) {
-                    is EmojiPickerItem.UnicodeEmoji -> {
-                        Column(
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .clickable {
-                                    view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                                    onEmojiSelected(
-                                        emojiImpl.applyFitzpatrickSkinTone(
-                                            item,
-                                            currentSkinTone
-                                        )
-                                    )
-                                }
-                                .aspectRatio(1f)
-                                .weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            Text(
-                                emojiImpl.applyFitzpatrickSkinTone(
-                                    item,
-                                    currentSkinTone
-                                ),
-                                style = LocalTextStyle.current.copy(fontSize = 20.sp)
-                            )
-                        }
-                    }
-
-                    is EmojiPickerItem.ServerEmote -> {
-                        Column(
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .combinedClickable(
-                                    onClick = {
-                                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                                        onEmojiSelected(":${item.emote.id}:")
-                                    },
-                                    onLongClick = {
-                                        view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                                        scope.launch {
-                                            item.emote.id?.let {
-                                                ActionChannel.send(
-                                                    Action.EmoteInfo(
-                                                        it
-                                                    )
-                                                )
-                                            }
-                                        }
-                                    }
-                                )
-                                .aspectRatio(1f)
-                                .weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            RemoteImage(
-                                url = "$REVOLT_FILES/emojis/${item.emote.id}/emoji.gif",
-                                description = item.emote.name,
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(8.dp)
-                            )
-                        }
-                    }
-
-                    is EmojiPickerItem.Section -> {
-                        Text(
-                            when (item.category) {
-                                is Category.UnicodeEmojiCategory -> stringResource(item.category.definition.nameResource)
-                                is Category.ServerEmoteCategory -> item.category.server.name
-                                    ?: stringResource(R.string.unknown)
-                            },
-                            style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                        )
-                    }
-                }
+                PickerItem(
+                    item = pickerList[index],
+                    skinToneFactory = { emojiImpl.applyFitzpatrickSkinTone(it, currentSkinTone) },
+                    onClick = onEmojiClick,
+                    onServerEmoteInfo = onServerEmoteInfo
+                )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ColumnScope.PickerItem(
+    item: EmojiPickerItem,
+    skinToneFactory: (EmojiPickerItem.UnicodeEmoji) -> String,
+    onClick: (EmojiPickerItem) -> Unit,
+    onServerEmoteInfo: (String) -> Unit,
+    lesserHeaders: Boolean = false,
+) {
+    when (item) {
+        is EmojiPickerItem.UnicodeEmoji -> {
+            Column(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
+                    }
+                    .aspectRatio(1f)
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = skinToneFactory(item),
+                    style = LocalTextStyle.current.copy(fontSize = 20.sp)
+                )
+            }
+        }
+
+        is EmojiPickerItem.ServerEmote -> {
+            Column(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .combinedClickable(
+                        onClick = { onClick(item) },
+                        onLongClick = { item.emote.id?.let { onServerEmoteInfo(it) } }
+                    )
+                    .aspectRatio(1f)
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                RemoteImage(
+                    url = "$REVOLT_FILES/emojis/${item.emote.id}/emoji.gif",
+                    description = item.emote.name,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                )
+            }
+        }
+
+        is EmojiPickerItem.Section -> {
+            Text(
+                when (item.category) {
+                    is Category.UnicodeEmojiCategory -> stringResource(item.category.definition.nameResource)
+                    is Category.ServerEmoteCategory -> item.category.server.name
+                        ?: stringResource(R.string.unknown)
+                },
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .then(
+                        if (lesserHeaders) {
+                            Modifier.alpha(.7f)
+                        } else {
+                            Modifier
+                        }
+                    )
+            )
         }
     }
 }

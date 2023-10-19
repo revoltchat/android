@@ -190,6 +190,53 @@ class EmojiImpl {
             ?: item.character
     }
 
+    /**
+     * Perform a search on the flat picker list to find all custom and unicode emoji that match the
+     * query.
+     */
+    fun searchForEmoji(query: String): List<EmojiPickerItem> {
+        val list = mutableListOf<EmojiPickerItem>()
+
+        for (server in serversWithEmotes()) {
+            val emotes = RevoltAPI.emojiCache.values.filter { it.parent?.id == server.id }
+            val matchingEmotes =
+                emotes.filter { it.name?.contains(query, ignoreCase = true) ?: false }
+            if (matchingEmotes.isNotEmpty()) {
+                list.add(EmojiPickerItem.Section(Category.ServerEmoteCategory(server)))
+                list.addAll(matchingEmotes.map { EmojiPickerItem.ServerEmote(it) })
+            }
+        }
+
+        for (group in metadata) {
+            val matchingEmoji = group.emoji.filter {
+                it.shortcodes.any { code ->
+                    code.contains(
+                        query,
+                        ignoreCase = true
+                    )
+                }
+            }
+            if (matchingEmoji.isNotEmpty()) {
+                val category =
+                    UnicodeEmojiSection.entries.find { it.googleName == group.group } ?: continue
+                list.add(EmojiPickerItem.Section(Category.UnicodeEmojiCategory(category)))
+                list.addAll(matchingEmoji.map { emoji ->
+                    EmojiPickerItem.UnicodeEmoji(
+                        emoji.base.joinToString("") { String(Character.toChars(it.toInt())) },
+                        emoji.alternates.any { alternate ->
+                            alternate.any { codepoint ->
+                                codepoint in 0x1F3FB..0x1F3FF
+                            }
+                        },
+                        emoji.alternates
+                    )
+                })
+            }
+        }
+
+        return list
+    }
+
     init {
         metadata = initMetadata(RevoltApplication.instance.applicationContext)
     }
