@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
@@ -31,6 +34,7 @@ import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
 import chat.revolt.components.chat.RoleChip
+import chat.revolt.components.generic.NonIdealState
 import chat.revolt.components.generic.WebMarkdown
 import chat.revolt.components.screens.settings.RawUserOverview
 
@@ -62,16 +66,25 @@ fun UserContextSheet(
 
     if (user == null) {
         // TODO fetch user in this scenario
-        Column(Modifier.padding(16.dp)) {
-            Text(
-                text = stringResource(R.string.user_context_sheet_user_not_found),
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = stringResource(R.string.user_context_sheet_user_not_found_description),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
+        NonIdealState(
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_alert_decagram_24dp),
+                    contentDescription = null,
+                    modifier = Modifier.size(it)
+                )
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.user_context_sheet_user_not_found)
+                )
+            },
+            description = {
+                Text(
+                    text = stringResource(R.string.user_context_sheet_user_not_found_description)
+                )
+            }
+        )
         return
     }
 

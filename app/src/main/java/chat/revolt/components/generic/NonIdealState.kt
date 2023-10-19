@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
@@ -21,13 +22,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 private val NoneLambda = @Composable { throw UnsupportedOperationException() }
+
 @Composable
 fun NonIdealState(
-    icon: @Composable () -> Unit,
+    icon: @Composable (Dp) -> Unit,
     title: @Composable () -> Unit,
     description: @Composable () -> Unit = NoneLambda,
     actions: @Composable () -> Unit = NoneLambda
@@ -40,17 +44,25 @@ fun NonIdealState(
             .padding(vertical = 32.dp)
     ) {
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.primary) {
-            icon()
+            icon(38.dp)
         }
 
         if (description != NoneLambda) Spacer(modifier = Modifier.height(16.dp))
 
-        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.headlineMedium) {
+        CompositionLocalProvider(
+            LocalTextStyle provides MaterialTheme.typography.headlineMedium.copy(
+                textAlign = TextAlign.Center
+            )
+        ) {
             title()
         }
 
         if (description != NoneLambda) {
-            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
+                    textAlign = TextAlign.Center
+                )
+            ) {
                 description()
             }
         }
@@ -75,7 +87,8 @@ fun NonIdealStatePreview() {
         icon = {
             Icon(
                 imageVector = Icons.Default.Star,
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier.size(it)
             )
         },
         title = { Text("Channel") },
@@ -95,7 +108,8 @@ fun NonIdealStatePreviewNoActions() {
         icon = {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier.size(it)
             )
         },
         title = { Text("Error") },
@@ -110,7 +124,8 @@ fun NonIdealStatePreviewNoDescription() {
         icon = {
             Icon(
                 imageVector = Icons.Default.Warning,
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier.size(it)
             )
         },
         title = { Text("No channels") },
