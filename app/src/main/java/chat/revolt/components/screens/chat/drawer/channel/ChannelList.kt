@@ -60,6 +60,7 @@ import chat.revolt.activities.RevoltTweenDp
 import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.CategorisedChannelList
 import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.ServerFlags
@@ -137,6 +138,13 @@ fun RowScope.ChannelList(
             .filter { if (it.channelType == ChannelType.DirectMessage) it.active == true else true }
             .sortedBy { it.lastMessageID ?: it.id }
             .reversed()
+
+    val server = remember(serverId, RevoltAPI.serverCache) { RevoltAPI.serverCache[serverId] }
+    val categorisedChannels = remember(server, RevoltAPI.channelCache) {
+        server?.let {
+            ChannelUtils.categoriseServerFlat(it)
+        }
+    }
 
     Surface(
         tonalElevation = 1.dp,
@@ -262,8 +270,6 @@ fun RowScope.ChannelList(
                     )
                 }
             } else {
-                val server = RevoltAPI.serverCache[serverId]
-
                 stickyHeader {
                     Box(
                         contentAlignment = Alignment.BottomStart,
@@ -435,7 +441,7 @@ fun RowScope.ChannelList(
 
                 }
 
-                if (server?.channels?.isEmpty() == true) {
+                if (categorisedChannels.isNullOrEmpty()) {
                     item {
                         Column(
                             Modifier.weight(1f),
@@ -458,30 +464,74 @@ fun RowScope.ChannelList(
                     }
                 } else {
                     items(
-                        server?.channels?.size ?: 0,
-                        key = { server?.channels?.get(it) ?: "" }
+                        categorisedChannels.size ?: 0,
+                        key = { index ->
+                            val channel = categorisedChannels.getOrNull(index)
+                            channel?.let {
+                                when (it) {
+                                    is CategorisedChannelList.Channel -> it.channel.id
+                                    is CategorisedChannelList.Category -> it.category.id
+                                }
+                            } ?: index
+                        }
                     ) {
-                        server?.channels?.get(it)?.let { channelId ->
-                            RevoltAPI.channelCache[channelId]?.let { ch ->
+                        when (val item = categorisedChannels.getOrNull(it)) {
+                            is CategorisedChannelList.Channel -> {
+                                val channel = item.channel
+
+                                val partner =
+                                    if (channel.channelType == ChannelType.DirectMessage) RevoltAPI.userCache[ChannelUtils.resolveDMPartner(
+                                        channel
+                                    )] else null
+
                                 DrawerChannel(
-                                    name = ch.name ?: stringResource(R.string.unknown),
-                                    channelType = ch.channelType ?: ChannelType.TextChannel,
-                                    selected = currentDestination == "channel/{channelId}" && currentChannel == ch.id,
-                                    hasUnread = ch.lastMessageID?.let { lastMessageID ->
+                                    name = partner?.let { p -> User.resolveDefaultName(p) }
+                                        ?: channel.name
+                                        ?: stringResource(R.string.unknown),
+                                    channelType = channel.channelType ?: ChannelType.TextChannel,
+                                    selected = currentDestination == "channel/{channelId}" && currentChannel == channel.id,
+                                    hasUnread = channel.lastMessageID?.let { lastMessageID ->
                                         RevoltAPI.unreads.hasUnread(
-                                            ch.id!!,
+                                            channel.id!!,
                                             lastMessageID
                                         )
                                     } ?: false,
+                                    dmPartnerIcon = partner?.avatar ?: channel.icon,
+                                    dmPartnerId = partner?.id,
+                                    dmPartnerName = partner?.let { p -> User.resolveDefaultName(p) },
+                                    dmPartnerStatus = presenceFromStatus(
+                                        status = partner?.status?.presence,
+                                        online = partner?.online ?: false
+                                    ),
                                     onClick = {
-                                        onChannelClick(ch.id ?: return@DrawerChannel)
+                                        onChannelClick(channel.id ?: return@DrawerChannel)
                                     },
                                     onLongClick = {
-                                        channelContextSheetTarget = ch.id ?: return@DrawerChannel
+                                        channelContextSheetTarget =
+                                            channel.id ?: return@DrawerChannel
                                         channelContextSheetShown = true
                                     }
                                 )
                             }
+
+                            is CategorisedChannelList.Category -> {
+                                val category = item.category
+
+                                Text(
+                                    text = category.title ?: stringResource(R.string.unknown),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontSize = 16.sp,
+                                    modifier = Modifier
+                                        .padding(
+                                            start = 16.dp,
+                                            end = 16.dp,
+                                            top = 24.dp,
+                                            bottom = 16.dp
+                                        )
+                                )
+                            }
+
+                            else -> {}
                         }
                     }
                 }
