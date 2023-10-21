@@ -489,16 +489,6 @@ fun EmojiPicker(
 
             items(
                 pickerList.size,
-                key = {
-                    when (val item = pickerList[it]) {
-                        is EmojiPickerItem.UnicodeEmoji -> item.character
-                        is EmojiPickerItem.ServerEmote -> item.emote.id ?: it
-                        is EmojiPickerItem.Section -> when (val category = item.category) {
-                            is Category.UnicodeEmojiCategory -> category.definition.googleName
-                            is Category.ServerEmoteCategory -> category.server.id ?: it
-                        }
-                    }
-                },
                 span = {
                     val item = pickerList[it]
                     when (item) {
