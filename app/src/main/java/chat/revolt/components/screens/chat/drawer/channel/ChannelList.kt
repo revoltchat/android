@@ -90,7 +90,7 @@ fun RowScope.ChannelList(
     val enableSmallBanner by remember {
         derivedStateOf {
             lazyListState.firstVisibleItemScrollOffset > 40 ||
-                lazyListState.firstVisibleItemIndex > 0
+                    lazyListState.firstVisibleItemIndex > 0
         }
     }
 
@@ -139,11 +139,9 @@ fun RowScope.ChannelList(
             .sortedBy { it.lastMessageID ?: it.id }
             .reversed()
 
-    val server = remember(serverId, RevoltAPI.serverCache) { RevoltAPI.serverCache[serverId] }
-    val categorisedChannels = remember(server, RevoltAPI.channelCache) {
-        server?.let {
-            ChannelUtils.categoriseServerFlat(it)
-        }
+    val server = RevoltAPI.serverCache[serverId]
+    val categorisedChannels = server?.let {
+        ChannelUtils.categoriseServerFlat(it)
     }
 
     Surface(
@@ -250,7 +248,7 @@ fun RowScope.ChannelList(
 
                     DrawerChannel(
                         name = partner?.let { p -> User.resolveDefaultName(p) } ?: channel.name
-                            ?: stringResource(R.string.unknown),
+                        ?: stringResource(R.string.unknown),
                         channelType = channel.channelType ?: ChannelType.TextChannel,
                         selected = currentDestination == "channel/{channelId}" && currentChannel == channel.id,
                         hasUnread = channel.lastMessageID?.let { lastMessageID ->
@@ -410,9 +408,9 @@ fun RowScope.ChannelList(
 
                             Text(
                                 text = (
-                                    server?.name
-                                        ?: stringResource(R.string.unknown)
-                                    ),
+                                        server?.name
+                                            ?: stringResource(R.string.unknown)
+                                        ),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = if (server?.banner != null) {
                                     bannerTextColour
@@ -485,7 +483,7 @@ fun RowScope.ChannelList(
                     }
                 } else {
                     items(
-                        categorisedChannels.size ?: 0,
+                        categorisedChannels.size,
                         key = { index ->
                             val channel = categorisedChannels.getOrNull(index)
                             channel?.let {
