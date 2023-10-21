@@ -13,6 +13,7 @@ jobs:
       RVX_SENTRY_DSN: ${{ vars.RVX_SENTRY_DSN }}
       RVX_ANALYSIS_ENABLED: ${{ vars.RVX_ANALYSIS_ENABLED }}
       RVX_ANALYSIS_BASEURL: ${{ vars.RVX_ANALYSIS_BASEURL }}
+      RVX_DEBUG_APP_NAME: ${{ vars.RVX_DEBUG_APP_NAME }}
 
     steps:
       - uses: actions/checkout@v3
