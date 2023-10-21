@@ -75,7 +75,8 @@ fun ChangelogsSettingsScreen(
             showBackButton = true,
             onBackButtonClicked = {
                 navController.popBackStack()
-            })
+            }
+        )
 
         LazyColumn {
             items(

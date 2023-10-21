@@ -9,8 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 class EmoteSpan(drawable: Drawable) :
-    ImageSpan(drawable, ALIGN_BOTTOM) {
-}
+    ImageSpan(drawable, ALIGN_BOTTOM)
 
 class EmoteClickableSpan(private val emoteId: String) : LongClickableSpan() {
     override fun onClick(widget: View) {

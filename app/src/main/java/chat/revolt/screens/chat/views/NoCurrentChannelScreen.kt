@@ -22,7 +22,7 @@ fun NoCurrentChannelScreen() {
             .fillMaxSize()
             .padding(64.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = stringResource(R.string.no_active_channel),
@@ -34,7 +34,7 @@ fun NoCurrentChannelScreen() {
         Text(
             text = stringResource(R.string.no_active_channel_body),
             style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Center
         )
     }
 }

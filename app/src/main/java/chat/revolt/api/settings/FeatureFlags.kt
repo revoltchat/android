@@ -10,7 +10,9 @@ annotation class Treatment(val description: String)
 
 @FeatureFlag("ClosedBetaAccessControl")
 sealed class ClosedBetaAccessControlVariates {
-    @Treatment("Restrict access to the app to users that meet certain or all criteria (implementation-specific)")
+    @Treatment(
+        "Restrict access to the app to users that meet certain or all criteria (implementation-specific)"
+    )
     data class Restricted(val predicate: () -> Boolean) : ClosedBetaAccessControlVariates()
 
     @Treatment("Allow access to the app to all users")
@@ -22,6 +24,6 @@ object FeatureFlags {
     var closedBetaAccessControl by mutableStateOf<ClosedBetaAccessControlVariates>(
         ClosedBetaAccessControlVariates.Restricted {
             RevoltAPI.channelCache.containsKey("01H7X2KRB0CA4QDSMB4N7WGERF")
-        })
+        }
+    )
 }
-

@@ -27,7 +27,7 @@ suspend fun putMessageReport(
             report_reason = reason,
             id = messageId
         ),
-        additional_context = additionalContext,
+        additional_context = additionalContext
     )
 
     val response = RevoltHttp.post("/safety/report") {
@@ -57,9 +57,9 @@ suspend fun putServerReport(
         content = ServerReport(
             type = "Server",
             report_reason = reason,
-            id = serverId,
+            id = serverId
         ),
-        additional_context = additionalContext,
+        additional_context = additionalContext
     )
 
     val response = RevoltHttp.post("/safety/report") {
@@ -89,9 +89,9 @@ suspend fun putUserReport(
         content = UserReport(
             type = "User",
             report_reason = reason,
-            id = userId,
+            id = userId
         ),
-        additional_context = additionalContext,
+        additional_context = additionalContext
     )
 
     val response = RevoltHttp.post("/safety/report") {

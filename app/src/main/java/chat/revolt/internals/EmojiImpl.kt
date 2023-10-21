@@ -15,13 +15,13 @@ data class Emoji(
     val alternates: List<List<Long>>,
     val emoticons: List<String>,
     val shortcodes: List<String>,
-    val animated: Boolean,
+    val animated: Boolean
 )
 
 @Serializable
 data class EmojiGroup(
     val group: String,
-    val emoji: List<Emoji>,
+    val emoji: List<Emoji>
 )
 
 enum class FitzpatrickSkinTone(val modifierCodepoint: Int?) {
@@ -30,7 +30,7 @@ enum class FitzpatrickSkinTone(val modifierCodepoint: Int?) {
     MediumLight(0x1F3FC),
     Medium(0x1F3FD),
     MediumDark(0x1F3FE),
-    Dark(0x1F3FF),
+    Dark(0x1F3FF)
 }
 
 enum class UnicodeEmojiSection(val googleName: String, val nameResource: Int) {
@@ -42,7 +42,7 @@ enum class UnicodeEmojiSection(val googleName: String, val nameResource: Int) {
     Activities("Activities and events", R.string.emoji_category_activities),
     Objects("Objects", R.string.emoji_category_objects),
     Symbols("Symbols", R.string.emoji_category_symbols),
-    Flags("Flags", R.string.emoji_category_flags),
+    Flags("Flags", R.string.emoji_category_flags)
 }
 
 sealed class Category {
@@ -55,7 +55,7 @@ sealed class EmojiPickerItem {
     data class UnicodeEmoji(
         val character: String,
         val hasSkinTones: Boolean,
-        val alternates: List<List<Long>>,
+        val alternates: List<List<Long>>
     ) : EmojiPickerItem()
 
     data class ServerEmote(val emote: chat.revolt.api.schemas.Emoji) : EmojiPickerItem()
@@ -106,17 +106,19 @@ class EmojiImpl {
             val category =
                 UnicodeEmojiSection.entries.find { it.googleName == group.group } ?: continue
             list.add(EmojiPickerItem.Section(Category.UnicodeEmojiCategory(category)))
-            list.addAll(group.emoji.map { emoji ->
-                EmojiPickerItem.UnicodeEmoji(
-                    emoji.base.joinToString("") { String(Character.toChars(it.toInt())) },
-                    emoji.alternates.any { alternate ->
-                        alternate.any { codepoint ->
-                            codepoint in 0x1F3FB..0x1F3FF
-                        }
-                    },
-                    emoji.alternates
-                )
-            })
+            list.addAll(
+                group.emoji.map { emoji ->
+                    EmojiPickerItem.UnicodeEmoji(
+                        emoji.base.joinToString("") { String(Character.toChars(it.toInt())) },
+                        emoji.alternates.any { alternate ->
+                            alternate.any { codepoint ->
+                                codepoint in 0x1F3FB..0x1F3FF
+                            }
+                        },
+                        emoji.alternates
+                    )
+                }
+            )
         }
 
         return list
@@ -143,7 +145,9 @@ class EmojiImpl {
 
         for (server in serversWithEmotes()) {
             val index =
-                flatPickerList.indexOfFirst { it is EmojiPickerItem.Section && it.category is Category.ServerEmoteCategory && it.category.server == server }
+                flatPickerList.indexOfFirst {
+                    it is EmojiPickerItem.Section && it.category is Category.ServerEmoteCategory && it.category.server == server
+                }
             val allEmotesInThatServer =
                 RevoltAPI.emojiCache.values.filter { it.parent?.id == server.id }
             val lastIndex = index + allEmotesInThatServer.size
@@ -152,12 +156,16 @@ class EmojiImpl {
         }
         for (section in UnicodeEmojiSection.entries) {
             val index =
-                flatPickerList.indexOfFirst { it is EmojiPickerItem.Section && it.category is Category.UnicodeEmojiCategory && it.category.definition == section }
+                flatPickerList.indexOfFirst {
+                    it is EmojiPickerItem.Section && it.category is Category.UnicodeEmojiCategory && it.category.definition == section
+                }
             val lastIndex = if (section == UnicodeEmojiSection.entries.last()) {
                 Int.MAX_VALUE
             } else {
                 val nextSection = UnicodeEmojiSection.entries[section.ordinal + 1]
-                flatPickerList.indexOfFirst { it is EmojiPickerItem.Section && it.category is Category.UnicodeEmojiCategory && it.category.definition == nextSection } - 1
+                flatPickerList.indexOfFirst {
+                    it is EmojiPickerItem.Section && it.category is Category.UnicodeEmojiCategory && it.category.definition == nextSection
+                } - 1
             }
             output[Category.UnicodeEmojiCategory(section)] = Pair(index, lastIndex)
         }
@@ -220,17 +228,19 @@ class EmojiImpl {
                 val category =
                     UnicodeEmojiSection.entries.find { it.googleName == group.group } ?: continue
                 list.add(EmojiPickerItem.Section(Category.UnicodeEmojiCategory(category)))
-                list.addAll(matchingEmoji.map { emoji ->
-                    EmojiPickerItem.UnicodeEmoji(
-                        emoji.base.joinToString("") { String(Character.toChars(it.toInt())) },
-                        emoji.alternates.any { alternate ->
-                            alternate.any { codepoint ->
-                                codepoint in 0x1F3FB..0x1F3FF
-                            }
-                        },
-                        emoji.alternates
-                    )
-                })
+                list.addAll(
+                    matchingEmoji.map { emoji ->
+                        EmojiPickerItem.UnicodeEmoji(
+                            emoji.base.joinToString("") { String(Character.toChars(it.toInt())) },
+                            emoji.alternates.any { alternate ->
+                                alternate.any { codepoint ->
+                                    codepoint in 0x1F3FB..0x1F3FF
+                                }
+                            },
+                            emoji.alternates
+                        )
+                    }
+                )
             }
         }
 

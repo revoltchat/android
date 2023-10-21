@@ -61,9 +61,9 @@ import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 val DO_NOT_FETCH_OFFLINE_MEMBERS_SERVERS = listOf(
     "01F7ZSBSFHQ8TA81725KQCSDDP" // Revolt Lounge
@@ -82,10 +82,7 @@ class MemberListSheetViewModel @Inject constructor(
 ) : ViewModel() {
     val fullItemList = mutableStateListOf<MemberListItem>()
 
-    fun fetchServerMemberList(
-        serverId: String,
-        channelId: String
-    ) {
+    fun fetchServerMemberList(serverId: String, channelId: String) {
         viewModelScope.launch {
             val memberList = fetchMembers(
                 serverId = serverId,
@@ -246,7 +243,8 @@ fun MemberListSheet(
             sheetState = userContextSheetState,
             onDismissRequest = {
                 showUserContextSheet = false
-            }) {
+            }
+        ) {
             UserContextSheet(
                 userId = userContextSheetTarget,
                 serverId = serverId
@@ -271,7 +269,9 @@ fun MemberListSheet(
         LazyColumn {
             viewModel.fullItemList.forEachIndexed { index, item ->
                 when (item) {
-                    is MemberListItem.CategoryItem -> stickyHeader(key = "${item.category}-$index") {
+                    is MemberListItem.CategoryItem -> stickyHeader(
+                        key = "${item.category}-$index"
+                    ) {
                         MemberListCategory(text = item.category, count = item.count)
                     }
 
@@ -362,10 +362,7 @@ fun MemberListMemberUser(
 }
 
 @Composable
-fun MemberListCategory(
-    text: String,
-    count: Int
-) {
+fun MemberListCategory(text: String, count: Int) {
     Text(
         text = AnnotatedString.Builder().apply {
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))

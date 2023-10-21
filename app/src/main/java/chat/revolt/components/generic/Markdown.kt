@@ -46,7 +46,7 @@ fun UIMarkdown(
     text: String,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = LocalTextStyle.current.fontSize,
-    maxLines: Int = Int.MAX_VALUE,
+    maxLines: Int = Int.MAX_VALUE
 ) {
     val context = LocalContext.current
     val foregroundColor = LocalContentColor.current
@@ -61,7 +61,7 @@ fun UIMarkdown(
             .addRevoltRules(context)
             .addRules(
                 createCodeRule(context, codeBlockColor.toArgb()),
-                createInlineCodeRule(context, codeBlockColor.toArgb()),
+                createInlineCodeRule(context, codeBlockColor.toArgb())
             )
             .addRules(
                 SimpleMarkdownRules.createSimpleMarkdownRules(
@@ -109,7 +109,7 @@ fun UIMarkdown(
         modifier = modifier,
         update = {
             it.text = spannableStringBuilder.value
-        },
+        }
     )
 }
 
@@ -118,6 +118,6 @@ fun UIMarkdown(
 fun UIMarkdownPreview() {
     UIMarkdown(
         text = "Hello, **world**! <@01F1WKM5TK2V6KCZWR6DGBJDTZ> [link](https://google.com) `code`\n\n```kt\nfun main() {\n    println(\"Hello, world!\")\n}\n```",
-        fontSize = 16.sp,
+        fontSize = 16.sp
     )
 }

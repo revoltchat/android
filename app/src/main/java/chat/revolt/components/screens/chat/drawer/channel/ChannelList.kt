@@ -84,13 +84,13 @@ fun RowScope.ChannelList(
     currentChannel: String?,
     onChannelClick: (String) -> Unit,
     onSpecialClick: (String) -> Unit,
-    onServerSheetOpenFor: (String) -> Unit,
+    onServerSheetOpenFor: (String) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
     val enableSmallBanner by remember {
         derivedStateOf {
             lazyListState.firstVisibleItemScrollOffset > 40 ||
-                    lazyListState.firstVisibleItemIndex > 0
+                lazyListState.firstVisibleItemIndex > 0
         }
     }
 
@@ -120,7 +120,7 @@ fun RowScope.ChannelList(
             sheetState = channelContextSheetState,
             onDismissRequest = {
                 channelContextSheetShown = false
-            },
+            }
         ) {
             ChannelContextSheet(
                 channelId = channelContextSheetTarget,
@@ -151,13 +151,13 @@ fun RowScope.ChannelList(
         modifier = Modifier
             .padding(start = 4.dp, top = 8.dp, bottom = 8.dp)
             .clip(RoundedCornerShape(16.dp))
-            .fillMaxWidth(),
+            .fillMaxWidth()
     ) {
         LazyColumn(
             Modifier
                 .weight(1f)
                 .fillMaxSize(),
-            state = lazyListState,
+            state = lazyListState
         ) {
             if (serverId == "home") {
                 stickyHeader(
@@ -194,7 +194,7 @@ fun RowScope.ChannelList(
                         onClick = {
                             onSpecialClick("home")
                         },
-                        large = true,
+                        large = true
                     )
                 }
 
@@ -212,7 +212,7 @@ fun RowScope.ChannelList(
                         onClick = {
                             onChannelClick(notesChannelId ?: return@DrawerChannel)
                         },
-                        large = true,
+                        large = true
                     )
                 }
 
@@ -238,13 +238,19 @@ fun RowScope.ChannelList(
                     val channel = dmAbleChannels.getOrNull(it) ?: return@items
 
                     val partner =
-                        if (channel.channelType == ChannelType.DirectMessage) RevoltAPI.userCache[ChannelUtils.resolveDMPartner(
-                            channel
-                        )] else null
+                        if (channel.channelType == ChannelType.DirectMessage) {
+                            RevoltAPI.userCache[
+                                ChannelUtils.resolveDMPartner(
+                                    channel
+                                )
+                            ]
+                        } else {
+                            null
+                        }
 
                     DrawerChannel(
                         name = partner?.let { p -> User.resolveDefaultName(p) } ?: channel.name
-                        ?: stringResource(R.string.unknown),
+                            ?: stringResource(R.string.unknown),
                         channelType = channel.channelType ?: ChannelType.TextChannel,
                         selected = currentDestination == "channel/{channelId}" && currentChannel == channel.id,
                         hasUnread = channel.lastMessageID?.let { lastMessageID ->
@@ -313,7 +319,9 @@ fun RowScope.ChannelList(
 
                                             Glide.with(this)
                                                 .load("$REVOLT_FILES/banners/${server.banner.id}")
-                                                .transition(DrawableTransitionOptions.withCrossFade())
+                                                .transition(
+                                                    DrawableTransitionOptions.withCrossFade()
+                                                )
                                                 .into(this)
                                         }
                                     },
@@ -348,21 +356,29 @@ fun RowScope.ChannelList(
                             Box(
                                 modifier = Modifier
                                     .alpha(0.9f)
-                                    .height(BANNER_HEIGHT_COMPACT.dp + 8.dp) // due to padding in Text
+                                    .height(
+                                        BANNER_HEIGHT_COMPACT.dp + 8.dp
+                                    ) // due to padding in Text
                                     .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                                    .background(
+                                        MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
+                                    )
                             )
                         }
 
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Spacer(Modifier.width(16.dp))
 
                             if (server?.flags has ServerFlags.Official) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.ic_revolt_decagram_24dp),
-                                    contentDescription = stringResource(R.string.server_flag_official),
+                                    painter = painterResource(
+                                        id = R.drawable.ic_revolt_decagram_24dp
+                                    ),
+                                    contentDescription = stringResource(
+                                        R.string.server_flag_official
+                                    ),
                                     tint = if (server?.banner != null) {
                                         bannerTextColour
                                     } else {
@@ -375,8 +391,12 @@ fun RowScope.ChannelList(
                             }
                             if (server?.flags has ServerFlags.Verified) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.ic_check_decagram_24dp),
-                                    contentDescription = stringResource(R.string.server_flag_verified),
+                                    painter = painterResource(
+                                        id = R.drawable.ic_check_decagram_24dp
+                                    ),
+                                    contentDescription = stringResource(
+                                        R.string.server_flag_verified
+                                    ),
                                     tint = if (server?.banner != null) {
                                         bannerTextColour
                                     } else {
@@ -389,8 +409,10 @@ fun RowScope.ChannelList(
                             }
 
                             Text(
-                                text = (server?.name
-                                    ?: stringResource(R.string.unknown)),
+                                text = (
+                                    server?.name
+                                        ?: stringResource(R.string.unknown)
+                                    ),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = if (server?.banner != null) {
                                     bannerTextColour
@@ -438,7 +460,6 @@ fun RowScope.ChannelList(
                             }
                         }
                     }
-
                 }
 
                 if (categorisedChannels.isNullOrEmpty()) {
@@ -458,7 +479,7 @@ fun RowScope.ChannelList(
                             Text(
                                 text = stringResource(R.string.no_channels_body),
                                 style = MaterialTheme.typography.bodyMedium,
-                                textAlign = TextAlign.Center,
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
@@ -480,9 +501,15 @@ fun RowScope.ChannelList(
                                 val channel = item.channel
 
                                 val partner =
-                                    if (channel.channelType == ChannelType.DirectMessage) RevoltAPI.userCache[ChannelUtils.resolveDMPartner(
-                                        channel
-                                    )] else null
+                                    if (channel.channelType == ChannelType.DirectMessage) {
+                                        RevoltAPI.userCache[
+                                            ChannelUtils.resolveDMPartner(
+                                                channel
+                                            )
+                                        ]
+                                    } else {
+                                        null
+                                    }
 
                                 DrawerChannel(
                                     name = partner?.let { p -> User.resolveDefaultName(p) }
@@ -498,7 +525,11 @@ fun RowScope.ChannelList(
                                     } ?: false,
                                     dmPartnerIcon = partner?.avatar ?: channel.icon,
                                     dmPartnerId = partner?.id,
-                                    dmPartnerName = partner?.let { p -> User.resolveDefaultName(p) },
+                                    dmPartnerName = partner?.let { p ->
+                                        User.resolveDefaultName(
+                                            p
+                                        )
+                                    },
                                     dmPartnerStatus = presenceFromStatus(
                                         status = partner?.status?.presence,
                                         online = partner?.online ?: false

@@ -35,14 +35,20 @@ suspend fun uploadToAutumn(
     val uploadUrl = "$REVOLT_FILES/$tag"
 
     val response = RevoltHttp.post(uploadUrl) {
-        setBody(MultiPartFormDataContent(
-            formData {
-                append("file", file.readBytes(), Headers.build {
-                    append(HttpHeaders.ContentType, contentType.toString())
-                    append(HttpHeaders.ContentDisposition, "filename=\"$name\"")
-                })
-            }
-        ))
+        setBody(
+            MultiPartFormDataContent(
+                formData {
+                    append(
+                        "file",
+                        file.readBytes(),
+                        Headers.build {
+                            append(HttpHeaders.ContentType, contentType.toString())
+                            append(HttpHeaders.ContentDisposition, "filename=\"$name\"")
+                        }
+                    )
+                }
+            )
+        )
         onUpload { bytesSentTotal, contentLength ->
             onProgress(bytesSentTotal, contentLength)
         }
@@ -59,5 +65,4 @@ suspend fun uploadToAutumn(
             throw Exception("Unknown error")
         }
     }
-
 }

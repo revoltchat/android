@@ -26,10 +26,12 @@ fun ThemeChip(
             .clickable(onClick = onClick)
             .then(modifier)
             .then(
-                if (selected)
+                if (selected) {
                     Modifier
                         .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-                else Modifier
+                } else {
+                    Modifier
+                }
             )
             .padding(4.dp)
             .padding(8.dp)

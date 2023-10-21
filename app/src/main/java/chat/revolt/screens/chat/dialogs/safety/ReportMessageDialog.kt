@@ -58,10 +58,7 @@ enum class ReportFlowState {
 }
 
 @Composable
-fun ReportMessageDialog(
-    navController: NavController,
-    messageId: String,
-) {
+fun ReportMessageDialog(navController: NavController, messageId: String) {
     val message = RevoltAPI.messageCache[messageId]
     if (message == null) {
         navController.popBackStack()
@@ -84,7 +81,7 @@ fun ReportMessageDialog(
                 "SpamAbuse" to stringResource(id = R.string.report_reason_content_spam_abuse),
                 "Malware" to stringResource(id = R.string.report_reason_content_malware),
                 "Harassment" to stringResource(id = R.string.report_reason_content_harassment),
-                "Other" to stringResource(id = R.string.report_reason_content_other),
+                "Other" to stringResource(id = R.string.report_reason_content_other)
             )
             val reasonDropdownExpanded = remember { mutableStateOf(false) }
 
@@ -146,7 +143,7 @@ fun ReportMessageDialog(
                                 },
                                 label = {
                                     Text(
-                                        text = stringResource(id = R.string.report_reason),
+                                        text = stringResource(id = R.string.report_reason)
                                     )
                                 },
                                 readOnly = true,
@@ -159,7 +156,9 @@ fun ReportMessageDialog(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.ArrowDropDown,
-                                            contentDescription = stringResource(id = R.string.report_reason)
+                                            contentDescription = stringResource(
+                                                id = R.string.report_reason
+                                            )
                                         )
                                     }
                                 },
@@ -170,7 +169,7 @@ fun ReportMessageDialog(
                                 expanded = reasonDropdownExpanded.value,
                                 onDismissRequest = {
                                     reasonDropdownExpanded.value = false
-                                },
+                                }
                             ) {
                                 reasons.forEach { (key, value) ->
                                     DropdownMenuItem(
@@ -196,7 +195,9 @@ fun ReportMessageDialog(
                             },
                             supportingText = {
                                 Text(
-                                    text = stringResource(id = R.string.report_reason_additional_hint)
+                                    text = stringResource(
+                                        id = R.string.report_reason_additional_hint
+                                    )
                                 )
                             }
                         )
@@ -282,11 +283,11 @@ fun ReportMessageDialog(
                     Text(
                         text = stringResource(id = R.string.report_submit_success),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth()
                     )
                 },
                 text = {
-                    Column() {
+                    Column {
                         Column(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
@@ -349,11 +350,11 @@ fun ReportMessageDialog(
                     Text(
                         text = stringResource(id = R.string.report_submit_error_header),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth()
                     )
                 },
                 text = {
-                    Column() {
+                    Column {
                         Text(
                             text = stringResource(id = R.string.report_submit_error),
                             textAlign = TextAlign.Center

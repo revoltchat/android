@@ -19,7 +19,7 @@ data class Server(
     val banner: AutumnResource? = null,
     val flags: Long? = null,
     val analytics: Boolean? = null,
-    val discoverable: Boolean? = null,
+    val discoverable: Boolean? = null
 ) {
     fun mergeWithPartial(other: Server): Server {
         return Server(
@@ -36,14 +36,14 @@ data class Server(
             banner = other.banner ?: banner,
             flags = other.flags ?: flags,
             analytics = other.analytics ?: analytics,
-            discoverable = other.discoverable ?: discoverable,
+            discoverable = other.discoverable ?: discoverable
         )
     }
 }
 
 enum class ServerFlags(val value: Long) {
     Official(1L shl 0),
-    Verified(1L shl 1),
+    Verified(1L shl 1)
 }
 
 infix fun Long?.has(flag: ServerFlags): Boolean {
@@ -90,7 +90,7 @@ data class Emoji(
     val name: String? = null,
     val animated: Boolean? = null,
     val nsfw: Boolean? = null,
-    val type: String? = null, // this is _only_ used for websocket events!
+    val type: String? = null // this is _only_ used for websocket events!
 )
 
 @Serializable

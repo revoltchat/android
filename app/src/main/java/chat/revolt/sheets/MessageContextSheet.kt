@@ -50,7 +50,7 @@ import kotlinx.coroutines.launch
 fun MessageContextSheet(
     messageId: String,
     onHideSheet: suspend () -> Unit,
-    onReportMessage: () -> Unit,
+    onReportMessage: () -> Unit
 ) {
     val message = RevoltAPI.messageCache[messageId]
     if (message == null) {
@@ -77,12 +77,12 @@ fun MessageContextSheet(
             sheetState = shareSheetState,
             onDismissRequest = {
                 showShareSheet = false
-            },
+            }
         ) {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
             ) {
                 SheetClickable(
                     icon = { modifier ->
@@ -97,7 +97,7 @@ fun MessageContextSheet(
                             text = stringResource(id = R.string.message_context_sheet_actions_copy),
                             style = style
                         )
-                    },
+                    }
                 ) {
                     if (message.content.isNullOrEmpty()) {
                         coroutineScope.launch {
@@ -105,7 +105,9 @@ fun MessageContextSheet(
                             onHideSheet()
                             Toast.makeText(
                                 context,
-                                context.getString(R.string.message_context_sheet_actions_copy_failed_empty),
+                                context.getString(
+                                    R.string.message_context_sheet_actions_copy_failed_empty
+                                ),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -139,15 +141,19 @@ fun MessageContextSheet(
                     },
                     label = { style ->
                         Text(
-                            text = stringResource(id = R.string.message_context_sheet_actions_copy_link),
+                            text = stringResource(
+                                id = R.string.message_context_sheet_actions_copy_link
+                            ),
                             style = style
                         )
-                    },
+                    }
                 ) {
                     if (message.content.isNullOrEmpty()) {
                         Toast.makeText(
                             context,
-                            context.getString(R.string.message_context_sheet_actions_copy_failed_empty),
+                            context.getString(
+                                R.string.message_context_sheet_actions_copy_failed_empty
+                            ),
                             Toast.LENGTH_SHORT
                         ).show()
 
@@ -171,7 +177,9 @@ fun MessageContextSheet(
                     if (Platform.needsShowClipboardNotification()) {
                         Toast.makeText(
                             context,
-                            context.getString(R.string.message_context_sheet_actions_copy_link_copied),
+                            context.getString(
+                                R.string.message_context_sheet_actions_copy_link_copied
+                            ),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -194,10 +202,12 @@ fun MessageContextSheet(
                     },
                     label = { style ->
                         Text(
-                            text = stringResource(id = R.string.message_context_sheet_actions_copy_id),
+                            text = stringResource(
+                                id = R.string.message_context_sheet_actions_copy_id
+                            ),
                             style = style
                         )
-                    },
+                    }
                 ) {
                     if (message.id == null) return@SheetClickable
 
@@ -206,7 +216,9 @@ fun MessageContextSheet(
                     if (Platform.needsShowClipboardNotification()) {
                         Toast.makeText(
                             context,
-                            context.getString(R.string.message_context_sheet_actions_copy_id_copied),
+                            context.getString(
+                                R.string.message_context_sheet_actions_copy_id_copied
+                            ),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -225,7 +237,7 @@ fun MessageContextSheet(
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
     ) {
         Box(
             modifier = Modifier
@@ -257,7 +269,7 @@ fun MessageContextSheet(
                     text = stringResource(id = R.string.message_context_sheet_actions_reply),
                     style = style
                 )
-            },
+            }
         ) {
             coroutineScope.launch {
                 UiCallbacks.replyToMessage(messageId)
@@ -278,7 +290,7 @@ fun MessageContextSheet(
                     text = stringResource(id = R.string.message_context_sheet_actions_react),
                     style = style
                 )
-            },
+            }
         ) {
             Toast.makeText(
                 context,
@@ -305,7 +317,7 @@ fun MessageContextSheet(
                         text = stringResource(id = R.string.message_context_sheet_actions_edit),
                         style = style
                     )
-                },
+                }
             ) {
                 coroutineScope.launch {
                     UiCallbacks.editMessage(messageId)
@@ -327,7 +339,7 @@ fun MessageContextSheet(
                     text = stringResource(id = R.string.message_context_sheet_actions_mark_unread),
                     style = style
                 )
-            },
+            }
         ) {
             Toast.makeText(
                 context,
@@ -353,7 +365,7 @@ fun MessageContextSheet(
                     text = stringResource(id = R.string.share),
                     style = style
                 )
-            },
+            }
         ) {
             showShareSheet = true
         }

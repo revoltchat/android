@@ -42,7 +42,7 @@ fun AddServerSheet() {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
     ) {
         if (joinFromInviteModalOpen.value) {
             JoinFromInviteModal(
@@ -63,7 +63,9 @@ fun AddServerSheet() {
             icon = { modifier ->
                 Icon(
                     imageVector = Icons.Default.ExitToApp,
-                    contentDescription = stringResource(id = R.string.add_server_sheet_join_by_invite),
+                    contentDescription = stringResource(
+                        id = R.string.add_server_sheet_join_by_invite
+                    ),
                     modifier = modifier
                 )
             },
@@ -86,7 +88,9 @@ fun AddServerSheet() {
             onClick = {
                 Toast.makeText(
                     context,
-                    context.getString(R.string.add_server_sheet_create_new_modal_under_construction),
+                    context.getString(
+                        R.string.add_server_sheet_create_new_modal_under_construction
+                    ),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -97,9 +101,7 @@ fun AddServerSheet() {
 }
 
 @Composable
-fun JoinFromInviteModal(
-    onDismiss: () -> Unit,
-) {
+fun JoinFromInviteModal(onDismiss: () -> Unit) {
     val context = LocalContext.current
 
     val inviteCode = remember { mutableStateOf("") }
@@ -117,10 +119,16 @@ fun JoinFromInviteModal(
         },
         text = {
             Column {
-                Text(text = stringResource(id = R.string.add_server_sheet_join_by_invite_modal_description))
+                Text(
+                    text = stringResource(
+                        id = R.string.add_server_sheet_join_by_invite_modal_description
+                    )
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormTextField(
-                    label = stringResource(id = R.string.add_server_sheet_join_by_invite_modal_hint),
+                    label = stringResource(
+                        id = R.string.add_server_sheet_join_by_invite_modal_hint
+                    ),
                     value = inviteCode.value,
                     onChange = {
                         inviteCode.value = it
@@ -140,7 +148,9 @@ fun JoinFromInviteModal(
                     inviteActivityResult.launch(intent)
                 }
             ) {
-                Text(text = stringResource(id = R.string.add_server_sheet_join_by_invite_modal_join))
+                Text(
+                    text = stringResource(id = R.string.add_server_sheet_join_by_invite_modal_join)
+                )
             }
         },
         dismissButton = {

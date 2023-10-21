@@ -78,7 +78,7 @@ fun UserAvatar(
     size: Dp = 40.dp,
     presenceSize: Dp = 16.dp,
     onLongClick: (() -> Unit)? = null,
-    onClick: (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null
 ) {
     Box(
         modifier = modifier
@@ -94,29 +94,35 @@ fun UserAvatar(
                     .clip(CircleShape)
                     .size(size)
                     .then(
-                        if (onLongClick != null || onClick != null) Modifier
-                            .combinedClickable(
-                                onClick = { onClick?.invoke() },
-                                onLongClick = { onLongClick?.invoke() }
-                            )
-                        else Modifier
+                        if (onLongClick != null || onClick != null) {
+                            Modifier
+                                .combinedClickable(
+                                    onClick = { onClick?.invoke() },
+                                    onLongClick = { onLongClick?.invoke() }
+                                )
+                        } else {
+                            Modifier
+                        }
                     )
             )
         } else {
             RemoteImage(
-                url = "$REVOLT_BASE/users/${userId}/default_avatar",
+                url = "$REVOLT_BASE/users/$userId/default_avatar",
                 description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
                     .clip(CircleShape)
                     .size(size)
                     .then(
-                        if (onLongClick != null || onClick != null) Modifier
-                            .combinedClickable(
-                                onClick = { onClick?.invoke() },
-                                onLongClick = { onLongClick?.invoke() }
-                            )
-                        else Modifier
-                    ),
+                        if (onLongClick != null || onClick != null) {
+                            Modifier
+                                .combinedClickable(
+                                    onClick = { onClick?.invoke() },
+                                    onLongClick = { onLongClick?.invoke() }
+                                )
+                        } else {
+                            Modifier
+                        }
+                    )
             )
         }
 
@@ -135,7 +141,7 @@ fun GroupIcon(
     rawUrl: String? = null,
     size: Dp = 40.dp,
     onLongClick: (() -> Unit)? = null,
-    onClick: (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null
 ) {
     Box(
         modifier = modifier
@@ -151,12 +157,15 @@ fun GroupIcon(
                     .clip(MaterialTheme.shapes.small)
                     .size(size)
                     .then(
-                        if (onLongClick != null || onClick != null) Modifier
-                            .combinedClickable(
-                                onClick = { onClick?.invoke() },
-                                onLongClick = { onLongClick?.invoke() }
-                            )
-                        else Modifier
+                        if (onLongClick != null || onClick != null) {
+                            Modifier
+                                .combinedClickable(
+                                    onClick = { onClick?.invoke() },
+                                    onLongClick = { onLongClick?.invoke() }
+                                )
+                        } else {
+                            Modifier
+                        }
                     )
             )
         } else {
@@ -164,12 +173,15 @@ fun GroupIcon(
                 modifier = Modifier
                     .size(size)
                     .then(
-                        if (onLongClick != null || onClick != null) Modifier
-                            .combinedClickable(
-                                onClick = { onClick?.invoke() },
-                                onLongClick = { onLongClick?.invoke() }
-                            )
-                        else Modifier
+                        if (onLongClick != null || onClick != null) {
+                            Modifier
+                                .combinedClickable(
+                                    onClick = { onClick?.invoke() },
+                                    onLongClick = { onLongClick?.invoke() }
+                                )
+                        } else {
+                            Modifier
+                        }
                     )
                     .clip(MaterialTheme.shapes.small)
                     .background(MaterialTheme.colorScheme.primary)
@@ -186,9 +198,7 @@ fun GroupIcon(
 }
 
 @Composable
-fun UserAvatarWidthPlaceholder(
-    size: Dp = 40.dp,
-) {
+fun UserAvatarWidthPlaceholder(size: Dp = 40.dp) {
     Box(
         modifier = Modifier
             .width(size)

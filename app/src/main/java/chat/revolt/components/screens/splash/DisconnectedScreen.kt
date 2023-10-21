@@ -17,9 +17,7 @@ import androidx.compose.ui.unit.sp
 import chat.revolt.R
 
 @Composable
-fun DisconnectedScreen(
-    onRetry: () -> Unit
-) {
+fun DisconnectedScreen(onRetry: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -35,7 +33,7 @@ fun DisconnectedScreen(
                 textAlign = TextAlign.Center
             ),
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
         )
 
         Text(
@@ -43,7 +41,7 @@ fun DisconnectedScreen(
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             style = MaterialTheme.typography.titleMedium.copy(
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.Normal
             ),
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)

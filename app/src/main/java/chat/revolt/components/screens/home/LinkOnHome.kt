@@ -29,7 +29,7 @@ fun LinkOnHome(
     icon: @Composable (Modifier) -> Unit,
     modifier: Modifier = Modifier,
     description: @Composable () -> Unit = {},
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     Box(
         modifier = modifier
@@ -37,12 +37,12 @@ fun LinkOnHome(
             .clickable { onClick() }
             .padding(20.dp)
             .fillMaxWidth()
-            .padding(vertical = 5.dp),
+            .padding(vertical = 5.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             icon(Modifier.padding(end = 14.dp))
 

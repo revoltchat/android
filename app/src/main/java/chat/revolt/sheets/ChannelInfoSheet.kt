@@ -36,9 +36,7 @@ import chat.revolt.components.screens.chat.ChannelSheetHeader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChannelInfoSheet(
-    channelId: String,
-) {
+fun ChannelInfoSheet(channelId: String) {
     val channel = RevoltAPI.channelCache[channelId]
     var memberListSheetShown by remember { mutableStateOf(false) }
 
@@ -53,7 +51,7 @@ fun ChannelInfoSheet(
         ) {
             MemberListSheet(
                 channelId = channelId,
-                serverId = channel?.server,
+                serverId = channel?.server
             )
         }
     }
@@ -72,13 +70,13 @@ fun ChannelInfoSheet(
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
     ) {
         ChannelSheetHeader(
             channelName = channel.name ?: stringResource(id = R.string.unknown),
             channelIcon = channel.icon,
             channelType = channel.channelType ?: ChannelType.TextChannel,
-            channelId = channel.id ?: "9",
+            channelId = channel.id ?: "9"
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -89,7 +87,13 @@ fun ChannelInfoSheet(
             modifier = Modifier.padding(bottom = 10.dp)
         )
         Text(
-            text = if (channel.description.isNullOrBlank()) stringResource(id = R.string.channel_info_sheet_description_empty) else channel.description,
+            text = if (channel.description.isNullOrBlank()) {
+                stringResource(
+                    id = R.string.channel_info_sheet_description_empty
+                )
+            } else {
+                channel.description
+            },
             modifier = Modifier.padding(bottom = 10.dp)
         )
 
@@ -140,7 +144,6 @@ fun ChannelInfoSheet(
                 )
             }
         ) {
-
         }
 
         SheetClickable(
@@ -153,12 +156,13 @@ fun ChannelInfoSheet(
             },
             label = { style ->
                 Text(
-                    text = stringResource(id = R.string.channel_info_sheet_options_notifications_manage),
+                    text = stringResource(
+                        id = R.string.channel_info_sheet_options_notifications_manage
+                    ),
                     style = style
                 )
             }
         ) {
-
         }
 
         Spacer(modifier = Modifier.height(8.dp))

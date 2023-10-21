@@ -91,10 +91,10 @@ import chat.revolt.sheets.ChannelInfoSheet
 import chat.revolt.sheets.MessageContextSheet
 import com.discord.simpleast.core.simple.SimpleMarkdownRules
 import com.discord.simpleast.core.simple.SimpleRenderer
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -207,10 +207,10 @@ fun ChannelScreen(
             sheetState = channelInfoSheetState,
             onDismissRequest = {
                 channelInfoSheetShown = false
-            },
+            }
         ) {
             ChannelInfoSheet(
-                channelId = channelId,
+                channelId = channelId
             )
         }
     }
@@ -222,7 +222,7 @@ fun ChannelScreen(
             sheetState = messageContextSheetState,
             onDismissRequest = {
                 messageContextSheetShown = false
-            },
+            }
         ) {
             MessageContextSheet(
                 messageId = messageContextSheetTarget,
@@ -232,7 +232,7 @@ fun ChannelScreen(
                 },
                 onReportMessage = {
                     navController.navigate("report/message/$messageContextSheetTarget")
-                },
+                }
             )
         }
     }
@@ -252,7 +252,7 @@ fun ChannelScreen(
                 channelInfoSheetShown = true
             },
             onToggleDrawer = onToggleDrawer,
-            useDrawer = useDrawer,
+            useDrawer = useDrawer
         )
 
         val isScrolledToBottom = remember(lazyListState) {
@@ -310,12 +310,12 @@ fun ChannelScreen(
                             parse = {
                                 val parser = MarkdownParser()
                                     .addRules(
-                                        SimpleMarkdownRules.createEscapeRule(),
+                                        SimpleMarkdownRules.createEscapeRule()
                                     )
                                     .addRevoltRules(context)
                                     .addRules(
                                         createCodeRule(context, codeBlockColor.toArgb()),
-                                        createInlineCodeRule(context, codeBlockColor.toArgb()),
+                                        createInlineCodeRule(context, codeBlockColor.toArgb())
                                     )
                                     .addRules(
                                         SimpleMarkdownRules.createSimpleMarkdownRules(
@@ -366,7 +366,7 @@ fun ChannelScreen(
                                     return@Message
                                 }
                                 viewModel.replyToMessage(message)
-                            },
+                            }
                         )
                     }
                 }
@@ -399,11 +399,11 @@ fun ChannelScreen(
                 !isScrolledToBottom.value,
                 enter = slideInHorizontally(
                     animationSpec = RevoltTweenInt,
-                    initialOffsetX = { it },
+                    initialOffsetX = { it }
                 ) + fadeIn(animationSpec = RevoltTweenFloat),
                 exit = slideOutHorizontally(
                     animationSpec = RevoltTweenInt,
-                    targetOffsetX = { it },
+                    targetOffsetX = { it }
                 ) + fadeOut(animationSpec = RevoltTweenFloat),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -460,7 +460,7 @@ fun ChannelScreen(
                     attachments = viewModel.pendingAttachments,
                     uploading = viewModel.isSendingMessage,
                     uploadProgress = viewModel.pendingUploadProgress,
-                    onRemove = { viewModel.pendingAttachments.remove(it) },
+                    onRemove = { viewModel.pendingAttachments.remove(it) }
                 )
             }
 
@@ -525,12 +525,14 @@ fun ChannelScreen(
                             if (nowFocused && viewModel.currentBottomPane != BottomPane.None) {
                                 viewModel.currentBottomPane = BottomPane.None
                             }
-                        },
+                        }
                     )
                 }
             }
 
-            AnimatedVisibility(visible = viewModel.currentBottomPane == BottomPane.InbuiltMediaPicker) {
+            AnimatedVisibility(
+                visible = viewModel.currentBottomPane == BottomPane.InbuiltMediaPicker
+            ) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     InbuiltMediaPicker(
                         onOpenDocumentsUi = {
@@ -573,7 +575,9 @@ fun ChannelScreen(
                                 if (e is FileNotFoundException) {
                                     Toast.makeText(
                                         context,
-                                        context.getString(R.string.file_picker_cannot_attach_file_invalid),
+                                        context.getString(
+                                            R.string.file_picker_cannot_attach_file_invalid
+                                        ),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -582,7 +586,7 @@ fun ChannelScreen(
                         pendingMedia = viewModel.pendingAttachments
                             .filterNot { it.pickerIdentifier == null }
                             .map { it.pickerIdentifier!! },
-                        disabled = viewModel.isSendingMessage,
+                        disabled = viewModel.isSendingMessage
                     )
                 }
             }

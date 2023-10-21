@@ -24,7 +24,7 @@ val RevoltColorScheme = darkColorScheme(
     onSurfaceVariant = Color(0xffffffff),
     surface = Color(0xff1c243c),
     onSurface = Color(0xffffffff),
-    surfaceTint = Color(0xff5658b9),
+    surfaceTint = Color(0xff5658b9)
 )
 
 val AmoledColorScheme = RevoltColorScheme.copy(
@@ -33,7 +33,7 @@ val AmoledColorScheme = RevoltColorScheme.copy(
     surfaceVariant = Color(0xff131313),
     onSurfaceVariant = Color(0xffffffff),
     surface = Color(0xff212121),
-    onSurface = Color(0xffffffff),
+    onSurface = Color(0xffffffff)
 )
 
 val LightColorScheme = lightColorScheme(
@@ -47,7 +47,7 @@ val LightColorScheme = lightColorScheme(
     onSurfaceVariant = Color(0xff000000),
     surface = Color(0xfff5f5f5),
     onSurface = Color(0xff000000),
-    surfaceTint = Color(0xff5658b9),
+    surfaceTint = Color(0xff5658b9)
 )
 
 enum class Theme {
@@ -55,15 +55,12 @@ enum class Theme {
     Revolt,
     Light,
     M3Dynamic,
-    Amoled,
+    Amoled
 }
 
 @SuppressLint("NewApi")
 @Composable
-fun RevoltTheme(
-    requestedTheme: Theme,
-    content: @Composable () -> Unit
-) {
+fun RevoltTheme(requestedTheme: Theme, content: @Composable () -> Unit) {
     val context = LocalContext.current
 
     val systemInDarkTheme = isSystemInDarkTheme()

@@ -27,9 +27,11 @@ fun SheetClickable(
     label: @Composable (TextStyle) -> Unit,
     modifier: Modifier = Modifier,
     dangerous: Boolean = false,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
-    CompositionLocalProvider(LocalContentColor provides if (dangerous) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground) {
+    CompositionLocalProvider(
+        LocalContentColor provides if (dangerous) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground
+    ) {
         Box(modifier = modifier.padding(vertical = 4.dp)) {
             Row(
                 modifier = Modifier
@@ -44,7 +46,7 @@ fun SheetClickable(
                 label(
                     MaterialTheme.typography.bodyMedium.copy(
                         color = LocalContentColor.current,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.SemiBold
                     )
                 )
             }

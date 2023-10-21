@@ -28,7 +28,9 @@ import chat.revolt.R
 @Composable
 fun RegisterVerifyScreen(navController: NavController, email: String) {
     val intentLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {}
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) {}
 
     Column(
         modifier = Modifier
@@ -53,7 +55,7 @@ fun RegisterVerifyScreen(navController: NavController, email: String) {
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -65,7 +67,7 @@ fun RegisterVerifyScreen(navController: NavController, email: String) {
                 ),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
@@ -81,7 +83,7 @@ fun RegisterVerifyScreen(navController: NavController, email: String) {
                 ),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
@@ -100,6 +102,3 @@ fun RegisterVerifyScreen(navController: NavController, email: String) {
         }
     }
 }
-
-
-

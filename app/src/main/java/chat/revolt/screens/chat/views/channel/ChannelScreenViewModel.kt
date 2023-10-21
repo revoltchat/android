@@ -315,16 +315,19 @@ class ChannelScreenViewModel : ViewModel() {
                             currentMsg.id == it.id
                         } ?: return@onEach // Message not found, ignore.
 
-                        if (messageFrame.author != null)
+                        if (messageFrame.author != null) {
                             addUserIfUnknown(messageFrame.author)
+                        }
 
-                        regroupMessages(renderableMessages.map { currentMsg ->
-                            if (currentMsg.id == it.id) {
-                                currentMsg.mergeWithPartial(messageFrame)
-                            } else {
-                                currentMsg
+                        regroupMessages(
+                            renderableMessages.map { currentMsg ->
+                                if (currentMsg.id == it.id) {
+                                    currentMsg.mergeWithPartial(messageFrame)
+                                } else {
+                                    currentMsg
+                                }
                             }
-                        })
+                        )
                     }
 
                     is MessageAppendFrame -> {
@@ -336,13 +339,15 @@ class ChannelScreenViewModel : ViewModel() {
 
                         if (!hasMessage) return@onEach
 
-                        regroupMessages(renderableMessages.map { currentMsg ->
-                            if (currentMsg.id == it.id) {
-                                RevoltAPI.messageCache[it.id] ?: currentMsg
-                            } else {
-                                currentMsg
+                        regroupMessages(
+                            renderableMessages.map { currentMsg ->
+                                if (currentMsg.id == it.id) {
+                                    RevoltAPI.messageCache[it.id] ?: currentMsg
+                                } else {
+                                    currentMsg
+                                }
                             }
-                        })
+                        )
                     }
 
                     is MessageDeleteFrame -> {
@@ -458,8 +463,8 @@ class ChannelScreenViewModel : ViewModel() {
         }
 
         val newContent = currentContent.substring(0, currentSelection.start) +
-                content +
-                currentContent.substring(currentSelection.end)
+            content +
+            currentContent.substring(currentSelection.end)
 
         pendingMessageContent = newContent
         textSelection = TextRange(currentSelection.start + content.length)
@@ -469,9 +474,12 @@ class ChannelScreenViewModel : ViewModel() {
         if (activeChannel == null) return
 
         val selfUser = RevoltAPI.userCache[RevoltAPI.selfId] ?: return
-        val selfMember = if (activeChannel!!.server == null) null else
+        val selfMember = if (activeChannel!!.server == null) {
+            null
+        } else {
             activeChannel?.server?.let { RevoltAPI.members.getMember(it, selfUser.id!!) }
                 ?: fetchMember(activeChannel!!.server!!, selfUser.id!!)
+        }
 
         val hasPermission =
             Roles.permissionFor(activeChannel!!, selfUser, selfMember)

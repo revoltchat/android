@@ -32,7 +32,7 @@ fun ChannelHeader(
     channel: Channel,
     onChannelClick: (String) -> Unit,
     onToggleDrawer: () -> Unit,
-    useDrawer: Boolean,
+    useDrawer: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -41,7 +41,7 @@ fun ChannelHeader(
                 channel.id?.let { onChannelClick(it) }
             }
             .padding(vertical = 4.dp, horizontal = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         if (useDrawer) {
             IconButton(onClick = {
@@ -49,7 +49,7 @@ fun ChannelHeader(
             }) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = stringResource(R.string.menu),
+                    contentDescription = stringResource(R.string.menu)
                 )
             }
 
@@ -74,7 +74,7 @@ fun ChannelHeader(
 
         Row(
             modifier = Modifier.weight(1f),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = channel.name
@@ -86,7 +86,7 @@ fun ChannelHeader(
                     },
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.width(4.dp))
@@ -96,7 +96,7 @@ fun ChannelHeader(
                 contentDescription = stringResource(R.string.menu),
                 modifier = Modifier
                     .size(18.dp)
-                    .alpha(0.4f),
+                    .alpha(0.4f)
             )
         }
     }

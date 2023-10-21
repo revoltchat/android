@@ -28,9 +28,9 @@ import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.Embed
+import chat.revolt.api.schemas.Embed as EmbedSchema
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.UIMarkdown
-import chat.revolt.api.schemas.Embed as EmbedSchema
 
 @Composable
 fun RegularEmbed(
@@ -66,12 +66,14 @@ fun RegularEmbed(
                 Row(
                     modifier = Modifier
                         .then(
-                            if (embed.originalURL != null)
+                            if (embed.originalURL != null) {
                                 Modifier
                                     .clickable {
                                         onLinkClick(embed.originalURL)
                                     }
-                            else Modifier
+                            } else {
+                                Modifier
+                            }
                         )
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -116,9 +118,13 @@ fun RegularEmbed(
                         modifier = Modifier
                             .clip(MaterialTheme.shapes.medium)
                             .then(
-                                if (embed.originalURL != null) Modifier.clickable {
-                                    onLinkClick(embed.originalURL)
-                                } else Modifier
+                                if (embed.originalURL != null) {
+                                    Modifier.clickable {
+                                        onLinkClick(embed.originalURL)
+                                    }
+                                } else {
+                                    Modifier
+                                }
                             )
                             .aspectRatio(
                                 (it.width?.toFloat() ?: 0f) / (it.height?.toFloat() ?: 0f)
@@ -130,15 +136,10 @@ fun RegularEmbed(
             }
         }
     }
-
 }
 
 @Composable
-fun Embed(
-    embed: Embed,
-    modifier: Modifier = Modifier,
-    onLinkClick: (String) -> Unit
-) {
+fun Embed(embed: Embed, modifier: Modifier = Modifier, onLinkClick: (String) -> Unit) {
     Column {
         when (embed.type) {
             else -> RegularEmbed(embed = embed, modifier = modifier, onLinkClick = onLinkClick)

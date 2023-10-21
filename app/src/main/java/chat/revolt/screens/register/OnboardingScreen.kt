@@ -83,7 +83,7 @@ fun OnboardingScreen(navController: NavController) {
                 ),
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -95,7 +95,7 @@ fun OnboardingScreen(navController: NavController) {
                 ),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
@@ -111,7 +111,7 @@ fun OnboardingScreen(navController: NavController) {
                 ),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
@@ -127,7 +127,7 @@ fun OnboardingScreen(navController: NavController) {
                 ),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
@@ -145,7 +145,7 @@ fun OnboardingScreen(navController: NavController) {
                 FormTextField(
                     value = username.value,
                     onChange = { username.value = it },
-                    label = stringResource(R.string.onboarding_username),
+                    label = stringResource(R.string.onboarding_username)
                 )
 
                 if (error.value.isNotBlank()) {

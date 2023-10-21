@@ -9,7 +9,9 @@ object WebChallenge {
     suspend fun needsCloudflare(): Boolean {
         RevoltHttp.get(REVOLT_BASE).let {
             val text = it.bodyAsText()
-            return text.contains("window._cf_chl_opt") // FIXME Naive, prone to captcha page changing
+            return text.contains(
+                "window._cf_chl_opt"
+            ) // FIXME Naive, prone to captcha page changing
         }
     }
 }

@@ -51,11 +51,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-fun AudioPlayer(
-    url: String,
-    filename: String,
-    contentType: String,
-) {
+fun AudioPlayer(url: String, filename: String, contentType: String) {
     val context = LocalContext.current
 
     val showMenu = remember { mutableStateOf(false) }
@@ -201,7 +197,7 @@ fun AudioPlayer(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
         ) {
             Text(
                 text = filename,
@@ -222,7 +218,7 @@ fun AudioPlayer(
             }
         }
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = {
                 if (isPlaying.value) {
@@ -237,12 +233,12 @@ fun AudioPlayer(
                     if (isPlaying.value) {
                         Icon(
                             painter = painterResource(R.drawable.ic_pause_24dp),
-                            contentDescription = stringResource(R.string.media_viewer_pause),
+                            contentDescription = stringResource(R.string.media_viewer_pause)
                         )
                     } else {
                         Icon(
                             imageVector = Icons.Filled.PlayArrow,
-                            contentDescription = stringResource(R.string.media_viewer_play),
+                            contentDescription = stringResource(R.string.media_viewer_play)
                         )
                     }
                 }
@@ -270,7 +266,7 @@ fun AudioPlayer(
             }) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
-                    contentDescription = stringResource(R.string.media_viewer_more),
+                    contentDescription = stringResource(R.string.media_viewer_more)
                 )
                 DropdownMenu(
                     expanded = showMenu.value,

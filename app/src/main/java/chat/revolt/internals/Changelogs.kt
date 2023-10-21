@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 data class Changelog(
     val summary: String,
     val version: String,
-    val date: String,
+    val date: String
 )
 
 @Serializable
@@ -26,19 +26,27 @@ class Changelogs(val context: Context, val kvStorage: KVStorage? = null) {
     }
 
     fun getChangelog(version: String): String {
-        return context.assets.open("changelogs/${version}.md").use {
+        return context.assets.open("changelogs/$version.md").use {
             it.reader().readText()
         }
     }
 
     suspend fun hasSeenLatest(): Boolean {
-        if (kvStorage == null) throw IllegalStateException("Not supported for non-KVStorage instances of Changelogs")
+        if (kvStorage == null) {
+            throw IllegalStateException(
+                "Not supported for non-KVStorage instances of Changelogs"
+            )
+        }
 
         return kvStorage.get("latestChangelogRead") == index.latest
     }
 
     suspend fun markAsSeen() {
-        if (kvStorage == null) throw IllegalStateException("Not supported for non-KVStorage instances of Changelogs")
+        if (kvStorage == null) {
+            throw IllegalStateException(
+                "Not supported for non-KVStorage instances of Changelogs"
+            )
+        }
 
         kvStorage.set("latestChangelogRead", index.latest)
     }

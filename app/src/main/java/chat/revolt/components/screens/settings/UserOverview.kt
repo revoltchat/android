@@ -97,9 +97,11 @@ fun RawUserOverview(user: User, profile: Profile? = null) {
                             width = 4.dp,
                             brush = teamMemberFlair
                                 ?: Brush.solidColor(Color.Transparent),
-                            shape = MaterialTheme.shapes.large,
+                            shape = MaterialTheme.shapes.large
                         )
-                } else Modifier
+                } else {
+                    Modifier
+                }
             )
     ) {
         profile?.background?.let { background ->
@@ -138,7 +140,7 @@ fun RawUserOverview(user: User, profile: Profile? = null) {
                 userId = user.id ?: ULID.makeSpecial(0),
                 avatar = user.avatar,
                 size = 48.dp,
-                presence = presenceFromStatus(user.status?.presence),
+                presence = presenceFromStatus(user.status?.presence)
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -156,7 +158,7 @@ fun RawUserOverview(user: User, profile: Profile? = null) {
                     append("#${user.discriminator}")
                     pop()
                 }.toAnnotatedString(),
-                color = if (profile?.background != null) Color.White else LocalContentColor.current,
+                color = if (profile?.background != null) Color.White else LocalContentColor.current
             )
         }
     }

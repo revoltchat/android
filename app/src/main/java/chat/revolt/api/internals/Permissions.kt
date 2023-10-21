@@ -76,30 +76,30 @@ object BitDefaults {
 
     val Default =
         ViewOnly +
-                PermissionBit.SendMessage +
-                PermissionBit.InviteOthers +
-                PermissionBit.SendEmbeds +
-                PermissionBit.UploadFiles +
-                PermissionBit.Connect +
-                PermissionBit.Speak
+            PermissionBit.SendMessage +
+            PermissionBit.InviteOthers +
+            PermissionBit.SendEmbeds +
+            PermissionBit.UploadFiles +
+            PermissionBit.Connect +
+            PermissionBit.Speak
 
     val SavedMessages =
         PermissionBit.GrantAllSafe.value
 
     val DirectMessages =
         Default +
-                PermissionBit.ManageChannel +
-                PermissionBit.React
+            PermissionBit.ManageChannel +
+            PermissionBit.React
 
     val Server =
         Default +
-                PermissionBit.React +
-                PermissionBit.ChangeNickname +
-                PermissionBit.ChangeAvatar
+            PermissionBit.React +
+            PermissionBit.ChangeNickname +
+            PermissionBit.ChangeAvatar
 
     val Webhook =
         PermissionBit.SendMessage +
-                PermissionBit.SendEmbeds +
-                PermissionBit.Masquerade +
-                PermissionBit.React
+            PermissionBit.SendEmbeds +
+            PermissionBit.Masquerade +
+            PermissionBit.React
 }

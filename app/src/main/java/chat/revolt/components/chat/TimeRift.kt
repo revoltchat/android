@@ -23,10 +23,7 @@ import androidx.compose.ui.unit.sp
 import chat.revolt.R
 
 @Composable
-fun TimeRift(
-    modifier: Modifier = Modifier,
-    onMessageLoad: () -> Unit,
-) {
+fun TimeRift(modifier: Modifier = Modifier, onMessageLoad: () -> Unit) {
     Column(
         modifier = modifier
             .padding(vertical = 10.dp)

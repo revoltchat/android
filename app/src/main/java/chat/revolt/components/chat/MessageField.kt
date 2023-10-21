@@ -71,7 +71,7 @@ fun MessageField(
     disabled: Boolean = false,
     editMode: Boolean = false,
     cancelEdit: () -> Unit = {},
-    onFocusChange: (Boolean) -> Unit = {},
+    onFocusChange: (Boolean) -> Unit = {}
 ) {
     val focusRequester = remember { FocusRequester() }
     val placeholderResource = when (channelType) {
@@ -126,7 +126,7 @@ fun MessageField(
                                 channelName
                             ),
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
+                            overflow = TextOverflow.Ellipsis
                         )
                     },
                     colors = TextFieldDefaults.colors(
@@ -139,7 +139,7 @@ fun MessageField(
                         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                             1.dp
                         ),
-                        focusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent
                     ),
                     contentPadding = PaddingValues(16.dp),
                     leadingIcon = {
@@ -185,7 +185,8 @@ fun MessageField(
 
                             Spacer(modifier = Modifier.width(8.dp))
 
-                            AnimatedVisibility(sendButtonVisible,
+                            AnimatedVisibility(
+                                sendButtonVisible,
                                 enter = expandIn(initialSize = { full ->
                                     IntSize(
                                         0,
@@ -203,7 +204,8 @@ fun MessageField(
                                 }) + slideOutHorizontally(
                                     animationSpec = RevoltTweenInt,
                                     targetOffsetX = { it }
-                                ) + fadeOut(animationSpec = RevoltTweenFloat)) {
+                                ) + fadeOut(animationSpec = RevoltTweenFloat)
+                            ) {
                                 Icon(
                                     when {
                                         editMode -> Icons.Default.Edit

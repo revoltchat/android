@@ -46,11 +46,14 @@ fun DrawerChannel(
     dmPartnerName: String? = null,
     dmPartnerIcon: AutumnResource? = null,
     dmPartnerId: String? = null,
-    large: Boolean = false,
+    large: Boolean = false
 ) {
     val backgroundColor = animateColorAsState(
-        if (selected) MaterialTheme.colorScheme.background
-        else Color.Transparent,
+        if (selected) {
+            MaterialTheme.colorScheme.background
+        } else {
+            Color.Transparent
+        },
         animationSpec = spring(),
         label = "Channel background colour"
     )
@@ -102,12 +105,16 @@ fun DrawerChannel(
             else -> ChannelIcon(
                 channelType = channelType,
                 modifier = Modifier.then(
-                    if (large) Modifier.padding(
-                        end = 12.dp,
-                        start = 4.dp,
-                        top = 4.dp,
-                        bottom = 4.dp
-                    ) else Modifier.padding(end = 8.dp)
+                    if (large) {
+                        Modifier.padding(
+                            end = 12.dp,
+                            start = 4.dp,
+                            top = 4.dp,
+                            bottom = 4.dp
+                        )
+                    } else {
+                        Modifier.padding(end = 8.dp)
+                    }
                 )
             )
         }

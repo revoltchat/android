@@ -17,7 +17,7 @@ data class RegistrationBody(
     val email: String,
     val password: String,
     val invite: String? = null,
-    val captcha: String,
+    val captcha: String
 )
 
 suspend fun register(body: RegistrationBody): RsResult<Unit, RevoltError> {

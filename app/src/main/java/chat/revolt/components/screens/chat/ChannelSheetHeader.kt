@@ -28,7 +28,7 @@ fun ChannelSheetHeader(
     channelName: String,
     channelIcon: AutumnResource? = null,
     channelType: ChannelType,
-    channelId: String,
+    channelId: String
 ) {
     Row(
         modifier = Modifier.padding(vertical = 4.dp),
@@ -65,7 +65,7 @@ fun ChannelSheetHeader(
             text = channelName,
             fontWeight = FontWeight.Medium,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

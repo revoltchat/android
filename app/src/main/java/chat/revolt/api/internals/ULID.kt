@@ -45,35 +45,67 @@ object ULID {
         // Entropy part (16 chars)
         chars[10] = b32chars[(entropy[0].toShort() and 0xff).toInt().ushr(3)]
         chars[11] =
-            b32chars[(entropy[0].toInt() shl 2 or (entropy[1].toShort() and 0xff).toInt()
-                .ushr(6) and 0x1f)]
+            b32chars[
+                (
+                    entropy[0].toInt() shl 2 or (entropy[1].toShort() and 0xff).toInt()
+                        .ushr(6) and 0x1f
+                    )
+            ]
         chars[12] = b32chars[((entropy[1].toShort() and 0xff).toInt().ushr(1) and 0x1f)]
         chars[13] =
-            b32chars[(entropy[1].toInt() shl 4 or (entropy[2].toShort() and 0xff).toInt()
-                .ushr(4) and 0x1f)]
+            b32chars[
+                (
+                    entropy[1].toInt() shl 4 or (entropy[2].toShort() and 0xff).toInt()
+                        .ushr(4) and 0x1f
+                    )
+            ]
         chars[14] =
-            b32chars[(entropy[2].toInt() shl 5 or (entropy[3].toShort() and 0xff).toInt()
-                .ushr(7) and 0x1f)]
+            b32chars[
+                (
+                    entropy[2].toInt() shl 5 or (entropy[3].toShort() and 0xff).toInt()
+                        .ushr(7) and 0x1f
+                    )
+            ]
         chars[15] = b32chars[((entropy[3].toShort() and 0xff).toInt().ushr(2) and 0x1f)]
         chars[16] =
-            b32chars[(entropy[3].toInt() shl 3 or (entropy[4].toShort() and 0xff).toInt()
-                .ushr(5) and 0x1f)]
+            b32chars[
+                (
+                    entropy[3].toInt() shl 3 or (entropy[4].toShort() and 0xff).toInt()
+                        .ushr(5) and 0x1f
+                    )
+            ]
         chars[17] = b32chars[(entropy[4].toInt() and 0x1f)]
         chars[18] = b32chars[(entropy[5].toShort() and 0xff).toInt().ushr(3)]
         chars[19] =
-            b32chars[(entropy[5].toInt() shl 2 or (entropy[6].toShort() and 0xff).toInt()
-                .ushr(6) and 0x1f)]
+            b32chars[
+                (
+                    entropy[5].toInt() shl 2 or (entropy[6].toShort() and 0xff).toInt()
+                        .ushr(6) and 0x1f
+                    )
+            ]
         chars[20] = b32chars[((entropy[6].toShort() and 0xff).toInt().ushr(1) and 0x1f)]
         chars[21] =
-            b32chars[(entropy[6].toInt() shl 4 or (entropy[7].toShort() and 0xff).toInt()
-                .ushr(4) and 0x1f)]
+            b32chars[
+                (
+                    entropy[6].toInt() shl 4 or (entropy[7].toShort() and 0xff).toInt()
+                        .ushr(4) and 0x1f
+                    )
+            ]
         chars[22] =
-            b32chars[(entropy[7].toInt() shl 5 or (entropy[8].toShort() and 0xff).toInt()
-                .ushr(7) and 0x1f)]
+            b32chars[
+                (
+                    entropy[7].toInt() shl 5 or (entropy[8].toShort() and 0xff).toInt()
+                        .ushr(7) and 0x1f
+                    )
+            ]
         chars[23] = b32chars[((entropy[8].toShort() and 0xff).toInt().ushr(2) and 0x1f)]
         chars[24] =
-            b32chars[(entropy[8].toInt() shl 3 or (entropy[9].toShort() and 0xff).toInt()
-                .ushr(5) and 0x1f)]
+            b32chars[
+                (
+                    entropy[8].toInt() shl 3 or (entropy[9].toShort() and 0xff).toInt()
+                        .ushr(5) and 0x1f
+                    )
+            ]
         chars[25] = b32chars[(entropy[9].toInt() and 0x1f)]
 
         return String(chars)

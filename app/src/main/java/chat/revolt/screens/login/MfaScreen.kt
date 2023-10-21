@@ -48,12 +48,12 @@ import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MfaScreenViewModel @Inject constructor(
-    private val kvStorage: KVStorage,
+    private val kvStorage: KVStorage
 ) : ViewModel() {
     private var _totpCode by mutableStateOf("")
     val totpCode: String
@@ -183,7 +183,7 @@ fun MfaScreen(
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
             )
 
             Text(
@@ -193,7 +193,7 @@ fun MfaScreen(
                 ),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -214,7 +214,6 @@ fun MfaScreen(
                         .fillMaxWidth()
                 )
             }
-
 
             // Collapsible cards for each auth type
             allowedAuthTypes.forEach { authType ->
@@ -245,7 +244,7 @@ fun MfaScreen(
                                     ),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         textAlign = TextAlign.Center,
-                                        fontWeight = FontWeight.Normal,
+                                        fontWeight = FontWeight.Normal
                                     ),
                                     modifier = Modifier
                                         .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -256,7 +255,7 @@ fun MfaScreen(
                                     label = stringResource(R.string.mfa_totp_code),
                                     onChange = viewModel::setTotpCode,
                                     type = KeyboardType.Number,
-                                    value = viewModel.totpCode,
+                                    value = viewModel.totpCode
                                 )
 
                                 Button(
@@ -267,7 +266,7 @@ fun MfaScreen(
                                         .testTag("do_totp_button")
                                 ) {
                                     Text(
-                                        text = stringResource(R.string.next),
+                                        text = stringResource(R.string.next)
                                     )
                                 }
                             }
@@ -300,7 +299,7 @@ fun MfaScreen(
                                     ),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         textAlign = TextAlign.Center,
-                                        fontWeight = FontWeight.Normal,
+                                        fontWeight = FontWeight.Normal
                                     ),
                                     modifier = Modifier
                                         .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -310,7 +309,7 @@ fun MfaScreen(
                                 FormTextField(
                                     label = stringResource(R.string.mfa_recovery_code),
                                     onChange = viewModel::setRecoveryCode,
-                                    value = viewModel.recoveryCode,
+                                    value = viewModel.recoveryCode
                                 )
 
                                 Button(
@@ -321,7 +320,7 @@ fun MfaScreen(
                                         .testTag("do_mfa_recovery_button")
                                 ) {
                                     Text(
-                                        text = stringResource(R.string.next),
+                                        text = stringResource(R.string.next)
                                     )
                                 }
                             }

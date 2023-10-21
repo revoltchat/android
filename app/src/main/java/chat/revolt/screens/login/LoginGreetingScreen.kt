@@ -94,7 +94,7 @@ fun LoginGreetingScreen(navController: NavController) {
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 10.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
             )
 
             Text(
@@ -105,7 +105,7 @@ fun LoginGreetingScreen(navController: NavController) {
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -157,7 +157,6 @@ fun LoginGreetingScreen(navController: NavController) {
                     url = "$REVOLT_MARKETING/aup"
                 )
             }
-
         }
     }
 }

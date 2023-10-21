@@ -72,7 +72,7 @@ fun NonIdealState(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
             ) {
                 actions()
             }
@@ -113,7 +113,7 @@ fun NonIdealStatePreviewNoActions() {
             )
         },
         title = { Text("Error") },
-        description = { Text("Could not load channels.") },
+        description = { Text("Could not load channels.") }
     )
 }
 
@@ -128,6 +128,6 @@ fun NonIdealStatePreviewNoDescription() {
                 modifier = Modifier.size(it)
             )
         },
-        title = { Text("No channels") },
+        title = { Text("No channels") }
     )
 }

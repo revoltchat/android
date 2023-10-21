@@ -20,7 +20,7 @@ data class MessagesInChannel(
 @Serializable
 data class ServerUserChoice(
     val server: String,
-    val user: String,
+    val user: String
 )
 
 @Serializable
@@ -35,7 +35,7 @@ data class Member(
     val roles: List<String>? = null,
     val nickname: String? = null,
 
-    val timeout: String? = null,
+    val timeout: String? = null
 ) {
     fun mergeWithPartial(other: Member): Member {
         return Member(
@@ -44,7 +44,7 @@ data class Member(
             avatar = other.avatar ?: avatar,
             roles = other.roles ?: roles,
             nickname = other.nickname ?: nickname,
-            timeout = other.timeout ?: timeout,
+            timeout = other.timeout ?: timeout
         )
     }
 
@@ -75,7 +75,7 @@ data class Channel(
     @SerialName("default_permissions")
     val defaultPermissions: PermissionDescription? = null,
     val nsfw: Boolean? = null,
-    val type: String? = null, // this is _only_ used for websocket events!
+    val type: String? = null // this is _only_ used for websocket events!
 ) {
     fun mergeWithPartial(partial: Channel): Channel {
         return Channel(
@@ -135,7 +135,7 @@ enum class ChannelType(val value: String) {
 @Serializable
 data class ChannelUserChoice(
     val channel: String,
-    val user: String,
+    val user: String
 )
 
 @Serializable
@@ -143,7 +143,7 @@ data class ChannelUnreadResponse(
     @SerialName("_id")
     val id: ChannelUserChoice,
     val last_id: String? = null,
-    val mentions: List<String>? = null,
+    val mentions: List<String>? = null
 )
 
 @Serializable
@@ -151,5 +151,5 @@ data class ChannelUnread(
     @SerialName("_id")
     val id: String,
     val last_id: String? = null,
-    val mentions: List<String>? = null,
+    val mentions: List<String>? = null
 )

@@ -30,10 +30,7 @@ import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 
 @Composable
-fun StackedUserAvatars(
-    users: List<String>,
-    amount: Int = 3,
-) {
+fun StackedUserAvatars(users: List<String>, amount: Int = 3) {
     Box(
         modifier = Modifier
             .size(16.dp + (8.dp * minOf(users.size, amount)), 16.dp)
@@ -43,21 +40,19 @@ fun StackedUserAvatars(
             UserAvatar(
                 avatar = user?.avatar,
                 userId = userId,
-                username = user?.let {User.resolveDefaultName(it)} ?: stringResource(id = R.string.unknown),
+                username = user?.let { User.resolveDefaultName(it) } ?: stringResource(id = R.string.unknown),
                 size = 16.dp,
                 modifier = Modifier
                     .offset(
-                        x = (index * 8).dp,
-                    ),
+                        x = (index * 8).dp
+                    )
             )
         }
     }
 }
 
 @Composable
-fun TypingIndicator(
-    users: List<String>,
-) {
+fun TypingIndicator(users: List<String>) {
     fun typingMessageResource(): Int {
         return when (users.size) {
             0 -> R.string.typing_blank
@@ -84,11 +79,11 @@ fun TypingIndicator(
                 .clip(
                     RoundedCornerShape(
                         topStart = 16.dp,
-                        topEnd = 16.dp,
+                        topEnd = 16.dp
                     )
                 )
                 .background(MaterialTheme.colorScheme.background)
-                .padding(top = 4.dp, start = 16.dp, end = 16.dp),
+                .padding(top = 4.dp, start = 16.dp, end = 16.dp)
         ) {
             StackedUserAvatars(users = users)
 
@@ -103,7 +98,7 @@ fun TypingIndicator(
                 ),
                 fontSize = 12.sp,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

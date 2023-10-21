@@ -15,44 +15,41 @@ import chat.revolt.R
 import chat.revolt.api.schemas.ChannelType
 
 @Composable
-fun ChannelIcon(
-    channelType: ChannelType,
-    modifier: Modifier = Modifier,
-) {
+fun ChannelIcon(channelType: ChannelType, modifier: Modifier = Modifier) {
     when (channelType) {
         ChannelType.TextChannel -> {
             Icon(
                 painter = painterResource(R.drawable.ic_pound_24dp),
                 contentDescription = stringResource(R.string.channel_text),
-                modifier = modifier,
+                modifier = modifier
             )
         }
         ChannelType.VoiceChannel -> {
             Icon(
                 painter = painterResource(R.drawable.ic_volume_up_24dp),
                 contentDescription = stringResource(R.string.channel_voice),
-                modifier = modifier,
+                modifier = modifier
             )
         }
         ChannelType.SavedMessages -> {
             Icon(
                 painter = painterResource(R.drawable.ic_note_24dp),
                 contentDescription = stringResource(R.string.channel_notes),
-                modifier = modifier,
+                modifier = modifier
             )
         }
         ChannelType.DirectMessage -> {
             Icon(
                 imageVector = Icons.Default.AccountCircle,
                 contentDescription = stringResource(R.string.channel_dm),
-                modifier = modifier,
+                modifier = modifier
             )
         }
         ChannelType.Group -> {
             Icon(
                 imageVector = Icons.Default.AccountBox,
                 contentDescription = stringResource(R.string.channel_group),
-                modifier = modifier,
+                modifier = modifier
             )
         }
     }
@@ -65,7 +62,7 @@ class ChannelTypeProvider : PreviewParameterProvider<ChannelType> {
             ChannelType.VoiceChannel,
             ChannelType.SavedMessages,
             ChannelType.DirectMessage,
-            ChannelType.Group,
+            ChannelType.Group
         )
 
     override val count: Int

@@ -50,5 +50,5 @@ data class AutumnId(
 
 @Serializable
 data class AutumnError(
-    val type: String,
+    val type: String
 )

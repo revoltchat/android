@@ -64,11 +64,11 @@ import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
+import chat.revolt.api.schemas.Message as MessageSchema
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.internals.markdown.LongClickableSpan
-import chat.revolt.api.schemas.Message as MessageSchema
 
 @Composable
 fun authorColour(message: MessageSchema): Brush {
@@ -132,10 +132,7 @@ fun viewAttachmentInBrowser(ctx: android.content.Context, attachment: AutumnReso
     viewUrlInBrowser(ctx, url)
 }
 
-
-fun formatLongAsTime(
-    time: Long
-): String {
+fun formatLongAsTime(time: Long): String {
     val date = java.util.Date(time)
 
     val withinLastWeek = System.currentTimeMillis() - time < 604800000
@@ -167,7 +164,7 @@ fun Message(
     onMessageContextMenu: () -> Unit = {},
     onAvatarClick: () -> Unit = {},
     canReply: Boolean = false,
-    onReply: () -> Unit = {},
+    onReply: () -> Unit = {}
 ) {
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
     val context = LocalContext.current
@@ -177,7 +174,8 @@ fun Message(
         contract = ActivityResultContracts.StartActivityForResult(),
         onResult = {
             // do nothing
-        })
+        }
+    )
     Column {
         if (message.tail == false) {
             Spacer(modifier = Modifier.height(10.dp))
@@ -237,7 +235,7 @@ fun Message(
                             userId = author.id ?: message.id ?: ULID.makeSpecial(0),
                             avatar = author.avatar,
                             rawUrl = authorAvatarUrl(message),
-                            onClick = onAvatarClick,
+                            onClick = onAvatarClick
                         )
                     }
                 } else {
@@ -251,7 +249,7 @@ fun Message(
                                 text = authorName(message),
                                 style = LocalTextStyle.current.copy(
                                     fontWeight = FontWeight.Bold,
-                                    brush = authorColour(message),
+                                    brush = authorColour(message)
                                 ),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
@@ -285,7 +283,9 @@ fun Message(
                                 Icon(
                                     imageVector = Icons.Default.Edit,
                                     contentDescription = stringResource(id = R.string.edited),
-                                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                    tint = MaterialTheme.colorScheme.onBackground.copy(
+                                        alpha = 0.5f
+                                    ),
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -343,7 +343,8 @@ fun Message(
                                                         x.toFloat()
                                                     )
                                                     val link = spannedString.getSpans(
-                                                        off, off,
+                                                        off,
+                                                        off,
                                                         LongClickableSpan::class.java
                                                     )
                                                     if (link.isNotEmpty()) {

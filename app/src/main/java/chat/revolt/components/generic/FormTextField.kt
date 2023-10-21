@@ -21,7 +21,7 @@ fun FormTextField(
     type: KeyboardType = KeyboardType.Text,
     supportingText: @Composable (() -> Unit)? = null,
     singleLine: Boolean = true,
-    enabled: Boolean = true,
+    enabled: Boolean = true
 ) {
     TextField(
         value = value,

@@ -21,13 +21,17 @@ fun RemoteImage(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     width: Int = 0,
-    height: Int = 0,
+    height: Int = 0
 ) {
     val context = LocalContext.current
 
     fun pxAsDp(px: Int): Dp {
-        return (px / (context.resources
-            .displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).dp
+        return (
+            px / (
+                context.resources
+                    .displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT
+                )
+            ).dp
     }
 
     GlideImage(

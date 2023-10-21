@@ -43,5 +43,5 @@ data class Invite(
 data class InviteJoined(
     val type: String? = null,
     val channels: List<Channel>? = null,
-    val server: Server? = null,
+    val server: Server? = null
 )

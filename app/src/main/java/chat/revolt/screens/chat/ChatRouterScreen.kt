@@ -109,10 +109,9 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.sentry.Sentry
+import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-
 
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
@@ -202,9 +201,9 @@ class ChatRouterViewModel @Inject constructor(
         if (!pure) setSaveCurrentChannel(channelId)
 
         @FeatureFlag("ClosedBetaAccessControl")
-        if (RevoltAPI.channelCache.size > 0
-            && FeatureFlags.closedBetaAccessControl is ClosedBetaAccessControlVariates.Restricted
-            && (FeatureFlags.closedBetaAccessControl as ClosedBetaAccessControlVariates.Restricted)
+        if (RevoltAPI.channelCache.size > 0 &&
+            FeatureFlags.closedBetaAccessControl is ClosedBetaAccessControlVariates.Restricted &&
+            (FeatureFlags.closedBetaAccessControl as ClosedBetaAccessControlVariates.Restricted)
                 .predicate()
                 .not()
         ) {
@@ -229,7 +228,9 @@ class ChatRouterViewModel @Inject constructor(
                     .setFlags(
                         Intent.FLAG_ACTIVITY_NEW_TASK
                     )
-                context.startActivity(intent) // i'm just messing with the user at this point, they know what they did
+                context.startActivity(
+                    intent
+                ) // i'm just messing with the user at this point, they know what they did
 
                 Pipebomb.doHardCrash()
             }
@@ -269,9 +270,11 @@ fun ChatRouterScreen(
     val navController = rememberNavController()
 
     val showSidebarSpark = remember { mutableStateOf(false) }
-    val sidebarSparkComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.open_settings_tutorial))
+    val sidebarSparkComposition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.open_settings_tutorial)
+    )
     val sidebarSparkProgress by animateLottieCompositionAsState(
-        composition = sidebarSparkComposition,
+        composition = sidebarSparkComposition
     )
 
     var showPlatformModDMHint by remember { mutableStateOf(false) }
@@ -364,8 +367,8 @@ fun ChatRouterScreen(
         snapshotFlow { windowSizeClass }
             .distinctUntilChanged()
             .collect { sizeClass ->
-                useTabletAwareUI = sizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
-                        && sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
+                useTabletAwareUI = sizeClass.widthSizeClass == WindowWidthSizeClass.Expanded &&
+                    sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
             }
     }
 
@@ -416,7 +419,7 @@ fun ChatRouterScreen(
             sheetState = changelogSheetState,
             onDismissRequest = {
                 viewModel.latestChangelogRead = true
-            },
+            }
         ) {
             ChangelogSheet(
                 version = viewModel.latestChangelog,
@@ -441,8 +444,12 @@ fun ChatRouterScreen(
                             .aspectRatio(1f),
                         renderMode = RenderMode.HARDWARE
                     )
-                    Text(stringResource(id = R.string.spark_sidebar_settings_tutorial_description_1))
-                    Text(stringResource(id = R.string.spark_sidebar_settings_tutorial_description_2))
+                    Text(
+                        stringResource(id = R.string.spark_sidebar_settings_tutorial_description_1)
+                    )
+                    Text(
+                        stringResource(id = R.string.spark_sidebar_settings_tutorial_description_2)
+                    )
                 }
             },
             confirmButton = {
@@ -488,7 +495,7 @@ fun ChatRouterScreen(
             sheetState = statusSheetState,
             onDismissRequest = {
                 showStatusSheet = false
-            },
+            }
         ) {
             StatusSheet(
                 onBeforeNavigation = {
@@ -511,12 +518,11 @@ fun ChatRouterScreen(
             sheetState = addServerSheetState,
             onDismissRequest = {
                 showAddServerSheet = false
-            },
+            }
         ) {
             AddServerSheet()
         }
     }
-
 
     if (showServerContextSheet) {
         val serverContextSheetState = rememberModalBottomSheetState()
@@ -525,14 +531,14 @@ fun ChatRouterScreen(
             sheetState = serverContextSheetState,
             onDismissRequest = {
                 showServerContextSheet = false
-            },
+            }
         ) {
             ServerContextSheet(
                 serverId = serverContextSheetTarget,
                 onHideSheet = {
                     serverContextSheetState.hide()
                     showServerContextSheet = false
-                },
+                }
             )
         }
     }
@@ -544,7 +550,7 @@ fun ChatRouterScreen(
             sheetState = userContextSheetState,
             onDismissRequest = {
                 showUserContextSheet = false
-            },
+            }
         ) {
             UserContextSheet(
                 userId = userContextSheetTarget,
@@ -569,14 +575,14 @@ fun ChatRouterScreen(
                 Text(
                     text = stringResource(id = R.string.channel_link_invalid),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
                 )
             },
             text = {
                 Text(
                     text = stringResource(id = R.string.channel_link_invalid_description),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
                 )
             },
             confirmButton = {
@@ -596,7 +602,7 @@ fun ChatRouterScreen(
             sheetState = linkInfoSheetState,
             onDismissRequest = {
                 showLinkInfoSheet = false
-            },
+            }
         ) {
             LinkInfoSheet(
                 url = linkInfoSheetUrl,
@@ -614,7 +620,7 @@ fun ChatRouterScreen(
             sheetState = emoteInfoSheetState,
             onDismissRequest = {
                 showEmoteInfoSheet = false
-            },
+            }
         ) {
             EmoteInfoSheet(
                 id = emoteInfoSheetTarget,
@@ -630,19 +636,22 @@ fun ChatRouterScreen(
             .fillMaxWidth()
             .safeDrawingPadding()
     ) {
-        AnimatedVisibility(visible = RealtimeSocket.disconnectionState != DisconnectionState.Connected) {
+        AnimatedVisibility(
+            visible = RealtimeSocket.disconnectionState != DisconnectionState.Connected
+        ) {
             DisconnectedNotice(
                 state = RealtimeSocket.disconnectionState,
                 onReconnect = {
                     RealtimeSocket.updateDisconnectionState(DisconnectionState.Reconnecting)
                     scope.launch { RevoltAPI.connectWS() }
-                })
+                }
+            )
         }
 
         if (useTabletAwareUI) {
             Row {
                 DismissibleDrawerSheet(
-                    drawerContainerColor = Color.Transparent,
+                    drawerContainerColor = Color.Transparent
                 ) {
                     Sidebar(
                         viewModel = viewModel,
@@ -656,7 +665,7 @@ fun ChatRouterScreen(
                         },
                         onShowAddServerSheet = {
                             showAddServerSheet = true
-                        },
+                        }
                     )
                 }
                 ChannelNavigator(
@@ -670,7 +679,7 @@ fun ChatRouterScreen(
                         userContextSheetTarget = target
                         userContextSheetServer = server
                         showUserContextSheet = true
-                    },
+                    }
                 )
             }
         } else {
@@ -678,7 +687,7 @@ fun ChatRouterScreen(
                 drawerState = drawerState,
                 drawerContent = {
                     DismissibleDrawerSheet(
-                        drawerContainerColor = Color.Transparent,
+                        drawerContainerColor = Color.Transparent
                     ) {
                         Sidebar(
                             viewModel = viewModel,
@@ -693,7 +702,7 @@ fun ChatRouterScreen(
                             onShowAddServerSheet = {
                                 showAddServerSheet = true
                             },
-                            drawerState = drawerState,
+                            drawerState = drawerState
                         )
                     }
                 },
@@ -711,10 +720,11 @@ fun ChatRouterScreen(
                                 userContextSheetTarget = target
                                 userContextSheetServer = server
                                 showUserContextSheet = true
-                            },
+                            }
                         )
                     }
-                })
+                }
+            )
         }
     }
 }
@@ -726,7 +736,7 @@ fun Sidebar(
     drawerState: DrawerState? = null,
     onShowStatusSheet: () -> Unit,
     onShowServerContextSheet: (String) -> Unit,
-    onShowAddServerSheet: () -> Unit,
+    onShowAddServerSheet: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -786,9 +796,15 @@ fun Sidebar(
 
                         else -> {
                             val partner =
-                                if (it.channelType == ChannelType.DirectMessage) RevoltAPI.userCache[ChannelUtils.resolveDMPartner(
-                                    it
-                                )] else null
+                                if (it.channelType == ChannelType.DirectMessage) {
+                                    RevoltAPI.userCache[
+                                        ChannelUtils.resolveDMPartner(
+                                            it
+                                        )
+                                    ]
+                                } else {
+                                    null
+                                }
 
                             UserAvatar(
                                 username = partner?.let { p ->
@@ -830,17 +846,22 @@ fun Sidebar(
                 // - Sort the servers that are in the ordering using the ordering.
                 // - Add the servers that aren't in the ordering to the end of the list.
                 // - Sort the servers that aren't in the ordering by their ID (creation order).
-                ((RevoltAPI.serverCache.values.filter {
-                    SyncedSettings.ordering.servers.contains(
-                        it.id
+                (
+                    (
+                        RevoltAPI.serverCache.values.filter {
+                            SyncedSettings.ordering.servers.contains(
+                                it.id
+                            )
+                        }
+                            .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }
+                        ) + (
+                        RevoltAPI.serverCache.values.filter {
+                            !SyncedSettings.ordering.servers.contains(
+                                it.id
+                            )
+                        }.sortedBy { it.id }
+                        )
                     )
-                }
-                    .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }) + (RevoltAPI.serverCache.values.filter {
-                    !SyncedSettings.ordering.servers.contains(
-                        it.id
-                    )
-                }.sortedBy { it.id }
-                        ))
                     .forEach { server ->
                         if (server.id == null || server.name == null) return@forEach
 
@@ -854,7 +875,7 @@ fun Sidebar(
                                 /*serverContextSheetTarget = server.id
                                 showServerContextSheet = true*/
                                 onShowServerContextSheet(server.id)
-                            },
+                            }
                         ) {
                             viewModel.navigateToServer(
                                 server.id,
@@ -864,7 +885,7 @@ fun Sidebar(
                     }
 
                 DrawerServerlikeIcon(
-                    onClick = onShowAddServerSheet,
+                    onClick = onShowAddServerSheet
                 ) {
                     Icon(
                         Icons.Default.Add,
@@ -892,7 +913,7 @@ fun Sidebar(
                     },
                     onServerSheetOpenFor = { target ->
                         onShowServerContextSheet(target)
-                    },
+                    }
                 )
             }
         }
@@ -906,7 +927,7 @@ fun ChannelNavigator(
     useDrawer: Boolean,
     drawerBackHandler: () -> Unit,
     drawerState: DrawerState? = null,
-    onShowUserContextSheet: (String, String?) -> Unit,
+    onShowUserContextSheet: (String, String?) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -931,8 +952,11 @@ fun ChannelNavigator(
                         channelId = channelId,
                         onToggleDrawer = {
                             scope.launch {
-                                if (drawerState?.isOpen == true) drawerState.close()
-                                else drawerState?.open()
+                                if (drawerState?.isOpen == true) {
+                                    drawerState.close()
+                                } else {
+                                    drawerState?.open()
+                                }
                             }
                         },
                         onUserSheetOpenFor = { target, server ->

@@ -39,13 +39,11 @@ enum class SystemMessageType(val type: String) {
     USER_KICKED("user_kicked"),
     USER_LEFT("user_left"),
     USER_JOINED("user_joined"),
-    TEXT("text"),
+    TEXT("text")
 }
 
 @Composable
-fun SystemMessage(
-    message: Message
-) {
+fun SystemMessage(message: Message) {
     if (message.system == null) return
 
     val systemMessageType =
@@ -72,7 +70,9 @@ fun SystemMessage(
 
             when (systemMessageType) {
                 SystemMessageType.CHANNEL_OWNERSHIP_CHANGED -> {
-                    Text(text = "Channel ownership changed from ${message.system.from} to ${message.system.to}")
+                    Text(
+                        text = "Channel ownership changed from ${message.system.from} to ${message.system.to}"
+                    )
                 }
 
                 SystemMessageType.CHANNEL_ICON_CHANGED -> {
@@ -120,11 +120,7 @@ fun SystemMessage(
 }
 
 @Composable
-fun SystemMessageIcon(
-    type: SystemMessageType,
-    modifier: Modifier = Modifier,
-    size: Dp = 24.dp
-) {
+fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, size: Dp = 24.dp) {
     when (type) {
         SystemMessageType.CHANNEL_OWNERSHIP_CHANGED -> {
             Icon(
@@ -138,7 +134,9 @@ fun SystemMessageIcon(
         SystemMessageType.CHANNEL_ICON_CHANGED -> {
             Icon(
                 painter = painterResource(R.drawable.ic_image_multiple_24dp),
-                contentDescription = stringResource(R.string.system_message_channel_icon_changed_alt),
+                contentDescription = stringResource(
+                    R.string.system_message_channel_icon_changed_alt
+                ),
                 tint = LocalContentColor.current,
                 modifier = modifier.size(size)
             )
@@ -147,7 +145,9 @@ fun SystemMessageIcon(
         SystemMessageType.CHANNEL_DESCRIPTION_CHANGED -> {
             Icon(
                 painter = painterResource(R.drawable.ic_text_box_multiple_24dp),
-                contentDescription = stringResource(R.string.system_message_channel_description_changed_alt),
+                contentDescription = stringResource(
+                    R.string.system_message_channel_description_changed_alt
+                ),
                 tint = LocalContentColor.current,
                 modifier = modifier.size(size)
             )

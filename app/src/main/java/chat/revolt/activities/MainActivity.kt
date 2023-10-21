@@ -84,7 +84,7 @@ fun AppEntrypoint(windowSizeClass: WindowSizeClass) {
     val navController = rememberNavController()
 
     RevoltTheme(
-        requestedTheme = GlobalState.theme,
+        requestedTheme = GlobalState.theme
     ) {
         Surface(
             modifier = Modifier.fillMaxSize(),

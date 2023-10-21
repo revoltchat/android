@@ -36,7 +36,7 @@ fun AttachmentManager(
     attachments: List<FileArgs>,
     uploading: Boolean,
     uploadProgress: Float = 0f,
-    onRemove: (FileArgs) -> Unit,
+    onRemove: (FileArgs) -> Unit
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = uploadProgress,
@@ -54,7 +54,6 @@ fun AttachmentManager(
                 .horizontalScroll(rememberScrollState())
                 .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
-
             attachments.forEach { attachment ->
                 Row(
                     modifier = Modifier
@@ -98,18 +97,18 @@ fun AttachmentManagerPreview() {
             FileArgs(
                 filename = "file1.png",
                 contentType = "image/png",
-                file = File("file1.png"),
+                file = File("file1.png")
             ),
             FileArgs(
                 filename = "file2.png",
                 contentType = "image/png",
-                file = File("file2.png"),
+                file = File("file2.png")
             ),
             FileArgs(
                 filename = "file3.png",
                 contentType = "image/png",
-                file = File("file3.png"),
-            ),
+                file = File("file3.png")
+            )
         ),
         uploading = false,
         onRemove = {}

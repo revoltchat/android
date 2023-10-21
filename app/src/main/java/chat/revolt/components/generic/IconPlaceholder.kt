@@ -31,11 +31,14 @@ fun IconPlaceholder(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
             .then(
-                if (onClick != NoopHandler || onLongClick != NoopHandler) Modifier.combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick
-                )
-                else Modifier
+                if (onClick != NoopHandler || onLongClick != NoopHandler) {
+                    Modifier.combinedClickable(
+                        onClick = onClick,
+                        onLongClick = onLongClick
+                    )
+                } else {
+                    Modifier
+                }
             )
     ) {
         Text(

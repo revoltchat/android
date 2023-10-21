@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 fun CollapsibleCard(
     header: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    content: @Composable () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -45,7 +45,7 @@ fun CollapsibleCard(
                 modifier = Modifier
                     .clickable { expanded = !expanded }
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
             ) {
                 CompositionLocalProvider(
                     LocalTextStyle provides MaterialTheme.typography.titleMedium.copy(

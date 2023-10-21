@@ -81,9 +81,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EmojiPicker(
-    onEmojiSelected: (String) -> Unit,
-) {
+fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
     val view = LocalView.current
     val focusManager = LocalFocusManager.current
 
@@ -104,7 +102,9 @@ fun EmojiPicker(
         derivedStateOf {
             val firstVisible = gridState.firstVisibleItemIndex
             val firstCategory =
-                categorySpans.entries.firstOrNull { it.value.first <= firstVisible && it.value.second >= firstVisible }?.key
+                categorySpans.entries.firstOrNull {
+                    it.value.first <= firstVisible && it.value.second >= firstVisible
+                }?.key
 
             firstCategory
         }
@@ -234,10 +234,14 @@ fun EmojiPicker(
                             .padding(4.dp)
                             .size(24.dp)
                             .then(
-                                if (searchQuery.isNotEmpty()) Modifier.clickable {
-                                    searchQuery = ""
-                                    focusManager.clearFocus() // this prevents the text field Z-below from gaining focus
-                                } else Modifier
+                                if (searchQuery.isNotEmpty()) {
+                                    Modifier.clickable {
+                                        searchQuery = ""
+                                        focusManager.clearFocus() // this prevents the text field Z-below from gaining focus
+                                    }
+                                } else {
+                                    Modifier
+                                }
                             )
                             .align(Alignment.CenterEnd)
                             .alpha(clearQueryButtonOpacity.value)
@@ -259,7 +263,7 @@ fun EmojiPicker(
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         FitzpatrickSkinTone.entries.forEach { skinTone ->
                             Text(
@@ -273,12 +277,24 @@ fun EmojiPicker(
                                     .clip(CircleShape)
                                     .clickable(
                                         onClickLabel = when (skinTone) {
-                                            FitzpatrickSkinTone.None -> stringResource(R.string.emoji_picker_skin_tone_none)
-                                            FitzpatrickSkinTone.Light -> stringResource(R.string.emoji_picker_skin_tone_fitzpatrick_1_2)
-                                            FitzpatrickSkinTone.MediumLight -> stringResource(R.string.emoji_picker_skin_tone_fitzpatrick_3)
-                                            FitzpatrickSkinTone.Medium -> stringResource(R.string.emoji_picker_skin_tone_fitzpatrick_4)
-                                            FitzpatrickSkinTone.MediumDark -> stringResource(R.string.emoji_picker_skin_tone_fitzpatrick_5)
-                                            FitzpatrickSkinTone.Dark -> stringResource(R.string.emoji_picker_skin_tone_fitzpatrick_6)
+                                            FitzpatrickSkinTone.None -> stringResource(
+                                                R.string.emoji_picker_skin_tone_none
+                                            )
+                                            FitzpatrickSkinTone.Light -> stringResource(
+                                                R.string.emoji_picker_skin_tone_fitzpatrick_1_2
+                                            )
+                                            FitzpatrickSkinTone.MediumLight -> stringResource(
+                                                R.string.emoji_picker_skin_tone_fitzpatrick_3
+                                            )
+                                            FitzpatrickSkinTone.Medium -> stringResource(
+                                                R.string.emoji_picker_skin_tone_fitzpatrick_4
+                                            )
+                                            FitzpatrickSkinTone.MediumDark -> stringResource(
+                                                R.string.emoji_picker_skin_tone_fitzpatrick_5
+                                            )
+                                            FitzpatrickSkinTone.Dark -> stringResource(
+                                                R.string.emoji_picker_skin_tone_fitzpatrick_6
+                                            )
                                         }
                                     ) {
                                         currentSkinTone = skinTone
@@ -286,7 +302,7 @@ fun EmojiPicker(
                                         focusManager.clearFocus() // this prevents the text field Z-below from gaining focus
                                     }
                                     .aspectRatio(1f),
-                                textAlign = TextAlign.Center,
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
@@ -323,7 +339,9 @@ fun EmojiPicker(
                         } else {
                             Icons.Default.KeyboardArrowRight
                         },
-                        contentDescription = stringResource(R.string.emoji_picker_close_skin_tone_menu),
+                        contentDescription = stringResource(
+                            R.string.emoji_picker_close_skin_tone_menu
+                        ),
                         tint = LocalContentColor.current,
                         modifier = Modifier
                             .alpha(skinToneMenuCloseHintIconOpacity)
@@ -340,7 +358,7 @@ fun EmojiPicker(
                     .horizontalScroll(categoryRowScrollState)
                     .height(37.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 servers.forEach { server ->
                     Column(
@@ -350,13 +368,17 @@ fun EmojiPicker(
                                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                                 scope.launch {
                                     val index =
-                                        pickerList.indexOfFirst { it is EmojiPickerItem.Section && it.category is Category.ServerEmoteCategory && it.category.server == server }
+                                        pickerList.indexOfFirst {
+                                            it is EmojiPickerItem.Section && it.category is Category.ServerEmoteCategory && it.category.server == server
+                                        }
                                     gridState.animateScrollToItem(index)
                                 }
                             }
                             .then(
                                 if (currentCategory.value is Category.ServerEmoteCategory && (currentCategory.value as Category.ServerEmoteCategory).server == server) {
-                                    Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                                    Modifier.background(
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                    )
                                 } else {
                                     Modifier
                                 }
@@ -364,7 +386,7 @@ fun EmojiPicker(
                             .aspectRatio(1f)
                             .padding(4.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
+                        verticalArrangement = Arrangement.Center
                     ) {
                         if (server.icon == null) {
                             IconPlaceholder(
@@ -393,13 +415,17 @@ fun EmojiPicker(
                                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                                 scope.launch {
                                     val index =
-                                        pickerList.indexOfFirst { it is EmojiPickerItem.Section && it.category is Category.UnicodeEmojiCategory && it.category.definition == category }
+                                        pickerList.indexOfFirst {
+                                            it is EmojiPickerItem.Section && it.category is Category.UnicodeEmojiCategory && it.category.definition == category
+                                        }
                                     gridState.animateScrollToItem(index)
                                 }
                             }
                             .then(
                                 if (currentCategory.value is Category.UnicodeEmojiCategory && (currentCategory.value as Category.UnicodeEmojiCategory).definition == category) {
-                                    Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                                    Modifier.background(
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                    )
                                 } else {
                                     Modifier
                                 }
@@ -407,24 +433,44 @@ fun EmojiPicker(
                             .aspectRatio(1f)
                             .padding(4.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
+                        verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
                             painter = when (category) {
-                                UnicodeEmojiSection.Smileys -> painterResource(R.drawable.ic_emoticon_24dp)
-                                UnicodeEmojiSection.People -> painterResource(R.drawable.ic_human_greeting_variant_24dp)
-                                UnicodeEmojiSection.Animals -> painterResource(R.drawable.ic_snake_24dp)
-                                UnicodeEmojiSection.Food -> painterResource(R.drawable.ic_glass_mug_variant_24dp)
-                                UnicodeEmojiSection.Travel -> painterResource(R.drawable.ic_train_bus_24dp)
-                                UnicodeEmojiSection.Activities -> painterResource(R.drawable.ic_skate_24dp)
-                                UnicodeEmojiSection.Objects -> painterResource(R.drawable.ic_table_chair_24dp)
-                                UnicodeEmojiSection.Symbols -> painterResource(R.drawable.ic_symbol_24dp)
-                                UnicodeEmojiSection.Flags -> painterResource(R.drawable.ic_flag_24dp)
+                                UnicodeEmojiSection.Smileys -> painterResource(
+                                    R.drawable.ic_emoticon_24dp
+                                )
+                                UnicodeEmojiSection.People -> painterResource(
+                                    R.drawable.ic_human_greeting_variant_24dp
+                                )
+                                UnicodeEmojiSection.Animals -> painterResource(
+                                    R.drawable.ic_snake_24dp
+                                )
+                                UnicodeEmojiSection.Food -> painterResource(
+                                    R.drawable.ic_glass_mug_variant_24dp
+                                )
+                                UnicodeEmojiSection.Travel -> painterResource(
+                                    R.drawable.ic_train_bus_24dp
+                                )
+                                UnicodeEmojiSection.Activities -> painterResource(
+                                    R.drawable.ic_skate_24dp
+                                )
+                                UnicodeEmojiSection.Objects -> painterResource(
+                                    R.drawable.ic_table_chair_24dp
+                                )
+                                UnicodeEmojiSection.Symbols -> painterResource(
+                                    R.drawable.ic_symbol_24dp
+                                )
+                                UnicodeEmojiSection.Flags -> painterResource(
+                                    R.drawable.ic_flag_24dp
+                                )
                             },
                             contentDescription = null,
                             tint = if (currentCategory.value is Category.UnicodeEmojiCategory && (currentCategory.value as Category.UnicodeEmojiCategory).definition == category) {
                                 MaterialTheme.colorScheme.primary
-                            } else LocalContentColor.current
+                            } else {
+                                LocalContentColor.current
+                            }
                         )
                     }
                 }
@@ -443,7 +489,7 @@ fun EmojiPicker(
                     key = "searchResultsHeader",
                     span = {
                         GridItemSpan(spanCount)
-                    },
+                    }
                 ) {
                     Text(
                         text = stringResource(R.string.emoji_picker_search_results_header),
@@ -481,7 +527,7 @@ fun EmojiPicker(
                     key = "searchResultsFooter",
                     span = {
                         GridItemSpan(spanCount)
-                    },
+                    }
                 ) {
                     Divider()
                 }
@@ -516,7 +562,7 @@ fun ColumnScope.PickerItem(
     skinToneFactory: (EmojiPickerItem.UnicodeEmoji) -> String,
     onClick: (EmojiPickerItem) -> Unit,
     onServerEmoteInfo: (String) -> Unit,
-    lesserHeaders: Boolean = false,
+    lesserHeaders: Boolean = false
 ) {
     when (item) {
         is EmojiPickerItem.UnicodeEmoji -> {
@@ -528,7 +574,7 @@ fun ColumnScope.PickerItem(
                     .aspectRatio(1f)
                     .weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = skinToneFactory(item),
@@ -548,7 +594,7 @@ fun ColumnScope.PickerItem(
                     .aspectRatio(1f)
                     .weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Center
             ) {
                 RemoteImage(
                     url = "$REVOLT_FILES/emojis/${item.emote.id}/emoji.gif",
@@ -564,9 +610,12 @@ fun ColumnScope.PickerItem(
         is EmojiPickerItem.Section -> {
             Text(
                 when (item.category) {
-                    is Category.UnicodeEmojiCategory -> stringResource(item.category.definition.nameResource)
-                    is Category.ServerEmoteCategory -> item.category.server.name
-                        ?: stringResource(R.string.unknown)
+                    is Category.UnicodeEmojiCategory -> stringResource(
+                        item.category.definition.nameResource
+                    )
+                    is Category.ServerEmoteCategory ->
+                        item.category.server.name
+                            ?: stringResource(R.string.unknown)
                 },
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier

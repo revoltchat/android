@@ -17,7 +17,7 @@ class UserMentionNode(private val userId: String) : Node<MarkdownContext>() {
     override fun render(builder: SpannableStringBuilder, renderContext: MarkdownContext) {
         val content = renderContext.memberMap[userId]?.let { "@$it" }
             ?: renderContext.userMap[userId]?.let { "@${it.username}" }
-            ?: "<@${userId}>"
+            ?: "<@$userId>"
 
         builder.append(content)
         builder.setSpan(
@@ -58,7 +58,7 @@ class CustomEmoteNode(private val emoteId: String, private val context: Context)
     Node<MarkdownContext>() {
     override fun render(builder: SpannableStringBuilder, renderContext: MarkdownContext) {
         val content = renderContext.emojiMap[emoteId]?.let { ":${it.name}:" }
-            ?: ":${emoteId}:"
+            ?: ":$emoteId:"
         val isGif = renderContext.emojiMap[emoteId]?.animated ?: false
         val emoteUrl = "$REVOLT_FILES/emojis/$emoteId/emote${if (isGif) ".gif" else ".png"}"
 

@@ -20,9 +20,11 @@ class LinkSpan(private val url: String, private val drawBackground: Boolean = fa
 
         // Intercept invite links
         if (uri.host == Uri.parse(REVOLT_INVITES).host!! ||
-            (uri.host?.endsWith(Uri.parse(REVOLT_APP).host!!) == true && uri.path?.startsWith(
-                "/invite"
-            ) == true)
+            (
+                uri.host?.endsWith(Uri.parse(REVOLT_APP).host!!) == true && uri.path?.startsWith(
+                    "/invite"
+                ) == true
+                )
         ) {
             val intent = Intent(
                 widget.context,

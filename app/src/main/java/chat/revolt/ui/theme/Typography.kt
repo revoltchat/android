@@ -17,7 +17,7 @@ private val Inter = FontFamily(
     Font(R.font.inter_semibold, FontWeight.SemiBold),
     Font(R.font.inter_bold, FontWeight.Bold),
     Font(R.font.inter_extrabold, FontWeight.ExtraBold),
-    Font(R.font.inter_black, FontWeight.Black),
+    Font(R.font.inter_black, FontWeight.Black)
 )
 
 val RevoltTypography = Typography(

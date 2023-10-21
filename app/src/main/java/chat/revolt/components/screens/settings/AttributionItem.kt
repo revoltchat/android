@@ -17,10 +17,7 @@ import chat.revolt.R
 import chat.revolt.screens.about.Library
 
 @Composable
-fun AttributionItem(
-    library: Library,
-    onClick: () -> Unit
-) {
+fun AttributionItem(library: Library, onClick: () -> Unit) {
     SelectionContainer {
         Column(
             modifier = Modifier
@@ -30,16 +27,15 @@ fun AttributionItem(
         ) {
             Text(
                 text = library.name,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = stringResource(id = R.string.oss_attribution_tap_to_view_license),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall
             )
         }
-
     }
 }

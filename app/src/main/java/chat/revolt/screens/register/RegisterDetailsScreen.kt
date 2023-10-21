@@ -92,7 +92,7 @@ class RegisterDetailsScreenViewModel : ViewModel() {
             val result = register(body)
 
             if (result.ok) {
-                navController.navigate("register/verify/${email}")
+                navController.navigate("register/verify/$email")
             } else {
                 error = result.unwrapError().type
             }
@@ -131,7 +131,7 @@ fun RegisterDetailsScreen(
                 ),
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -143,7 +143,7 @@ fun RegisterDetailsScreen(
                 ),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
@@ -161,7 +161,7 @@ fun RegisterDetailsScreen(
                 FormTextField(
                     value = viewModel.email,
                     onChange = { viewModel.email = it },
-                    label = stringResource(R.string.register_email),
+                    label = stringResource(R.string.register_email)
                 )
                 Text(
                     text = stringResource(R.string.register_email_verification_hint),

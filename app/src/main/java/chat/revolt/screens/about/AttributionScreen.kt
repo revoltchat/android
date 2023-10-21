@@ -48,7 +48,7 @@ data class AboutLibraries(
 
 @Serializable
 data class Metadata(
-    val generated: String,
+    val generated: String
 )
 
 @Serializable
@@ -58,7 +58,7 @@ data class License(
     val internalHash: String? = null,
     val url: String,
     val spdxId: String? = null,
-    val name: String,
+    val name: String
 )
 
 @Serializable
@@ -72,26 +72,26 @@ data class Library(
     val name: String,
     val licenses: List<String>,
     val website: String? = null,
-    val organization: Organization? = null,
+    val organization: Organization? = null
 )
 
 @Serializable
 data class Organization(
     val url: String,
-    val name: String,
+    val name: String
 )
 
 @Serializable
 data class Developer(
     val organisationUrl: String? = null,
-    val name: String? = null,
+    val name: String? = null
 )
 
 @Serializable
 data class Scm(
     val connection: String? = null,
     val url: String,
-    val developerConnection: String? = null,
+    val developerConnection: String? = null
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -151,7 +151,8 @@ fun AttributionScreen(navController: NavController) {
         PageHeader(
             text = stringResource(R.string.oss_attribution),
             showBackButton = true,
-            onBackButtonClicked = { navController.popBackStack() })
+            onBackButtonClicked = { navController.popBackStack() }
+        )
 
         libraries?.let {
             LazyColumn {
@@ -207,5 +208,4 @@ fun AttributionScreen(navController: NavController) {
             }
         }
     }
-
 }

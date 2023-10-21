@@ -41,7 +41,7 @@ fun DrawerServer(
     ) {
         if (iconId != null) {
             RemoteImage(
-                url = "$REVOLT_FILES/icons/${iconId}/server.png?max_side=256",
+                url = "$REVOLT_FILES/icons/$iconId/server.png?max_side=256",
                 modifier = Modifier
                     .padding(8.dp)
                     .size(48.dp)

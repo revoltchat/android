@@ -86,7 +86,7 @@ private fun Long.formatAsLengthDuration(): String {
             if (days > 0) "$days:" else null,
             if (hours > 0) "$hours".padStart(2, '0') + ":" else null,
             "$minutes".padStart(2, '0') + ":",
-            "$seconds".padStart(2, '0'),
+            "$seconds".padStart(2, '0')
         )
     }
 
@@ -102,7 +102,7 @@ fun InbuiltMediaPicker(
     onClose: () -> Unit,
     onMediaSelected: (Media) -> Unit,
     pendingMedia: List<String>,
-    disabled: Boolean = false,
+    disabled: Boolean = false
 ) {
     val context = LocalContext.current
 
@@ -140,14 +140,16 @@ fun InbuiltMediaPicker(
         onResult = { mediaPermissionState ->
             hasPhotoPermission = mediaPermissionState[Manifest.permission.READ_MEDIA_IMAGES] == true
             hasVideoPermission = mediaPermissionState[Manifest.permission.READ_MEDIA_VIDEO] == true
-            mediaPermissionIsPartial = if (!hasMediaPermissions
-                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
-                && mediaPermissionState[Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED] == true
+            mediaPermissionIsPartial = if (!hasMediaPermissions &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+                mediaPermissionState[Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED] == true
             ) {
                 true
             } else if (hasMediaPermissions) {
                 false
-            } else null
+            } else {
+                null
+            }
         }
     )
 
@@ -158,9 +160,9 @@ fun InbuiltMediaPicker(
     }
 
     LaunchedEffect(hasMediaPermissions) {
-        mediaPermissionIsPartial = if (!hasMediaPermissions
-            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
-            && ContextCompat.checkSelfPermission(
+        mediaPermissionIsPartial = if (!hasMediaPermissions &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+            ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
             ) == PermissionChecker.PERMISSION_GRANTED
@@ -168,7 +170,9 @@ fun InbuiltMediaPicker(
             true
         } else if (hasMediaPermissions) {
             false
-        } else null
+        } else {
+            null
+        }
     }
 
     LaunchedEffect(hasMediaPermissions, mediaPermissionIsPartial) {
@@ -178,7 +182,7 @@ fun InbuiltMediaPicker(
                 MediaStore.Images.ImageColumns.RESOLUTION,
                 MediaStore.Images.ImageColumns.ORIENTATION,
                 MediaStore.Images.ImageColumns.MIME_TYPE,
-                MediaStore.Video.VideoColumns.DURATION,
+                MediaStore.Video.VideoColumns.DURATION
             )
 
             val selection: String? = null
@@ -199,16 +203,30 @@ fun InbuiltMediaPicker(
                 while (cursor.moveToNext()) {
                     try {
                         val id =
-                            cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID))
+                            cursor.getLong(
+                                cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID)
+                            )
                         val resolution =
-                            cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.RESOLUTION))
+                            cursor.getString(
+                                cursor.getColumnIndexOrThrow(
+                                    MediaStore.Images.ImageColumns.RESOLUTION
+                                )
+                            )
                         val orientation =
-                            cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.ORIENTATION))
+                            cursor.getInt(
+                                cursor.getColumnIndexOrThrow(
+                                    MediaStore.Images.ImageColumns.ORIENTATION
+                                )
+                            )
 
                         val swapDimensions = orientation == 90 || orientation == 270
 
                         val isVideo =
-                            cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.MIME_TYPE))
+                            cursor.getString(
+                                cursor.getColumnIndexOrThrow(
+                                    MediaStore.Images.ImageColumns.MIME_TYPE
+                                )
+                            )
                                 .startsWith("video")
 
                         val durationColumn =
@@ -293,7 +311,7 @@ fun InbuiltMediaPicker(
                                 alpha = 0.5f
                             )
                         ),
-                        textAlign = TextAlign.Center,
+                        textAlign = TextAlign.Center
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -311,12 +329,14 @@ fun InbuiltMediaPicker(
                             permissionRequester.launch(
                                 arrayOf(
                                     Manifest.permission.READ_MEDIA_IMAGES,
-                                    Manifest.permission.READ_MEDIA_VIDEO,
+                                    Manifest.permission.READ_MEDIA_VIDEO
                                 )
                             )
                         }
                     }) {
-                        Text(text = stringResource(id = R.string.file_picker_permission_request_cta))
+                        Text(
+                            text = stringResource(id = R.string.file_picker_permission_request_cta)
+                        )
                     }
                 }
             } else {
@@ -324,7 +344,7 @@ fun InbuiltMediaPicker(
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 16.dp)
                 ) {
                     AnimatedVisibility(
                         mediaPermissionIsPartial == true
@@ -343,7 +363,9 @@ fun InbuiltMediaPicker(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.ux_file_unpartialise_request),
+                                    painter = painterResource(
+                                        id = R.drawable.ux_file_unpartialise_request
+                                    ),
                                     modifier = Modifier
                                         .size(52.dp),
                                     contentDescription = null // decorative
@@ -354,14 +376,18 @@ fun InbuiltMediaPicker(
                                         .weight(1f)
                                 ) {
                                     Text(
-                                        text = stringResource(id = R.string.file_picker_permission_unpartialise_request_header),
+                                        text = stringResource(
+                                            id = R.string.file_picker_permission_unpartialise_request_header
+                                        ),
                                         style = MaterialTheme.typography.titleMedium
                                     )
 
                                     Spacer(modifier = Modifier.height(4.dp))
 
                                     Text(
-                                        text = stringResource(id = R.string.file_picker_permission_unpartialise_request_body),
+                                        text = stringResource(
+                                            id = R.string.file_picker_permission_unpartialise_request_body
+                                        ),
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             color = LocalContentColor.current.copy(
                                                 alpha = 0.5f
@@ -384,12 +410,16 @@ fun InbuiltMediaPicker(
                                     permissionRequester.launch(
                                         arrayOf(
                                             Manifest.permission.READ_MEDIA_IMAGES,
-                                            Manifest.permission.READ_MEDIA_VIDEO,
+                                            Manifest.permission.READ_MEDIA_VIDEO
                                         )
                                     )
                                 }
                             }) {
-                                Text(text = stringResource(id = R.string.file_picker_permission_unpartialise_request_cta))
+                                Text(
+                                    text = stringResource(
+                                        id = R.string.file_picker_permission_unpartialise_request_cta
+                                    )
+                                )
                             }
                         }
                     }
@@ -404,7 +434,9 @@ fun InbuiltMediaPicker(
                                 onOpenDocumentsUi()
                             },
                             label = {
-                                Text(text = stringResource(id = R.string.file_picker_chip_documents))
+                                Text(
+                                    text = stringResource(id = R.string.file_picker_chip_documents)
+                                )
                             },
                             leadingIcon = {
                                 Icon(
@@ -468,14 +500,14 @@ fun InbuiltMediaPicker(
                                             }
                                         )
                                         .width(100.dp)
-                                        .aspectRatio(images[image].aspectRatio),
+                                        .aspectRatio(images[image].aspectRatio)
                                 ) {
                                     GlideImage(
                                         model = images[image].uri.toString(),
                                         contentDescription = null,
                                         modifier = Modifier
                                             .clip(MaterialTheme.shapes.medium)
-                                            .fillMaxSize(),
+                                            .fillMaxSize()
                                     )
 
                                     if (images[image].duration != null) {

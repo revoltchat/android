@@ -10,8 +10,7 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.readBytes
 import java.io.File
 
-class AttachmentProvider : FileProvider(R.xml.file_paths) {
-}
+class AttachmentProvider : FileProvider(R.xml.file_paths)
 
 suspend fun getAttachmentContentUri(
     context: Context,

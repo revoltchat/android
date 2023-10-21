@@ -168,7 +168,7 @@ fun FeedbackDialog(navController: NavController) {
                         onValueChange = {},
                         label = {
                             Text(
-                                text = stringResource(id = R.string.settings_feedback_category),
+                                text = stringResource(id = R.string.settings_feedback_category)
                             )
                         },
                         readOnly = true,
@@ -181,7 +181,9 @@ fun FeedbackDialog(navController: NavController) {
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = stringResource(id = R.string.settings_feedback_category)
+                                    contentDescription = stringResource(
+                                        id = R.string.settings_feedback_category
+                                    )
                                 )
                             }
                         },
@@ -192,7 +194,7 @@ fun FeedbackDialog(navController: NavController) {
                         expanded = categoryDropdownExpanded.value,
                         onDismissRequest = {
                             categoryDropdownExpanded.value = false
-                        },
+                        }
                     ) {
                         category.forEach { (key, value) ->
                             DropdownMenuItem(
@@ -218,7 +220,7 @@ fun FeedbackDialog(navController: NavController) {
                     },
                     supportingText = {
                         Text(
-                            text = "${message.value.length}/1250",
+                            text = "${message.value.length}/1250"
                         )
                     },
                     enabled = !sending.value,
@@ -233,7 +235,7 @@ fun FeedbackDialog(navController: NavController) {
                     navController.popBackStack()
                 },
                 modifier = Modifier.testTag("feedback_cancel"),
-                enabled = !sending.value,
+                enabled = !sending.value
             ) {
                 Text(text = stringResource(id = R.string.cancel))
             }

@@ -21,14 +21,14 @@ object DirectMessages {
     fun hasPlatformModerationDM(): Boolean {
         return unreadDMs().any {
             it.channelType == ChannelType.DirectMessage &&
-                    it.recipients?.contains(PLATFORM_MODERATION_USER) ?: false
+                it.recipients?.contains(PLATFORM_MODERATION_USER) ?: false
         }
     }
 
     fun getPlatformModerationDM(): Channel? {
         return unreadDMs().firstOrNull {
             it.channelType == ChannelType.DirectMessage &&
-                    it.recipients?.contains(PLATFORM_MODERATION_USER) ?: false
+                it.recipients?.contains(PLATFORM_MODERATION_USER) ?: false
         }
     }
 }

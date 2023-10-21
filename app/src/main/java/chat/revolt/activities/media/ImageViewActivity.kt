@@ -79,10 +79,7 @@ class ImageViewActivity : ComponentActivity() {
 }
 
 @Composable
-fun ImageViewScreen(
-    resource: AutumnResource,
-    onClose: () -> Unit = {}
-) {
+fun ImageViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
     val resourceUrl = "$REVOLT_FILES/attachments/${resource.id}/${resource.filename}"
 
     val context = LocalContext.current
@@ -182,7 +179,7 @@ fun ImageViewScreen(
 
     RevoltTheme(requestedTheme = GlobalState.theme) {
         Scaffold(
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
         ) { pv ->
             Surface(
                 modifier = Modifier
@@ -191,10 +188,11 @@ fun ImageViewScreen(
                     .fillMaxSize()
             ) {
                 Column {
-                    PageHeader(text = stringResource(
-                        id = R.string.media_viewer_title_image,
-                        resource.filename ?: resource.id!!
-                    ),
+                    PageHeader(
+                        text = stringResource(
+                            id = R.string.media_viewer_title_image,
+                            resource.filename ?: resource.id!!
+                        ),
                         showBackButton = true,
                         onBackButtonClicked = onClose,
                         maxLines = 1,
@@ -213,13 +211,16 @@ fun ImageViewScreen(
                                     expanded = shareSubmenuIsOpen.value,
                                     onDismissRequest = {
                                         shareSubmenuIsOpen.value = false
-                                    }) {
+                                    }
+                                ) {
                                     DropdownMenuItem(
                                         onClick = {
                                             shareUrl()
                                         },
                                         text = {
-                                            Text(stringResource(id = R.string.media_viewer_share_url))
+                                            Text(
+                                                stringResource(id = R.string.media_viewer_share_url)
+                                            )
                                         }
                                     )
                                     DropdownMenuItem(
@@ -227,7 +228,11 @@ fun ImageViewScreen(
                                             shareImage()
                                         },
                                         text = {
-                                            Text(stringResource(id = R.string.media_viewer_share_image))
+                                            Text(
+                                                stringResource(
+                                                    id = R.string.media_viewer_share_image
+                                                )
+                                            )
                                         }
                                     )
                                 }
@@ -237,11 +242,14 @@ fun ImageViewScreen(
                                 }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_download_24dp),
-                                        contentDescription = stringResource(id = R.string.media_viewer_save)
+                                        contentDescription = stringResource(
+                                            id = R.string.media_viewer_save
+                                        )
                                     )
                                 }
                             }
-                        })
+                        }
+                    )
 
                     Box(
                         modifier = Modifier
@@ -260,7 +268,7 @@ fun ImageViewScreen(
                             },
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.background),
+                                .background(MaterialTheme.colorScheme.background)
                         )
                     }
                 }

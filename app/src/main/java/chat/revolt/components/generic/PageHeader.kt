@@ -28,7 +28,7 @@ fun PageHeader(
     showBackButton: Boolean = false,
     onBackButtonClicked: () -> Unit = {},
     additionalButtons: @Composable () -> Unit = {},
-    maxLines: Int = Int.MAX_VALUE,
+    maxLines: Int = Int.MAX_VALUE
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -53,7 +53,7 @@ fun PageHeader(
             ),
             modifier = modifier
                 .padding(horizontal = 15.dp, vertical = 15.dp)
-                .weight(1f),
+                .weight(1f)
         )
         additionalButtons()
     }

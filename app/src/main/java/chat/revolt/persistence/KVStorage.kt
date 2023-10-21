@@ -7,9 +7,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.firstOrNull
 
 val Context.revoltKVStorage: DataStore<Preferences> by preferencesDataStore(name = "revolt_kv")
 
@@ -45,4 +45,3 @@ class KVStorage @Inject constructor(
         }
     }
 }
-

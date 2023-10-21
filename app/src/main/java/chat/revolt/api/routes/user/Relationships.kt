@@ -7,8 +7,8 @@ import chat.revolt.api.RevoltJson
 import io.ktor.client.request.delete
 import io.ktor.client.request.put
 import io.ktor.client.statement.bodyAsText
-import kotlinx.serialization.SerializationException
 import kotlin.collections.set
+import kotlinx.serialization.SerializationException
 
 suspend fun blockUser(userId: String) {
     val response = RevoltHttp.put("/users/$userId/block")

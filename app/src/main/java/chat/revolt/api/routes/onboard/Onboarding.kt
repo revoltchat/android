@@ -21,10 +21,7 @@ data class OnboardingResponse(
     val onboarding: Boolean
 )
 
-
-suspend fun needsOnboarding(
-    sessionToken: String = RevoltAPI.sessionToken,
-): Boolean {
+suspend fun needsOnboarding(sessionToken: String = RevoltAPI.sessionToken): Boolean {
     val response = RevoltHttp.get("/onboard/hello") {
         header(RevoltAPI.TOKEN_HEADER_NAME, sessionToken)
     }
@@ -36,12 +33,12 @@ suspend fun needsOnboarding(
 
 @Serializable
 data class OnboardingCompletionBody(
-    val username: String,
+    val username: String
 )
 
 suspend fun completeOnboarding(
     body: OnboardingCompletionBody,
-    sessionToken: String = RevoltAPI.sessionToken,
+    sessionToken: String = RevoltAPI.sessionToken
 ): RsResult<Unit, RevoltError> {
     val response = RevoltHttp.post("/onboard/complete") {
         setBody(body)

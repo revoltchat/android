@@ -15,7 +15,7 @@ import com.discord.simpleast.core.node.Node
 // https://github.com/discord/SimpleAST/blob/567b61c51056cbdec39e839100690c576c26a4c6/app/src/main/java/com/discord/simpleast/sample/spans/BlockBackgroundNode.kt
 // LICENSED UNDER THE APACHE LICENSE, VERSION 2.0
 // Adapted for Revolt.
-// 
+//
 // Changes:
 // - Fill and stroke colours are now parameters
 // - Whether we are in a quote is no longer a boolean, but an integer with the quote depth
@@ -28,7 +28,7 @@ class BlockBackgroundNode<R>(
     private val quoteDepth: Int,
     private val fillColor: Int = Color.DKGRAY,
     private val strokeColor: Int = Color.BLACK,
-    vararg children: Node<R>,
+    vararg children: Node<R>
 ) : Node.Parent<R>(*children) {
 
     override fun render(builder: SpannableStringBuilder, renderContext: R) {
@@ -41,7 +41,8 @@ class BlockBackgroundNode<R>(
         ensureEndsWithNewline(builder)
 
         val backgroundSpan = BlockBackgroundSpan(
-            fillColor, strokeColor,
+            fillColor,
+            strokeColor,
             strokeWidth = 2,
             strokeRadius = 15,
             leftMargin = 40 * quoteDepth

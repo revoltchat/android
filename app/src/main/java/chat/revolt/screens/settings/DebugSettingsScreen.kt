@@ -22,12 +22,12 @@ import androidx.navigation.NavController
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class DebugSettingsScreenViewModel @Inject constructor(
-    private val kvStorage: KVStorage,
+    private val kvStorage: KVStorage
 ) : ViewModel() {
     fun forgetSidebarSparkShown() {
         viewModelScope.launch {
@@ -61,8 +61,8 @@ fun DebugSettingsScreen(
             showBackButton = true,
             onBackButtonClicked = {
                 navController.popBackStack()
-            })
-
+            }
+        )
 
         Column(
             modifier = Modifier

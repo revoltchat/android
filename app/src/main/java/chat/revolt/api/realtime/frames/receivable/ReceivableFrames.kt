@@ -7,13 +7,13 @@ import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class AnyFrame(
-    val type: String,
+    val type: String
 )
 
 @Serializable
 data class ErrorFrame(
     val type: String = "Error",
-    val error: String,
+    val error: String
 )
 
 @Serializable
@@ -49,7 +49,7 @@ data class MessageUpdateFrame(
 
 @Serializable
 data class Appendable(
-    val embeds: List<Embed>? = null,
+    val embeds: List<Embed>? = null
 )
 
 @Serializable
@@ -73,7 +73,7 @@ data class MessageReactFrame(
     val id: String,
     val channel_id: String,
     val user_id: String,
-    val emoji_id: String,
+    val emoji_id: String
 )
 
 @Serializable
@@ -82,7 +82,7 @@ data class MessageUnreactFrame(
     val id: String,
     val channel_id: String,
     val user_id: String,
-    val emoji_id: String,
+    val emoji_id: String
 )
 
 @Serializable
@@ -90,7 +90,7 @@ data class MessageRemoveReactionFrame(
     val type: String = "MessageRemoveReaction",
     val id: String,
     val channel_id: String,
-    val emoji_id: String,
+    val emoji_id: String
 )
 
 /* ChannelCreate: we already have a "type" property in channel so we just alias the type */
@@ -152,7 +152,7 @@ data class ServerCreateFrame(
     val type: String = "ServerCreate",
     val id: String,
     val server: Server,
-    val channels: List<Channel>,
+    val channels: List<Channel>
 )
 
 @Serializable
@@ -222,7 +222,7 @@ data class UserRelationshipFrame(
     val type: String = "UserRelationship",
     val id: String,
     val user: User,
-    val status: String,
+    val status: String
 )
 
 typealias EmojiCreateFrame = Emoji
@@ -230,5 +230,5 @@ typealias EmojiCreateFrame = Emoji
 @Serializable
 data class EmojiDeleteFrame(
     val type: String = "EmojiDelete",
-    val id: String,
+    val id: String
 )

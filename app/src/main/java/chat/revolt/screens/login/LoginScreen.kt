@@ -49,12 +49,12 @@ import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.Weblink
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val kvStorage: KVStorage,
+    private val kvStorage: KVStorage
 ) : ViewModel() {
     private var _email by mutableStateOf("")
     val email: String
@@ -137,10 +137,7 @@ class LoginViewModel @Inject constructor(
 }
 
 @Composable
-fun LoginScreen(
-    navController: NavController,
-    viewModel: LoginViewModel = hiltViewModel()
-) {
+fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltViewModel()) {
     val context = LocalContext.current
 
     LaunchedEffect(viewModel.navigateTo) {
@@ -196,9 +193,8 @@ fun LoginScreen(
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 10.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
             )
-
 
             Column(
                 modifier = Modifier
@@ -216,7 +212,7 @@ fun LoginScreen(
                     value = viewModel.password,
                     label = stringResource(R.string.password),
                     type = KeyboardType.Password,
-                    onChange = viewModel::setPassword,
+                    onChange = viewModel::setPassword
                 )
 
                 AnyLink(

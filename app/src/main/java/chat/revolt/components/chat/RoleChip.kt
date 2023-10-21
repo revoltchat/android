@@ -13,16 +13,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RoleChip(
-    label: String,
-    brush: Brush,
-    modifier: Modifier = Modifier,
-) {
+fun RoleChip(label: String, brush: Brush, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
             .background(
-                brush = brush,
+                brush = brush
             )
             .background(
                 // darken the background a bit

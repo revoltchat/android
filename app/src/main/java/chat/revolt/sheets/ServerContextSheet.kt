@@ -55,10 +55,7 @@ import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
 @Composable
-fun ServerContextSheet(
-    serverId: String,
-    onHideSheet: suspend () -> Unit
-) {
+fun ServerContextSheet(serverId: String, onHideSheet: suspend () -> Unit) {
     val server = RevoltAPI.serverCache[serverId]
 
     if (server == null) {
@@ -80,9 +77,10 @@ fun ServerContextSheet(
     var leaveSilently by remember { mutableStateOf(false) }
 
     if (showLeaveConfirmation) {
-        AlertDialog(onDismissRequest = {
-            showLeaveConfirmation = false
-        },
+        AlertDialog(
+            onDismissRequest = {
+                showLeaveConfirmation = false
+            },
             title = {
                 Text(
                     text = stringResource(
@@ -93,7 +91,11 @@ fun ServerContextSheet(
             },
             text = {
                 Column {
-                    Text(text = stringResource(id = R.string.server_context_sheet_actions_leave_confirm_eyebrow))
+                    Text(
+                        text = stringResource(
+                            id = R.string.server_context_sheet_actions_leave_confirm_eyebrow
+                        )
+                    )
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -102,10 +104,12 @@ fun ServerContextSheet(
                     ) {
                         Checkbox(
                             checked = leaveSilently,
-                            onCheckedChange = { leaveSilently = it },
+                            onCheckedChange = { leaveSilently = it }
                         )
                         Text(
-                            text = stringResource(id = R.string.server_context_sheet_actions_leave_silently),
+                            text = stringResource(
+                                id = R.string.server_context_sheet_actions_leave_silently
+                            ),
                             modifier = Modifier.padding(start = 4.dp)
                         )
                     }
@@ -122,7 +126,11 @@ fun ServerContextSheet(
                         }
                     }
                 ) {
-                    Text(text = stringResource(id = R.string.server_context_sheet_actions_leave_confirm_yes))
+                    Text(
+                        text = stringResource(
+                            id = R.string.server_context_sheet_actions_leave_confirm_yes
+                        )
+                    )
                 }
             },
             dismissButton = {
@@ -131,7 +139,11 @@ fun ServerContextSheet(
                         showLeaveConfirmation = false
                     }
                 ) {
-                    Text(text = stringResource(id = R.string.server_context_sheet_actions_leave_confirm_no))
+                    Text(
+                        text = stringResource(
+                            id = R.string.server_context_sheet_actions_leave_confirm_no
+                        )
+                    )
                 }
             }
         )
@@ -243,9 +255,13 @@ fun ServerContextSheet(
             )
 
             UIMarkdown(
-                text = if (server.description?.isBlank() == false) server.description else stringResource(
-                    R.string.server_context_sheet_description_empty
-                ),
+                text = if (server.description?.isBlank() == false) {
+                    server.description
+                } else {
+                    stringResource(
+                        R.string.server_context_sheet_description_empty
+                    )
+                }
             )
 
             Text(

@@ -47,11 +47,7 @@ fun replyContentText(message: Message): String {
 }
 
 @Composable
-fun ManageableReply(
-    reply: SendMessageReply,
-    onToggleMention: () -> Unit,
-    onRemove: () -> Unit,
-) {
+fun ManageableReply(reply: SendMessageReply, onToggleMention: () -> Unit, onRemove: () -> Unit) {
     val replyMessage = RevoltAPI.messageCache[reply.id] ?: return onRemove()
     val replyAuthor = RevoltAPI.userCache[replyMessage.author] ?: return onRemove()
 
@@ -61,7 +57,7 @@ fun ManageableReply(
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
             .horizontalScroll(rememberScrollState())
             .padding(horizontal = 8.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Default.Close,
@@ -72,7 +68,7 @@ fun ManageableReply(
                     onRemove()
                 }
                 .padding(4.dp)
-                .size(16.dp),
+                .size(16.dp)
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -97,7 +93,7 @@ fun ManageableReply(
             style = LocalTextStyle.current.copy(
                 brush = authorColour(message = replyMessage),
                 fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
+                fontSize = 12.sp
             )
         )
 
@@ -133,7 +129,7 @@ fun ManageableReply(
             } else {
                 MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             },
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -142,7 +138,7 @@ fun ManageableReply(
 fun ReplyManager(
     replies: List<SendMessageReply>,
     onToggleMention: (SendMessageReply) -> Unit,
-    onRemove: (SendMessageReply) -> Unit,
+    onRemove: (SendMessageReply) -> Unit
 ) {
     Column {
         replies.forEach { reply ->

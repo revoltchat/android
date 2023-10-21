@@ -40,10 +40,7 @@ import chat.revolt.components.screens.settings.RawUserOverview
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun UserContextSheet(
-    userId: String,
-    serverId: String? = null
-) {
+fun UserContextSheet(userId: String, serverId: String? = null) {
     val user = RevoltAPI.userCache[userId]
 
     val member = serverId?.let { RevoltAPI.members.getMember(it, userId) }
@@ -106,7 +103,7 @@ fun UserContextSheet(
 
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     it
                         .map { roleId -> server?.roles?.get(roleId) }

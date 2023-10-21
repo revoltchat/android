@@ -26,7 +26,7 @@ private val ADDITIONAL_WEB_COLOURS = mapOf(
     "transparent" to Color.Transparent,
     "inherit" to Color.Unspecified,
     "initial" to Color.Unspecified,
-    "unset" to Color.Unspecified,
+    "unset" to Color.Unspecified
 )
 
 object WebCompat {

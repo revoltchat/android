@@ -17,7 +17,7 @@ data class LoginNegotiation(
 
     @SerialName("friendly_name")
     val friendlyName: String,
-    val captcha: String? = null,
+    val captcha: String? = null
 )
 
 @Serializable
@@ -111,7 +111,6 @@ suspend fun negotiateAuthentication(email: String, password: String): EmailPassw
     val responseContent = response.bodyAsText()
     Log.d("Revolt", "negotiateAuthentication: $responseContent")
 
-
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), responseContent)
         return EmailPasswordAssessment(error = error)
@@ -122,7 +121,7 @@ suspend fun negotiateAuthentication(email: String, password: String): EmailPassw
     if (response.status == HttpStatusCode.InternalServerError) {
         return EmailPasswordAssessment(
             error = RevoltError(
-                "InternalServerError",
+                "InternalServerError"
             )
         )
     }
@@ -143,7 +142,7 @@ suspend fun negotiateAuthentication(email: String, password: String): EmailPassw
 
 suspend fun authenticateWithMfaTotpCode(
     mfaTicket: String,
-    mfaResponse: MfaResponseTotpCode,
+    mfaResponse: MfaResponseTotpCode
 ): EmailPasswordAssessment {
     val response: HttpResponse = RevoltHttp.post("/auth/session/login") {
         contentType(ContentType.Application.Json)
@@ -167,7 +166,7 @@ suspend fun authenticateWithMfaTotpCode(
 
 suspend fun authenticateWithMfaRecoveryCode(
     mfaTicket: String,
-    mfaResponse: MfaResponseRecoveryCode,
+    mfaResponse: MfaResponseRecoveryCode
 ): EmailPasswordAssessment {
     val response: HttpResponse = RevoltHttp.post("/auth/session/login") {
         contentType(ContentType.Application.Json)
@@ -188,7 +187,6 @@ suspend fun authenticateWithMfaRecoveryCode(
         firstUserHints = RevoltJson.decodeFromString(UserHints.serializer(), responseContent)
     )
 }
-
 
 fun friendlySessionName(): String {
     return "Revolt Android on ${Build.MANUFACTURER} ${Build.MODEL}"

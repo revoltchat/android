@@ -19,11 +19,7 @@ abstract class LongClickableSpan : ClickableSpan() {
 class LongClickLinkMovementMethod : LinkMovementMethod() {
     private var longClickHandler: Handler? = null
     private var isLongPressed = false
-    override fun onTouchEvent(
-        widget: TextView,
-        buffer: Spannable,
-        event: MotionEvent
-    ): Boolean {
+    override fun onTouchEvent(widget: TextView, buffer: Spannable, event: MotionEvent): Boolean {
         val action = event.action
         if (action == MotionEvent.ACTION_CANCEL) {
             longClickHandler?.removeCallbacksAndMessages(null)
@@ -41,7 +37,8 @@ class LongClickLinkMovementMethod : LinkMovementMethod() {
             val line = layout.getLineForVertical(y)
             val off = layout.getOffsetForHorizontal(line, x.toFloat())
             val link = buffer.getSpans(
-                off, off,
+                off,
+                off,
                 LongClickableSpan::class.java
             )
             if (link.isNotEmpty()) {

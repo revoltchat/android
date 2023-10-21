@@ -64,7 +64,7 @@ fun EmoteInfoSheet(id: String, onDismiss: () -> Unit) {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -104,7 +104,7 @@ fun EmoteInfoSheet(id: String, onDismiss: () -> Unit) {
                         )
                     } else {
                         stringResource(id = R.string.emote_info_from_server_unknown)
-                    },
+                    }
                 )
             }
         }
@@ -124,7 +124,7 @@ fun EmoteInfoSheet(id: String, onDismiss: () -> Unit) {
                     text = stringResource(id = R.string.copy),
                     style = style
                 )
-            },
+            }
         ) {
             coroutineScope.launch {
                 clipboardManager.setText(AnnotatedString(":$id:"))

@@ -55,12 +55,12 @@ fun HomeScreen(navController: NavController) {
             modifier = Modifier
                 .weight(1f)
                 .fillMaxSize(),
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "🐈",
                 fontSize = 100.sp,
-                modifier = Modifier.rotate(catRotation),
+                modifier = Modifier.rotate(catRotation)
             )
         }
 
@@ -74,7 +74,11 @@ fun HomeScreen(navController: NavController) {
                     )
                 },
                 heading = { Text(text = stringResource(id = R.string.home_join_jenvolt)) },
-                description = { Text(text = stringResource(id = R.string.home_join_jenvolt_description)) },
+                description = {
+                    Text(
+                        text = stringResource(id = R.string.home_join_jenvolt_description)
+                    )
+                }
             ) {
                 context.startActivity(
                     Intent(

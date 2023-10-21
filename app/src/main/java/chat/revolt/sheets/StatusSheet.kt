@@ -28,10 +28,7 @@ import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
 
 @Composable
-fun StatusSheet(
-    onBeforeNavigation: () -> Unit,
-    onGoSettings: () -> Unit
-) {
+fun StatusSheet(onBeforeNavigation: () -> Unit, onGoSettings: () -> Unit) {
     val selfUser = RevoltAPI.userCache[RevoltAPI.selfId]!!
 
     Column(
@@ -47,23 +44,25 @@ fun StatusSheet(
                 userId = selfUser.id ?: ULID.makeSpecial(0),
                 avatar = selfUser.avatar,
                 size = 48.dp,
-                presence = presenceFromStatus(selfUser.status?.presence),
+                presence = presenceFromStatus(selfUser.status?.presence)
             )
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Text(text = AnnotatedString.Builder().apply {
-                if (selfUser.displayName != null) {
-                    pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                    append(selfUser.displayName)
+            Text(
+                text = AnnotatedString.Builder().apply {
+                    if (selfUser.displayName != null) {
+                        pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                        append(selfUser.displayName)
+                        pop()
+                        append("\n")
+                    }
+                    append("${selfUser.username}")
+                    pushStyle(SpanStyle(fontWeight = FontWeight.ExtraLight))
+                    append("#${selfUser.discriminator}")
                     pop()
-                    append("\n")
-                }
-                append("${selfUser.username}")
-                pushStyle(SpanStyle(fontWeight = FontWeight.ExtraLight))
-                append("#${selfUser.discriminator}")
-                pop()
-            }.toAnnotatedString())
+                }.toAnnotatedString()
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))

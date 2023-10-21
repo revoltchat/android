@@ -82,37 +82,37 @@ enum class UserReportReason(val value: String) {
 data class MessageReport(
     val type: String,
     val id: String,
-    val report_reason: ContentReportReason,
+    val report_reason: ContentReportReason
 )
 
 @Serializable
 data class FullMessageReport(
     val content: MessageReport,
-    val additional_context: String? = null,
+    val additional_context: String? = null
 )
 
 @Serializable
 data class ServerReport(
     val type: String,
     val id: String,
-    val report_reason: ContentReportReason,
+    val report_reason: ContentReportReason
 )
 
 @Serializable
 data class FullServerReport(
     val content: ServerReport,
-    val additional_context: String? = null,
+    val additional_context: String? = null
 )
 
 @Serializable
 data class UserReport(
     val type: String,
     val id: String,
-    val report_reason: UserReportReason,
+    val report_reason: UserReportReason
 )
 
 @Serializable
 data class FullUserReport(
     val content: UserReport,
-    val additional_context: String? = null,
+    val additional_context: String? = null
 )

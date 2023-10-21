@@ -33,7 +33,7 @@ fun InReplyTo(
     messageId: String,
     modifier: Modifier = Modifier,
     withMention: Boolean = false,
-    onMessageClick: (String) -> Unit = { _ -> },
+    onMessageClick: (String) -> Unit = { _ -> }
 ) {
     val message = RevoltAPI.messageCache[messageId]
     val author = RevoltAPI.userCache[message?.author ?: ""]

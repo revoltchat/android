@@ -70,12 +70,12 @@ data class SendMessageBody(
     val content: String,
     val nonce: String = ULID.makeNext(),
     val replies: List<SendMessageReply> = emptyList(),
-    val attachments: List<String>?,
+    val attachments: List<String>?
 )
 
 @kotlinx.serialization.Serializable
 data class EditMessageBody(
-    val content: String?,
+    val content: String?
 )
 
 suspend fun sendMessage(
@@ -83,7 +83,7 @@ suspend fun sendMessage(
     content: String,
     nonce: String? = ULID.makeNext(),
     replies: List<SendMessageReply>? = null,
-    attachments: List<String>? = null,
+    attachments: List<String>? = null
 ): String {
     val response = RevoltHttp.post("/channels/$channelId/messages") {
         contentType(ContentType.Application.Json)
@@ -101,11 +101,7 @@ suspend fun sendMessage(
     return response
 }
 
-suspend fun editMessage(
-    channelId: String,
-    messageId: String,
-    newContent: String? = null,
-) {
+suspend fun editMessage(channelId: String, messageId: String, newContent: String? = null) {
     val response = RevoltHttp.patch("/channels/$channelId/messages/$messageId") {
         contentType(ContentType.Application.Json)
         setBody(

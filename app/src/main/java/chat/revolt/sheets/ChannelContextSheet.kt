@@ -25,10 +25,7 @@ import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
 @Composable
-fun ChannelContextSheet(
-    channelId: String,
-    onHideSheet: suspend () -> Unit,
-) {
+fun ChannelContextSheet(channelId: String, onHideSheet: suspend () -> Unit) {
     val channel = RevoltAPI.channelCache[channelId]
     if (channel == null) {
         Box(
@@ -60,7 +57,7 @@ fun ChannelContextSheet(
                     text = stringResource(id = R.string.channel_context_sheet_actions_copy_id),
                     style = style
                 )
-            },
+            }
         ) {
             if (channel.id == null) return@SheetClickable
 
@@ -92,7 +89,7 @@ fun ChannelContextSheet(
                     text = stringResource(id = R.string.channel_context_sheet_actions_mark_read),
                     style = style
                 )
-            },
+            }
         ) {
             coroutineScope.launch {
                 channel.lastMessageID?.let {

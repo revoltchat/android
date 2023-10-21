@@ -50,7 +50,7 @@ fun WebMarkdown(
     text: String,
     maskLoading: Boolean = false,
     simpleLineBreaks: Boolean = true,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     val contentColour = LocalContentColor.current
     val materialColourScheme = MaterialTheme.colorScheme
@@ -97,9 +97,11 @@ fun WebMarkdown(
                     ): Boolean {
                         // Capture clicks on invite links
                         if (webResourceRequest.url.host == "rvlt.gg" ||
-                            (webResourceRequest.url.host?.endsWith("revolt.chat") == true && webResourceRequest.url.path?.startsWith(
-                                "/invite"
-                            ) == true)
+                            (
+                                webResourceRequest.url.host?.endsWith("revolt.chat") == true && webResourceRequest.url.path?.startsWith(
+                                    "/invite"
+                                ) == true
+                                )
                         ) {
                             val intent = Intent(
                                 context,
@@ -129,7 +131,7 @@ fun WebMarkdown(
                 }
 
                 loadUrl(
-                    "$REVOLT_APP/_android_assets/webmarkdown/renderer.html",
+                    "$REVOLT_APP/_android_assets/webmarkdown/renderer.html"
                 )
 
                 settings.apply {

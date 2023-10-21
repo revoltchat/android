@@ -80,7 +80,7 @@ object Roles {
 
             ChannelType.TextChannel, ChannelType.VoiceChannel -> {
                 val server = RevoltAPI.serverCache[channel.server]
-                // FIXME this is a stupid patch to prevent it from showing "no permission" on a channel on launch
+                    // FIXME this is a stupid patch to prevent it from showing "no permission" on a channel on launch
                     ?: return PermissionBit.GrantAllSafe.value
 
                 if (server.owner == user?.id) return PermissionBit.GrantAllSafe.value

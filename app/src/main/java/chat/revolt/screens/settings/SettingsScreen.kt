@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -34,8 +33,8 @@ import chat.revolt.components.generic.SheetClickable
 import chat.revolt.components.screens.settings.SelfUserOverview
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 @HiltViewModel
 class SettingsScreenViewModel @Inject constructor(
@@ -65,7 +64,8 @@ fun SettingsScreen(
             showBackButton = true,
             onBackButtonClicked = {
                 navController.popBackStack()
-            })
+            }
+        )
 
         Column(
             modifier = Modifier

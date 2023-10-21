@@ -45,11 +45,11 @@ fun FileAttachment(attachment: AutumnResource) {
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
                 .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_file_24dp),
-                contentDescription = null,
+                contentDescription = null
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -58,13 +58,13 @@ fun FileAttachment(attachment: AutumnResource) {
                 Text(
                     text = attachment.filename ?: "File",
                     maxLines = 1,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = Formatter.formatShortFileSize(context, attachment.size ?: 0),
                     maxLines = 1,
                     color = LocalContentColor.current.copy(alpha = 0.7f),
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Normal
                 )
             }
         }
@@ -80,8 +80,10 @@ fun ImageAttachment(attachment: AutumnResource) {
         contentScale = ContentScale.Fit,
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()),
-        description = attachment.filename ?: "Image",
+            .aspectRatio(
+                attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()
+            ),
+        description = attachment.filename ?: "Image"
     )
 }
 
@@ -100,8 +102,10 @@ fun VideoAttachment(attachment: AutumnResource) {
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()),
-            description = attachment.filename ?: "Video",
+                .aspectRatio(
+                    attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()
+                ),
+            description = attachment.filename ?: "Video"
         )
 
         Box(
@@ -109,7 +113,7 @@ fun VideoAttachment(attachment: AutumnResource) {
                 .width(48.dp)
                 .aspectRatio(1f)
                 .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
         )
 
         Icon(
@@ -117,7 +121,7 @@ fun VideoAttachment(attachment: AutumnResource) {
             contentDescription = stringResource(id = R.string.media_viewer_play),
             modifier = Modifier
                 .width(32.dp)
-                .aspectRatio(1f),
+                .aspectRatio(1f)
         )
     }
 }
@@ -128,7 +132,7 @@ fun AudioAttachment(attachment: AutumnResource) {
     AudioPlayer(
         url = url,
         filename = attachment.filename ?: "Audio",
-        contentType = attachment.metadata?.type ?: "audio/mpeg",
+        contentType = attachment.metadata?.type ?: "audio/mpeg"
     )
 }
 

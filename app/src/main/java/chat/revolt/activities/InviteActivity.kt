@@ -180,7 +180,7 @@ fun InviteScreen(
                             contentScale = ContentScale.Crop,
                             contentDescription = null,
                             modifier = Modifier
-                                .fillMaxSize(),
+                                .fillMaxSize()
                         )
 
                         Box(
@@ -214,10 +214,9 @@ fun InviteScreen(
                                         ?: stringResource(id = R.string.unknown),
                                     modifier = Modifier
                                         .size(64.dp)
-                                        .clip(CircleShape),
+                                        .clip(CircleShape)
                                 )
                             }
-
 
                             Spacer(modifier = Modifier.height(8.dp))
 
@@ -227,7 +226,7 @@ fun InviteScreen(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 24.sp,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth()
                             )
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -235,7 +234,7 @@ fun InviteScreen(
                             Text(
                                 text = stringResource(id = R.string.invite_message),
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth()
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -270,10 +269,7 @@ fun InviteScreen(
 }
 
 @Composable
-fun InvalidInviteError(
-    error: RevoltError? = null,
-    onDismissRequest: () -> Unit
-) {
+fun InvalidInviteError(error: RevoltError? = null, onDismissRequest: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         icon = {
@@ -287,11 +283,11 @@ fun InvalidInviteError(
             Text(
                 text = stringResource(id = R.string.invite_error_header),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
             )
         },
         text = {
-            Column() {
+            Column {
                 Text(
                     text = stringResource(
                         id = when (error?.type) {
@@ -301,7 +297,7 @@ fun InvalidInviteError(
                         }
                     ),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         },
@@ -333,15 +329,15 @@ fun NoInviteSpecifiedError(onDismissRequest: () -> Unit) {
             Text(
                 text = stringResource(id = R.string.invite_error_header),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
             )
         },
         text = {
-            Column() {
+            Column {
                 Text(
                     text = stringResource(id = R.string.invite_error_no_invite),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         },

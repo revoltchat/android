@@ -32,7 +32,7 @@ import chat.revolt.ui.theme.Theme
 private val NON_MATERIAL_COLOURS = mapOf(
     DisconnectionState.Disconnected to (Color(0xff4E0C0C) to Color(0xffff1744)),
     DisconnectionState.Reconnecting to (Color(0xff5B5300) to Color(0xffffea00)),
-    DisconnectionState.Connected to (Color(0xff0E2F10) to Color(0xff00e676)),
+    DisconnectionState.Connected to (Color(0xff0E2F10) to Color(0xff00e676))
 )
 
 @Composable
@@ -50,7 +50,7 @@ private fun DisconnectedNoticeBase(
             .fillMaxWidth()
             .background(background)
             .padding(vertical = 8.dp, horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             modifier = Modifier.padding(end = 8.dp),
@@ -75,10 +75,7 @@ private fun DisconnectedNoticeBase(
 }
 
 @Composable
-fun DisconnectedNotice(
-    state: DisconnectionState,
-    onReconnect: () -> Unit
-) {
+fun DisconnectedNotice(state: DisconnectionState, onReconnect: () -> Unit) {
     val retries = remember { mutableStateOf(0) }
 
     LaunchedEffect(state) {
@@ -101,7 +98,7 @@ fun DisconnectedNotice(
     val materialColours = mapOf(
         DisconnectionState.Disconnected to (MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError),
         DisconnectionState.Reconnecting to (MaterialTheme.colorScheme.secondary to MaterialTheme.colorScheme.onSecondary),
-        DisconnectionState.Connected to (MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary),
+        DisconnectionState.Connected to (MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary)
     )
 
     val (background, foreground) = when (GlobalState.theme) {
@@ -123,14 +120,14 @@ fun DisconnectedNotice(
             background = background,
             foreground = foreground,
             icon = Icons.Default.Refresh,
-            text = stringResource(id = R.string.reconnecting),
+            text = stringResource(id = R.string.reconnecting)
         )
 
         DisconnectionState.Connected -> DisconnectedNoticeBase(
             background = background,
             foreground = foreground,
             icon = Icons.Default.Done,
-            text = stringResource(id = R.string.reconnected),
+            text = stringResource(id = R.string.reconnected)
         )
     }
 }

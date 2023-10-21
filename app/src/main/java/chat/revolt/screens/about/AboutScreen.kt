@@ -51,12 +51,11 @@ import chat.revolt.api.routes.misc.getRootRoute
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.PrimaryTabs
 import chat.revolt.internals.Platform
+import java.net.URI
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
-import java.net.URI
 
-class AboutViewModel(
-) : ViewModel() {
+class AboutViewModel() : ViewModel() {
     var root by mutableStateOf<Root?>(null)
     var selectedTabIndex by mutableIntStateOf(0)
 
@@ -83,11 +82,7 @@ class AboutViewModel(
 }
 
 @Composable
-fun VersionItem(
-    key: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
+fun VersionItem(key: String, value: String, modifier: Modifier = Modifier) {
     Row(modifier) {
         Text(
             text = key,
@@ -131,16 +126,15 @@ fun DebugInfo(viewModel: AboutViewModel) {
 }
 
 @Composable
-fun AboutScreen(
-    navController: NavController,
-    viewModel: AboutViewModel = viewModel()
-) {
+fun AboutScreen(navController: NavController, viewModel: AboutViewModel = viewModel()) {
     val context = LocalContext.current
     val clipboardManager: ClipboardManager =
         LocalClipboardManager.current
 
     fun copyDebugInformation() {
-        clipboardManager.setText(AnnotatedString(RevoltJson.encodeToString(viewModel.getDebugInformation())))
+        clipboardManager.setText(
+            AnnotatedString(RevoltJson.encodeToString(viewModel.getDebugInformation()))
+        )
 
         if (Platform.needsShowClipboardNotification()) {
             Toast.makeText(
@@ -161,7 +155,8 @@ fun AboutScreen(
         PageHeader(
             text = stringResource(R.string.about),
             showBackButton = true,
-            onBackButtonClicked = { navController.popBackStack() })
+            onBackButtonClicked = { navController.popBackStack() }
+        )
 
         PrimaryTabs(
             tabs = listOf(
@@ -169,7 +164,8 @@ fun AboutScreen(
                 stringResource(R.string.about_tab_details)
             ),
             currentIndex = viewModel.selectedTabIndex,
-            onTabSelected = { viewModel.selectedTabIndex = it })
+            onTabSelected = { viewModel.selectedTabIndex = it }
+        )
 
         Column(
             modifier = Modifier

@@ -4,17 +4,17 @@ import android.content.Context
 import android.graphics.RuntimeShader
 import android.os.Build
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush as AndroidBrush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ShaderBrush
 import org.intellij.lang.annotations.Language
-import androidx.compose.ui.graphics.Brush as AndroidBrush
 
 object SpecialUsers {
     val PLATFORM_MODERATION_USER = "01FC17E1WTM2BGE4F3ARN3FDAF"
 
     val TRUSTED_MODERATION_BOTS = listOf(
         "01GXBYCNQ52A9QYCQ99RBPXPAW", // AutoMod
-        "01FCXRNNVW69AMSHBE61W1M5T3", // AutoMod Nightly
+        "01FCXRNNVW69AMSHBE61W1M5T3" // AutoMod Nightly
     )
 
     sealed class TeamMemberFlair {
@@ -40,7 +40,7 @@ object SpecialUsers {
                     Color(0xFFFF9B55),
                     Color(0xFFFFFFFF),
                     Color(0xFFD461A6),
-                    Color(0xFFA50062),
+                    Color(0xFFA50062)
                 ),
                 start = Offset.Zero,
                 end = Offset.Infinite
@@ -51,7 +51,7 @@ object SpecialUsers {
             AndroidBrush.linearGradient(
                 listOf(
                     Color(0xFF68224F),
-                    Color(0xFFC68235),
+                    Color(0xFFC68235)
                 ),
                 start = Offset.Zero,
                 end = Offset.Infinite
@@ -75,7 +75,7 @@ object SpecialUsers {
                     Color(0xFF1000AF)
                 )
             )
-        ), // zomatree
+        ) // zomatree
     )
 
     fun teamFlairAsBrush(context: Context, id: String): AndroidBrush? {

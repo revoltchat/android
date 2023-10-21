@@ -21,7 +21,7 @@ data class Message(
     val masquerade: Masquerade? = null,
     val system: SystemInfo? = null,
     val type: String? = null, // this is _only_ used for websocket events!
-    val tail: Boolean? = null, // this is used to determine if the message is the last in a message group
+    val tail: Boolean? = null // this is used to determine if the message is the last in a message group
 ) {
     fun getAuthor(): User? {
         return author?.let { RevoltAPI.userCache[it] }
@@ -42,7 +42,7 @@ data class Message(
             mentions = partial.mentions ?: mentions,
             masquerade = partial.masquerade ?: masquerade,
             type = partial.type ?: type,
-            tail = partial.tail ?: tail,
+            tail = partial.tail ?: tail
         )
     }
 }
@@ -100,5 +100,5 @@ data class SystemInfo(
     val by: String? = null,
     val from: String? = null,
     val to: String? = null,
-    val content: String? = null,
+    val content: String? = null
 )

@@ -12,10 +12,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DrawerServerlikeIcon(
-    onClick: () -> Unit,
-    content: @Composable () -> Unit
-) {
+fun DrawerServerlikeIcon(onClick: () -> Unit, content: @Composable () -> Unit) {
     IconButton(
         onClick = onClick,
         modifier = Modifier

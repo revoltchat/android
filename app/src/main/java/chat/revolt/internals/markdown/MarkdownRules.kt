@@ -65,7 +65,8 @@ class TimestampRule<S>(private val context: Context) :
                     matcher.group(2)
                 ),
                 listOf(TextAppearanceSpan(context, R.style.Code_TextAppearance))
-            ), state
+            ),
+            state
         )
     }
 }
@@ -113,10 +114,7 @@ fun <RC, S> createInlineCodeRule(context: Context, backgroundColor: Int): Rule<R
     )
 }
 
-fun <RC> createCodeRule(
-    context: Context,
-    backgroundColor: Int
-): Rule<RC, Node<RC>, MarkdownState> {
+fun <RC> createCodeRule(context: Context, backgroundColor: Int): Rule<RC, Node<RC>, MarkdownState> {
     val codeStyleProviders = CodeStyleProviders<RC>(
         defaultStyleProvider = { listOf(TextAppearanceSpan(context, R.style.Code_TextAppearance)) },
         commentStyleProvider = {
@@ -174,7 +172,7 @@ fun <RC> createCodeRule(
                     R.style.Code_TextAppearance_Params
                 )
             )
-        },
+        }
     )
     val languageMap = CodeRules.createCodeLanguageMap<RC, MarkdownState>(codeStyleProviders)
 
@@ -203,6 +201,6 @@ fun MarkdownParser.addRevoltRules(context: Context): MarkdownParser {
         CustomEmoteRule(context),
         TimestampRule(context),
         NamedLinkRule(),
-        LinkRule(),
+        LinkRule()
     )
 }

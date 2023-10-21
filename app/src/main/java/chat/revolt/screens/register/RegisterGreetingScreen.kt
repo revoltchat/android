@@ -53,7 +53,7 @@ fun RegisterGreetingScreen(navController: NavController) {
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 10.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -74,7 +74,7 @@ fun RegisterGreetingScreen(navController: NavController) {
                 ),
                 style = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -88,7 +88,7 @@ fun RegisterGreetingScreen(navController: NavController) {
             }) {
                 Text(text = stringResource(R.string.back))
             }
-            
+
             Spacer(modifier = Modifier.width(10.dp))
 
             Button(onClick = {
@@ -99,6 +99,3 @@ fun RegisterGreetingScreen(navController: NavController) {
         }
     }
 }
-
-
-

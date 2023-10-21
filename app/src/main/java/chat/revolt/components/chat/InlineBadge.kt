@@ -20,7 +20,7 @@ enum class InlineBadge {
 fun InlineBadge(
     badge: InlineBadge,
     modifier: Modifier = Modifier,
-    colour: Color = Color.Unspecified,
+    colour: Color = Color.Unspecified
 ) {
     when (badge) {
         InlineBadge.Bot -> Icon(
@@ -62,7 +62,7 @@ fun InlineBadges(
     teamMember: Boolean = false,
     colour: Color = Color.Unspecified,
     precedingIfAny: @Composable () -> Unit = {},
-    followingIfAny: @Composable () -> Unit = {},
+    followingIfAny: @Composable () -> Unit = {}
 ) {
     val hasBadges = bot || bridge || platformModeration || teamMember
 

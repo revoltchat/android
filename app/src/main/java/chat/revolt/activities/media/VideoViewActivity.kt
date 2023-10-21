@@ -83,10 +83,7 @@ class VideoViewActivity : ComponentActivity() {
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-fun VideoViewScreen(
-    resource: AutumnResource,
-    onClose: () -> Unit = {}
-) {
+fun VideoViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
     val resourceUrl = "$REVOLT_FILES/attachments/${resource.id}/${resource.filename}"
 
     val context = LocalContext.current
@@ -198,7 +195,7 @@ fun VideoViewScreen(
 
     RevoltTheme(requestedTheme = GlobalState.theme) {
         Scaffold(
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
         ) { pv ->
             Surface(
                 modifier = Modifier
@@ -207,10 +204,11 @@ fun VideoViewScreen(
                     .fillMaxSize()
             ) {
                 Column {
-                    PageHeader(text = stringResource(
-                        id = R.string.media_viewer_title_video,
-                        resource.filename ?: resource.id!!
-                    ),
+                    PageHeader(
+                        text = stringResource(
+                            id = R.string.media_viewer_title_video,
+                            resource.filename ?: resource.id!!
+                        ),
                         showBackButton = true,
                         onBackButtonClicked = onClose,
                         maxLines = 1,
@@ -229,13 +227,16 @@ fun VideoViewScreen(
                                     expanded = shareSubmenuIsOpen.value,
                                     onDismissRequest = {
                                         shareSubmenuIsOpen.value = false
-                                    }) {
+                                    }
+                                ) {
                                     DropdownMenuItem(
                                         onClick = {
                                             shareUrl()
                                         },
                                         text = {
-                                            Text(stringResource(id = R.string.media_viewer_share_url))
+                                            Text(
+                                                stringResource(id = R.string.media_viewer_share_url)
+                                            )
                                         }
                                     )
                                     DropdownMenuItem(
@@ -243,7 +244,11 @@ fun VideoViewScreen(
                                             shareVideo()
                                         },
                                         text = {
-                                            Text(stringResource(id = R.string.media_viewer_share_video))
+                                            Text(
+                                                stringResource(
+                                                    id = R.string.media_viewer_share_video
+                                                )
+                                            )
                                         }
                                     )
                                 }
@@ -253,11 +258,14 @@ fun VideoViewScreen(
                                 }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_download_24dp),
-                                        contentDescription = stringResource(id = R.string.media_viewer_save)
+                                        contentDescription = stringResource(
+                                            id = R.string.media_viewer_save
+                                        )
                                     )
                                 }
                             }
-                        })
+                        }
+                    )
 
                     Box(
                         modifier = Modifier
@@ -275,7 +283,7 @@ fun VideoViewScreen(
                             },
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.background),
+                                .background(MaterialTheme.colorScheme.background)
                         )
                     }
                 }

@@ -63,7 +63,7 @@ enum class UpdateState {
     NotChecked,
     Checking,
     RequestingUpdateToken,
-    ErrorChecking,
+    ErrorChecking
 }
 
 fun viewUrlInBrowser(ctx: android.content.Context, url: String) {
@@ -77,7 +77,7 @@ fun viewUrlInBrowser(ctx: android.content.Context, url: String) {
 data class UpdaterBody(
     val author: String,
     @SerialName("current_build")
-    val currentBuild: String,
+    val currentBuild: String
 )
 
 @Serializable
@@ -85,7 +85,7 @@ data class UpdaterResponse(
     val outdated: Boolean,
     @SerialName("newest_build")
     val newestBuild: Int?,
-    val token: String?,
+    val token: String?
 )
 
 class ClosedBetaUpdaterScreenViewModel : ViewModel() {
@@ -98,7 +98,7 @@ class ClosedBetaUpdaterScreenViewModel : ViewModel() {
 
         viewModelScope.launch {
             val outdatedResponse = RevoltHttp.post(
-                "${BuildConfig.ANALYSIS_BASEURL}/api/distribution/android",
+                "${BuildConfig.ANALYSIS_BASEURL}/api/distribution/android"
             ) {
                 contentType(ContentType.Application.Json)
                 setBody(
@@ -152,7 +152,8 @@ fun ClosedBetaUpdaterScreen(
             showBackButton = true,
             onBackButtonClicked = {
                 navController.popBackStack()
-            })
+            }
+        )
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -210,7 +211,9 @@ fun ClosedBetaUpdaterScreen(
                             modifier = Modifier.padding(vertical = 10.dp)
                         )
 
-                        AnimatedVisibility(visible = viewModel.updateState == UpdateState.UpdateAvailable) {
+                        AnimatedVisibility(
+                            visible = viewModel.updateState == UpdateState.UpdateAvailable
+                        ) {
                             ElevatedButton(onClick = {
                                 viewUrlInBrowser(
                                     ctx = context,
