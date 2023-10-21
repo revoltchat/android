@@ -40,7 +40,6 @@ import chat.revolt.api.routes.server.fetchMember
 import chat.revolt.api.routes.user.addUserIfUnknown
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Message
-import chat.revolt.api.settings.FeatureFlag
 import chat.revolt.callbacks.UiCallback
 import chat.revolt.callbacks.UiCallbacks
 import io.ktor.http.ContentType
@@ -57,8 +56,6 @@ import kotlinx.datetime.Instant
 
 sealed class BottomPane {
     data object None : BottomPane()
-
-    @FeatureFlag("TiramisuFilePicker")
     data object InbuiltMediaPicker : BottomPane()
     data object EmojiPicker : BottomPane()
 }

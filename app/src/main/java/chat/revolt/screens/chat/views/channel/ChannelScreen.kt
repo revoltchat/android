@@ -72,9 +72,6 @@ import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.ChannelType
-import chat.revolt.api.settings.FeatureFlag
-import chat.revolt.api.settings.FeatureFlags
-import chat.revolt.api.settings.FilePickerFeatureFlagVariates
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.MessageField
 import chat.revolt.components.chat.SystemMessage
@@ -491,10 +488,8 @@ fun ChannelScreen(
                         onAddAttachment = {
                             val isTiramisu = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 
-                            @FeatureFlag("TiramisuFilePicker")
                             when {
-                                FeatureFlags.filePickerType == FilePickerFeatureFlagVariates.TiramisuMediaPermissions
-                                        && isTiramisu -> {
+                                isTiramisu -> {
                                     focusManager.clearFocus()
                                     if (viewModel.currentBottomPane == BottomPane.InbuiltMediaPicker) {
                                         viewModel.currentBottomPane = BottomPane.None
@@ -503,8 +498,7 @@ fun ChannelScreen(
                                     }
                                 }
 
-                                FeatureFlags.filePickerType == FilePickerFeatureFlagVariates.DocumentsUI
-                                        || !isTiramisu -> {
+                                !isTiramisu -> {
                                     pickFileLauncher.launch(arrayOf("*/*"))
                                 }
                             }
@@ -592,7 +586,7 @@ fun ChannelScreen(
                     )
                 }
             }
- 
+
             AnimatedVisibility(visible = viewModel.currentBottomPane == BottomPane.EmojiPicker) {
                 BackHandler(enabled = viewModel.currentBottomPane == BottomPane.EmojiPicker) {
                     viewModel.currentBottomPane = BottomPane.None

@@ -73,7 +73,9 @@ import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.server.fetchMembers
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.User
+import chat.revolt.api.settings.ClosedBetaAccessControlVariates
 import chat.revolt.api.settings.FeatureFlag
+import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
@@ -199,9 +201,13 @@ class ChatRouterViewModel @Inject constructor(
     fun navigateToChannel(channelId: String, navController: NavController, pure: Boolean = false) {
         if (!pure) setSaveCurrentChannel(channelId)
 
-        // Only allow access to closed beta users, currently "has access to #beta-chat in Jenvolt"
         @FeatureFlag("ClosedBetaAccessControl")
-        if (RevoltAPI.channelCache.size > 0 && !RevoltAPI.channelCache.containsKey("01H7X2KRB0CA4QDSMB4N7WGERF")) {
+        if (RevoltAPI.channelCache.size > 0
+            && FeatureFlags.closedBetaAccessControl is ClosedBetaAccessControlVariates.Restricted
+            && (FeatureFlags.closedBetaAccessControl as ClosedBetaAccessControlVariates.Restricted)
+                .predicate()
+                .not()
+        ) {
             Pipebomb.incrementHardCrashCounter()
 
             navController.navigate("no_current_channel") {
