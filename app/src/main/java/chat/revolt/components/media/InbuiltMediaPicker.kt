@@ -1,12 +1,16 @@
 package chat.revolt.components.media
 
+import android.Manifest
 import android.content.ContentUris
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -44,7 +48,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -57,11 +63,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
 import chat.revolt.R
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlin.time.Duration.Companion.milliseconds
 
 data class Media(
@@ -87,7 +93,7 @@ private fun Long.formatAsLengthDuration(): String {
     return components.joinToString(separator = "")
 }
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalGlideComposeApi::class)
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun InbuiltMediaPicker(
@@ -98,14 +104,52 @@ fun InbuiltMediaPicker(
     pendingMedia: List<String>,
     disabled: Boolean = false,
 ) {
-    val mediaPermissionState = rememberMultiplePermissionsState(
-        listOf(
-            android.Manifest.permission.READ_MEDIA_IMAGES,
-            android.Manifest.permission.READ_MEDIA_VIDEO
-        )
-    )
-
     val context = LocalContext.current
+
+    var hasPhotoPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_MEDIA_IMAGES
+            ) == PermissionChecker.PERMISSION_GRANTED
+        )
+    }
+    var hasVideoPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_MEDIA_VIDEO
+            ) == PermissionChecker.PERMISSION_GRANTED
+        )
+    }
+    val hasMediaPermissions by remember {
+        derivedStateOf {
+            hasPhotoPermission && hasVideoPermission
+        }
+    }
+    var mediaPermissionIsPartial by remember { mutableStateOf<Boolean?>(null) }
+
+    val canShowGallery by remember {
+        derivedStateOf {
+            hasMediaPermissions || (mediaPermissionIsPartial == true)
+        }
+    }
+
+    val permissionRequester = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { mediaPermissionState ->
+            hasPhotoPermission = mediaPermissionState[Manifest.permission.READ_MEDIA_IMAGES] == true
+            hasVideoPermission = mediaPermissionState[Manifest.permission.READ_MEDIA_VIDEO] == true
+            mediaPermissionIsPartial = if (!hasMediaPermissions
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+                && mediaPermissionState[Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED] == true
+            ) {
+                true
+            } else if (hasMediaPermissions) {
+                false
+            } else null
+        }
+    )
 
     val images = remember { mutableStateListOf<Media>() }
 
@@ -113,8 +157,22 @@ fun InbuiltMediaPicker(
         onClose()
     }
 
-    LaunchedEffect(mediaPermissionState.allPermissionsGranted) {
-        if (mediaPermissionState.allPermissionsGranted) {
+    LaunchedEffect(hasMediaPermissions) {
+        mediaPermissionIsPartial = if (!hasMediaPermissions
+            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+            && ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+            ) == PermissionChecker.PERMISSION_GRANTED
+        ) {
+            true
+        } else if (hasMediaPermissions) {
+            false
+        } else null
+    }
+
+    LaunchedEffect(hasMediaPermissions, mediaPermissionIsPartial) {
+        if (hasMediaPermissions || mediaPermissionIsPartial == true) {
             val projection = arrayOf(
                 MediaStore.Images.ImageColumns._ID,
                 MediaStore.Images.ImageColumns.RESOLUTION,
@@ -197,7 +255,7 @@ fun InbuiltMediaPicker(
         verticalArrangement = Arrangement.Center
     ) {
         Crossfade(
-            targetState = mediaPermissionState.allPermissionsGranted,
+            targetState = canShowGallery,
             animationSpec = tween(
                 durationMillis = 300,
                 easing = FastOutSlowInEasing
@@ -241,7 +299,22 @@ fun InbuiltMediaPicker(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Button(onClick = {
-                        mediaPermissionState.launchMultiplePermissionRequest()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                            permissionRequester.launch(
+                                arrayOf(
+                                    Manifest.permission.READ_MEDIA_IMAGES,
+                                    Manifest.permission.READ_MEDIA_VIDEO,
+                                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+                                )
+                            )
+                        } else {
+                            permissionRequester.launch(
+                                arrayOf(
+                                    Manifest.permission.READ_MEDIA_IMAGES,
+                                    Manifest.permission.READ_MEDIA_VIDEO,
+                                )
+                            )
+                        }
                     }) {
                         Text(text = stringResource(id = R.string.file_picker_permission_request_cta))
                     }
@@ -253,6 +326,74 @@ fun InbuiltMediaPicker(
                         .fillMaxHeight()
                         .padding(horizontal = 16.dp),
                 ) {
+                    AnimatedVisibility(
+                        mediaPermissionIsPartial == true
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ux_file_unpartialise_request),
+                                    modifier = Modifier
+                                        .size(52.dp),
+                                    contentDescription = null // decorative
+                                )
+
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.file_picker_permission_unpartialise_request_header),
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+
+                                    Spacer(modifier = Modifier.height(4.dp))
+
+                                    Text(
+                                        text = stringResource(id = R.string.file_picker_permission_unpartialise_request_body),
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            color = LocalContentColor.current.copy(
+                                                alpha = 0.5f
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+
+                            Button(onClick = {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                                    permissionRequester.launch(
+                                        arrayOf(
+                                            Manifest.permission.READ_MEDIA_IMAGES,
+                                            Manifest.permission.READ_MEDIA_VIDEO,
+                                            Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+                                        )
+                                    )
+                                } else {
+                                    permissionRequester.launch(
+                                        arrayOf(
+                                            Manifest.permission.READ_MEDIA_IMAGES,
+                                            Manifest.permission.READ_MEDIA_VIDEO,
+                                        )
+                                    )
+                                }
+                            }) {
+                                Text(text = stringResource(id = R.string.file_picker_permission_unpartialise_request_cta))
+                            }
+                        }
+                    }
+
                     Row(
                         modifier = Modifier
                             .horizontalScroll(rememberScrollState()),
