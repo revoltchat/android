@@ -44,7 +44,10 @@ fun StatusSheet(onBeforeNavigation: () -> Unit, onGoSettings: () -> Unit) {
                 userId = selfUser.id ?: ULID.makeSpecial(0),
                 avatar = selfUser.avatar,
                 size = 48.dp,
-                presence = presenceFromStatus(selfUser.status?.presence)
+                presence = presenceFromStatus(
+                    selfUser.status?.presence,
+                    selfUser.online ?: false
+                )
             )
 
             Spacer(modifier = Modifier.width(12.dp))

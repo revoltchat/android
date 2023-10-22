@@ -764,7 +764,8 @@ fun Sidebar(
                     }
                         ?: "",
                     presence = presenceFromStatus(
-                        RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence
+                        RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence,
+                        RevoltAPI.userCache[RevoltAPI.selfId]?.online ?: false
                     ),
                     userId = RevoltAPI.selfId ?: "",
                     avatar = RevoltAPI.userCache[RevoltAPI.selfId]?.avatar,
@@ -821,7 +822,8 @@ fun Sidebar(
                                     )
                                 } ?: it.name ?: "?",
                                 presence = presenceFromStatus(
-                                    partner?.status?.presence
+                                    partner?.status?.presence,
+                                    partner?.online ?: false
                                 ),
                                 userId = partner?.id ?: it.id ?: "",
                                 avatar = partner?.avatar ?: it.icon,

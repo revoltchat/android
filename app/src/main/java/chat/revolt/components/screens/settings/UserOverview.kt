@@ -140,7 +140,7 @@ fun RawUserOverview(user: User, profile: Profile? = null) {
                 userId = user.id ?: ULID.makeSpecial(0),
                 avatar = user.avatar,
                 size = 48.dp,
-                presence = presenceFromStatus(user.status?.presence)
+                presence = presenceFromStatus(user.status?.presence, user.online ?: false)
             )
 
             Spacer(modifier = Modifier.width(12.dp))
