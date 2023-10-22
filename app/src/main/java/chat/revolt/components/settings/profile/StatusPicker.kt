@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.components.generic.Presence
@@ -28,6 +30,16 @@ fun Presence.stringResource(): Int {
         Presence.Dnd -> R.string.status_dnd
         Presence.Focus -> R.string.status_focus
         Presence.Offline -> R.string.status_invisible
+    }
+}
+
+fun Presence.explainerResource(): Int? {
+    return when (this) {
+        Presence.Online -> null
+        Presence.Idle -> null
+        Presence.Dnd -> R.string.status_dnd_explainer
+        Presence.Focus -> R.string.status_focus_explainer
+        Presence.Offline -> R.string.status_invisible_explainer
     }
 }
 
@@ -49,7 +61,6 @@ fun StatusPicker(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
@@ -66,8 +77,18 @@ fun StatusPicker(
 
         Text(
             text = stringResource(currentStatus.stringResource()),
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Bold
+            )
         )
+
+        currentStatus.explainerResource()?.let {
+            Text(
+                text = stringResource(it),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
