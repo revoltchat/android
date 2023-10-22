@@ -503,6 +503,9 @@ fun ChannelScreen(
                                 }
                             }
                         },
+                        onCommitAttachment = { uri ->
+                            processFileUri(uri)
+                        },
                         onPickEmoji = {
                             focusManager.clearFocus()
                             if (viewModel.currentBottomPane == BottomPane.EmojiPicker) {

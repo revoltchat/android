@@ -1,7 +1,14 @@
 package chat.revolt.components.chat
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RectShape
+import android.net.Uri
 import android.os.Build
+import android.util.Log
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandIn
@@ -46,6 +53,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.inputmethod.EditorInfoCompat
+import androidx.core.view.inputmethod.InputConnectionCompat
 import androidx.core.view.setPadding
 import androidx.core.widget.addTextChangedListener
 import chat.revolt.R
@@ -59,6 +69,7 @@ fun NativeMessageField(
     value: String,
     onValueChange: (String) -> Unit,
     onAddAttachment: () -> Unit,
+    onCommitAttachment: (Uri) -> Unit,
     onPickEmoji: () -> Unit,
     onSendMessage: () -> Unit,
     channelType: ChannelType,
@@ -86,7 +97,9 @@ fun NativeMessageField(
     val density = LocalDensity.current
 
     val selectionColour = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f).toArgb()
+    val cursorColour = MaterialTheme.colorScheme.primary.toArgb()
     val contentColour = LocalContentColor.current.toArgb()
+    val placeholderColour = LocalContentColor.current.copy(alpha = 0.5f).toArgb()
 
     LaunchedEffect(editMode) {
         if (editMode) {
@@ -129,13 +142,31 @@ fun NativeMessageField(
 
         AndroidView(
             factory = { context ->
-                com.google.android.material.textfield.TextInputEditText(context).apply {
+                object : androidx.appcompat.widget.AppCompatEditText(context) {
+                    override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
+                        var ic = super.onCreateInputConnection(outAttrs)
+                        EditorInfoCompat.setContentMimeTypes(
+                            outAttrs,
+                            arrayOf("image/*")
+                        )
+                        val mimeTypes = ViewCompat.getOnReceiveContentMimeTypes(this)
+                        if (mimeTypes != null) {
+                            EditorInfoCompat.setContentMimeTypes(outAttrs, mimeTypes)
+                            ic = ic?.let { InputConnectionCompat.createWrapper(this, it, outAttrs) }
+                        }
+                        return ic
+                    }
+                }.apply {
                     background = null
                     textSize = 16f
                     setPadding((density.density * 16.dp.value).toInt())
+
+                    // Propagate text changes to parent
                     addTextChangedListener {
                         onValueChange(it.toString())
                     }
+
+                    // Hide/show keyboard on focus change and propagate to parent
                     onFocusChangeListener = android.view.View.OnFocusChangeListener { _, hasFocus ->
                         val keyboard =
                             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -145,23 +176,55 @@ fun NativeMessageField(
                                 0
                             )
                         } else {
-                            keyboard.hideSoftInputFromWindow(this.getWindowToken(), 0)
+                            keyboard.hideSoftInputFromWindow(this.windowToken, 0)
                         }
 
                         onFocusChange(hasFocus)
                     }
+
+                    ViewCompat.setOnReceiveContentListener(
+                        this,
+                        arrayOf("image/*")
+                    ) { _, payload ->
+                        // Check mimetype
+                        if (payload.clip.description.hasMimeType("image/*")) {
+                            // Get image
+                            val item = payload.clip.getItemAt(0)
+                            val uri = item.uri
+
+                            if (uri == null) {
+                                Log.e("MessageField", "Received payload with null uri")
+                                return@setOnReceiveContentListener payload
+                            }
+
+                            onCommitAttachment(uri)
+
+                            return@setOnReceiveContentListener null
+                        }
+                        payload
+                    }
+
                     isFocusable = true
                     isFocusableInTouchMode = true
 
                     typeface = ResourcesCompat.getFont(context, R.font.inter)
 
+                    // Set colours
                     highlightColor = selectionColour
                     setTextColor(contentColour)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        setTextCursorDrawable(null)
-                    }
+                    setHintTextColor(ColorStateList.valueOf(placeholderColour))
 
-                    this.alpha = 1f
+                    // Caret colour and size
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val shapeDrawable = ShapeDrawable(RectShape())
+                        shapeDrawable.paint.color = cursorColour
+                        val sizeInDp = 1
+                        val sizeInPixels = (sizeInDp * resources.displayMetrics.density).toInt()
+                        shapeDrawable.intrinsicWidth = sizeInPixels
+                        shapeDrawable.intrinsicHeight = sizeInPixels
+
+                        setTextCursorDrawable(shapeDrawable)
+                    }
 
                     clearFocus = {
                         this.clearFocus()
@@ -247,6 +310,7 @@ fun NativeMessageFieldPreview() {
         value = "Hello world!",
         onValueChange = {},
         onAddAttachment = {},
+        onCommitAttachment = {},
         onPickEmoji = {},
         onSendMessage = {},
         channelType = ChannelType.DirectMessage,

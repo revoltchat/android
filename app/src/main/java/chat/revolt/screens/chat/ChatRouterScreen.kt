@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -49,7 +50,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -109,9 +112,9 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.sentry.Sentry
-import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
@@ -265,6 +268,8 @@ fun ChatRouterScreen(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val view = LocalView.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val navController = rememberNavController()
@@ -317,6 +322,9 @@ fun ChatRouterScreen(
             .collect { state ->
                 if (state == DrawerValue.Open) {
                     keyboardController?.hide()
+                    val keyboard =
+                        context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    keyboard.hideSoftInputFromWindow(view.windowToken, 0)
                 }
             }
     }
@@ -368,7 +376,7 @@ fun ChatRouterScreen(
             .distinctUntilChanged()
             .collect { sizeClass ->
                 useTabletAwareUI = sizeClass.widthSizeClass == WindowWidthSizeClass.Expanded &&
-                    sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
+                        sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
             }
     }
 
@@ -847,21 +855,21 @@ fun Sidebar(
                 // - Add the servers that aren't in the ordering to the end of the list.
                 // - Sort the servers that aren't in the ordering by their ID (creation order).
                 (
-                    (
-                        RevoltAPI.serverCache.values.filter {
-                            SyncedSettings.ordering.servers.contains(
-                                it.id
-                            )
-                        }
-                            .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }
-                        ) + (
-                        RevoltAPI.serverCache.values.filter {
-                            !SyncedSettings.ordering.servers.contains(
-                                it.id
-                            )
-                        }.sortedBy { it.id }
+                        (
+                                RevoltAPI.serverCache.values.filter {
+                                    SyncedSettings.ordering.servers.contains(
+                                        it.id
+                                    )
+                                }
+                                    .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }
+                                ) + (
+                                RevoltAPI.serverCache.values.filter {
+                                    !SyncedSettings.ordering.servers.contains(
+                                        it.id
+                                    )
+                                }.sortedBy { it.id }
+                                )
                         )
-                    )
                     .forEach { server ->
                         if (server.id == null || server.name == null) return@forEach
 
