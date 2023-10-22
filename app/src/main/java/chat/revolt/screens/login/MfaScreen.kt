@@ -48,8 +48,8 @@ import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class MfaScreenViewModel @Inject constructor(
@@ -98,10 +98,13 @@ class MfaScreenViewModel @Inject constructor(
 
                 try {
                     val token = response.firstUserHints!!.token
+                    val id = response.firstUserHints.id
 
                     RevoltAPI.loginAs(token)
+                    RevoltAPI.setSessionId(id)
                     loadSettings(token)
                     kvStorage.set("sessionToken", token)
+                    kvStorage.set("sessionId", id)
 
                     _navigateToHome = true
                 } catch (e: Error) {
@@ -126,10 +129,13 @@ class MfaScreenViewModel @Inject constructor(
 
                 try {
                     val token = response.firstUserHints!!.token
+                    val id = response.firstUserHints.id
 
                     RevoltAPI.loginAs(token)
+                    RevoltAPI.setSessionId(id)
                     loadSettings(token)
                     kvStorage.set("sessionToken", token)
+                    kvStorage.set("sessionId", id)
 
                     _navigateToHome = true
                 } catch (e: Error) {

@@ -369,9 +369,21 @@
     <string name="notice_platform_mod_dm_description">You have received an important notice regarding your account from our moderation team. Please read it carefully.</string>
     <string name="notice_platform_mod_dm_acknowledge">View</string>
 
+    <string name="settings_category_account">Account</string>
     <string name="settings_category_general">General</string>
     <string name="settings_category_miscellaneous">Miscellaneous</string>
     <string name="settings_category_last" translatable="false">Revolt v%1$s</string>
+
+    <string name="settings_sessions">Sessions</string>
+    <string name="settings_sessions_this_device">This Device</string>
+    <string name="settings_sessions_this_device_unavailable">The session of this device is unavailable. Please **log in again** to view your current session.</string>
+    <string name="settings_sessions_other_sessions">Other Active Sessions</string>
+    <string name="settings_sessions_first_seen">First seen %1$s</string>
+    <string name="settings_sessions_log_out_other">Log out other sessions</string>
+    <string name="settings_sessions_log_out_other_description">This device will stay logged in.</string>
+    <string name="settings_sessions_log_out_other_confirm">Log out all other sessions?</string>
+    <string name="settings_sessions_log_out_other_confirm_yes">Log out</string>
+    <string name="settings_sessions_log_out_other_confirm_no">Keep logged in</string>
 
     <string name="settings_appearance">Appearance</string>
     <string name="settings_appearance_theme">Theme</string>

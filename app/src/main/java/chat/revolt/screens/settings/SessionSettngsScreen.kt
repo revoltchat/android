@@ -1,0 +1,239 @@
+package chat.revolt.screens.settings
+
+import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import chat.revolt.R
+import chat.revolt.api.RevoltAPI
+import chat.revolt.api.routes.auth.fetchAllSessions
+import chat.revolt.api.routes.auth.logoutAllSessions
+import chat.revolt.api.routes.auth.logoutSessionById
+import chat.revolt.api.schemas.Session
+import chat.revolt.components.generic.PageHeader
+import chat.revolt.components.generic.UIMarkdown
+import chat.revolt.components.settings.sessions.SessionItem
+import kotlinx.coroutines.launch
+
+class SessionSettingsScreenViewModel : ViewModel() {
+    val sessions = mutableStateListOf<Session>()
+    var currentSession by mutableStateOf<Session?>(null)
+    var showLogoutOtherConfirmation by mutableStateOf(false)
+
+    fun fetchSessions() {
+        viewModelScope.launch {
+            sessions.addAll(fetchAllSessions())
+            currentSession = sessions.firstOrNull { it.isCurrent() }
+            Log.d(
+                "SessionSettingsScreen",
+                "Current session: $currentSession. Current session ID: ${RevoltAPI.sessionId}"
+            )
+        }
+    }
+
+    fun logoutSession(id: String) {
+        viewModelScope.launch {
+            logoutSessionById(id)
+            sessions.removeIf { it.id == id }
+        }
+    }
+
+    fun logoutOtherSessions() {
+        viewModelScope.launch {
+            logoutAllSessions(includingSelf = false)
+            sessions.clear()
+            sessions.addAll(fetchAllSessions())
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun SessionSettingsScreen(
+    navController: NavController,
+    viewModel: SessionSettingsScreenViewModel = viewModel()
+) {
+    LaunchedEffect(Unit) {
+        viewModel.fetchSessions()
+    }
+
+    if (viewModel.showLogoutOtherConfirmation) {
+        AlertDialog(
+            onDismissRequest = {
+                viewModel.showLogoutOtherConfirmation = false
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.settings_sessions_log_out_other_confirm)
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.showLogoutOtherConfirmation = false
+                        viewModel.logoutOtherSessions()
+                    }
+                ) {
+                    Text(stringResource(R.string.settings_sessions_log_out_other_confirm_yes))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.showLogoutOtherConfirmation = false
+                    }
+                ) {
+                    Text(stringResource(R.string.settings_sessions_log_out_other_confirm_no))
+                }
+            }
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .safeDrawingPadding()
+    ) {
+        PageHeader(
+            text = stringResource(id = R.string.settings_sessions),
+            showBackButton = true,
+            onBackButtonClicked = {
+                navController.popBackStack()
+            }
+        )
+
+        LazyColumn {
+            stickyHeader(key = "thisDevice") {
+                Text(
+                    text = stringResource(id = R.string.settings_sessions_this_device),
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(10.dp)
+                )
+            }
+
+            viewModel.currentSession?.let {
+                item(key = it.id) {
+                    Spacer(Modifier.height(8.dp))
+                    SessionItem(
+                        session = it,
+                        currentSession = true,
+                        onLogout = {},
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                }
+            } ?: run {
+                item(key = "noCurrentSession") {
+                    UIMarkdown(
+                        text = stringResource(id = R.string.settings_sessions_this_device_unavailable),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(10.dp)
+                    )
+                }
+            }
+
+            stickyHeader(key = "otherSessions") {
+                Text(
+                    text = stringResource(id = R.string.settings_sessions_other_sessions),
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(10.dp)
+                )
+            }
+
+            item(key = "logoutOtherSessions") {
+                Row(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .clip(shape = MaterialTheme.shapes.medium)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
+                        )
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 16.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_sessions_log_out_other),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+
+                        Text(
+                            text = stringResource(R.string.settings_sessions_log_out_other_description),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Normal
+                            )
+                        )
+                    }
+
+                    FilledTonalButton(onClick = { viewModel.showLogoutOtherConfirmation = true }) {
+                        Text(stringResource(R.string.logout))
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+
+            items(viewModel.sessions.size) {
+                val item = viewModel.sessions[it]
+
+                if (item.isCurrent()) {
+                    return@items
+                }
+
+                SessionItem(
+                    session = item,
+                    onLogout = { session ->
+                        viewModel.logoutSession(session.id)
+                    },
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
+    }
+}

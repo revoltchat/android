@@ -33,8 +33,8 @@ import chat.revolt.components.generic.SheetClickable
 import chat.revolt.components.screens.settings.SelfUserOverview
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @HiltViewModel
 class SettingsScreenViewModel @Inject constructor(
@@ -80,9 +80,34 @@ fun SettingsScreen(
                     .padding(10.dp)
             ) {
                 Text(
+                    text = stringResource(id = R.string.settings_category_account),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, top = 20.dp)
+                )
+
+                SheetClickable(
+                    icon = { modifier ->
+                        Icon(
+                            painter = painterResource(R.drawable.ic_tablet_cellphone_24dp),
+                            contentDescription = stringResource(id = R.string.settings_sessions),
+                            modifier = modifier
+                        )
+                    },
+                    label = { textStyle ->
+                        Text(
+                            text = stringResource(id = R.string.settings_sessions),
+                            style = textStyle
+                        )
+                    },
+                    modifier = Modifier.testTag("settings_view_sessions")
+                ) {
+                    navController.navigate("settings/sessions")
+                }
+
+                Text(
                     text = stringResource(id = R.string.settings_category_general),
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(bottom = 10.dp, start = 10.dp)
+                    modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, top = 20.dp)
                 )
 
                 SheetClickable(

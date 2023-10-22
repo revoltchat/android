@@ -49,8 +49,8 @@ import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.Weblink
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -102,8 +102,10 @@ class LoginViewModel @Inject constructor(
 
                     try {
                         val token = response.firstUserHints!!.token
+                        val id = response.firstUserHints.id
 
                         kvStorage.set("sessionToken", token)
+                        kvStorage.set("sessionId", id)
 
                         val onboard = needsOnboarding(token)
                         if (onboard) {
@@ -112,6 +114,7 @@ class LoginViewModel @Inject constructor(
                         }
 
                         RevoltAPI.loginAs(token)
+                        RevoltAPI.setSessionId(response.firstUserHints.token)
                         loadSettings(token)
 
                         _navigateTo = "home"

@@ -9,7 +9,6 @@ import chat.revolt.api.internals.Members
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.user.fetchSelf
-import chat.revolt.api.schemas.Channel as ChannelSchema
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.Server
@@ -39,6 +38,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import chat.revolt.api.schemas.Channel as ChannelSchema
 
 const val REVOLT_BASE = "https://api.revolt.chat"
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
@@ -118,6 +118,8 @@ object RevoltAPI {
 
     var sessionToken: String = ""
         private set
+    var sessionId: String = ""
+        private set
 
     @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     val realtimeContext = newSingleThreadContext("RealtimeContext")
@@ -127,6 +129,10 @@ object RevoltAPI {
 
     fun setSessionHeader(token: String) {
         sessionToken = token
+    }
+
+    fun setSessionId(id: String) {
+        sessionId = id
     }
 
     suspend fun loginAs(token: String) {
@@ -189,6 +195,7 @@ object RevoltAPI {
     fun logout() {
         selfId = null
         sessionToken = ""
+        sessionId = ""
 
         userCache.clear()
         serverCache.clear()
