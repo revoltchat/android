@@ -45,13 +45,23 @@ fun presenceFromStatus(status: String?, online: Boolean = true): Presence {
     }
 }
 
+fun Presence.asApiName(): String {
+    return when (this) {
+        Presence.Online -> "Online"
+        Presence.Idle -> "Idle"
+        Presence.Dnd -> "Busy"
+        Presence.Focus -> "Focus"
+        Presence.Offline -> "Invisible"
+    }
+}
+
 fun presenceColour(presence: Presence): Color {
     return when (presence) {
-        Presence.Online -> Color(0xFF00C853)
-        Presence.Idle -> Color(0xFFFFD600)
-        Presence.Dnd -> Color(0xFFD50000)
-        Presence.Focus -> Color(0xFF0091EA)
-        Presence.Offline -> Color(0xff546e7a)
+        Presence.Online -> Color(0xFF3ABF7E)
+        Presence.Idle -> Color(0xFFF39F00)
+        Presence.Dnd -> Color(0xFFF84848)
+        Presence.Focus -> Color(0xFF4799F0)
+        Presence.Offline -> Color(0xFFA5A5A5)
     }
 }
 

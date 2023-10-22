@@ -181,6 +181,7 @@
     <string name="reconnecting">Reconnecting…</string>
     <string name="reconnected">Reconnected</string>
 
+    <string name="status">Status</string>
     <string name="status_online">Online</string>
     <string name="status_idle">Idle</string>
     <string name="status_focus">Focus</string>
