@@ -73,7 +73,7 @@ import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.chat.Message
-import chat.revolt.components.chat.MessageField
+import chat.revolt.components.chat.NativeMessageField
 import chat.revolt.components.chat.SystemMessage
 import chat.revolt.components.emoji.EmojiPicker
 import chat.revolt.components.media.InbuiltMediaPicker
@@ -91,10 +91,10 @@ import chat.revolt.sheets.ChannelInfoSheet
 import chat.revolt.sheets.MessageContextSheet
 import com.discord.simpleast.core.simple.SimpleMarkdownRules
 import com.discord.simpleast.core.simple.SimpleRenderer
-import java.io.File
-import java.io.FileNotFoundException
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileNotFoundException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -478,11 +478,11 @@ fun ChannelScreen(
                         textAlign = TextAlign.Center
                     )
                 } else {
-                    MessageField(
-                        value = fieldContent,
+                    NativeMessageField(
+                        value = fieldContent.text,
                         onValueChange = {
-                            viewModel.pendingMessageContent = it.text
-                            viewModel.textSelection = it.selection
+                            viewModel.pendingMessageContent = it
+                            // viewModel.textSelection = it.selection
                         },
                         onSendMessage = viewModel::sendPendingMessage,
                         onAddAttachment = {
