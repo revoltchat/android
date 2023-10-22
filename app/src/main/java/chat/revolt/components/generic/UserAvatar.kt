@@ -28,8 +28,8 @@ import chat.revolt.api.schemas.AutumnResource
 enum class Presence {
     Online,
     Idle,
-    Dnd,
     Focus,
+    Dnd,
     Offline
 }
 
