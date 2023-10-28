@@ -5,6 +5,7 @@ plugins {
     id 'com.mikepenz.aboutlibraries.plugin'
     id 'com.google.dagger.hilt.android'
     id 'com.google.devtools.ksp'
+    id 'org.jmailen.kotlinter'
     id "io.sentry.android.gradle" version "3.4.2"
 
     id 'kotlin-kapt'
