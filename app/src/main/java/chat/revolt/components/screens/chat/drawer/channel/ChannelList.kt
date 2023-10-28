@@ -90,7 +90,7 @@ fun RowScope.ChannelList(
     val enableSmallBanner by remember {
         derivedStateOf {
             lazyListState.firstVisibleItemScrollOffset > 40 ||
-                    lazyListState.firstVisibleItemIndex > 0
+                lazyListState.firstVisibleItemIndex > 0
         }
     }
 
@@ -248,7 +248,7 @@ fun RowScope.ChannelList(
 
                     DrawerChannel(
                         name = partner?.let { p -> User.resolveDefaultName(p) } ?: channel.name
-                        ?: stringResource(R.string.unknown),
+                            ?: stringResource(R.string.unknown),
                         channelType = channel.channelType ?: ChannelType.TextChannel,
                         selected = currentDestination == "channel/{channelId}" && currentChannel == channel.id,
                         hasUnread = channel.lastMessageID?.let { lastMessageID ->
@@ -408,9 +408,9 @@ fun RowScope.ChannelList(
 
                             Text(
                                 text = (
-                                        server?.name
-                                            ?: stringResource(R.string.unknown)
-                                        ),
+                                    server?.name
+                                        ?: stringResource(R.string.unknown)
+                                    ),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = if (server?.banner != null) {
                                     bannerTextColour

@@ -63,7 +63,6 @@ import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.schemas.ChannelType
 
-
 @Composable
 fun NativeMessageField(
     value: String,
@@ -112,7 +111,7 @@ fun NativeMessageField(
     Row(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(modifier = Modifier.width(8.dp))
 

@@ -104,9 +104,13 @@ fun StatusButton(
             .size(48.dp)
             .clickable { onClick(presence) }
             .then(
-                if (selected) Modifier.background(
-                    MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
-                ) else Modifier
+                if (selected) {
+                    Modifier.background(
+                        MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
+                    )
+                } else {
+                    Modifier
+                }
             ),
         contentAlignment = Alignment.Center
     ) {

@@ -49,8 +49,8 @@ import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.Weblink
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(

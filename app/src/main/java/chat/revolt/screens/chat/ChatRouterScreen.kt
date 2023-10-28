@@ -112,9 +112,9 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.sentry.Sentry
+import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
@@ -376,7 +376,7 @@ fun ChatRouterScreen(
             .distinctUntilChanged()
             .collect { sizeClass ->
                 useTabletAwareUI = sizeClass.widthSizeClass == WindowWidthSizeClass.Expanded &&
-                        sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
+                    sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
             }
     }
 
@@ -857,21 +857,21 @@ fun Sidebar(
                 // - Add the servers that aren't in the ordering to the end of the list.
                 // - Sort the servers that aren't in the ordering by their ID (creation order).
                 (
-                        (
-                                RevoltAPI.serverCache.values.filter {
-                                    SyncedSettings.ordering.servers.contains(
-                                        it.id
-                                    )
-                                }
-                                    .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }
-                                ) + (
-                                RevoltAPI.serverCache.values.filter {
-                                    !SyncedSettings.ordering.servers.contains(
-                                        it.id
-                                    )
-                                }.sortedBy { it.id }
-                                )
+                    (
+                        RevoltAPI.serverCache.values.filter {
+                            SyncedSettings.ordering.servers.contains(
+                                it.id
+                            )
+                        }
+                            .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }
+                        ) + (
+                        RevoltAPI.serverCache.values.filter {
+                            !SyncedSettings.ordering.servers.contains(
+                                it.id
+                            )
+                        }.sortedBy { it.id }
                         )
+                    )
                     .forEach { server ->
                         if (server.id == null || server.name == null) return@forEach
 

@@ -41,10 +41,7 @@ suspend fun fetchSelf(): User {
     return user
 }
 
-suspend fun patchSelf(
-    status: Status? = null,
-    pure: Boolean = false,
-) {
+suspend fun patchSelf(status: Status? = null, pure: Boolean = false) {
     val body = mutableMapOf<String, JsonElement>()
     if (status != null) {
         body["status"] = RevoltJson.encodeToJsonElement(Status.serializer(), status)
@@ -57,7 +54,8 @@ suspend fun patchSelf(
                 MapSerializer(
                     String.serializer(),
                     JsonElement.serializer()
-                ), body
+                ),
+                body
             )
         )
     }

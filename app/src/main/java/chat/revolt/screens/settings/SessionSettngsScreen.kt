@@ -204,7 +204,9 @@ fun SessionSettingsScreen(
                         )
 
                         Text(
-                            text = stringResource(R.string.settings_sessions_log_out_other_description),
+                            text = stringResource(
+                                R.string.settings_sessions_log_out_other_description
+                            ),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Normal
                             )
