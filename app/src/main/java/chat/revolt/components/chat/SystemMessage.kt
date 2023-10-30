@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.schemas.Message
+import chat.revolt.components.generic.UIMarkdown
 
 enum class SystemMessageType(val type: String) {
     CHANNEL_OWNERSHIP_CHANGED("channel_ownership_changed"),
@@ -42,12 +44,16 @@ enum class SystemMessageType(val type: String) {
     TEXT("text")
 }
 
+fun String?.mention(): String {
+    return "<@$this>"
+}
+
 @Composable
 fun SystemMessage(message: Message) {
     if (message.system == null) return
 
     val systemMessageType =
-        SystemMessageType.values().firstOrNull { it.type == message.system.type }
+        SystemMessageType.entries.firstOrNull { it.type == message.system.type }
 
     if (systemMessageType == null) {
         Text(text = message.system.toString())
@@ -62,7 +68,9 @@ fun SystemMessage(message: Message) {
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+            modifier = Modifier
+                .padding(horizontal = 10.dp, vertical = 4.dp)
+                .fillMaxWidth()
         ) {
             SystemMessageIconWithBackground(type = systemMessageType)
 
@@ -70,49 +78,101 @@ fun SystemMessage(message: Message) {
 
             when (systemMessageType) {
                 SystemMessageType.CHANNEL_OWNERSHIP_CHANGED -> {
-                    Text(
-                        text = "Channel ownership changed from ${message.system.from} to ${message.system.to}"
+                    UIMarkdown(
+                        stringResource(
+                            R.string.system_message_ownership_changed,
+                            message.system.from.mention(),
+                            message.system.to.mention()
+                        )
                     )
                 }
 
                 SystemMessageType.CHANNEL_ICON_CHANGED -> {
-                    Text(text = "Channel icon changed by ${message.system.by}")
+                    UIMarkdown(
+                        stringResource(
+                            R.string.system_message_channel_icon_changed,
+                            message.system.by.mention()
+                        )
+                    )
                 }
 
                 SystemMessageType.CHANNEL_DESCRIPTION_CHANGED -> {
-                    Text(text = "Channel description changed by ${message.system.by}")
+                    UIMarkdown(
+                        stringResource(
+                            R.string.system_message_channel_description_changed,
+                            message.system.by.mention()
+                        )
+                    )
                 }
 
                 SystemMessageType.CHANNEL_RENAMED -> {
-                    Text(text = "Channel renamed to ${message.system.name} by ${message.system.by}")
+                    UIMarkdown(
+                        stringResource(
+                            R.string.system_message_channel_renamed,
+                            message.system.by.mention(),
+                            "**${message.system.name ?: stringResource(R.string.unknown)}**"
+                        )
+                    )
                 }
 
                 SystemMessageType.USER_REMOVE -> {
-                    Text(text = "User ${message.system.id} removed by ${message.system.by}")
+                    UIMarkdown(
+                        stringResource(
+                            R.string.system_message_user_removed,
+                            message.system.by.mention(),
+                            message.system.id.mention()
+                        )
+                    )
                 }
 
                 SystemMessageType.USER_ADDED -> {
-                    Text(text = "User ${message.system.id} added by ${message.system.by}")
+                    UIMarkdown(
+                        stringResource(
+                            R.string.system_message_user_added,
+                            message.system.by.mention(),
+                            message.system.id.mention()
+                        )
+                    )
                 }
 
                 SystemMessageType.USER_BANNED -> {
-                    Text(text = "User ${message.system.id} banned")
+                    UIMarkdown(
+                        stringResource(
+                            R.string.system_message_user_banned,
+                            message.system.id.mention()
+                        )
+                    )
                 }
 
                 SystemMessageType.USER_KICKED -> {
-                    Text(text = "User ${message.system.id} kicked")
+                    UIMarkdown(
+                        stringResource(
+                            R.string.system_message_user_kicked,
+                            message.system.id.mention()
+                        )
+                    )
                 }
 
                 SystemMessageType.USER_LEFT -> {
-                    Text(text = "User ${message.system.id} left")
+                    UIMarkdown(
+                        stringResource(
+                            R.string.system_message_user_left,
+                            message.system.id.mention()
+                        )
+                    )
                 }
 
                 SystemMessageType.USER_JOINED -> {
-                    Text(text = "User ${message.system.id} joined")
+                    UIMarkdown(
+                        stringResource(
+                            R.string.system_message_user_joined,
+                            message.system.id.mention()
+                        )
+                    )
                 }
 
                 SystemMessageType.TEXT -> {
-                    message.system.content?.let { Text(text = it) }
+                    message.system.content?.let { UIMarkdown(it) }
                 }
             }
         }
