@@ -221,7 +221,7 @@ fun RowScope.ChannelList(
                     DrawerChannel(
                         name = stringResource(R.string.channel_notes),
                         iconType = DrawerChannelIconType.Channel(ChannelType.SavedMessages),
-                        selected = currentDestination == "channel/{channelId}" && currentChannel == notesChannelId,
+                        selected = currentDestination == "channel/$notesChannelId",
                         hasUnread = false,
                         onClick = {
                             onChannelClick(notesChannelId ?: return@DrawerChannel)
@@ -268,7 +268,7 @@ fun RowScope.ChannelList(
                         iconType = DrawerChannelIconType.Channel(
                             channel.channelType ?: ChannelType.TextChannel
                         ),
-                        selected = currentDestination == "channel/{channelId}" && currentChannel == channel.id,
+                        selected = currentDestination == "channel/${channel.id}",
                         hasUnread = channel.lastMessageID?.let { lastMessageID ->
                             RevoltAPI.unreads.hasUnread(
                                 channel.id!!,
@@ -534,7 +534,7 @@ fun RowScope.ChannelList(
                                     iconType = DrawerChannelIconType.Channel(
                                         channel.channelType ?: ChannelType.TextChannel
                                     ),
-                                    selected = currentDestination == "channel/{channelId}" && currentChannel == channel.id,
+                                    selected = currentDestination == "channel/${channel.id}",
                                     hasUnread = channel.lastMessageID?.let { lastMessageID ->
                                         RevoltAPI.unreads.hasUnread(
                                             channel.id!!,

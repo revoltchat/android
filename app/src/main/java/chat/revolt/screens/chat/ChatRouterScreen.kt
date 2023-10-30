@@ -125,6 +125,7 @@ class ChatRouterViewModel @Inject constructor(
 ) : ViewModel() {
     var currentServer by mutableStateOf("home")
     var currentChannel by mutableStateOf<String?>(null)
+    var currentRoute by mutableStateOf("home")
     var sidebarSparkDisplayed by mutableStateOf(true)
     var latestChangelogRead by mutableStateOf(true)
     var latestChangelog by mutableStateOf("")
@@ -135,6 +136,7 @@ class ChatRouterViewModel @Inject constructor(
         viewModelScope.launch {
             currentServer = kvStorage.get("currentServer") ?: "home"
             currentChannel = kvStorage.get("currentChannel")
+            currentRoute = kvStorage.get("currentRoute") ?: "home"
 
             sidebarSparkDisplayed = if (kvStorage.getBoolean("sidebarSpark") == null) {
                 false
@@ -150,12 +152,20 @@ class ChatRouterViewModel @Inject constructor(
         }
     }
 
-    private suspend fun setCurrentServer(serverId: String, save: Boolean = true) {
+    private suspend fun setSaveCurrentServer(serverId: String) {
         currentServer = serverId
 
-        if (save) kvStorage.set("currentServer", serverId)
+        kvStorage.set("currentServer", serverId)
 
         if (serverId != "home") fetchMembers(serverId, includeOffline = false, pure = false)
+    }
+
+    private fun setSaveCurrentRoute(route: String) {
+        currentRoute = route
+
+        viewModelScope.launch {
+            kvStorage.set("currentRoute", route)
+        }
     }
 
     private fun setSaveCurrentChannel(channelId: String) {
@@ -179,7 +189,8 @@ class ChatRouterViewModel @Inject constructor(
                 }
             }
             viewModelScope.launch {
-                setCurrentServer("home")
+                setSaveCurrentServer("home")
+                setSaveCurrentRoute("home")
             }
             return
         }
@@ -187,7 +198,7 @@ class ChatRouterViewModel @Inject constructor(
         val channelId = RevoltAPI.serverCache[serverId]?.channels?.firstOrNull()
 
         viewModelScope.launch {
-            setCurrentServer(serverId, channelId != null)
+            setSaveCurrentServer(serverId)
         }
 
         if (channelId != null) {
@@ -197,6 +208,10 @@ class ChatRouterViewModel @Inject constructor(
                 navController.graph.startDestinationRoute?.let { route ->
                     popUpTo(route)
                 }
+            }
+
+            viewModelScope.launch {
+                setSaveCurrentRoute("no_current_channel")
             }
         }
     }
@@ -245,6 +260,10 @@ class ChatRouterViewModel @Inject constructor(
                     popUpTo(route)
                 }
             }
+
+            viewModelScope.launch {
+                setSaveCurrentRoute("channel/$channelId")
+            }
         }
     }
 
@@ -253,6 +272,10 @@ class ChatRouterViewModel @Inject constructor(
             navController.graph.startDestinationRoute?.let { route ->
                 popUpTo(route)
             }
+        }
+
+        viewModelScope.launch {
+            setSaveCurrentRoute(destination)
         }
     }
 }
@@ -305,7 +328,7 @@ fun ChatRouterScreen(
 
     var useTabletAwareUI by remember { mutableStateOf(false) }
 
-    val toggleDrawerLda = remember {
+    val toggleDrawerLambda = remember {
         {
             scope.launch {
                 if (drawerState.isOpen) {
@@ -682,7 +705,7 @@ fun ChatRouterScreen(
                     topNav = topNav,
                     useDrawer = false,
                     toggleDrawer = {
-                        toggleDrawerLda()
+                        toggleDrawerLambda()
                     },
                     onShowUserContextSheet = { target, server ->
                         userContextSheetTarget = target
@@ -722,7 +745,7 @@ fun ChatRouterScreen(
                             topNav = topNav,
                             useDrawer = true,
                             toggleDrawer = {
-                                toggleDrawerLda()
+                                toggleDrawerLambda()
                             },
                             drawerState = drawerState,
                             onShowUserContextSheet = { target, server ->
@@ -912,7 +935,7 @@ fun Sidebar(
             ) {
                 ChannelList(
                     serverId = it,
-                    currentDestination = navController.currentDestination?.route,
+                    currentDestination = viewModel.currentRoute,
                     currentChannel = viewModel.currentChannel,
                     onChannelClick = { channelId ->
                         viewModel.navigateToChannel(channelId, navController)
