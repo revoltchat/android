@@ -23,6 +23,7 @@ import chat.revolt.api.realtime.frames.receivable.ServerMemberJoinFrame
 import chat.revolt.api.realtime.frames.receivable.ServerMemberLeaveFrame
 import chat.revolt.api.realtime.frames.receivable.ServerMemberUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.ServerUpdateFrame
+import chat.revolt.api.realtime.frames.receivable.UserRelationshipFrame
 import chat.revolt.api.realtime.frames.receivable.UserUpdateFrame
 import chat.revolt.api.realtime.frames.sendable.AuthorizationFrame
 import chat.revolt.api.realtime.frames.sendable.PingFrame
@@ -260,6 +261,27 @@ object RealtimeSocket {
 
                 RevoltAPI.userCache[userUpdateFrame.id] =
                     existing.mergeWithPartial(userUpdateFrame.data)
+            }
+
+            "UserRelationship" -> {
+                val userRelationshipFrame =
+                    RevoltJson.decodeFromString(UserRelationshipFrame.serializer(), rawFrame)
+
+                val existing = RevoltAPI.userCache[userRelationshipFrame.user.id]
+
+                if (existing == null && userRelationshipFrame.user.id != null) {
+                    RevoltAPI.userCache[userRelationshipFrame.user.id] =
+                        userRelationshipFrame.user.copy(
+                            relationship = userRelationshipFrame.status
+                        )
+                } else if (existing != null && userRelationshipFrame.user.id != null) {
+                    val merged = existing.mergeWithPartial(userRelationshipFrame.user).copy(
+                        relationship = userRelationshipFrame.status
+                    )
+                    RevoltAPI.userCache[userRelationshipFrame.user.id] = merged
+                } else {
+                    Log.w("RealtimeSocket", "Invalid UserRelationship frame: $rawFrame")
+                }
             }
 
             "ChannelUpdate" -> {

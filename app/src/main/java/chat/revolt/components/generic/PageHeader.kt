@@ -27,6 +27,7 @@ fun PageHeader(
     modifier: Modifier = Modifier,
     showBackButton: Boolean = false,
     onBackButtonClicked: () -> Unit = {},
+    startButtons: @Composable () -> Unit = {},
     additionalButtons: @Composable () -> Unit = {},
     maxLines: Int = Int.MAX_VALUE
 ) {
@@ -42,6 +43,7 @@ fun PageHeader(
                 )
             }
         }
+        startButtons()
         Text(
             text = text,
             maxLines = maxLines,

@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,7 +35,7 @@ import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.screens.home.LinkOnHome
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, useDrawer: Boolean, onDrawerClicked: () -> Unit) {
     val context = LocalContext.current
 
     val catTransition = rememberInfiniteTransition(label = "cat")
@@ -50,7 +52,19 @@ fun HomeScreen(navController: NavController) {
     Column(
         modifier = Modifier.safeDrawingPadding()
     ) {
-        PageHeader(text = stringResource(id = R.string.home))
+        PageHeader(
+            text = stringResource(id = R.string.home),
+            startButtons = {
+                if (useDrawer) {
+                    IconButton(onClick = onDrawerClicked) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = stringResource(R.string.menu)
+                        )
+                    }
+                }
+            }
+        )
         Box(
             modifier = Modifier
                 .weight(1f)

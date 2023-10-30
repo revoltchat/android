@@ -123,6 +123,12 @@
     <string name="home_join_jenvolt">Join Jenvolt</string>
     <string name="home_join_jenvolt_description">Jenvolt is the developer-run space for all things Android app and more. Support, feedback go here. Maybe you will get to try out new features! 👀</string>
 
+    <string name="friends">Friends</string>
+    <string name="friends_incoming_requests">Incoming Requests</string>
+    <string name="friends_outgoing_requests">Outgoing Requests</string>
+    <string name="friends_blocked">Blocked</string>
+    <string name="friends_deny_all_incoming">Clear all incoming requests</string>
+
     <string name="server_plus_alt">Add server</string>
 
     <string name="no_channels_heading">Bit awkward.</string>

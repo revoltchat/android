@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,10 +34,16 @@ import chat.revolt.components.generic.Presence
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.screens.chat.ChannelIcon
 
+sealed class DrawerChannelIconType {
+    data class Channel(val type: ChannelType) : DrawerChannelIconType()
+    data class Painter(val painter: androidx.compose.ui.graphics.painter.Painter) :
+        DrawerChannelIconType()
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DrawerChannel(
-    channelType: ChannelType,
+    iconType: DrawerChannelIconType,
     name: String,
     selected: Boolean,
     hasUnread: Boolean,
@@ -84,39 +91,55 @@ fun DrawerChannel(
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        when (channelType) {
-            ChannelType.DirectMessage -> UserAvatar(
-                username = dmPartnerName ?: "",
-                avatar = dmPartnerIcon,
-                userId = dmPartnerId ?: "",
-                presence = dmPartnerStatus,
-                size = 32.dp,
-                presenceSize = 16.dp,
-                modifier = Modifier.padding(end = 8.dp)
-            )
+        when (iconType) {
+            is DrawerChannelIconType.Channel -> {
+                when (val channelType = iconType.type) {
+                    ChannelType.DirectMessage -> UserAvatar(
+                        username = dmPartnerName ?: "",
+                        avatar = dmPartnerIcon,
+                        userId = dmPartnerId ?: "",
+                        presence = dmPartnerStatus,
+                        size = 32.dp,
+                        presenceSize = 16.dp,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
 
-            ChannelType.Group -> GroupIcon(
-                name = name,
-                icon = dmPartnerIcon,
-                size = 32.dp,
-                modifier = Modifier.padding(end = 8.dp)
-            )
+                    ChannelType.Group -> GroupIcon(
+                        name = name,
+                        icon = dmPartnerIcon,
+                        size = 32.dp,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
 
-            else -> ChannelIcon(
-                channelType = channelType,
-                modifier = Modifier.then(
-                    if (large) {
-                        Modifier.padding(
-                            end = 12.dp,
-                            start = 4.dp,
-                            top = 4.dp,
-                            bottom = 4.dp
+                    else -> ChannelIcon(
+                        channelType = channelType,
+                        modifier = Modifier.then(
+                            if (large) {
+                                Modifier.padding(
+                                    end = 12.dp,
+                                    start = 4.dp,
+                                    top = 4.dp,
+                                    bottom = 4.dp
+                                )
+                            } else {
+                                Modifier.padding(end = 8.dp)
+                            }
                         )
-                    } else {
-                        Modifier.padding(end = 8.dp)
-                    }
+                    )
+                }
+            }
+
+            is DrawerChannelIconType.Painter -> {
+                Icon(
+                    painter = iconType.painter,
+                    contentDescription = null,
+                    tint = LocalContentColor.current,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(32.dp)
+                        .padding(4.dp)
                 )
-            )
+            }
         }
 
         Text(

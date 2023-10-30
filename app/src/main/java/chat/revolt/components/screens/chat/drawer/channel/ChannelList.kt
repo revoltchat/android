@@ -68,6 +68,7 @@ import chat.revolt.api.schemas.User
 import chat.revolt.api.schemas.has
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
+import chat.revolt.components.screens.chat.drawer.server.DrawerChannelIconType
 import chat.revolt.sheets.ChannelContextSheet
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -90,7 +91,7 @@ fun RowScope.ChannelList(
     val enableSmallBanner by remember {
         derivedStateOf {
             lazyListState.firstVisibleItemScrollOffset > 40 ||
-                lazyListState.firstVisibleItemIndex > 0
+                    lazyListState.firstVisibleItemIndex > 0
         }
     }
 
@@ -186,11 +187,26 @@ fun RowScope.ChannelList(
                 ) {
                     DrawerChannel(
                         name = stringResource(R.string.home),
-                        channelType = ChannelType.TextChannel,
+                        iconType = DrawerChannelIconType.Painter(painterResource(R.drawable.ic_home_24dp)),
                         selected = currentDestination == "home",
                         hasUnread = false,
                         onClick = {
                             onSpecialClick("home")
+                        },
+                        large = true
+                    )
+                }
+
+                item(
+                    key = "friends"
+                ) {
+                    DrawerChannel(
+                        name = stringResource(R.string.friends),
+                        iconType = DrawerChannelIconType.Painter(painterResource(R.drawable.ic_human_greeting_variant_24dp)),
+                        selected = currentDestination == "friends",
+                        hasUnread = false,
+                        onClick = {
+                            onSpecialClick("friends")
                         },
                         large = true
                     )
@@ -204,7 +220,7 @@ fun RowScope.ChannelList(
 
                     DrawerChannel(
                         name = stringResource(R.string.channel_notes),
-                        channelType = ChannelType.SavedMessages,
+                        iconType = DrawerChannelIconType.Channel(ChannelType.SavedMessages),
                         selected = currentDestination == "channel/{channelId}" && currentChannel == notesChannelId,
                         hasUnread = false,
                         onClick = {
@@ -248,8 +264,10 @@ fun RowScope.ChannelList(
 
                     DrawerChannel(
                         name = partner?.let { p -> User.resolveDefaultName(p) } ?: channel.name
-                            ?: stringResource(R.string.unknown),
-                        channelType = channel.channelType ?: ChannelType.TextChannel,
+                        ?: stringResource(R.string.unknown),
+                        iconType = DrawerChannelIconType.Channel(
+                            channel.channelType ?: ChannelType.TextChannel
+                        ),
                         selected = currentDestination == "channel/{channelId}" && currentChannel == channel.id,
                         hasUnread = channel.lastMessageID?.let { lastMessageID ->
                             RevoltAPI.unreads.hasUnread(
@@ -408,9 +426,9 @@ fun RowScope.ChannelList(
 
                             Text(
                                 text = (
-                                    server?.name
-                                        ?: stringResource(R.string.unknown)
-                                    ),
+                                        server?.name
+                                            ?: stringResource(R.string.unknown)
+                                        ),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = if (server?.banner != null) {
                                     bannerTextColour
@@ -513,7 +531,9 @@ fun RowScope.ChannelList(
                                     name = partner?.let { p -> User.resolveDefaultName(p) }
                                         ?: channel.name
                                         ?: stringResource(R.string.unknown),
-                                    channelType = channel.channelType ?: ChannelType.TextChannel,
+                                    iconType = DrawerChannelIconType.Channel(
+                                        channel.channelType ?: ChannelType.TextChannel
+                                    ),
                                     selected = currentDestination == "channel/{channelId}" && currentChannel == channel.id,
                                     hasUnread = channel.lastMessageID?.let { lastMessageID ->
                                         RevoltAPI.unreads.hasUnread(

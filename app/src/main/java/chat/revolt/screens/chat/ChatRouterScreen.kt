@@ -94,6 +94,7 @@ import chat.revolt.internals.Changelogs
 import chat.revolt.ndk.Pipebomb
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
+import chat.revolt.screens.chat.views.FriendsScreen
 import chat.revolt.screens.chat.views.HomeScreen
 import chat.revolt.screens.chat.views.NoCurrentChannelScreen
 import chat.revolt.screens.chat.views.channel.ChannelScreen
@@ -112,9 +113,9 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.sentry.Sentry
-import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
@@ -304,7 +305,7 @@ fun ChatRouterScreen(
 
     var useTabletAwareUI by remember { mutableStateOf(false) }
 
-    val drawerBackHandler = remember {
+    val toggleDrawerLda = remember {
         {
             scope.launch {
                 if (drawerState.isOpen) {
@@ -376,7 +377,7 @@ fun ChatRouterScreen(
             .distinctUntilChanged()
             .collect { sizeClass ->
                 useTabletAwareUI = sizeClass.widthSizeClass == WindowWidthSizeClass.Expanded &&
-                    sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
+                        sizeClass.heightSizeClass != WindowHeightSizeClass.Compact
             }
     }
 
@@ -680,8 +681,8 @@ fun ChatRouterScreen(
                     navController = navController,
                     topNav = topNav,
                     useDrawer = false,
-                    drawerBackHandler = {
-                        drawerBackHandler()
+                    toggleDrawer = {
+                        toggleDrawerLda()
                     },
                     onShowUserContextSheet = { target, server ->
                         userContextSheetTarget = target
@@ -720,8 +721,8 @@ fun ChatRouterScreen(
                             navController = navController,
                             topNav = topNav,
                             useDrawer = true,
-                            drawerBackHandler = {
-                                drawerBackHandler()
+                            toggleDrawer = {
+                                toggleDrawerLda()
                             },
                             drawerState = drawerState,
                             onShowUserContextSheet = { target, server ->
@@ -857,21 +858,21 @@ fun Sidebar(
                 // - Add the servers that aren't in the ordering to the end of the list.
                 // - Sort the servers that aren't in the ordering by their ID (creation order).
                 (
-                    (
-                        RevoltAPI.serverCache.values.filter {
-                            SyncedSettings.ordering.servers.contains(
-                                it.id
-                            )
-                        }
-                            .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }
-                        ) + (
-                        RevoltAPI.serverCache.values.filter {
-                            !SyncedSettings.ordering.servers.contains(
-                                it.id
-                            )
-                        }.sortedBy { it.id }
+                        (
+                                RevoltAPI.serverCache.values.filter {
+                                    SyncedSettings.ordering.servers.contains(
+                                        it.id
+                                    )
+                                }
+                                    .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }
+                                ) + (
+                                RevoltAPI.serverCache.values.filter {
+                                    !SyncedSettings.ordering.servers.contains(
+                                        it.id
+                                    )
+                                }.sortedBy { it.id }
+                                )
                         )
-                    )
                     .forEach { server ->
                         if (server.id == null || server.name == null) return@forEach
 
@@ -935,7 +936,7 @@ fun ChannelNavigator(
     navController: NavHostController,
     topNav: NavController,
     useDrawer: Boolean,
-    drawerBackHandler: () -> Unit,
+    toggleDrawer: () -> Unit,
     drawerState: DrawerState? = null,
     onShowUserContextSheet: (String, String?) -> Unit
 ) {
@@ -945,14 +946,28 @@ fun ChannelNavigator(
         NavHost(navController = navController, startDestination = "home") {
             composable("home") {
                 BackHandler(enabled = useDrawer) {
-                    drawerBackHandler()
+                    toggleDrawer()
                 }
-                HomeScreen(navController = topNav)
+                HomeScreen(
+                    navController = topNav,
+                    useDrawer = useDrawer,
+                    onDrawerClicked = toggleDrawer,
+                )
+            }
+
+            composable("friends") {
+                BackHandler(enabled = useDrawer) {
+                    toggleDrawer()
+                }
+                FriendsScreen(
+                    useDrawer = useDrawer,
+                    onDrawerClicked = toggleDrawer,
+                )
             }
 
             composable("channel/{channelId}") { backStackEntry ->
                 BackHandler(enabled = useDrawer) {
-                    drawerBackHandler()
+                    toggleDrawer()
                 }
 
                 val channelId = backStackEntry.arguments?.getString("channelId")
@@ -979,7 +994,7 @@ fun ChannelNavigator(
 
             composable("no_current_channel") {
                 BackHandler(enabled = useDrawer) {
-                    drawerBackHandler()
+                    toggleDrawer()
                 }
 
                 NoCurrentChannelScreen()
