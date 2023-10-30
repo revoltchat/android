@@ -1,8 +1,6 @@
 package chat.revolt.components.generic
 
-import android.text.SpannableStringBuilder
 import android.text.TextUtils
-import android.util.Log
 import android.util.TypedValue
 import android.view.ViewGroup
 import androidx.compose.material3.LocalContentColor
@@ -10,9 +8,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -51,42 +46,6 @@ fun UIMarkdown(
     val context = LocalContext.current
     val foregroundColor = LocalContentColor.current
     val codeBlockColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
-    val spannableStringBuilder = remember { mutableStateOf(SpannableStringBuilder()) }
-
-    LaunchedEffect(text) {
-        val parser = MarkdownParser()
-            .addRules(
-                SimpleMarkdownRules.createEscapeRule()
-            )
-            .addRevoltRules(context)
-            .addRules(
-                createCodeRule(context, codeBlockColor.toArgb()),
-                createInlineCodeRule(context, codeBlockColor.toArgb())
-            )
-            .addRules(
-                SimpleMarkdownRules.createSimpleMarkdownRules(
-                    includeEscapeRule = false
-                )
-            )
-
-        spannableStringBuilder.value = SimpleRenderer.render(
-            source = text,
-            parser = parser,
-            initialState = MarkdownState(0),
-            renderContext = MarkdownContext(
-                memberMap = mapOf(),
-                userMap = RevoltAPI.userCache.toMap(),
-                channelMap = RevoltAPI.channelCache.mapValues { ch ->
-                    ch.value.name ?: ch.value.id ?: "{this does not exist 🤫}"
-                },
-                emojiMap = RevoltAPI.emojiCache,
-                serverId = null,
-                useLargeEmojis = false
-            )
-        )
-
-        Log.d("Markdown", "Rendered: ${spannableStringBuilder.value}")
-    }
 
     AndroidView(
         factory = {
@@ -108,7 +67,38 @@ fun UIMarkdown(
         },
         modifier = modifier,
         update = {
-            it.text = spannableStringBuilder.value
+            val parser = MarkdownParser()
+                .addRules(
+                    SimpleMarkdownRules.createEscapeRule()
+                )
+                .addRevoltRules(context)
+                .addRules(
+                    createCodeRule(context, codeBlockColor.toArgb()),
+                    createInlineCodeRule(context, codeBlockColor.toArgb())
+                )
+                .addRules(
+                    SimpleMarkdownRules.createSimpleMarkdownRules(
+                        includeEscapeRule = false
+                    )
+                )
+
+            val spannableStringBuilder = SimpleRenderer.render(
+                source = text,
+                parser = parser,
+                initialState = MarkdownState(0),
+                renderContext = MarkdownContext(
+                    memberMap = mapOf(),
+                    userMap = RevoltAPI.userCache.toMap(),
+                    channelMap = RevoltAPI.channelCache.mapValues { ch ->
+                        ch.value.name ?: ch.value.id ?: "{this does not exist 🤫}"
+                    },
+                    emojiMap = RevoltAPI.emojiCache,
+                    serverId = null,
+                    useLargeEmojis = false
+                )
+            )
+
+            it.text = spannableStringBuilder
         }
     )
 }
