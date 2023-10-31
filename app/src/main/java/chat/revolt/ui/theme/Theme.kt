@@ -3,7 +3,6 @@ package chat.revolt.ui.theme
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
@@ -118,7 +117,6 @@ fun getColorScheme(requestedTheme: Theme, colourOverrides: Map<String, Int>? = n
             val name = it.name
             val value = colourOverrides?.get(name)
             if (value != null) {
-                Log.d("RevoltTheme", "Overriding $name with $value")
                 it.setter.call(colorScheme, Color(value))
             }
         }
