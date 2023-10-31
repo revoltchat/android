@@ -42,14 +42,12 @@ import chat.revolt.api.routes.account.MfaResponseRecoveryCode
 import chat.revolt.api.routes.account.MfaResponseTotpCode
 import chat.revolt.api.routes.account.authenticateWithMfaRecoveryCode
 import chat.revolt.api.routes.account.authenticateWithMfaTotpCode
-import chat.revolt.api.settings.GlobalState
-import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.CollapsibleCard
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class MfaScreenViewModel @Inject constructor(
@@ -79,11 +77,6 @@ class MfaScreenViewModel @Inject constructor(
         _recoveryCode = code
     }
 
-    private suspend fun loadSettings(token: String) {
-        SyncedSettings.fetch(token)
-        GlobalState.hydrateWithSettings(SyncedSettings)
-    }
-
     fun tryAuthorizeTotp(mfaTicket: String) {
         _error = null
         viewModelScope.launch {
@@ -102,7 +95,6 @@ class MfaScreenViewModel @Inject constructor(
 
                     RevoltAPI.loginAs(token)
                     RevoltAPI.setSessionId(id)
-                    loadSettings(token)
                     kvStorage.set("sessionToken", token)
                     kvStorage.set("sessionId", id)
 
@@ -133,7 +125,6 @@ class MfaScreenViewModel @Inject constructor(
 
                     RevoltAPI.loginAs(token)
                     RevoltAPI.setSessionId(id)
-                    loadSettings(token)
                     kvStorage.set("sessionToken", token)
                     kvStorage.set("sessionId", id)
 

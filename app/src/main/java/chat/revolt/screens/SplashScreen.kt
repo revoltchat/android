@@ -38,15 +38,13 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.internals.WebChallenge
 import chat.revolt.api.routes.onboard.needsOnboarding
-import chat.revolt.api.settings.GlobalState
-import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.screens.splash.DisconnectedScreen
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.request.get
-import javax.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
@@ -130,16 +128,8 @@ class SplashScreenViewModel @Inject constructor(
 
                 RevoltAPI.loginAs(token)
                 RevoltAPI.setSessionId(id)
-                loadSettings()
                 setNavigateTo("home")
             }
-        }
-    }
-
-    private fun loadSettings() {
-        viewModelScope.launch {
-            SyncedSettings.fetch()
-            GlobalState.hydrateWithSettings(SyncedSettings)
         }
     }
 

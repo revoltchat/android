@@ -28,6 +28,8 @@ import chat.revolt.api.realtime.frames.receivable.UserUpdateFrame
 import chat.revolt.api.realtime.frames.sendable.AuthorizationFrame
 import chat.revolt.api.realtime.frames.sendable.PingFrame
 import chat.revolt.api.routes.server.fetchMember
+import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.SyncedSettings
 import io.ktor.client.plugins.websocket.ws
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
@@ -446,7 +448,8 @@ object RealtimeSocket {
             }
 
             "Authenticated" -> {
-                /* no-op */
+                SyncedSettings.fetch()
+                GlobalState.hydrateWithSettings(SyncedSettings)
             }
 
             else -> {

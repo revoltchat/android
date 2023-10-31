@@ -42,15 +42,13 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.account.EmailPasswordAssessment
 import chat.revolt.api.routes.account.negotiateAuthentication
 import chat.revolt.api.routes.onboard.needsOnboarding
-import chat.revolt.api.settings.GlobalState
-import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.AnyLink
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.Weblink
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -75,11 +73,6 @@ class LoginViewModel @Inject constructor(
     private var _mfaResponse by mutableStateOf<EmailPasswordAssessment?>(null)
     val mfaResponse: EmailPasswordAssessment?
         get() = _mfaResponse
-
-    private suspend fun loadSettings(token: String) {
-        SyncedSettings.fetch(token)
-        GlobalState.hydrateWithSettings(SyncedSettings)
-    }
 
     fun doLogin() {
         _error = null
@@ -115,7 +108,6 @@ class LoginViewModel @Inject constructor(
 
                         RevoltAPI.loginAs(token)
                         RevoltAPI.setSessionId(response.firstUserHints.token)
-                        loadSettings(token)
 
                         _navigateTo = "home"
                     } catch (e: Error) {
