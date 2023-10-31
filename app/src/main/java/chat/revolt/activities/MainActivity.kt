@@ -26,6 +26,7 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import chat.revolt.BuildConfig
 import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
@@ -86,7 +87,8 @@ fun AppEntrypoint(windowSizeClass: WindowSizeClass) {
     val navController = rememberNavController()
 
     RevoltTheme(
-        requestedTheme = GlobalState.theme
+        requestedTheme = GlobalState.theme,
+        colourOverrides = SyncedSettings.android.colourOverrides
     ) {
         Surface(
             modifier = Modifier.fillMaxSize(),

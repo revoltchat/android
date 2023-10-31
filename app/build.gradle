@@ -168,6 +168,7 @@ sentry {
 dependencies {
     // Android/Kotlin Core
     implementation 'androidx.core:core-ktx:1.10.1'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.9.10"
 
     // Kotlinx - various first-party extensions for Kotlin
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
@@ -253,6 +254,9 @@ dependencies {
     implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
     implementation "androidx.media3:media3-datasource-okhttp:$media3_version"
     implementation "androidx.media3:media3-ui:$media3_version"
+
+    // Colour picker
+    implementation "com.github.skydoves:colorpicker-compose:1.0.5"
 
     // Debug-only dependencies
 

@@ -56,6 +56,7 @@ import chat.revolt.api.schemas.Invite
 import chat.revolt.api.schemas.InviteJoined
 import chat.revolt.api.schemas.RsResult
 import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.IconPlaceholder
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.ui.theme.RevoltTheme
@@ -143,7 +144,10 @@ fun InviteScreen(
     val inviteValid = if (viewModel.loadingFinished) (viewModel.inviteResult?.ok ?: false) else null
     val invite = viewModel.inviteResult?.value
 
-    RevoltTheme(requestedTheme = GlobalState.theme) {
+    RevoltTheme(
+        requestedTheme = GlobalState.theme,
+        colourOverrides = SyncedSettings.android.colourOverrides
+    ) {
         Surface(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)

@@ -45,6 +45,7 @@ import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.provider.getAttachmentContentUri
 import chat.revolt.ui.theme.RevoltTheme
@@ -177,7 +178,10 @@ fun ImageViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
         }
     }
 
-    RevoltTheme(requestedTheme = GlobalState.theme) {
+    RevoltTheme(
+        requestedTheme = GlobalState.theme,
+        colourOverrides = SyncedSettings.android.colourOverrides
+    ) {
         Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
         ) { pv ->
