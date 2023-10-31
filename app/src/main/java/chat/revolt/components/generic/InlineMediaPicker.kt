@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -87,11 +86,11 @@ fun InlineMediaPicker(
                         onRemove()
                     },
                     enabled = currentModel != null,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.width(480.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.inline_media_picker_remove)
+                        contentDescription = null
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))

@@ -9,14 +9,21 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -191,7 +198,18 @@ class ProfileSettingsScreenViewModel @Inject constructor(@ApplicationContext val
     fun removeBackground() {
         viewModelScope.launch {
             patchSelf(remove = listOf("ProfileBackground"))
-            pfpModel = null
+            backgroundModel = null
+        }
+    }
+
+    fun saveBio() {
+        viewModelScope.launch {
+            patchSelf(bio = pendingProfile?.content)
+            
+            fetchUserProfile(RevoltAPI.selfId!!).let {
+                currentProfile = it
+                pendingProfile = it
+            }
         }
     }
 }
@@ -298,6 +316,47 @@ fun ProfileSettingsScreen(
                         onRemove = {
                             viewModel.removeBackground()
                         }
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 20.dp)
+            ) {
+                OutlinedTextField(
+                    value = viewModel.pendingProfile?.content ?: "",
+                    onValueChange = { value ->
+                        viewModel.pendingProfile?.let {
+                            viewModel.pendingProfile = it.copy(content = value)
+                        }
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(id = R.string.user_context_sheet_category_bio),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    },
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                TextButton(
+                    onClick = {
+                        viewModel.saveBio()
+                    },
+                    enabled = viewModel.pendingProfile?.content != viewModel.currentProfile?.content,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.settings_profile_save),
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }

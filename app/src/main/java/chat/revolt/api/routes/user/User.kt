@@ -67,7 +67,7 @@ suspend fun patchSelf(
             profileMap["background"] = background
         }
         if (bio != null) {
-            profileMap["bio"] = bio
+            profileMap["content"] = bio
         }
 
         body["profile"] = RevoltJson.encodeToJsonElement(
