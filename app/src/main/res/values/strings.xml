@@ -455,6 +455,7 @@
     <string name="settings_appearance_colour_overrides_reset">Reset</string>
     <string name="settings_appearance_colour_overrides_export">Export</string>
     <string name="settings_appearance_colour_overrides_import">Import</string>
+    <string name="settings_appearance_colour_overrides_import_error">This file is not a valid colour override file.</string>
 
     <string name="settings_feedback">Feedback</string>
     <string name="settings_feedback_introduction">Any feedback you have for Revolt is greatly appreciated and all feedback is read by the development team of our Android app.</string>

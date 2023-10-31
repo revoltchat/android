@@ -9,7 +9,6 @@ import chat.revolt.api.internals.Members
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.user.fetchSelf
-import chat.revolt.api.schemas.Channel as ChannelSchema
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.Server
@@ -38,7 +37,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
+import chat.revolt.api.schemas.Channel as ChannelSchema
 
 const val REVOLT_BASE = "https://api.revolt.chat"
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
@@ -59,6 +60,11 @@ private const val BACKEND_IS_STABLE = false
 val RevoltJson = Json {
     ignoreUnknownKeys = true
     explicitNulls = false
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+val RevoltCbor = Cbor {
+    ignoreUnknownKeys = true
 }
 
 val RevoltHttp = HttpClient(OkHttp) {

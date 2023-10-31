@@ -1,6 +1,10 @@
 package chat.revolt.screens.settings
 
+import android.content.Context
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
@@ -51,14 +55,16 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.revolt.R
+import chat.revolt.api.RevoltCbor
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.PageHeader
@@ -71,11 +77,22 @@ import com.github.skydoves.colorpicker.compose.BrightnessSlider
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
+import java.io.File
+import javax.inject.Inject
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
 
-class AppearanceSettingsScreenViewModel : ViewModel() {
+@HiltViewModel
+@Suppress("StaticFieldLeak")
+class AppearanceSettingsScreenViewModel @Inject constructor(
+    @ApplicationContext val context: Context
+) : ViewModel() {
     var showColourOverrides by mutableStateOf(false)
     var selectedOverrideName by mutableStateOf<String?>(null)
     var selectedOverrideInitialValue by mutableStateOf<Int?>(null)
@@ -116,13 +133,72 @@ class AppearanceSettingsScreenViewModel : ViewModel() {
             }
         }
     }
+
+    private fun validOverrideKey(key: String): Boolean {
+        return ColorScheme::class.memberProperties.any { it.name == key }
+    }
+
+    private fun applyBulkOverrides(overrides: Map<String, Int>) {
+        val existingOverrides = SyncedSettings.android.colourOverrides ?: mapOf()
+        val newOverrides = existingOverrides.toMutableMap()
+
+        newOverrides.putAll(overrides.filterKeys { validOverrideKey(it) })
+
+        viewModelScope.launch {
+            SyncedSettings.updateAndroid(
+                SyncedSettings.android.copy(
+                    colourOverrides = newOverrides
+                )
+            )
+        }
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    fun processImportedOverrides(uri: Uri) {
+        val mFile = File(context.cacheDir, uri.lastPathSegment ?: "temp")
+
+        mFile.outputStream().use { outputStream ->
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
+
+        try {
+            RevoltCbor.decodeFromByteArray(
+                MapSerializer(String.serializer(), Int.serializer()),
+                mFile.readBytes()
+            ).let {
+                applyBulkOverrides(it)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.settings_appearance_colour_overrides_import_error),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        mFile.delete()
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    fun saveOverridesToFile(uri: Uri) {
+        context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+            outputStream.write(
+                RevoltCbor.encodeToByteArray(
+                    MapSerializer(String.serializer(), Int.serializer()),
+                    SyncedSettings.android.colourOverrides ?: mapOf()
+                )
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AppearanceSettingsScreen(
     navController: NavController,
-    viewModel: AppearanceSettingsScreenViewModel = viewModel()
+    viewModel: AppearanceSettingsScreenViewModel = hiltViewModel()
 ) {
     val colourOverridesOpenerArrowRotation by animateFloatAsState(
         if (viewModel.showColourOverrides) {
@@ -130,6 +206,21 @@ fun AppearanceSettingsScreen(
         } else 0f,
         label = "colourOverridesOpenerArrowRotation"
     )
+
+    val filePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        if (uri != null) {
+            viewModel.processImportedOverrides(uri)
+        }
+    }
+    val fileSaver = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/x-revolt-android-theme-overrides"),
+    ) { uri ->
+        if (uri != null) {
+            viewModel.saveOverridesToFile(uri)
+        }
+    }
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -314,6 +405,53 @@ fun AppearanceSettingsScreen(
 
             AnimatedVisibility(viewModel.showColourOverrides) {
                 Column {
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp)
+                    ) {
+                        TextButton(
+                            onClick = {
+                                filePicker.launch(arrayOf("*/*"))
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_folder_24dp),
+                                contentDescription = null
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                text = stringResource(id = R.string.settings_appearance_colour_overrides_import)
+                            )
+                        }
+
+                        TextButton(
+                            onClick = {
+                                fileSaver.launch("${SyncedSettings.android.theme}-colours.rato")
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_content_save_24dp),
+                                contentDescription = null
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                text = stringResource(id = R.string.settings_appearance_colour_overrides_export)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     ColorScheme::class.memberProperties.forEach { member ->
                         if (member.visibility != KVisibility.PUBLIC) return@forEach
 
