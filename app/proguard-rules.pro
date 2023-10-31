@@ -72,3 +72,13 @@
 # hCaptcha related
 -dontwarn edu.umd.cs.findbugs.annotations.**
 -dontwarn lombok.**
+
+# do not log in release builds
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static *** v(...);
+    public static *** d(...);
+    public static *** i(...);
+    public static *** w(...);
+    public static *** e(...);
+}
