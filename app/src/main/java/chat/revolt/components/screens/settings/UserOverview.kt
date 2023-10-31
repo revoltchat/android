@@ -37,6 +37,7 @@ import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
+import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.Profile
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.RemoteImage
@@ -70,7 +71,12 @@ fun UserOverview(user: User) {
 }
 
 @Composable
-fun RawUserOverview(user: User, profile: Profile? = null) {
+fun RawUserOverview(
+    user: User,
+    profile: Profile? = null,
+    pfpUrl: String? = null,
+    backgroundUrl: String? = null
+) {
     val context = LocalContext.current
     var teamMemberFlair by remember { mutableStateOf<Brush?>(null) }
 
@@ -104,9 +110,10 @@ fun RawUserOverview(user: User, profile: Profile? = null) {
                 }
             )
     ) {
-        profile?.background?.let { background ->
+        (backgroundUrl ?: profile?.background)?.let { background ->
             RemoteImage(
-                url = "$REVOLT_FILES/backgrounds/${background.id}",
+                url = backgroundUrl
+                    ?: "$REVOLT_FILES/backgrounds/${if (background is AutumnResource) background.id else null}",
                 description = null,
                 modifier = Modifier
                     .height(128.dp)
@@ -137,6 +144,7 @@ fun RawUserOverview(user: User, profile: Profile? = null) {
         ) {
             UserAvatar(
                 username = user.displayName ?: stringResource(id = R.string.unknown),
+                rawUrl = pfpUrl,
                 userId = user.id ?: ULID.makeSpecial(0),
                 avatar = user.avatar,
                 size = 48.dp,

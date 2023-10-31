@@ -2,7 +2,10 @@ package chat.revolt.screens.settings
 
 import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -29,7 +32,6 @@ import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.screens.settings.appearance.ThemeChip
 import chat.revolt.ui.theme.Theme
 import chat.revolt.ui.theme.systemSupportsDynamicColors
-import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.launch
 
 class AppearanceSettingsScreenViewModel : ViewModel() {
@@ -42,6 +44,7 @@ class AppearanceSettingsScreenViewModel : ViewModel() {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AppearanceSettingsScreen(
     navController: NavController,
@@ -80,14 +83,16 @@ fun AppearanceSettingsScreen(
             )
 
             FlowRow(
-                mainAxisSpacing = 10.dp,
-                crossAxisSpacing = 10.dp
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 ThemeChip(
                     color = Color(0xff1c243c),
                     text = stringResource(id = R.string.settings_appearance_theme_revolt),
                     selected = GlobalState.theme == Theme.Revolt,
-                    modifier = Modifier.weight(1f).testTag("set_theme_revolt")
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("set_theme_revolt")
                 ) {
                     setNewTheme(Theme.Revolt)
                 }
@@ -96,7 +101,9 @@ fun AppearanceSettingsScreen(
                     color = Color(0xfff7f7f7),
                     text = stringResource(id = R.string.settings_appearance_theme_light),
                     selected = GlobalState.theme == Theme.Light,
-                    modifier = Modifier.weight(1f).testTag("set_theme_light")
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("set_theme_light")
                 ) {
                     setNewTheme(Theme.Light)
                 }
@@ -105,7 +112,9 @@ fun AppearanceSettingsScreen(
                     color = Color(0xff000000),
                     text = stringResource(id = R.string.settings_appearance_theme_amoled),
                     selected = GlobalState.theme == Theme.Amoled,
-                    modifier = Modifier.weight(1f).testTag("set_theme_amoled")
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("set_theme_amoled")
                 ) {
                     setNewTheme(Theme.Amoled)
                 }
@@ -114,7 +123,9 @@ fun AppearanceSettingsScreen(
                     color = if (isSystemInDarkTheme()) Color(0xff1c243c) else Color(0xfff7f7f7),
                     text = stringResource(id = R.string.settings_appearance_theme_none),
                     selected = GlobalState.theme == Theme.None,
-                    modifier = Modifier.weight(1f).testTag("set_theme_none")
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("set_theme_none")
                 ) {
                     setNewTheme(Theme.None)
                 }
@@ -124,7 +135,9 @@ fun AppearanceSettingsScreen(
                         color = dynamicDarkColorScheme(LocalContext.current).primary,
                         text = stringResource(id = R.string.settings_appearance_theme_m3dynamic),
                         selected = GlobalState.theme == Theme.M3Dynamic,
-                        modifier = Modifier.weight(1f).testTag("set_theme_m3dynamic")
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("set_theme_m3dynamic")
                     ) {
                         setNewTheme(Theme.M3Dynamic)
                     }
@@ -135,7 +148,9 @@ fun AppearanceSettingsScreen(
                             id = R.string.settings_appearance_theme_m3dynamic_unsupported
                         ),
                         selected = false,
-                        modifier = Modifier.weight(1f).testTag("set_theme_m3dynamic_unsupported")
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("set_theme_m3dynamic_unsupported")
                     ) {
                         Toast.makeText(
                             context,

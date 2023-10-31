@@ -43,6 +43,7 @@ import chat.revolt.screens.settings.AppearanceSettingsScreen
 import chat.revolt.screens.settings.ChangelogsSettingsScreen
 import chat.revolt.screens.settings.ClosedBetaUpdaterScreen
 import chat.revolt.screens.settings.DebugSettingsScreen
+import chat.revolt.screens.settings.ProfileSettingsScreen
 import chat.revolt.screens.settings.SessionSettingsScreen
 import chat.revolt.screens.settings.SettingsScreen
 import chat.revolt.ui.theme.RevoltTheme
@@ -143,6 +144,7 @@ fun AppEntrypoint(windowSizeClass: WindowSizeClass) {
                 composable("chat") { ChatRouterScreen(navController, windowSizeClass) }
 
                 composable("settings") { SettingsScreen(navController) }
+                composable("settings/profile") { ProfileSettingsScreen(navController) }
                 composable("settings/sessions") { SessionSettingsScreen(navController) }
                 composable("settings/appearance") { AppearanceSettingsScreen(navController) }
                 composable("settings/debug") { DebugSettingsScreen(navController) }

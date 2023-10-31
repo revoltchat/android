@@ -14,6 +14,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
@@ -41,10 +42,45 @@ suspend fun fetchSelf(): User {
     return user
 }
 
-suspend fun patchSelf(status: Status? = null, pure: Boolean = false) {
+suspend fun patchSelf(
+    status: Status? = null,
+    avatar: String? = null,
+    background: String? = null,
+    bio: String? = null,
+    remove: List<String>? = null,
+    pure: Boolean = false
+) {
     val body = mutableMapOf<String, JsonElement>()
+
     if (status != null) {
         body["status"] = RevoltJson.encodeToJsonElement(Status.serializer(), status)
+    }
+
+    if (avatar != null) {
+        body["avatar"] = RevoltJson.encodeToJsonElement(String.serializer(), avatar)
+    }
+
+    if (background != null || bio != null) {
+        val profileMap = mutableMapOf<String, String>()
+
+        if (background != null) {
+            profileMap["background"] = background
+        }
+        if (bio != null) {
+            profileMap["bio"] = bio
+        }
+
+        body["profile"] = RevoltJson.encodeToJsonElement(
+            MapSerializer(
+                String.serializer(),
+                String.serializer()
+            ),
+            profileMap
+        )
+    }
+
+    if (remove != null) {
+        body["remove"] = RevoltJson.encodeToJsonElement(ListSerializer(String.serializer()), remove)
     }
 
     val response = RevoltHttp.patch("/users/@me") {

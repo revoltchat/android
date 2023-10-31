@@ -259,6 +259,13 @@ object RealtimeSocket {
                 val existing = RevoltAPI.userCache[userUpdateFrame.id]
                     ?: return // if we don't have the user no point in updating it
 
+                if (userUpdateFrame.clear != null) {
+                    if (userUpdateFrame.clear.contains("Avatar")) {
+                        RevoltAPI.userCache[userUpdateFrame.id] =
+                            existing.copy(avatar = null)
+                    }
+                }
+
                 RevoltAPI.userCache[userUpdateFrame.id] =
                     existing.mergeWithPartial(userUpdateFrame.data)
             }

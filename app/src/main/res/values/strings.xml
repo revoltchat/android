@@ -367,6 +367,10 @@
     <string name="file_picker_chip_documents">Attach a file</string>
     <string name="file_picker_chip_camera">Take a photo</string>
 
+    <string name="inline_media_picker_current_description">Currently selected media</string>
+    <string name="inline_media_picker_no_media_placeholder">Pick media…</string>
+    <string name="inline_media_picker_remove">Remove</string>
+
     <string name="emoji_picker_close_skin_tone_menu">Close skin tone menu</string>
     <string name="emoji_picker_skin_tone_none">No skin tone</string>
     <string name="emoji_picker_skin_tone_fitzpatrick_1_2">Light skin tone</string>
@@ -390,6 +394,10 @@
     <string name="settings_category_general">General</string>
     <string name="settings_category_miscellaneous">Miscellaneous</string>
     <string name="settings_category_last" translatable="false">Revolt v%1$s</string>
+
+    <string name="settings_profile">Profile</string>
+    <string name="settings_profile_profile_picture">Profile picture</string>
+    <string name="settings_profile_custom_background">Custom background</string>
 
     <string name="settings_sessions">Sessions</string>
     <string name="settings_sessions_this_device">This Device</string>

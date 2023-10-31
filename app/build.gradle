@@ -191,7 +191,6 @@ dependencies {
     // Accompanist - Jetpack Compose Extensions
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
     implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version"
 
     // KTOR - HTTP+WebSocket Library
     implementation "io.ktor:ktor-client-core:$ktor_version"

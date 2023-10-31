@@ -62,6 +62,9 @@ suspend fun uploadToAutumn(
             val error = RevoltJson.decodeFromString(AutumnError.serializer(), response.bodyAsText())
             throw Exception(error.type)
         } catch (e: Exception) {
+            if (response.status.value == 429) {
+                throw Exception("Rate limited")
+            }
             throw Exception("Unknown error")
         }
     }
