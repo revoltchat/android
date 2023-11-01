@@ -4,6 +4,7 @@ import android.text.format.Formatter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -75,54 +76,61 @@ fun FileAttachment(attachment: AutumnResource) {
 fun ImageAttachment(attachment: AutumnResource) {
     val url = "$REVOLT_FILES/attachments/${attachment.id}/${attachment.filename}"
 
-    RemoteImage(
-        url = url,
-        contentScale = ContentScale.Fit,
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(
-                attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()
-            ),
-        description = attachment.filename ?: "Image"
-    )
+    BoxWithConstraints {
+        RemoteImage(
+            url = url,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .width(attachment.metadata?.width?.toInt()?.dp ?: maxWidth)
+                .aspectRatio(
+                    attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()
+                ),
+            description = attachment.filename ?: "Image"
+        )
+    }
 }
 
 @Composable
 fun VideoAttachment(attachment: AutumnResource) {
     val url = "$REVOLT_FILES/attachments/${attachment.id}/${attachment.filename}"
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        // Turns out that when you give Glide a video URL, you get a perfectly cromulent thumbnail.
-        RemoteImage(
-            url = url,
-            contentScale = ContentScale.Fit,
+    BoxWithConstraints {
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .fillMaxWidth()
+                .width(attachment.metadata?.width?.toInt()?.dp ?: maxWidth)
                 .aspectRatio(
                     attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()
-                ),
-            description = attachment.filename ?: "Video"
-        )
+                )
+        ) {
+            // Turns out that when you give Glide a video URL, you get a perfectly cromulent thumbnail.
+            RemoteImage(
+                url = url,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(
+                        attachment.metadata.width!!.toFloat() / attachment.metadata.height.toFloat()
+                    ),
+                description = attachment.filename ?: "Video"
+            )
 
-        Box(
-            modifier = Modifier
-                .width(48.dp)
-                .aspectRatio(1f)
-                .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
-        )
+            Box(
+                modifier = Modifier
+                    .width(48.dp)
+                    .aspectRatio(1f)
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+            )
 
-        Icon(
-            imageVector = Icons.Default.PlayArrow,
-            contentDescription = stringResource(id = R.string.media_viewer_play),
-            modifier = Modifier
-                .width(32.dp)
-                .aspectRatio(1f)
-        )
+            Icon(
+                imageVector = Icons.Default.PlayArrow,
+                contentDescription = stringResource(id = R.string.media_viewer_play),
+                modifier = Modifier
+                    .width(32.dp)
+                    .aspectRatio(1f)
+            )
+        }
     }
 }
 
