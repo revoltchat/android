@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -168,6 +170,7 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel 
     ) {
         Image(
             painter = painterResource(id = R.drawable.revolt_logo_wide),
+            colorFilter = ColorFilter.tint(LocalContentColor.current),
             contentDescription = "Revolt Logo",
             contentScale = ContentScale.Fit,
             modifier = Modifier
