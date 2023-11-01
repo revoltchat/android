@@ -19,8 +19,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
-import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.memberProperties
 
 val RevoltColorScheme = darkColorScheme(
     primary = Color(0xffda4e5b),
@@ -68,7 +66,10 @@ enum class Theme {
 }
 
 @Composable
-fun getColorScheme(requestedTheme: Theme, colourOverrides: Map<String, Int>? = null): ColorScheme {
+fun getColorScheme(
+    requestedTheme: Theme,
+    colourOverrides: OverridableColourScheme? = null
+): ColorScheme {
     val context = LocalContext.current
 
     val systemInDarkTheme = isSystemInDarkTheme()
@@ -112,24 +113,15 @@ fun getColorScheme(requestedTheme: Theme, colourOverrides: Map<String, Int>? = n
         }
     }
 
-    colorScheme::class.memberProperties.forEach {
-        if (it is KMutableProperty<*>) {
-            val name = it.name
-            val value = colourOverrides?.get(name)
-            if (value != null) {
-                it.setter.call(colorScheme, Color(value))
-            }
-        }
-    }
-
-    return colorScheme
+    if (colourOverrides == null) return colorScheme
+    return colourOverrides.applyTo(colorScheme)
 }
 
 @SuppressLint("NewApi")
 @Composable
 fun RevoltTheme(
     requestedTheme: Theme,
-    colourOverrides: Map<String, Int>?,
+    colourOverrides: OverridableColourScheme? = null,
     content: @Composable () -> Unit
 ) {
     val colorScheme = getColorScheme(requestedTheme, colourOverrides)

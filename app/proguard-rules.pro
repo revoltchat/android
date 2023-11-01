@@ -82,3 +82,29 @@
     public static *** w(...);
     public static *** e(...);
 }
+
+-dontwarn kotlin.**
+-dontwarn org.w3c.dom.events.*
+-dontwarn org.jetbrains.kotlin.di.InjectorForRuntimeDescriptorLoader
+
+-keep class kotlin.** { *; }
+-keep class org.jetbrains.kotlin.** { *; }
+
+-keepclassmembers,allowoptimization enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+    **[] $VALUES;
+    public *;
+}
+
+-keepattributes InnerClasses
+
+-keep class androidx.compose.ui.graphics.ColorKt { *; }
+
+-keep class androidx.compose.material3.ColorScheme { *; }
+-keep class androidx.compose.material3.ColorSchemeKt { *; }
+-keep class androidx.compose.material3.ColorSchemeKt$* { *; }
+-keepclassmembers class androidx.compose.material3.ColorSchemeKt {
+    public static final <fields>;
+    public <fields>;
+}

@@ -1,5 +1,6 @@
 package chat.revolt.api.schemas
 
+import chat.revolt.ui.theme.OverridableColourScheme
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,5 +19,5 @@ data class AndroidSpecificSettings(
      * Colour overrides.
      * Map of `primary, onPrimary, primaryContainer, onPrimaryContainer, inversePrimary, secondary, onSecondary, secondaryContainer, onSecondaryContainer, tertiary, onTertiary, tertiaryContainer, onTertiaryContainer, background, onBackground, surface, onSurface, surfaceVariant, onSurfaceVariant, surfaceTint, inverseSurface, inverseOnSurface, error, onError, errorContainer, onErrorContainer, outline, outlineVariant, scrim` to int colours.
      */
-    var colourOverrides: Map<String, Int>? = null,
+    var colourOverrides: OverridableColourScheme? = null,
 )

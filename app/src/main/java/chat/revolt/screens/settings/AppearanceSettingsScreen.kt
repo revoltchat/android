@@ -31,7 +31,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.Button
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -65,12 +64,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltCbor
+import chat.revolt.api.RevoltJson
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.screens.settings.appearance.ColourChip
 import chat.revolt.ui.theme.ClearRippleTheme
+import chat.revolt.ui.theme.OverridableColourScheme
 import chat.revolt.ui.theme.Theme
+import chat.revolt.ui.theme.getFieldByName
 import chat.revolt.ui.theme.systemSupportsDynamicColors
 import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
@@ -85,8 +87,6 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import java.io.File
 import javax.inject.Inject
-import kotlin.reflect.KVisibility
-import kotlin.reflect.full.memberProperties
 
 @HiltViewModel
 @Suppress("StaticFieldLeak")
@@ -110,7 +110,17 @@ class AppearanceSettingsScreenViewModel @Inject constructor(
             val overrides = SyncedSettings.android.copy().colourOverrides
 
             if (overrides != null) {
-                val mutOverrides = overrides.toMutableMap()
+                // Yes, this looks stupid. Please see the comments in OverridableColourScheme.kt regarding this.
+                val json = RevoltJson.encodeToString(
+                    OverridableColourScheme.serializer(),
+                    overrides
+                )
+                val asMap = RevoltJson.decodeFromString(
+                    MapSerializer(String.serializer(), Int.serializer()),
+                    json
+                )
+
+                val mutOverrides = asMap.toMutableMap()
                 if (value == null) {
                     mutOverrides.remove(fieldName)
                 } else {
@@ -119,35 +129,31 @@ class AppearanceSettingsScreenViewModel @Inject constructor(
 
                 SyncedSettings.updateAndroid(
                     SyncedSettings.android.copy(
-                        colourOverrides = mutOverrides
+                        colourOverrides = OverridableColourScheme()
+                            .applyFromKeyValueMap(mutOverrides)
                     )
                 )
             } else if (value != null) {
                 SyncedSettings.updateAndroid(
                     SyncedSettings.android.copy(
-                        colourOverrides = mapOf(
-                            fieldName to value
-                        )
+                        colourOverrides = OverridableColourScheme()
+                            .applyFromKeyValueMap(
+                                mapOf(fieldName to value)
+                            )
                     )
                 )
             }
         }
     }
 
-    private fun validOverrideKey(key: String): Boolean {
-        return ColorScheme::class.memberProperties.any { it.name == key }
-    }
-
     private fun applyBulkOverrides(overrides: Map<String, Int>) {
-        val existingOverrides = SyncedSettings.android.colourOverrides ?: mapOf()
-        val newOverrides = existingOverrides.toMutableMap()
-
-        newOverrides.putAll(overrides.filterKeys { validOverrideKey(it) })
+        val existingOverrides = SyncedSettings.android.colourOverrides ?: OverridableColourScheme()
 
         viewModelScope.launch {
             SyncedSettings.updateAndroid(
                 SyncedSettings.android.copy(
-                    colourOverrides = newOverrides
+                    colourOverrides = existingOverrides
+                        .applyFromKeyValueMap(overrides.filterKeys { it in OverridableColourScheme.fieldNames })
                 )
             )
         }
@@ -186,8 +192,8 @@ class AppearanceSettingsScreenViewModel @Inject constructor(
         context.contentResolver.openOutputStream(uri)?.use { outputStream ->
             outputStream.write(
                 RevoltCbor.encodeToByteArray(
-                    MapSerializer(String.serializer(), Int.serializer()),
-                    SyncedSettings.android.colourOverrides ?: mapOf()
+                    OverridableColourScheme.serializer(),
+                    SyncedSettings.android.colourOverrides ?: OverridableColourScheme()
                 )
             )
         }
@@ -452,28 +458,23 @@ fun AppearanceSettingsScreen(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    ColorScheme::class.memberProperties.forEach { member ->
-                        if (member.visibility != KVisibility.PUBLIC) return@forEach
-
-                        val name = member.name
-                        val value = member.getter.call(MaterialTheme.colorScheme) as Color
+                    OverridableColourScheme.fieldNames.forEach { fieldName ->
+                        val value =
+                            SyncedSettings.android.colourOverrides?.getFieldByName(fieldName)
+                                ?: MaterialTheme.colorScheme.getFieldByName(fieldName)
 
                         ColourChip(
-                            color = value,
-                            text = try {
-                                R.string::class.java.getField("settings_appearance_colour_overrides_${name.toSnakeCase()}")
-                                    .getInt(null)
-                                    .let { context.getString(it) }
-                            } catch (e: Exception) {
-                                name
-                            },
+                            color = Color(value ?: 0),
+                            text = OverridableColourScheme.fieldNameToResource[fieldName]
+                                ?.let { context.getString(it) }
+                                ?: fieldName,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 20.dp, end = 20.dp)
-                                .testTag("set_colour_override_$name")
+                                .testTag("set_colour_override_$fieldName")
                         ) {
-                            viewModel.selectedOverrideName = name
-                            viewModel.selectedOverrideInitialValue = value.toArgb()
+                            viewModel.selectedOverrideName = fieldName
+                            viewModel.selectedOverrideInitialValue = value
                             viewModel.overridePickerSheetVisible = true
                         }
                     }
