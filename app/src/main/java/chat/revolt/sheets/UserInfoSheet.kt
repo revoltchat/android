@@ -40,7 +40,7 @@ import chat.revolt.components.screens.settings.RawUserOverview
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun UserContextSheet(userId: String, serverId: String? = null) {
+fun UserInfoSheet(userId: String, serverId: String? = null) {
     val user = RevoltAPI.userCache[userId]
 
     val member = serverId?.let { RevoltAPI.members.getMember(it, userId) }

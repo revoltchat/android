@@ -61,9 +61,9 @@ import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 val DO_NOT_FETCH_OFFLINE_MEMBERS_SERVERS = listOf(
     "01F7ZSBSFHQ8TA81725KQCSDDP" // Revolt Lounge
@@ -245,7 +245,7 @@ fun MemberListSheet(
                 showUserContextSheet = false
             }
         ) {
-            UserContextSheet(
+            UserInfoSheet(
                 userId = userContextSheetTarget,
                 serverId = serverId
             )
@@ -312,11 +312,13 @@ fun MemberListMemberUser(
     onSelectUser: (String) -> Unit
 ) {
     val highestColourRole = serverId?.let {
-        Roles.resolveHighestRole(
-            it,
-            user.id!!,
-            true
-        )
+        user.id?.let { userId ->
+            Roles.resolveHighestRole(
+                it,
+                userId,
+                true
+            )
+        }
     }
     val colour = highestColourRole?.colour?.let { WebCompat.parseColour(it) }
         ?: Brush.solidColor(LocalContentColor.current)

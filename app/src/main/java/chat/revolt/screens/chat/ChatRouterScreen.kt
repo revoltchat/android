@@ -104,7 +104,7 @@ import chat.revolt.sheets.EmoteInfoSheet
 import chat.revolt.sheets.LinkInfoSheet
 import chat.revolt.sheets.ServerContextSheet
 import chat.revolt.sheets.StatusSheet
-import chat.revolt.sheets.UserContextSheet
+import chat.revolt.sheets.UserInfoSheet
 import com.airbnb.lottie.RenderMode
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -584,7 +584,7 @@ fun ChatRouterScreen(
                 showUserContextSheet = false
             }
         ) {
-            UserContextSheet(
+            UserInfoSheet(
                 userId = userContextSheetTarget,
                 serverId = userContextSheetServer
             )
