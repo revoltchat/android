@@ -247,7 +247,11 @@ fun MemberListSheet(
         ) {
             UserInfoSheet(
                 userId = userContextSheetTarget,
-                serverId = serverId
+                serverId = serverId,
+                dismissSheet = {
+                    userContextSheetState.hide()
+                    showUserContextSheet = false
+                }
             )
         }
     }

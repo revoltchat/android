@@ -37,10 +37,15 @@ import chat.revolt.components.chat.RoleChip
 import chat.revolt.components.generic.NonIdealState
 import chat.revolt.components.generic.WebMarkdown
 import chat.revolt.components.screens.settings.RawUserOverview
+import chat.revolt.components.screens.settings.UserButtons
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun UserInfoSheet(userId: String, serverId: String? = null) {
+fun UserInfoSheet(
+    userId: String,
+    serverId: String? = null,
+    dismissSheet: suspend () -> Unit
+) {
     val user = RevoltAPI.userCache[userId]
 
     val member = serverId?.let { RevoltAPI.members.getMember(it, userId) }
@@ -73,12 +78,12 @@ fun UserInfoSheet(userId: String, serverId: String? = null) {
             },
             title = {
                 Text(
-                    text = stringResource(R.string.user_context_sheet_user_not_found)
+                    text = stringResource(R.string.user_info_sheet_user_not_found)
                 )
             },
             description = {
                 Text(
-                    text = stringResource(R.string.user_context_sheet_user_not_found_description)
+                    text = stringResource(R.string.user_info_sheet_user_not_found_description)
                 )
             }
         )
@@ -94,9 +99,14 @@ fun UserInfoSheet(userId: String, serverId: String? = null) {
         Column(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 8.dp)
         ) {
+            UserButtons(
+                user,
+                dismissSheet
+            )
+
             member?.roles?.let {
                 Text(
-                    text = stringResource(id = R.string.user_context_sheet_category_roles),
+                    text = stringResource(id = R.string.user_info_sheet_category_roles),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(vertical = 10.dp)
                 )
@@ -121,7 +131,7 @@ fun UserInfoSheet(userId: String, serverId: String? = null) {
             }
 
             Text(
-                text = stringResource(id = R.string.user_context_sheet_category_bio),
+                text = stringResource(id = R.string.user_info_sheet_category_bio),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(vertical = 10.dp)
             )
@@ -133,12 +143,12 @@ fun UserInfoSheet(userId: String, serverId: String? = null) {
                 )
             } else if (profile != null) {
                 Text(
-                    text = stringResource(id = R.string.user_context_sheet_bio_empty),
+                    text = stringResource(id = R.string.user_info_sheet_bio_empty),
                     color = LocalContentColor.current.copy(alpha = 0.6f)
                 )
             } else if (profileNotFound) {
                 Text(
-                    text = stringResource(id = R.string.user_context_sheet_bio_not_found),
+                    text = stringResource(id = R.string.user_info_sheet_bio_not_found),
                     color = LocalContentColor.current.copy(alpha = 0.6f)
                 )
             } else {

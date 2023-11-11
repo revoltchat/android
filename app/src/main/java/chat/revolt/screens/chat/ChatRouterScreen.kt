@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.DismissibleNavigationDrawer
 import androidx.compose.material3.DrawerState
@@ -439,6 +440,14 @@ fun ChatRouterScreen(
                         emoteInfoSheetTarget = action.emoteId
                         showEmoteInfoSheet = true
                     }
+
+                    is Action.TopNavigate -> {
+                        topNav.navigate(action.route)
+                    }
+
+                    is Action.ChatNavigate -> {
+                        navController.navigate(action.route)
+                    }
                 }
             }
         }
@@ -586,7 +595,11 @@ fun ChatRouterScreen(
         ) {
             UserInfoSheet(
                 userId = userContextSheetTarget,
-                serverId = userContextSheetServer
+                serverId = userContextSheetServer,
+                dismissSheet = {
+                    userContextSheetState.hide()
+                    showUserContextSheet = false
+                }
             )
         }
     }
@@ -954,6 +967,7 @@ fun Sidebar(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChannelNavigator(
     navController: NavHostController,
@@ -1030,6 +1044,22 @@ fun ChannelNavigator(
                         navController = navController,
                         messageId = messageId
                     )
+                }
+            }
+
+            dialog("report/user/{userId}") { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId")
+                if (userId != null) {
+                    AlertDialog(onDismissRequest = {
+                        navController.popBackStack()
+                    }) {
+                        Text("Report user $userId")
+                        Button(onClick = {
+                            navController.popBackStack()
+                        }) {
+                            Text("Close")
+                        }
+                    }
                 }
             }
         }

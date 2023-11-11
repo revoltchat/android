@@ -28,6 +28,7 @@ import chat.revolt.api.realtime.frames.receivable.UserUpdateFrame
 import chat.revolt.api.realtime.frames.sendable.AuthorizationFrame
 import chat.revolt.api.realtime.frames.sendable.PingFrame
 import chat.revolt.api.routes.server.fetchMember
+import chat.revolt.api.schemas.Channel
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import io.ktor.client.plugins.websocket.ws
@@ -302,6 +303,18 @@ object RealtimeSocket {
 
                 RevoltAPI.channelCache[channelUpdateFrame.id] =
                     existing.mergeWithPartial(channelUpdateFrame.data)
+            }
+
+            "ChannelCreate" -> {
+                val channelCreateFrame =
+                    RevoltJson.decodeFromString(Channel.serializer(), rawFrame)
+
+                Log.d(
+                    "RealtimeSocket",
+                    "Received channel create frame for ${channelCreateFrame.id}, with name ${channelCreateFrame.name}. Adding to cache."
+                )
+
+                RevoltAPI.channelCache[channelCreateFrame.id!!] = channelCreateFrame
             }
 
             "ChannelAck" -> {

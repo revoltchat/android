@@ -205,7 +205,7 @@ class ProfileSettingsScreenViewModel @Inject constructor(@ApplicationContext val
     fun saveBio() {
         viewModelScope.launch {
             patchSelf(bio = pendingProfile?.content)
-            
+
             fetchUserProfile(RevoltAPI.selfId!!).let {
                 currentProfile = it
                 pendingProfile = it
@@ -332,7 +332,7 @@ fun ProfileSettingsScreen(
                     },
                     label = {
                         Text(
-                            text = stringResource(id = R.string.user_context_sheet_category_bio),
+                            text = stringResource(id = R.string.user_info_sheet_category_bio),
                             style = MaterialTheme.typography.labelLarge,
                         )
                     },

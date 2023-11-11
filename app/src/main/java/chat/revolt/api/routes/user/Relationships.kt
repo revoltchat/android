@@ -1,14 +1,16 @@
 package chat.revolt.api.routes.user
 
-import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import io.ktor.client.request.delete
+import io.ktor.client.request.post
 import io.ktor.client.request.put
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.serialization.SerializationException
-import kotlin.collections.set
 
 suspend fun blockUser(userId: String) {
     val response = RevoltHttp.put("/users/$userId/block")
@@ -20,9 +22,6 @@ suspend fun blockUser(userId: String) {
     } catch (e: SerializationException) {
         // Not an error
     }
-
-    val user = RevoltAPI.userCache[userId] ?: return
-    RevoltAPI.userCache[userId] = user.copy(relationship = "Blocked")
 }
 
 suspend fun unblockUser(userId: String) {
@@ -35,9 +34,33 @@ suspend fun unblockUser(userId: String) {
     } catch (e: SerializationException) {
         // Not an error
     }
+}
 
-    val user = RevoltAPI.userCache[userId] ?: return
-    RevoltAPI.userCache[userId] = user.copy(relationship = "None")
+suspend fun friendUser(username: String) {
+    val response = RevoltHttp.post("/users/friend") {
+        contentType(ContentType.Application.Json)
+        setBody(mapOf("username" to username))
+    }
+    val body = response.bodyAsText()
+
+    try {
+        val error = RevoltJson.decodeFromString(RevoltError.serializer(), body)
+        throw Error(error.type)
+    } catch (e: SerializationException) {
+        // Not an error
+    }
+}
+
+suspend fun acceptFriendRequest(userId: String) {
+    val response = RevoltHttp.put("/users/$userId/friend")
+        .bodyAsText()
+
+    try {
+        val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
+        throw Error(error.type)
+    } catch (e: SerializationException) {
+        // Not an error
+    }
 }
 
 suspend fun unfriendUser(userId: String) {
@@ -50,7 +73,4 @@ suspend fun unfriendUser(userId: String) {
     } catch (e: SerializationException) {
         // Not an error
     }
-
-    val user = RevoltAPI.userCache[userId] ?: return
-    RevoltAPI.userCache[userId] = user.copy(relationship = "None")
 }
