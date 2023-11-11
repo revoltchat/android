@@ -2,6 +2,7 @@ package chat.revolt.components.screens.settings
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
@@ -176,10 +177,12 @@ fun UserButtons(
                     Text(stringResource(R.string.user_info_sheet_unblock))
                 }
             }
+
+            "BlockedOther" -> Box(Modifier.weight(1f))
         }
 
         when (user.relationship) {
-            "Friend", "Incoming", "Outgoing", "None" -> {
+            "Friend", "Incoming", "Outgoing", "None", "BlockedOther" -> {
                 Column { // Prevent the dropdown menu from counting towards arrangement spacing
                     IconButton(
                         onClick = {
