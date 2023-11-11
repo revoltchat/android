@@ -463,8 +463,8 @@ class ChannelScreenViewModel : ViewModel() {
         }
 
         val newContent = currentContent.substring(0, currentSelection.start) +
-            content +
-            currentContent.substring(currentSelection.end)
+                content +
+                currentContent.substring(currentSelection.end)
 
         pendingMessageContent = newContent
         textSelection = TextRange(currentSelection.start + content.length)

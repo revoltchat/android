@@ -233,6 +233,7 @@
     <string name="channel_info_sheet_options">Options</string>
     <string name="channel_info_sheet_options_members">Members</string>
     <string name="channel_info_sheet_options_invite">Invite</string>
+    <string name="channel_info_sheet_options_add">Add members</string>
     <string name="channel_info_sheet_options_notifications_manage">Manage notifications</string>
 
     <string name="message_context_sheet_actions_copy">Copy</string>
