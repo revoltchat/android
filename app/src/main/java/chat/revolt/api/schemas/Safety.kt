@@ -12,8 +12,16 @@ import kotlinx.serialization.encoding.Encoder
 enum class ContentReportReason(val value: String) {
     NoneSpecified("NoneSpecified"),
     Illegal("Illegal"),
+    IllegalGoods("IllegalGoods"),
+    IllegalExtortion("IllegalExtortion"),
+    IllegalPornography("IllegalPornography"),
+    IllegalHacking("IllegalHacking"),
+    ExtremeViolence("ExtremeViolence"),
     PromotesHarm("PromotesHarm"),
+    UnsolicitedSpam("UnsolicitedSpam"),
+    Raid("Raid"),
     SpamAbuse("SpamAbuse"),
+    ScamsFraud("ScamsFraud"),
     Malware("Malware"),
     Harassment("Harassment");
 
@@ -30,8 +38,16 @@ enum class ContentReportReason(val value: String) {
             when (val value = decoder.decodeString()) {
                 "NoneSpecified" -> NoneSpecified
                 "Illegal" -> Illegal
+                "IllegalGoods" -> IllegalGoods
+                "IllegalExtortion" -> IllegalExtortion
+                "IllegalPornography" -> IllegalPornography
+                "IllegalHacking" -> IllegalHacking
+                "ExtremeViolence" -> ExtremeViolence
                 "PromotesHarm" -> PromotesHarm
+                "UnsolicitedSpam" -> UnsolicitedSpam
+                "Raid" -> Raid
                 "SpamAbuse" -> SpamAbuse
+                "ScamsFraud" -> ScamsFraud
                 "Malware" -> Malware
                 "Harassment" -> Harassment
                 else -> throw IllegalArgumentException("Unknown ContentReportReason: $value")
@@ -46,6 +62,7 @@ enum class ContentReportReason(val value: String) {
 @Serializable
 enum class UserReportReason(val value: String) {
     NoneSpecified("NoneSpecified"),
+    UnsolicitedSpam("UnsolicitedSpam"),
     SpamAbuse("SpamAbuse"),
     InappropriateProfile("InappropriateProfile"),
     Impersonation("Impersonation"),
@@ -64,6 +81,7 @@ enum class UserReportReason(val value: String) {
         override fun deserialize(decoder: Decoder): UserReportReason =
             when (val value = decoder.decodeString()) {
                 "NoneSpecified" -> NoneSpecified
+                "UnsolicitedSpam" -> UnsolicitedSpam
                 "SpamAbuse" -> SpamAbuse
                 "InappropriateProfile" -> InappropriateProfile
                 "Impersonation" -> Impersonation

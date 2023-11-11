@@ -23,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.DismissibleNavigationDrawer
 import androidx.compose.material3.DrawerState
@@ -95,6 +94,7 @@ import chat.revolt.internals.Changelogs
 import chat.revolt.ndk.Pipebomb
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
+import chat.revolt.screens.chat.dialogs.safety.ReportUserDialog
 import chat.revolt.screens.chat.views.FriendsScreen
 import chat.revolt.screens.chat.views.HomeScreen
 import chat.revolt.screens.chat.views.NoCurrentChannelScreen
@@ -1050,16 +1050,10 @@ fun ChannelNavigator(
             dialog("report/user/{userId}") { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")
                 if (userId != null) {
-                    AlertDialog(onDismissRequest = {
-                        navController.popBackStack()
-                    }) {
-                        Text("Report user $userId")
-                        Button(onClick = {
-                            navController.popBackStack()
-                        }) {
-                            Text("Close")
-                        }
-                    }
+                    ReportUserDialog(
+                        navController = navController,
+                        userId = userId
+                    )
                 }
             }
         }

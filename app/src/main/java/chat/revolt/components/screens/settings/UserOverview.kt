@@ -54,7 +54,7 @@ fun SelfUserOverview() {
 }
 
 @Composable
-fun UserOverview(user: User) {
+fun UserOverview(user: User, internalPadding: Boolean = true) {
     var profile by remember { mutableStateOf<Profile?>(null) }
 
     LaunchedEffect(user) {
@@ -67,7 +67,7 @@ fun UserOverview(user: User) {
         }
     }
 
-    RawUserOverview(user, profile)
+    RawUserOverview(user, profile, internalPadding = internalPadding)
 }
 
 @Composable
@@ -75,7 +75,8 @@ fun RawUserOverview(
     user: User,
     profile: Profile? = null,
     pfpUrl: String? = null,
-    backgroundUrl: String? = null
+    backgroundUrl: String? = null,
+    internalPadding: Boolean = true
 ) {
     val context = LocalContext.current
     var teamMemberFlair by remember { mutableStateOf<Brush?>(null) }
@@ -94,7 +95,7 @@ fun RawUserOverview(
     Box(
         contentAlignment = Alignment.BottomStart,
         modifier = Modifier
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = if (internalPadding) 16.dp else 0.dp)
             .clip(MaterialTheme.shapes.large)
             .then(
                 if (user.id in SpecialUsers.TEAM_MEMBER_FLAIRS.keys) {

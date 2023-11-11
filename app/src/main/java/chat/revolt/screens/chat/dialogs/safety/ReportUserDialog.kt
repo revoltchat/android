@@ -47,13 +47,16 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.safety.putMessageReport
+import chat.revolt.api.routes.safety.putUserReport
 import chat.revolt.api.routes.user.blockUser
 import chat.revolt.api.schemas.ContentReportReason
+import chat.revolt.api.schemas.UserReportReason
 import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.FormTextField
+import chat.revolt.components.screens.settings.UserOverview
 import kotlinx.coroutines.launch
 
-enum class MessageReportFlowState {
+enum class UserReportFlowState {
     Reason,
     Sending,
     Done,
@@ -62,38 +65,28 @@ enum class MessageReportFlowState {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportMessageDialog(navController: NavController, messageId: String) {
-    val message = RevoltAPI.messageCache[messageId]
-    if (message == null) {
+fun ReportUserDialog(navController: NavController, userId: String) {
+    val user = RevoltAPI.userCache[userId]
+    if (user == null) {
         navController.popBackStack()
         return
     }
 
-    val author = RevoltAPI.userCache[message.author]
-    val messageIsBridged = author?.let { author.bot != null && message.masquerade != null } ?: false
+    val state = remember { mutableStateOf(UserReportFlowState.Reason) }
 
-    val state = remember { mutableStateOf(MessageReportFlowState.Reason) }
-
-    val selectedReason = remember { mutableStateOf("Illegal") }
+    val selectedReason = remember { mutableStateOf("UnsolicitedSpam") }
     val userAddedContext = remember { mutableStateOf("") }
 
     when (state.value) {
-        MessageReportFlowState.Reason -> {
+        UserReportFlowState.Reason -> {
             val reasons = mapOf(
-                "Illegal" to stringResource(id = R.string.report_reason_content_illegal),
-                "IllegalGoods" to stringResource(id = R.string.report_reason_content_illegal_goods),
-                "IllegalExtortion" to stringResource(id = R.string.report_reason_content_illegal_extortion),
-                "IllegalPornography" to stringResource(id = R.string.report_reason_content_illegal_pornography),
-                "IllegalHacking" to stringResource(id = R.string.report_reason_content_illegal_hacking),
-                "ExtremeViolence" to stringResource(id = R.string.report_reason_content_extreme_violence),
-                "PromotesHarm" to stringResource(id = R.string.report_reason_content_promotes_harm),
-                "UnsolicitedSpam" to stringResource(id = R.string.report_reason_content_unsolicited_spam),
-                "Raid" to stringResource(id = R.string.report_reason_content_raid),
-                "SpamAbuse" to stringResource(id = R.string.report_reason_content_spam_abuse),
-                "ScamsFraud" to stringResource(id = R.string.report_reason_content_scams_fraud),
-                "Malware" to stringResource(id = R.string.report_reason_content_malware),
-                "Harassment" to stringResource(id = R.string.report_reason_content_harassment),
-                "NoneSpecified" to stringResource(id = R.string.report_reason_content_other)
+                "UnsolicitedSpam" to stringResource(id = R.string.report_reason_user_unsolicited_spam),
+                "SpamAbuse" to stringResource(id = R.string.report_reason_user_spam_abuse),
+                "InappropriateProfile" to stringResource(id = R.string.report_reason_user_inappropriate_content),
+                "Impersonation" to stringResource(id = R.string.report_reason_user_impersonation),
+                "BanEvasion" to stringResource(id = R.string.report_reason_user_ban_evasion),
+                "Underage" to stringResource(id = R.string.report_reason_user_underage),
+                "NoneSpecified" to stringResource(id = R.string.report_reason_user_other)
             )
             val reasonDropdownExpanded = remember { mutableStateOf(false) }
 
@@ -103,46 +96,24 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
                 },
                 title = {
                     Text(
-                        text = stringResource(id = R.string.report_message_heading),
+                        text = stringResource(id = R.string.report_user_heading),
                         modifier = Modifier.fillMaxWidth()
                     )
                 },
                 text = {
                     Column {
-                        Text(text = stringResource(id = R.string.report_message))
+                        Text(text = stringResource(id = R.string.report_user))
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = stringResource(id = R.string.report_message_preview),
+                            text = stringResource(id = R.string.report_user_preview),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
                         )
+
                         Spacer(modifier = Modifier.height(4.dp))
 
-                        Box(
-                            modifier = Modifier
-                                .clip(MaterialTheme.shapes.medium)
-                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
-                                .verticalScroll(rememberScrollState())
-                                .heightIn(max = 200.dp)
-                                .padding(bottom = 8.dp)
-                        ) {
-                            Message(
-                                message = message.copy(
-                                    tail = false,
-                                    masquerade = null
-                                ),
-                                truncate = false
-                            )
-                        }
-
-                        if (messageIsBridged) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = stringResource(id = R.string.report_message_bridge_notice),
-                                fontSize = 12.sp
-                            )
-                        }
+                        UserOverview(user, internalPadding = false)
 
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -220,7 +191,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            state.value = MessageReportFlowState.Sending
+                            state.value = UserReportFlowState.Sending
                         },
                         modifier = Modifier.testTag("report_send")
                     ) {
@@ -230,7 +201,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
             )
         }
 
-        MessageReportFlowState.Sending -> {
+        UserReportFlowState.Sending -> {
             AlertDialog(
                 onDismissRequest = {},
                 title = {
@@ -248,16 +219,16 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
                         LaunchedEffect(true) {
                             launch {
                                 try {
-                                    Log.d("ReportMessageDialog", "Reporting message $messageId")
-                                    putMessageReport(
-                                        messageId,
-                                        ContentReportReason.valueOf(selectedReason.value),
+                                    Log.d("ReportMessageDialog", "Reporting user $userId")
+                                    putUserReport(
+                                        userId,
+                                        UserReportReason.valueOf(selectedReason.value),
                                         userAddedContext.value
                                     )
-                                    state.value = MessageReportFlowState.Done
+                                    state.value = UserReportFlowState.Done
                                 } catch (e: Error) {
-                                    state.value = MessageReportFlowState.Error
-                                    Log.e("ReportMessageDialog", "Failed to report message", e)
+                                    state.value = UserReportFlowState.Error
+                                    Log.e("ReportMessageDialog", "Failed to report user", e)
                                     return@launch
                                 }
                             }
@@ -269,7 +240,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
             )
         }
 
-        MessageReportFlowState.Done -> {
+        UserReportFlowState.Done -> {
             val scope = rememberCoroutineScope()
 
             AlertDialog(
@@ -326,7 +297,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
                     TextButton(
                         onClick = {
                             scope.launch {
-                                blockUser(message.author ?: return@launch)
+                                blockUser(userId)
                             }
                             navController.popBackStack()
                         },
@@ -338,7 +309,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
             )
         }
 
-        MessageReportFlowState.Error -> {
+        UserReportFlowState.Error -> {
             AlertDialog(
                 onDismissRequest = {
                     navController.popBackStack()

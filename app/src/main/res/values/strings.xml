@@ -303,23 +303,35 @@
     <string name="report">Report</string>
     <string name="report_cancel">Cancel</string>
 
-    <string name="report_message">Thank you for taking the time to report this message. Please provide a reason for reporting this message.</string>
+    <string name="report_message_heading">Tell us what\'s wrong with this message</string>
+    <string name="report_message">Thank you for taking the time to report this message. Your report will not be shared with the user who sent the message or the server\'s moderators.</string>
     <string name="report_message_preview">Selected message:</string>
     <string name="report_message_bridge_notice">Note: This message may have been sent from another platform. It is recommended to also report the message on the platform it was sent from.</string>
-    <string name="report_server">Thank you for taking the time to report this server. Please provide a reason for reporting this server.</string>
+    <string name="report_server_heading">Tell us what\'s wrong with this server</string>
+    <string name="report_server">Thank you for taking the time to report this server. Your report will not be shared with the server\'s moderators.</string>
     <string name="report_server_preview">Selected server:</string>
-    <string name="report_user">Thank you for taking the time to report this user. Please provide a reason for reporting this user.</string>
+    <string name="report_user_heading">Tell us what\'s wrong with this user</string>
+    <string name="report_user">Thank you for taking the time to report this user. Your report will not be shared with the user or the server\'s moderators.</string>
     <string name="report_user_preview">Selected user:</string>
 
-    <string name="report_reason">Reason</string>
+    <string name="report_reason">Pick a category</string>
 
     <string name="report_reason_content_illegal">Illegal content</string>
+    <string name="report_reason_content_illegal_goods">Drugs or other illegal goods</string>
+    <string name="report_reason_content_illegal_extortion">Extortion or blackmail</string>
+    <string name="report_reason_content_illegal_pornography">Revenge or underage pornography</string>
+    <string name="report_reason_content_illegal_hacking">Illegal hacking or cracking</string>
+    <string name="report_reason_content_extreme_violence">Extreme violence, gore or animal cruelty</string>
     <string name="report_reason_content_promotes_harm">Promotes harm</string>
+    <string name="report_reason_content_unsolicited_spam">Unsolicited advertising or spam</string>
+    <string name="report_reason_content_raid">Raid or spam attack</string>
     <string name="report_reason_content_spam_abuse">Spam or similar platform abuse</string>
+    <string name="report_reason_content_scams_fraud">Scams or fraud</string>
     <string name="report_reason_content_malware">Malware or phishing</string>
     <string name="report_reason_content_harassment">Harassment or cyberbullying</string>
     <string name="report_reason_content_other">Other</string>
 
+    <string name="report_reason_user_unsolicited_spam">Unsolicited advertising or spam</string>
     <string name="report_reason_user_spam_abuse">Spam or similar platform abuse</string>
     <string name="report_reason_user_inappropriate_content">Inappropriate content (like NSFW)</string>
     <string name="report_reason_user_impersonation">Impersonation</string>
