@@ -78,7 +78,8 @@ fun NativeMessageField(
     disabled: Boolean = false,
     editMode: Boolean = false,
     cancelEdit: () -> Unit = {},
-    onFocusChange: (Boolean) -> Unit = {}
+    onFocusChange: (Boolean) -> Unit = {},
+    onSelectionChange: (Pair<Int, Int>) -> Unit = {}
 ) {
     val placeholderResource = when (channelType) {
         ChannelType.DirectMessage -> R.string.message_field_placeholder_dm
@@ -154,6 +155,11 @@ fun NativeMessageField(
                             ic = ic?.let { InputConnectionCompat.createWrapper(this, it, outAttrs) }
                         }
                         return ic
+                    }
+
+                    override fun onSelectionChanged(selStart: Int, selEnd: Int) {
+                        super.onSelectionChanged(selStart, selEnd)
+                        onSelectionChange(selStart to selEnd)
                     }
                 }.apply {
                     background = null
@@ -319,6 +325,7 @@ fun NativeMessageFieldPreview() {
         disabled = false,
         editMode = false,
         cancelEdit = {},
-        onFocusChange = {}
+        onFocusChange = {},
+        onSelectionChange = {}
     )
 }

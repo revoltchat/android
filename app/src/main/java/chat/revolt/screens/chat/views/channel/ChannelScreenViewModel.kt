@@ -8,7 +8,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chat.revolt.R
@@ -71,7 +70,7 @@ class ChannelScreenViewModel : ViewModel() {
     var hasNoMoreMessages by mutableStateOf(false)
 
     var pendingMessageContent by mutableStateOf("")
-    var textSelection by mutableStateOf(TextRange(0))
+    var textSelection by mutableStateOf(0 to 0)
     var pendingReplies = mutableStateListOf<SendMessageReply>()
     var pendingAttachments = mutableStateListOf<FileArgs>()
 
@@ -404,7 +403,8 @@ class ChannelScreenViewModel : ViewModel() {
                             msg.id == it.messageId
                         } ?: return@onEach
                         pendingMessageContent = message.content ?: ""
-                        textSelection = TextRange(message.content?.length ?: 0)
+                        textSelection =
+                            (message.content?.length ?: 0) to (message.content?.length ?: 0)
                     }
                 }
             }.catch {
@@ -456,18 +456,20 @@ class ChannelScreenViewModel : ViewModel() {
         val currentSelection = textSelection
 
         // if out of bounds, just append
-        if (currentSelection.start > currentContent.length) {
+        if (currentSelection.first > currentContent.length) {
             pendingMessageContent = currentContent + content
-            textSelection = TextRange(currentContent.length + content.length)
+            textSelection =
+                currentSelection.first + content.length to currentSelection.first + content.length
             return
         }
 
-        val newContent = currentContent.substring(0, currentSelection.start) +
+        val newContent = currentContent.substring(0, currentSelection.first) +
                 content +
-                currentContent.substring(currentSelection.end)
+                currentContent.substring(currentSelection.second)
 
         pendingMessageContent = newContent
-        textSelection = TextRange(currentSelection.start + content.length)
+        textSelection =
+            currentSelection.first + content.length to currentSelection.first + content.length
     }
 
     suspend fun checkShouldDenyMessageField() {

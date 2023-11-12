@@ -57,7 +57,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
@@ -91,10 +90,10 @@ import chat.revolt.sheets.ChannelInfoSheet
 import chat.revolt.sheets.MessageContextSheet
 import com.discord.simpleast.core.simple.SimpleMarkdownRules
 import com.discord.simpleast.core.simple.SimpleRenderer
-import java.io.File
-import java.io.FileNotFoundException
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileNotFoundException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -179,13 +178,6 @@ fun ChannelScreen(
         animationSpec = RevoltTweenDp,
         label = "ScrollDownFABPadding"
     )
-
-    val fieldContent = remember(viewModel.pendingMessageContent, viewModel.textSelection) {
-        TextFieldValue(
-            viewModel.pendingMessageContent,
-            viewModel.textSelection
-        )
-    }
 
     LaunchedEffect(channelId) {
         viewModel.activeChannelId = channelId
@@ -479,7 +471,7 @@ fun ChannelScreen(
                     )
                 } else {
                     NativeMessageField(
-                        value = fieldContent.text,
+                        value = viewModel.pendingMessageContent,
                         onValueChange = {
                             viewModel.pendingMessageContent = it
                             // viewModel.textSelection = it.selection
@@ -528,6 +520,9 @@ fun ChannelScreen(
                             if (nowFocused && viewModel.currentBottomPane != BottomPane.None) {
                                 viewModel.currentBottomPane = BottomPane.None
                             }
+                        },
+                        onSelectionChange = {
+                            viewModel.textSelection = it
                         }
                     )
                 }
