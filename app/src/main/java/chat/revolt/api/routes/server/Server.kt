@@ -75,8 +75,10 @@ suspend fun fetchMember(serverId: String, userId: String, pure: Boolean = false)
     val member = RevoltJson.decodeFromString(Member.serializer(), response.bodyAsText())
 
     if (!pure) {
-        if (!RevoltAPI.members.hasMember(serverId, member.id!!.user)) {
-            RevoltAPI.members.setMember(serverId, member)
+        member.id?.let {
+            if (!RevoltAPI.members.hasMember(serverId, it.user)) {
+                RevoltAPI.members.setMember(serverId, member)
+            }
         }
     }
 
