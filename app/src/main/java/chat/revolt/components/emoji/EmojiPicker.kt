@@ -79,7 +79,6 @@ import chat.revolt.internals.FitzpatrickSkinTone
 import chat.revolt.internals.UnicodeEmojiSection
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
     val view = LocalView.current
@@ -280,18 +279,23 @@ fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
                                             FitzpatrickSkinTone.None -> stringResource(
                                                 R.string.emoji_picker_skin_tone_none
                                             )
+
                                             FitzpatrickSkinTone.Light -> stringResource(
                                                 R.string.emoji_picker_skin_tone_fitzpatrick_1_2
                                             )
+
                                             FitzpatrickSkinTone.MediumLight -> stringResource(
                                                 R.string.emoji_picker_skin_tone_fitzpatrick_3
                                             )
+
                                             FitzpatrickSkinTone.Medium -> stringResource(
                                                 R.string.emoji_picker_skin_tone_fitzpatrick_4
                                             )
+
                                             FitzpatrickSkinTone.MediumDark -> stringResource(
                                                 R.string.emoji_picker_skin_tone_fitzpatrick_5
                                             )
+
                                             FitzpatrickSkinTone.Dark -> stringResource(
                                                 R.string.emoji_picker_skin_tone_fitzpatrick_6
                                             )
@@ -371,7 +375,7 @@ fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
                                         pickerList.indexOfFirst {
                                             it is EmojiPickerItem.Section && it.category is Category.ServerEmoteCategory && it.category.server == server
                                         }
-                                    gridState.animateScrollToItem(index)
+                                    gridState.scrollToItem(index)
                                 }
                             }
                             .then(
@@ -418,7 +422,7 @@ fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
                                         pickerList.indexOfFirst {
                                             it is EmojiPickerItem.Section && it.category is Category.UnicodeEmojiCategory && it.category.definition == category
                                         }
-                                    gridState.animateScrollToItem(index)
+                                    gridState.scrollToItem(index)
                                 }
                             }
                             .then(
@@ -440,27 +444,35 @@ fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
                                 UnicodeEmojiSection.Smileys -> painterResource(
                                     R.drawable.ic_emoticon_24dp
                                 )
+
                                 UnicodeEmojiSection.People -> painterResource(
                                     R.drawable.ic_human_greeting_variant_24dp
                                 )
+
                                 UnicodeEmojiSection.Animals -> painterResource(
                                     R.drawable.ic_snake_24dp
                                 )
+
                                 UnicodeEmojiSection.Food -> painterResource(
                                     R.drawable.ic_glass_mug_variant_24dp
                                 )
+
                                 UnicodeEmojiSection.Travel -> painterResource(
                                     R.drawable.ic_train_bus_24dp
                                 )
+
                                 UnicodeEmojiSection.Activities -> painterResource(
                                     R.drawable.ic_skate_24dp
                                 )
+
                                 UnicodeEmojiSection.Objects -> painterResource(
                                     R.drawable.ic_table_chair_24dp
                                 )
+
                                 UnicodeEmojiSection.Symbols -> painterResource(
                                     R.drawable.ic_symbol_24dp
                                 )
+
                                 UnicodeEmojiSection.Flags -> painterResource(
                                     R.drawable.ic_flag_24dp
                                 )
@@ -613,6 +625,7 @@ fun ColumnScope.PickerItem(
                     is Category.UnicodeEmojiCategory -> stringResource(
                         item.category.definition.nameResource
                     )
+
                     is Category.ServerEmoteCategory ->
                         item.category.server.name
                             ?: stringResource(R.string.unknown)
