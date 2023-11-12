@@ -28,7 +28,13 @@ object ChannelUtils {
         val output = mutableListOf<CategorisedChannelList>()
 
         val uncategorised =
-            server.channels?.filter { c -> server.categories?.none { cat -> cat.channels?.contains(c) == true } == true }
+            server.channels?.filter { c ->
+                server.categories?.none { cat ->
+                    cat.channels?.contains(
+                        c
+                    ) == true
+                } ?: true
+            }
                 ?.mapNotNull {
                     RevoltAPI.channelCache[it]?.let { it1 ->
                         CategorisedChannelList.Channel(it1)
