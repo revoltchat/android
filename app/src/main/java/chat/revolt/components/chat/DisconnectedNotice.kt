@@ -1,6 +1,5 @@
 package chat.revolt.components.chat
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -17,8 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,10 +28,6 @@ import chat.revolt.R
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.ui.theme.Theme
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 private val NON_MATERIAL_COLOURS = mapOf(
     DisconnectionState.Disconnected to (Color(0xff4E0C0C) to Color(0xffff1744)),
@@ -83,28 +76,23 @@ private fun DisconnectedNoticeBase(
 
 @Composable
 fun DisconnectedNotice(state: DisconnectionState, onReconnect: () -> Unit) {
-    // This is a coroutine-based retry mechanism that will retry every 10 seconds
-    // until the connection is re-established. If the connection is re-established
-    // we don't need to keep retrying.
-    val job = remember { mutableStateOf<Job?>(null) }
-    val scope = rememberCoroutineScope()
+    val retries = remember { mutableStateOf(0) }
 
     LaunchedEffect(state) {
-        snapshotFlow { state }
-            .distinctUntilChanged()
-            .collect { state ->
-                if (state == DisconnectionState.Disconnected) {
-                    job.value = scope.launch {
-                        while (true) {
-                            Log.d("DisconnectedNotice", "Trying to reconnect.")
-                            onReconnect()
-                            delay(10_000)
-                        }
-                    }
-                } else {
-                    job.value?.cancel()
+        when (state) {
+            DisconnectionState.Disconnected -> {
+                if (retries.value < 3) {
+                    onReconnect()
+                    retries.value++
                 }
             }
+
+            DisconnectionState.Connected -> {
+                retries.value = 0
+            }
+
+            else -> Unit
+        }
     }
 
     val materialColours = mapOf(
