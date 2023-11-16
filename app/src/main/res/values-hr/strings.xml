@@ -195,7 +195,6 @@
     <string name="mfa_password_header">Upiši svoju lozinku</string>
     <string name="mfa_password_lead">Upiši svoju lozinku za nastavak.</string>
     <string name="about">O</string>
-    <string name="app_full_name">Revolt na Androidu</string>
     <string name="mfa_interstitial_lead">Uključili ste 2FA da držite svoj korisnički račun ekstra sigurnim.</string>
     <string name="oss_attribution">Atribucija softvera otvorenog izvora</string>
     <string name="typing_one">%1$s piše…</string>

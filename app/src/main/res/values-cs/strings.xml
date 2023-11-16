@@ -25,4 +25,6 @@
     <string name="login_heading">Pojďme se přihlásit</string>
     <string name="login_onboarding_heading">Najděte svou komunitu, spojte se se světem.</string>
     <string name="resend_verification">Znovu poslat ověřovací e-mail</string>
+    <string name="register_image_alt">Chatujte s ostatními na Revoltu.</string>
+    <string name="register_instructions">Revolt je místo, kde se můžete scházet, setkávat a povídat si o čemkoli. A to nejlepší\? Je to na internetu.</string>
 </resources>

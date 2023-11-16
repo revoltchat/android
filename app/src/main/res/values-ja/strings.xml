@@ -41,7 +41,6 @@
     <string name="mfa_recovery_header">回復コードを入力してください</string>
     <string name="mfa_password_header">パスワードを入力してください</string>
     <string name="about">概要</string>
-    <string name="app_full_name">AndroidのRevolt</string>
     <string name="comingsoon_toast">ごめんなさい、この機能は実装されていません。</string>
     <string name="send_alt">送信</string>
     <string name="add_attachment_alt">添付ファイルを追加</string>

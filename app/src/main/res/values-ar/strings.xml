@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">← الرجوع</string>
+    <string name="send_email">إرسال بريد إلكتروني</string>
+    <string name="next">التالي →</string>
+    <string name="ok">حسناً</string>
+    <string name="cancel">إلغاء</string>
+    <string name="share">مشاركة</string>
+    <string name="lets_go">هيا نذهب</string>
+    <string name="terms_of_service">شروط الخدمة</string>
+    <string name="privacy_policy">سياسة الخصوصية</string>
+    <string name="community_guidelines">ارشادات المجتمع</string>
+    <string name="login_onboarding_heading">أجد مجتمعك، اتصل بالعالم.</string>
+    <string name="login_onboarding_body">Revolt من أفضل الطرق لكي تظل متصلاً مع أصدقائك ومجتمعك، في أي مكان، وفي أي وقت.</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="signup">إنشاء حساب</string>
+    <string name="resend">أعد الإرسال</string>
+    <string name="login_heading">هيا نسجل دخولك</string>
+    <string name="password_forgot">نسيت كلمة المرور؟</string>
+    <string name="password_forgot_heading">نسيت كلمة المرور؟</string>
+    <string name="register_heading">مرحبا بك في Revolt</string>
+    <string name="register_image_alt">استخدم Revolt كي تتحدث عن الأشياء.</string>
+    <string name="loading">نجلب بعض المعلومات، انتظرنا…</string>
+    <string name="resend_verification">أعد إرسال بريد إلكتروني للتحقق</string>
+    <string name="password_manager_hint">تستخدم مساعد كلمات المرور؟</string>
+    <string name="password_forgot_instructions">أدخل بريدك الإلكتروني وسنرسل إليك خطوات لإعادة تعيين كلمة مرورك.</string>
+</resources>

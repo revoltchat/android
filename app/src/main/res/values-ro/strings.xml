@@ -156,7 +156,6 @@
     <string name="mfa_totp_code">Cod</string>
     <string name="mfa_recovery_header">Introdu un cod de recuperare</string>
     <string name="mfa_password_lead">Introdu parola pentru a continua.</string>
-    <string name="app_full_name">Revolt pe Android</string>
     <string name="comingsoon_toast">Ne pare rău, această funcție nu este încă pregătită.</string>
     <string name="typing_one">%1$s tastează…</string>
     <string name="typing_many">%1$s tastează…</string>

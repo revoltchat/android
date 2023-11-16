@@ -38,7 +38,6 @@
     <string name="mfa_password_header">Escriu la teva contrassenya</string>
     <string name="mfa_password_lead">Escriu la teva contrassenya per continuar.</string>
     <string name="about">Sobre nosaltres</string>
-    <string name="app_full_name">Revolt a Android</string>
     <string name="oss_attribution">Atribució d\'OSS</string>
     <string name="home">Inici</string>
     <string name="today">Avui</string>

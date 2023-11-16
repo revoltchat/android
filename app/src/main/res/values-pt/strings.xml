@@ -40,7 +40,6 @@
     <string name="mfa_password_header">Insere a tua palavra-passe</string>
     <string name="mfa_password_lead">Insere a tua palavra-passe para continuares.</string>
     <string name="about">Sobre</string>
-    <string name="app_full_name">O Revolt no Android</string>
     <string name="typing_many">%1$s estão a escrever…</string>
     <string name="send_alt">Enviar</string>
     <string name="add_attachment_alt">Adicionar anexo</string>
