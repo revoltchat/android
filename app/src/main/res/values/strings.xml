@@ -130,6 +130,7 @@
     <string name="friends_deny_all_incoming">Clear all incoming requests</string>
 
     <string name="server_plus_alt">Add server</string>
+    <string name="discover_alt">Discover</string>
 
     <string name="no_channels_heading">Bit awkward.</string>
     <string name="no_channels_body">There aren\'t any channels in this server. Not even a welcome channel. How rude.</string>
@@ -299,6 +300,8 @@
     <string name="add_server_sheet_create_new">Create a new server</string>
     <string name="add_server_sheet_create_new_modal_title">Create a new server</string>
     <string name="add_server_sheet_create_new_modal_under_construction">This feature is currently under construction.</string>
+
+    <string name="discover">Discover Revolt</string>
 
     <string name="report">Report</string>
     <string name="report_cancel">Cancel</string>

@@ -40,6 +40,7 @@ import chat.revolt.screens.register.OnboardingScreen
 import chat.revolt.screens.register.RegisterDetailsScreen
 import chat.revolt.screens.register.RegisterGreetingScreen
 import chat.revolt.screens.register.RegisterVerifyScreen
+import chat.revolt.screens.services.DiscoverScreen
 import chat.revolt.screens.settings.AppearanceSettingsScreen
 import chat.revolt.screens.settings.ChangelogsSettingsScreen
 import chat.revolt.screens.settings.ClosedBetaUpdaterScreen
@@ -144,6 +145,8 @@ fun AppEntrypoint(windowSizeClass: WindowSizeClass) {
                 composable("register/onboarding") { OnboardingScreen(navController) }
 
                 composable("chat") { ChatRouterScreen(navController, windowSizeClass) }
+
+                composable("discover") { DiscoverScreen(navController) }
 
                 composable("settings") { SettingsScreen(navController) }
                 composable("settings/profile") { ProfileSettingsScreen(navController) }

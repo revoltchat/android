@@ -700,6 +700,7 @@ fun ChatRouterScreen(
                 ) {
                     Sidebar(
                         viewModel = viewModel,
+                        topNav = topNav,
                         navController = navController,
                         onShowStatusSheet = {
                             showStatusSheet = true
@@ -736,6 +737,7 @@ fun ChatRouterScreen(
                     ) {
                         Sidebar(
                             viewModel = viewModel,
+                            topNav = topNav,
                             navController = navController,
                             onShowStatusSheet = {
                                 showStatusSheet = true
@@ -777,6 +779,7 @@ fun ChatRouterScreen(
 @Composable
 fun Sidebar(
     viewModel: ChatRouterViewModel,
+    topNav: NavController,
     navController: NavHostController,
     drawerState: DrawerState? = null,
     onShowStatusSheet: () -> Unit,
@@ -919,8 +922,6 @@ fun Sidebar(
                                 server.id
                             ),
                             onLongClick = {
-                                /*serverContextSheetTarget = server.id
-                                showServerContextSheet = true*/
                                 onShowServerContextSheet(server.id)
                             }
                         ) {
@@ -937,6 +938,16 @@ fun Sidebar(
                     Icon(
                         Icons.Default.Add,
                         contentDescription = stringResource(id = R.string.server_plus_alt),
+                        modifier = Modifier.padding(4.dp)
+                    )
+                }
+
+                DrawerServerlikeIcon(
+                    onClick = { topNav.navigate("discover") }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_compass_24dp),
+                        contentDescription = stringResource(id = R.string.discover_alt),
                         modifier = Modifier.padding(4.dp)
                     )
                 }
