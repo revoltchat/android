@@ -199,7 +199,6 @@
     <string name="spark_sidebar_settings_tutorial_description_1">Voit avata sivupalkin vetämällä näytön vasemmasta laidasta.</string>
     <string name="register_form_heading">Mennään laittamaan sinut kuntoon.</string>
     <string name="mfa_interstitial_lead">Sinulla on kaksivaiheinen todennus päällä että tilisi pystyy turvallisena.</string>
-    <string name="app_full_name">Revolt Androidilla</string>
     <string name="direct_messages">Yksityisviestit</string>
     <string name="channel_dm">Yksityisviesti</string>
     <string name="scroll_to_bottom">Siirry alas</string>

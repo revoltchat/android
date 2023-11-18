@@ -60,6 +60,5 @@
     <string name="mfa_totp_lead">Πληκτρολόγησε τον εξαψήφιο κωδικό από την εφαρμογή ελέγχου ταυτότητας.</string>
     <string name="mfa_recovery_header">Πληκτρολόγησε έναν κωδικό ανάκτησης</string>
     <string name="mfa_password_lead">Πληκτρολόγησε τον κωδικό πρόσβασής σου για να συνεχίσεις.</string>
-    <string name="app_full_name">Revolt για Android</string>
     <string name="comingsoon_toast">Λυπούμαστε, αυτή η λειτουργία δεν είναι ακόμα έτοιμη.</string>
 </resources>

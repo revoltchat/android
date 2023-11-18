@@ -53,7 +53,6 @@
     <string name="mfa_recovery_lead">আপনার একটি রিকভারি কোড লিখুন।</string>
     <string name="mfa_recovery_code">কোড</string>
     <string name="mfa_password_header">আপনার পাসওয়ার্ড লিখুন</string>
-    <string name="app_full_name">অ্যান্ড্রয়েডে Revolt</string>
     <string name="comingsoon_toast">দুঃখিত, এই বৈশিষ্ট্যটি (ফিচারটি) এখনও তৈরি নয়।</string>
     <string name="typing_one">%1$s লিখছেন…</string>
     <string name="typing_many">%1$s লিখছেন…</string>
@@ -229,4 +228,19 @@
     <string name="report_reason_content_promotes_harm">কনটেন্ট এমন কিছুকে উৎসাহিত/প্রচার করছে যা নিজ বা অন্যের ক্ষতি করতে পারে</string>
     <string name="report_reason_user_spam_abuse">এটি স্প্যাম বা প্ল্যাটফর্মের অপব্যবহার/দুর্ব্যবহার</string>
     <string name="report_reason_user_impersonation">অন্যকে নকল করছেন</string>
+    <string name="oss_attribution_body">এই দুর্দান্ত ওপেন সোর্স প্রকল্পগুলির সাহায্যে Revolt তৈরি করা হয়েছে।</string>
+    <string name="oss_attribution_generation_date">শেষবারের মতো আপডেট হয়েছে: %1$s</string>
+    <string name="oss_attribution_warning">নীচের তালিকাটি স্বয়ংক্রিয়ভাবে তৈরি। এটা অসম্পূর্ণ বা ভুল হতে পারে।</string>
+    <string name="oss_attribution_tap_to_view_license">লাইসেন্স দেখতে এখানে টিপুন</string>
+    <string name="about_tab_version">ভার্সন</string>
+    <string name="emoji_category_objects">বস্তু</string>
+    <string name="emoji_category_flags">পতাকা</string>
+    <string name="badge_platform_moderation_alt">প্ল্যাটফর্ম মডারেশন</string>
+    <string name="pick_emoji_alt">ইমোজি বাছুন</string>
+    <string name="emoji_category_animals">পশুপাখি ও প্রকৃতি</string>
+    <string name="emoji_category_activities">কার্যকলাপ</string>
+    <string name="emoji_category_symbols">প্রতীক</string>
+    <string name="badge_team_member_alt">Revolt দলের সদস্য</string>
+    <string name="home_join_jenvolt">Jenvolt -এ যুক্ত হোন</string>
+    <string name="badge_masquerade_alt">লিঙ্ক করা চ্যানেল থেকে</string>
 </resources>

@@ -82,7 +82,6 @@
     <string name="mfa_password_header">Şifreni girin</string>
     <string name="mfa_password_lead">Devam etmek için şifreni gir.</string>
     <string name="about">Hakkında</string>
-    <string name="app_full_name">Android\'de Revolt</string>
     <string name="typing_one">%1$s yazıyor…</string>
     <string name="typing_many">%1$s yazıyor…</string>
     <string name="typing_several">Birkaç kişi yazıyor</string>

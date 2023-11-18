@@ -27,7 +27,6 @@
     <string name="mfa_recovery_lead">Ingresa uno de tus códigos de recuperación.</string>
     <string name="mfa_password_lead">Introduce tu contraseña para continuar.</string>
     <string name="about">Acerca de</string>
-    <string name="app_full_name">Revolt en Android</string>
     <string name="oss_attribution">Atribución de OSS</string>
     <string name="typing_one">%1$s está escribiendo…</string>
     <string name="send_alt">Enviar</string>

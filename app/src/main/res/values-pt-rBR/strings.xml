@@ -71,7 +71,6 @@
     <string name="onboarding_username">Nome de usuário</string>
     <string name="about">Sobre</string>
     <string name="register_password">Senha</string>
-    <string name="app_full_name">Revolt no Android</string>
     <string name="typing_one">%1$s está digitando…</string>
     <string name="mfa_password_header">Insira sua senha</string>
     <string name="mfa_recovery_code">Código</string>

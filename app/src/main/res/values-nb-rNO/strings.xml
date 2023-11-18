@@ -49,7 +49,6 @@
     <string name="mfa_password_header">Skriv inn passordet ditt</string>
     <string name="mfa_password_lead">Skriv inn passordet ditt for å fortsette.</string>
     <string name="about">Om</string>
-    <string name="app_full_name">Revolt på Android</string>
     <string name="oss_attribution">OSS Attribusjon</string>
     <string name="typing_one">%1$s skriver…</string>
     <string name="typing_many">%1$s skriver…</string>
