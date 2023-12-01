@@ -1,16 +1,15 @@
 package chat.revolt.sheets
 
+import android.text.format.DateUtils
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -21,25 +20,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
-import chat.revolt.components.chat.RoleChip
+import chat.revolt.components.chat.RoleListEntry
+import chat.revolt.components.chat.UserBadgeList
+import chat.revolt.components.chat.UserBadgeRow
 import chat.revolt.components.generic.NonIdealState
 import chat.revolt.components.generic.WebMarkdown
 import chat.revolt.components.screens.settings.RawUserOverview
 import chat.revolt.components.screens.settings.UserButtons
+import chat.revolt.components.sheets.SheetTile
+import kotlinx.datetime.Instant
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun UserInfoSheet(
     userId: String,
@@ -90,72 +94,174 @@ fun UserInfoSheet(
         return
     }
 
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Fixed(2),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalItemSpacing = 16.dp,
+        modifier = Modifier.padding(16.dp)
     ) {
-        RawUserOverview(user, profile)
+        item(key = "overview", span = StaggeredGridItemSpan.FullLine) {
+            RawUserOverview(user, profile, internalPadding = false)
+        }
 
-        Column(
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 8.dp)
-        ) {
-            UserButtons(
-                user,
-                dismissSheet
-            )
-
-            member?.roles?.let {
-                Text(
-                    text = stringResource(id = R.string.user_info_sheet_category_roles),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(vertical = 10.dp)
-                )
-
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    it
-                        .map { roleId -> server?.roles?.get(roleId) }
-                        .sortedBy { it?.rank ?: 0.0 }
-                        .forEach { role ->
-                            role?.let {
-                                RoleChip(
-                                    label = role.name ?: "null",
-                                    brush = role.colour?.let { WebCompat.parseColour(it) }
-                                        ?: Brush.solidColor(LocalContentColor.current)
-                                )
-                            }
+        member?.roles?.let {
+            item(key = "roles") {
+                SheetTile(
+                    header = {
+                        Text(stringResource(R.string.user_info_sheet_category_roles))
+                    },
+                    contentPreview = {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            it
+                                .map { roleId -> server?.roles?.get(roleId) }
+                                .sortedBy { it?.rank ?: 0.0 }
+                                .take(3)
+                                .forEach { role ->
+                                    role?.let {
+                                        RoleListEntry(
+                                            label = role.name ?: "null",
+                                            brush = role.colour?.let { WebCompat.parseColour(it) }
+                                                ?: Brush.solidColor(LocalContentColor.current)
+                                        )
+                                    }
+                                }
                         }
+                    }
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        it
+                            .map { roleId -> server?.roles?.get(roleId) }
+                            .sortedBy { it?.rank ?: 0.0 }
+                            .forEach { role ->
+                                role?.let {
+                                    RoleListEntry(
+                                        label = role.name ?: "null",
+                                        brush = role.colour?.let { WebCompat.parseColour(it) }
+                                            ?: Brush.solidColor(LocalContentColor.current)
+                                    )
+                                }
+                            }
+                    }
                 }
             }
+        }
+        val accountAt = user.id?.let {
+            DateUtils.getRelativeTimeSpanString(
+                ULID.asTimestamp(user.id),
+                System.currentTimeMillis(),
+                DateUtils.MINUTE_IN_MILLIS
+            ).toString()
+        }
+        val joinedAt = member?.joinedAt?.let {
+            DateUtils.getRelativeTimeSpanString(
+                Instant.parse(member.joinedAt).toEpochMilliseconds(),
+                System.currentTimeMillis(),
+                DateUtils.MINUTE_IN_MILLIS
+            ).toString()
+        }
 
-            Text(
-                text = stringResource(id = R.string.user_info_sheet_category_bio),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(vertical = 10.dp)
-            )
+        item(key = "joined") {
+            SheetTile(
+                header = {
+                    Text(stringResource(R.string.user_info_sheet_category_joined))
+                },
+                contentPreview = {
+                    if (joinedAt != null && server?.name != null) {
+                        Text(
+                            text = joinedAt,
+                            fontSize = 14.sp
+                        )
 
-            if (profile?.content.isNullOrBlank().not()) {
-                WebMarkdown(
-                    text = profile!!.content!!,
-                    maskLoading = true
-                )
-            } else if (profile != null) {
-                Text(
-                    text = stringResource(id = R.string.user_info_sheet_bio_empty),
-                    color = LocalContentColor.current.copy(alpha = 0.6f)
-                )
-            } else if (profileNotFound) {
-                Text(
-                    text = stringResource(id = R.string.user_info_sheet_bio_not_found),
-                    color = LocalContentColor.current.copy(alpha = 0.6f)
-                )
-            } else {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-                    CircularProgressIndicator()
+                        Text(
+                            text = server.name,
+                            style = MaterialTheme.typography.labelMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+                    }
+
+                    accountAt?.let { _ ->
+                        Text(
+                            text = accountAt,
+                            fontSize = 14.sp
+                        )
+
+                        Text(
+                            text = stringResource(id = R.string.user_info_sheet_category_joined_revolt),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+            ) {
+                if (joinedAt != null && server?.name != null) {
+                    Text(
+                        text = joinedAt,
+                        style = MaterialTheme.typography.displaySmall
+                    )
+
+                    Text(
+                        text = server.name,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                accountAt?.let { _ ->
+                    Text(
+                        text = accountAt,
+                        style = MaterialTheme.typography.displaySmall
+                    )
+
+                    Text(
+                        text = stringResource(id = R.string.user_info_sheet_category_joined_revolt),
+                        style = MaterialTheme.typography.labelMedium
+                    )
                 }
             }
+        }
+
+        if ((user.badges ?: 0) > 0) {
+            item(key = "info") {
+                SheetTile(
+                    header = {
+                        Text(stringResource(R.string.user_info_sheet_category_badges))
+                    },
+                    contentPreview = {
+                        user.badges?.let { UserBadgeRow(badges = it) }
+                    }
+                ) {
+                    user.badges?.let { UserBadgeList(badges = it) }
+                }
+            }
+        }
+
+        if (profile?.content.isNullOrBlank().not()) {
+            item(key = "bio", span = StaggeredGridItemSpan.FullLine) {
+                SheetTile(
+                    header = {
+                        Text(stringResource(R.string.user_info_sheet_category_bio))
+                    },
+                    contentPreview = {
+                        Text(
+                            text = profile?.content!!,
+                            maxLines = 4,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                ) {
+                    WebMarkdown(
+                        text = profile?.content!!,
+                        maskLoading = true
+                    )
+                }
+            }
+        }
+
+        item(key = "actions", span = StaggeredGridItemSpan.FullLine) {
+            UserButtons(user, dismissSheet)
         }
     }
 }

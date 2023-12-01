@@ -7,14 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 
-// color is spelled american because Color from compose is spelled american
-fun Brush.Companion.solidColor(colour: Color) = linearGradient(
-    colorStops = arrayOf(
-        0f to colour,
-        1f to colour
-    )
-)
+fun Brush.Companion.solidColor(colour: Color) = SolidColor(colour)
 
 // Some colours that are not present in Android's built-in list.
 // not exhaustive, but covers most of the ones I've seen in the wild

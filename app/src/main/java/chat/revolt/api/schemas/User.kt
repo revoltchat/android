@@ -65,6 +65,25 @@ data class User(
     }
 }
 
+enum class UserBadges(val value: Long) {
+    Developer(1L shl 0),
+    Translator(1L shl 1),
+    Supporter(1L shl 2),
+    ResponsibleDisclosure(1L shl 3),
+    Founder(1L shl 4),
+    PlatformModeration(1L shl 5),
+    ActiveSupporter(1L shl 6),
+    Paw(1L shl 7),
+    EarlyAdopter(1L shl 8),
+    ReservedRelevantJokeBadge1(1L shl 9),
+    ReservedRelevantJokeBadge2(1L shl 10),
+}
+
+infix fun Long?.has(flag: UserBadges): Boolean {
+    if (this == null) return false
+    return this and flag.value == flag.value
+}
+
 @Serializable
 data class Bot(
     val owner: String? = null
