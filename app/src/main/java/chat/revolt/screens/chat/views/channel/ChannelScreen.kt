@@ -347,6 +347,11 @@ fun ChannelScreen(
                                     onUserSheetOpenFor(author, channel?.server)
                                 }
                             },
+                            onNameClick = {
+                                val author = message.author?.let { RevoltAPI.userCache[it] }
+                                    ?: return@Message
+                                viewModel.putAtCursorPosition("@${author.username}#${author.discriminator}")
+                            },
                             canReply = true,
                             onReply = {
                                 if (viewModel.pendingReplies.size >= 5) {

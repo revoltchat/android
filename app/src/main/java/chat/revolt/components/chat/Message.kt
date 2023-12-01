@@ -64,11 +64,11 @@ import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
-import chat.revolt.api.schemas.Message as MessageSchema
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.internals.markdown.LongClickableSpan
+import chat.revolt.api.schemas.Message as MessageSchema
 
 @Composable
 fun authorColour(message: MessageSchema): Brush {
@@ -163,6 +163,7 @@ fun Message(
     parse: (MessageSchema) -> SpannableStringBuilder = { SpannableStringBuilder(it.content) },
     onMessageContextMenu: () -> Unit = {},
     onAvatarClick: () -> Unit = {},
+    onNameClick: (() -> Unit)? = null,
     canReply: Boolean = false,
     onReply: () -> Unit = {}
 ) {
@@ -252,7 +253,17 @@ fun Message(
                                     brush = authorColour(message)
                                 ),
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.then(
+                                    if (onNameClick != null)
+                                        Modifier.combinedClickable(
+                                            onClick = onNameClick,
+                                            onLongClick = {
+                                                onMessageContextMenu()
+                                            }
+                                        )
+                                    else Modifier
+                                )
                             )
 
                             InlineBadges(

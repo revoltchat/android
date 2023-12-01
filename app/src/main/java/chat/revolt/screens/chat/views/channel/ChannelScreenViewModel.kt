@@ -14,6 +14,7 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ChannelUtils
+import chat.revolt.api.internals.MessageProcessor
 import chat.revolt.api.internals.PermissionBit
 import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.SpecialUsers
@@ -211,7 +212,7 @@ class ChannelScreenViewModel : ViewModel() {
 
             sendMessage(
                 activeChannel!!.id!!,
-                pendingMessageContent.trimIndent(),
+                MessageProcessor.processOutgoing(pendingMessageContent.trimIndent()),
                 attachments = if (attachmentIds.isEmpty()) null else attachmentIds,
                 replies = pendingReplies
             )
