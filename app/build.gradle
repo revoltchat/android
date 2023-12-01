@@ -66,7 +66,8 @@ android {
         }
 
         // Please keep this list sorted alphabetically.
-        resourceConfigurations += ['b+es+419',
+        resourceConfigurations += ['ar',
+                                   'b+es+419',
                                    'be',
                                    'bg',
                                    'bn',
@@ -87,6 +88,7 @@ android {
                                    'id',
                                    'in',
                                    'ja',
+                                   'mwl',
                                    'nb-rNO',
                                    'nl',
                                    'pl',
