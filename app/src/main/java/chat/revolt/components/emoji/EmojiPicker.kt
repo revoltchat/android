@@ -582,6 +582,7 @@ fun ColumnScope.PickerItem(
                 modifier = Modifier
                     .clip(CircleShape)
                     .clickable {
+                        onClick(item)
                     }
                     .aspectRatio(1f)
                     .weight(1f),
