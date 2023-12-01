@@ -199,6 +199,78 @@ fun FriendsScreen(useDrawer: Boolean, onDrawerClicked: () -> Unit) {
                 })
             }
 
+            stickyHeader(key = "online") {
+                Text(
+                    text = AnnotatedString.Builder().apply {
+                        pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                        append(stringResource(id = R.string.status_online))
+                        pop()
+
+                        pushStyle(
+                            SpanStyle(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = LocalTextStyle.current.fontSize * 0.8,
+                                color = LocalContentColor.current.copy(alpha = 0.6f)
+                            )
+                        )
+                        append("—${FriendRequests.getOnlineFriends().size}")
+                        pop()
+                    }.toAnnotatedString(),
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(10.dp)
+                )
+            }
+
+            items(FriendRequests.getOnlineFriends().size) {
+                val item = FriendRequests.getOnlineFriends()[it]
+                UserItem(item, onClick = {
+                    scope.launch {
+                        item.id?.let { userId ->
+                            ActionChannel.send(Action.OpenUserSheet(userId, null))
+                        }
+                    }
+                })
+            }
+
+            stickyHeader(key = "not_online") {
+                Text(
+                    text = AnnotatedString.Builder().apply {
+                        pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                        append(stringResource(id = R.string.friends_all))
+                        pop()
+
+                        pushStyle(
+                            SpanStyle(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = LocalTextStyle.current.fontSize * 0.8,
+                                color = LocalContentColor.current.copy(alpha = 0.6f)
+                            )
+                        )
+                        append("—${FriendRequests.getFriends(true).size}")
+                        pop()
+                    }.toAnnotatedString(),
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(10.dp)
+                )
+            }
+
+            items(FriendRequests.getFriends(true).size) {
+                val item = FriendRequests.getFriends(true)[it]
+                UserItem(item, onClick = {
+                    scope.launch {
+                        item.id?.let { userId ->
+                            ActionChannel.send(Action.OpenUserSheet(userId, null))
+                        }
+                    }
+                })
+            }
+
             stickyHeader(key = "blocked") {
                 Text(
                     text = AnnotatedString.Builder().apply {

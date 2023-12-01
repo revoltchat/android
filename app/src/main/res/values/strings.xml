@@ -126,6 +126,7 @@
     <string name="friends">Friends</string>
     <string name="friends_incoming_requests">Incoming Requests</string>
     <string name="friends_outgoing_requests">Outgoing Requests</string>
+    <string name="friends_all">All</string>
     <string name="friends_blocked">Blocked</string>
     <string name="friends_deny_all_incoming">Clear all incoming requests</string>
 

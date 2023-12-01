@@ -10,18 +10,10 @@ object FriendRequests {
         }
     }
 
-    fun getIncomingCount(): Int {
-        return getIncoming().size
-    }
-
     fun getOutgoing(): List<User> {
         return RevoltAPI.userCache.values.filter { user ->
             user.relationship == "Outgoing"
         }
-    }
-
-    fun getOutgoingCount(): Int {
-        return getOutgoing().size
     }
 
     fun getBlocked(): List<User> {
@@ -30,7 +22,15 @@ object FriendRequests {
         }
     }
 
-    fun getBlockedCount(): Int {
-        return getBlocked().size
+    fun getOnlineFriends(): List<User> {
+        return RevoltAPI.userCache.values.filter { user ->
+            user.relationship == "Friend" && user.online == true
+        }
+    }
+
+    fun getFriends(excludeOnline: Boolean = false): List<User> {
+        return RevoltAPI.userCache.values.filter { user ->
+            user.relationship == "Friend" && (excludeOnline && user.online == false)
+        }
     }
 }
