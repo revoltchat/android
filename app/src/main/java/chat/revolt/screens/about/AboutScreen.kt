@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.LocalContentColor
@@ -51,9 +52,9 @@ import chat.revolt.api.routes.misc.getRootRoute
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.PrimaryTabs
 import chat.revolt.internals.Platform
-import java.net.URI
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
+import java.net.URI
 
 class AboutViewModel() : ViewModel() {
     var root by mutableStateOf<Root?>(null)
@@ -186,7 +187,9 @@ fun AboutScreen(navController: NavController, viewModel: AboutViewModel = viewMo
                         Image(
                             painter = painterResource(R.drawable.revolt_logo_wide),
                             contentDescription = stringResource(R.string.about_full_name),
-                            colorFilter = ColorFilter.tint(LocalContentColor.current)
+                            colorFilter = ColorFilter.tint(LocalContentColor.current),
+                            modifier = Modifier
+                                .width(250.dp)
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
