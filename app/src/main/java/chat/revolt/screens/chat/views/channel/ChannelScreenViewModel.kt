@@ -212,7 +212,10 @@ class ChannelScreenViewModel : ViewModel() {
 
             sendMessage(
                 activeChannel!!.id!!,
-                MessageProcessor.processOutgoing(pendingMessageContent.trimIndent()),
+                MessageProcessor.processOutgoing(
+                    pendingMessageContent.trimIndent(),
+                    activeChannel?.server
+                ),
                 attachments = if (attachmentIds.isEmpty()) null else attachmentIds,
                 replies = pendingReplies
             )

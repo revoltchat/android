@@ -247,6 +247,18 @@ class EmojiImpl {
         return list
     }
 
+    fun unicodeByShortcode(shortcode: String): String? {
+        return metadata.asSequence().mapNotNull { group ->
+            group.emoji.find { emoji ->
+                emoji.shortcodes.any { code ->
+                    code == ":${shortcode}:"
+                }
+            }
+        }.firstOrNull().let { emoji ->
+            emoji?.base?.joinToString("") { String(Character.toChars(it.toInt())) }
+        }
+    }
+
     init {
         metadata = initMetadata(RevoltApplication.instance.applicationContext)
     }
