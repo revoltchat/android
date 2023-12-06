@@ -57,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -74,8 +75,10 @@ import androidx.core.widget.addTextChangedListener
 import chat.revolt.R
 import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.activities.RevoltTweenInt
+import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.Member
+import chat.revolt.components.generic.RemoteImage
 import chat.revolt.internals.Autocomplete
 import kotlinx.coroutines.launch
 
@@ -288,7 +291,13 @@ fun NativeMessageField(
                                         )
                                     )
                                 },
-                                label = { Text(item.shortcode) },
+                                label = {
+                                    if (item.custom != null) {
+                                        Text(":${item.custom.name}:")
+                                    } else {
+                                        Text(item.shortcode)
+                                    }
+                                },
                                 icon = {
                                     if (item.unicode != null) {
                                         Text(
@@ -299,10 +308,13 @@ fun NativeMessageField(
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                     } else {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_emoticon_24dp),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(SuggestionChipDefaults.IconSize)
+                                        RemoteImage(
+                                            url = "$REVOLT_FILES/emojis/${item.custom?.id}/emoji.gif",
+                                            description = null,
+                                            contentScale = ContentScale.Fit,
+                                            modifier = Modifier
+                                                .size(SuggestionChipDefaults.IconSize)
+                                                .align(Alignment.CenterHorizontally)
                                         )
                                     }
                                 },

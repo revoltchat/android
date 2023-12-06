@@ -1,5 +1,6 @@
 package chat.revolt.internals
 
+import chat.revolt.api.RevoltAPI
 import chat.revolt.components.chat.AutocompleteSuggestion
 
 object Autocomplete {
@@ -16,6 +17,20 @@ object Autocomplete {
             )
         }.distinctBy { it.shortcode }
 
-        return unicodeResults
+        val customResults =
+            RevoltAPI.emojiCache.values.filter { it.name?.contains(query) ?: false }.map {
+                if (it.name != null) {
+                    AutocompleteSuggestion.Emoji(
+                        ":${it.id}:",
+                        null,
+                        it,
+                        query
+                    )
+                } else {
+                    null
+                }
+            }.filterNotNull().distinctBy { it.custom?.id }
+
+        return (unicodeResults + customResults)
     }
 }
