@@ -9,7 +9,7 @@ object MessageProcessor {
     private val ChannelRegex = Regex("(?:\\s|^)#(.+?)(?:\\s|\$)", RegexOption.IGNORE_CASE)
     private val EmojiRegex = Regex(":(.+?):", RegexOption.IGNORE_CASE)
 
-    private val emojiMetadata = EmojiImpl()
+    val emoji = EmojiImpl()
 
     /**
      * Processes an outgoing message for sending.
@@ -52,7 +52,7 @@ object MessageProcessor {
             val emojiName = EmojiRegex.matchEntire(emoji)?.destructured?.component1()
                 ?: return@fold acc
 
-            val byShortcode = emojiMetadata.unicodeByShortcode(emojiName)
+            val byShortcode = this.emoji.unicodeByShortcode(emojiName)
                 ?: return@fold acc
 
             acc.replace(":$emojiName:", byShortcode)

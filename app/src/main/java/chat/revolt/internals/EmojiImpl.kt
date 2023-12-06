@@ -259,6 +259,16 @@ class EmojiImpl {
         }
     }
 
+    fun shortcodeContains(query: String): List<Emoji> {
+        return metadata.asSequence().map { group ->
+            group.emoji.filter { emoji ->
+                emoji.shortcodes.any { code ->
+                    code.contains(query, ignoreCase = true)
+                }
+            }
+        }.flatten().toList()
+    }
+
     init {
         metadata = initMetadata(RevoltApplication.instance.applicationContext)
     }
