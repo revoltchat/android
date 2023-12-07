@@ -71,6 +71,8 @@ import chat.revolt.api.routes.channel.unreact
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.User
+import chat.revolt.callbacks.Action
+import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.internals.markdown.LongClickableSpan
@@ -488,7 +490,14 @@ fun Message(
                                         }
                                     }
                                 ) {
-
+                                    scope.launch {
+                                        ActionChannel.send(
+                                            Action.MessageReactionInfo(
+                                                message.id!!,
+                                                reaction.key
+                                            )
+                                        )
+                                    }
                                 }
                             }
                         }

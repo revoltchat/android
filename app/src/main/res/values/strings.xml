@@ -229,6 +229,7 @@
 
     <string name="emote_info_from_server">from %1$s</string>
     <string name="emote_info_from_server_unknown">from a private server</string>
+    <string name="emote_info_from_unicode">A default emoji that you can use anywhere</string>
 
     <string name="channel_info_sheet_description">Channel description</string>
     <string name="channel_info_sheet_description_empty">There hasn\'t been a description set for this channel yet.</string>

@@ -103,6 +103,7 @@ import chat.revolt.sheets.AddServerSheet
 import chat.revolt.sheets.ChangelogSheet
 import chat.revolt.sheets.EmoteInfoSheet
 import chat.revolt.sheets.LinkInfoSheet
+import chat.revolt.sheets.ReactionInfoSheet
 import chat.revolt.sheets.ServerContextSheet
 import chat.revolt.sheets.StatusSheet
 import chat.revolt.sheets.UserInfoSheet
@@ -327,6 +328,10 @@ fun ChatRouterScreen(
     var showEmoteInfoSheet by remember { mutableStateOf(false) }
     var emoteInfoSheetTarget by remember { mutableStateOf("") }
 
+    var showReactionInfoSheet by remember { mutableStateOf(false) }
+    var reactionInfoSheetMessageId by remember { mutableStateOf("") }
+    var reactionInfoSheetEmoji by remember { mutableStateOf("") }
+
     var useTabletAwareUI by remember { mutableStateOf(false) }
 
     val toggleDrawerLambda = remember {
@@ -439,6 +444,12 @@ fun ChatRouterScreen(
                     is Action.EmoteInfo -> {
                         emoteInfoSheetTarget = action.emoteId
                         showEmoteInfoSheet = true
+                    }
+
+                    is Action.MessageReactionInfo -> {
+                        reactionInfoSheetMessageId = action.messageId
+                        reactionInfoSheetEmoji = action.emoji
+                        showReactionInfoSheet = true
                     }
 
                     is Action.TopNavigate -> {
@@ -671,6 +682,25 @@ fun ChatRouterScreen(
                 id = emoteInfoSheetTarget,
                 onDismiss = {
                     showEmoteInfoSheet = false
+                }
+            )
+        }
+    }
+
+    if (showReactionInfoSheet) {
+        val reactionInfoSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = reactionInfoSheetState,
+            onDismissRequest = {
+                showReactionInfoSheet = false
+            }
+        ) {
+            ReactionInfoSheet(
+                messageId = reactionInfoSheetMessageId,
+                emoji = reactionInfoSheetEmoji,
+                onDismiss = {
+                    showReactionInfoSheet = false
                 }
             )
         }
