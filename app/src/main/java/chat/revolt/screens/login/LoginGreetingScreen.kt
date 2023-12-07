@@ -22,7 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,7 +45,7 @@ import chat.revolt.components.generic.Weblink
 @Composable
 fun LoginGreetingScreen(navController: NavController) {
     val context = LocalContext.current
-    var catTaps by remember { mutableStateOf(0) }
+    var catTaps by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -67,7 +67,7 @@ fun LoginGreetingScreen(navController: NavController) {
                 contentDescription = "Revolt Logo",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .height(70.dp)
+                    .height(55.dp)
                     .padding(bottom = 10.dp)
                     .clickable(
                         interactionSource = remember(::MutableInteractionSource),
