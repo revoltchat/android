@@ -519,6 +519,8 @@ fun ChannelScreen(
                             ),
                         forceSendButton = viewModel.pendingAttachments.isNotEmpty(),
                         disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage,
+                        channelId = channelId,
+                        serverId = channel?.server,
                         editMode = viewModel.editingMessage != null,
                         cancelEdit = viewModel::cancelEditingMessage,
                         onFocusChange = { nowFocused ->

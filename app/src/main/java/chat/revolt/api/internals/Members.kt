@@ -38,4 +38,10 @@ class Members {
             member.nickname?.let { userId to member.nickname }
         }?.toMap() ?: emptyMap()
     }
+
+    fun filterNamesFor(serverId: String, query: String): List<Member> {
+        return memberCache[serverId]?.values?.filter { member ->
+            member.nickname?.contains(query, ignoreCase = true) ?: false
+        } ?: emptyList()
+    }
 }

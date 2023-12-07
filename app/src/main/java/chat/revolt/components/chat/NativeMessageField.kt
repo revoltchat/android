@@ -79,6 +79,8 @@ import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.Member
 import chat.revolt.components.generic.RemoteImage
+import chat.revolt.components.generic.UserAvatar
+import chat.revolt.components.screens.chat.ChannelIcon
 import chat.revolt.internals.Autocomplete
 import kotlinx.coroutines.launch
 
@@ -155,9 +157,9 @@ fun NativeMessageField(
     modifier: Modifier = Modifier,
     forceSendButton: Boolean = false,
     disabled: Boolean = false,
-    editMode: Boolean = false,
     serverId: String? = null,
     channelId: String? = null,
+    editMode: Boolean = false,
     cancelEdit: () -> Unit = {},
     onFocusChange: (Boolean) -> Unit = {},
     onSelectionChange: (Pair<Int, Int>) -> Unit = {}
@@ -247,10 +249,15 @@ fun NativeMessageField(
                                 },
                                 label = { Text("@${item.user.username}#${item.user.discriminator}") },
                                 icon = {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_human_greeting_variant_24dp),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SuggestionChipDefaults.IconSize)
+                                    UserAvatar(
+                                        username = item.user.username
+                                            ?: stringResource(R.string.unknown),
+                                        userId = item.user.id ?: "",
+                                        avatar = item.user.avatar,
+                                        rawUrl = item.member?.avatar?.id?.let {
+                                            "$REVOLT_FILES/avatars/$it?max_side=64"
+                                        },
+                                        size = SuggestionChipDefaults.IconSize,
                                     )
                                 },
                                 modifier = Modifier
@@ -270,11 +277,7 @@ fun NativeMessageField(
                                 },
                                 label = { Text("#${item.channel.name}") },
                                 icon = {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_pound_24dp),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SuggestionChipDefaults.IconSize)
-                                    )
+                                    item.channel.channelType?.let { type -> ChannelIcon(channelType = type) }
                                 },
                                 modifier = Modifier
                                     .animateItemPlacement()
@@ -360,6 +363,8 @@ fun NativeMessageField(
             AndroidView(
                 factory = { context ->
                     object : androidx.appcompat.widget.AppCompatEditText(context) {
+                        var serverId: String? = null
+
                         override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
                             var ic = super.onCreateInputConnection(outAttrs)
                             EditorInfoCompat.setContentMimeTypes(
@@ -400,6 +405,17 @@ fun NativeMessageField(
                                 lastWord.startsWith(':') && !lastWord.endsWith(':') -> {
                                     autocompleteSuggestions.addAll(
                                         Autocomplete.emoji(lastWord.substring(1))
+                                    )
+                                }
+
+                                lastWord.startsWith('@') -> {
+                                    if (channelId == null) return
+                                    autocompleteSuggestions.addAll(
+                                        Autocomplete.user(
+                                            channelId,
+                                            this.serverId,
+                                            lastWord.substring(1)
+                                        )
                                     )
                                 }
                             }
@@ -489,6 +505,7 @@ fun NativeMessageField(
                         it.setSelection(value.length)
                     }
                     it.hint = it.context.getString(placeholderResource, channelName)
+                    it.serverId = serverId
                 },
                 modifier = Modifier
                     .weight(1f)
