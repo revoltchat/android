@@ -26,6 +26,8 @@ import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
 import chat.revolt.api.realtime.frames.receivable.MessageAppendFrame
 import chat.revolt.api.realtime.frames.receivable.MessageDeleteFrame
 import chat.revolt.api.realtime.frames.receivable.MessageFrame
+import chat.revolt.api.realtime.frames.receivable.MessageReactFrame
+import chat.revolt.api.realtime.frames.receivable.MessageUnreactFrame
 import chat.revolt.api.realtime.frames.receivable.MessageUpdateFrame
 import chat.revolt.api.routes.channel.SendMessageReply
 import chat.revolt.api.routes.channel.ackChannel
@@ -335,6 +337,46 @@ class ChannelScreenViewModel : ViewModel() {
 
                     is MessageAppendFrame -> {
                         if (it.channel != activeChannel?.id) return@onEach
+
+                        val hasMessage = renderableMessages.any { currentMsg ->
+                            currentMsg.id == it.id
+                        }
+
+                        if (!hasMessage) return@onEach
+
+                        regroupMessages(
+                            renderableMessages.map { currentMsg ->
+                                if (currentMsg.id == it.id) {
+                                    RevoltAPI.messageCache[it.id] ?: currentMsg
+                                } else {
+                                    currentMsg
+                                }
+                            }
+                        )
+                    }
+
+                    is MessageReactFrame -> {
+                        if (it.channel_id != activeChannel?.id) return@onEach
+
+                        val hasMessage = renderableMessages.any { currentMsg ->
+                            currentMsg.id == it.id
+                        }
+
+                        if (!hasMessage) return@onEach
+
+                        regroupMessages(
+                            renderableMessages.map { currentMsg ->
+                                if (currentMsg.id == it.id) {
+                                    RevoltAPI.messageCache[it.id] ?: currentMsg
+                                } else {
+                                    currentMsg
+                                }
+                            }
+                        )
+                    }
+
+                    is MessageUnreactFrame -> {
+                        if (it.channel_id != activeChannel?.id) return@onEach
 
                         val hasMessage = renderableMessages.any { currentMsg ->
                             currentMsg.id == it.id

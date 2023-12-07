@@ -20,8 +20,11 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +42,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -62,12 +66,15 @@ import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.internals.solidColor
+import chat.revolt.api.routes.channel.react
+import chat.revolt.api.routes.channel.unreact
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.internals.markdown.LongClickableSpan
+import kotlinx.coroutines.launch
 import chat.revolt.api.schemas.Message as MessageSchema
 
 @Composable
@@ -155,7 +162,7 @@ fun formatLongAsTime(time: Long): String {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun Message(
     message: MessageSchema,
@@ -170,6 +177,8 @@ fun Message(
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
     val context = LocalContext.current
     val contentColor = LocalContentColor.current
+
+    val scope = rememberCoroutineScope()
 
     val attachmentView = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
@@ -450,6 +459,40 @@ fun Message(
                             })
                             Spacer(modifier = Modifier.height(8.dp))
                         }
+
+                    }
+
+                    if ((message.reactions?.size ?: 0) > 0) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            message.reactions?.forEach { reaction ->
+                                Reaction(reaction.key, reaction.value,
+                                    onClick = { hasOwn ->
+                                        scope.launch {
+                                            if (hasOwn) {
+                                                unreact(
+                                                    message.channel!!,
+                                                    message.id!!,
+                                                    reaction.key
+                                                )
+                                            } else {
+                                                react(
+                                                    message.channel!!,
+                                                    message.id!!,
+                                                    reaction.key
+                                                )
+                                            }
+                                        }
+                                    }
+                                ) {
+
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }

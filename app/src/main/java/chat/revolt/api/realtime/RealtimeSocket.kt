@@ -14,6 +14,7 @@ import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.MessageAppendFrame
 import chat.revolt.api.realtime.frames.receivable.MessageFrame
+import chat.revolt.api.realtime.frames.receivable.MessageReactFrame
 import chat.revolt.api.realtime.frames.receivable.MessageUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.PongFrame
 import chat.revolt.api.realtime.frames.receivable.ReadyFrame
@@ -253,6 +254,69 @@ object RealtimeSocket {
                 }
 
                 RevoltAPI.wsFrameChannel.send(messageUpdateFrame)
+            }
+
+            "MessageReact" -> {
+                val messageReactFrame =
+                    RevoltJson.decodeFromString(MessageReactFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received message react frame for ${messageReactFrame.id}."
+                )
+
+                val oldMessage = RevoltAPI.messageCache[messageReactFrame.id]
+                if (oldMessage == null) {
+                    Log.d(
+                        "RealtimeSocket",
+                        "Message ${messageReactFrame.id} not found in cache. Will not update."
+                    )
+                    return
+                }
+
+                val reactions = oldMessage.reactions?.toMutableMap() ?: mutableMapOf()
+                val forEmoji =
+                    reactions[messageReactFrame.emoji_id]?.toMutableList() ?: mutableListOf()
+                forEmoji.add(messageReactFrame.user_id)
+                reactions[messageReactFrame.emoji_id] = forEmoji
+
+                RevoltAPI.messageCache[messageReactFrame.id] =
+                    oldMessage.copy(reactions = reactions)
+
+                RevoltAPI.wsFrameChannel.send(messageReactFrame)
+            }
+
+            "MessageUnreact" -> {
+                val messageUnreactFrame =
+                    RevoltJson.decodeFromString(MessageReactFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received message unreact frame for ${messageUnreactFrame.id}."
+                )
+
+                val oldMessage = RevoltAPI.messageCache[messageUnreactFrame.id]
+                if (oldMessage == null) {
+                    Log.d(
+                        "RealtimeSocket",
+                        "Message ${messageUnreactFrame.id} not found in cache. Will not update."
+                    )
+                    return
+                }
+
+                val reactions = oldMessage.reactions?.toMutableMap() ?: mutableMapOf()
+                val forEmoji =
+                    reactions[messageUnreactFrame.emoji_id]?.toMutableList() ?: mutableListOf()
+                forEmoji.remove(messageUnreactFrame.user_id)
+
+                if (forEmoji.isEmpty()) {
+                    reactions.remove(messageUnreactFrame.emoji_id)
+                } else {
+                    reactions[messageUnreactFrame.emoji_id] = forEmoji
+                }
+
+                RevoltAPI.messageCache[messageUnreactFrame.id] =
+                    oldMessage.copy(reactions = reactions)
+
+                RevoltAPI.wsFrameChannel.send(messageUnreactFrame)
             }
 
             "UserUpdate" -> {
