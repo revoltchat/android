@@ -102,13 +102,13 @@ fun String.applyAutocompleteSuggestion(
                 this.replaceRange(
                     cursorPosition - suggestion.query.length - 1,
                     cursorPosition,
-                    "#${suggestion.channel.name} "
+                    "<#${suggestion.channel.id}> "
                 )
             } else {
                 this.replaceRange(
                     cursorPosition - suggestion.query.length - 1,
                     cursorPosition,
-                    "<#${suggestion.channel.id}> "
+                    "#${suggestion.channel.name} "
                 )
             }
         }
