@@ -98,7 +98,7 @@ fun String.applyAutocompleteSuggestion(
         }
 
         is AutocompleteSuggestion.Channel -> {
-            if (suggestion.channel.name?.contains(" ") == true) {
+            if (suggestion.channel.name?.contains(" ", ignoreCase = true) == true) {
                 this.replaceRange(
                     cursorPosition - suggestion.query.length - 1,
                     cursorPosition,
@@ -277,7 +277,12 @@ fun NativeMessageField(
                                 },
                                 label = { Text("#${item.channel.name}") },
                                 icon = {
-                                    item.channel.channelType?.let { type -> ChannelIcon(channelType = type) }
+                                    item.channel.channelType?.let { type ->
+                                        ChannelIcon(
+                                            channelType = type,
+                                            modifier = Modifier.size(SuggestionChipDefaults.IconSize)
+                                        )
+                                    }
                                 },
                                 modifier = Modifier
                                     .animateItemPlacement()
@@ -414,6 +419,16 @@ fun NativeMessageField(
                                         Autocomplete.user(
                                             channelId,
                                             this.serverId,
+                                            lastWord.substring(1)
+                                        )
+                                    )
+                                }
+
+                                lastWord.startsWith('#') -> {
+                                    if (this.serverId == null) return
+                                    autocompleteSuggestions.addAll(
+                                        Autocomplete.channel(
+                                            this.serverId!!,
                                             lastWord.substring(1)
                                         )
                                     )

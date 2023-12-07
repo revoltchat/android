@@ -10,7 +10,7 @@ object Autocomplete {
     fun emoji(query: String): List<AutocompleteSuggestion.Emoji> {
         val unicodeResults = emojiImpl.shortcodeContains(query).map {
             AutocompleteSuggestion.Emoji(
-                it.shortcodes.find { shortcode -> shortcode.contains(query) }
+                it.shortcodes.find { shortcode -> shortcode.contains(query, ignoreCase = true) }
                     ?: it.shortcodes.first(),
                 it.base.joinToString("") { s -> String(Character.toChars(s.toInt())) },
                 null,
@@ -19,7 +19,9 @@ object Autocomplete {
         }.distinctBy { it.shortcode }
 
         val customResults =
-            RevoltAPI.emojiCache.values.filter { it.name?.contains(query) ?: false }.map {
+            RevoltAPI.emojiCache.values.filter {
+                it.name?.contains(query, ignoreCase = true) ?: false
+            }.map {
                 if (it.name != null) {
                     AutocompleteSuggestion.Emoji(
                         ":${it.id}:",
@@ -47,7 +49,7 @@ object Autocomplete {
                 val otherUser = channel.recipients?.find { it != RevoltAPI.selfId }
                 if (otherUser != null) {
                     val user = RevoltAPI.userCache[otherUser]
-                    if (user != null && user.username?.contains(query) == true) {
+                    if (user != null && user.username?.contains(query, ignoreCase = true) == true) {
                         listOf(
                             AutocompleteSuggestion.User(
                                 user,
@@ -67,7 +69,7 @@ object Autocomplete {
                 val users =
                     channel.recipients?.mapNotNull { RevoltAPI.userCache[it] } ?: emptyList()
                 users
-                    .filter { it.username?.contains(query) ?: false }
+                    .filter { it.username?.contains(query, ignoreCase = true) ?: false }
                     .map {
                         AutocompleteSuggestion.User(
                             it,
@@ -79,7 +81,11 @@ object Autocomplete {
 
             ChannelType.SavedMessages -> {
                 val user = RevoltAPI.userCache[RevoltAPI.selfId]
-                return if (user != null && user.username?.contains(query) == true) {
+                return if (user != null && user.username?.contains(
+                        query,
+                        ignoreCase = true
+                    ) == true
+                ) {
                     listOf(
                         AutocompleteSuggestion.User(
                             user,
@@ -132,6 +138,21 @@ object Autocomplete {
             }
 
             null -> emptyList()
+        }
+    }
+
+    fun channel(
+        serverId: String,
+        query: String
+    ): List<AutocompleteSuggestion.Channel> {
+        val server = RevoltAPI.serverCache[serverId] ?: return emptyList()
+        val channels = server.channels?.mapNotNull { RevoltAPI.channelCache[it] } ?: emptyList()
+
+        return channels.filter { it.name?.contains(query, ignoreCase = true) ?: false }.map {
+            AutocompleteSuggestion.Channel(
+                it,
+                query
+            )
         }
     }
 }
