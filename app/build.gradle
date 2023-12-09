@@ -260,9 +260,4 @@ dependencies {
 
     // Colour picker
     implementation "com.github.skydoves:colorpicker-compose:1.0.5"
-
-    // Debug-only dependencies
-
-    // LeakCanary - memory leak detection
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.11'
 }
