@@ -4,13 +4,13 @@ buildscript {
         compose_bom_version = '2023.09.00'
         accompanist_version = '0.31.2-alpha'
         okhttp_version = '4.10.0'
-        nav_version = '2.7.1'
+        nav_version = '2.7.5'
         hilt_version = '2.44'
         coil_version = '2.2.2'
         glide_version = '4.16.0'
         ktor_version = '2.3.0'
         aboutlibraries_version = '10.9.1'
-        media3_version = '1.1.1'
+        media3_version = '1.2.0'
     }
 }
 
