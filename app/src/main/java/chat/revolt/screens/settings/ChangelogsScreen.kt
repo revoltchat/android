@@ -40,7 +40,9 @@ class ChangelogsSettingsScreenViewModel @Inject constructor(
     kvStorage: KVStorage,
     @ApplicationContext context: Context
 ) : ViewModel() {
-    val index = Changelogs(context, kvStorage).index
+    private val changelogs = Changelogs(context, kvStorage)
+    val index = changelogs.index
+    val list = changelogs.getList()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,11 +82,11 @@ fun ChangelogsSettingsScreen(
 
         LazyColumn {
             items(
-                viewModel.index.list.size,
-                key = { viewModel.index.list.keys.elementAt(it) }
+                viewModel.list.size,
+                key = { viewModel.list.keys.elementAt(it) }
             ) { index ->
-                val version = viewModel.index.list.keys.elementAt(index)
-                val changelog = viewModel.index.list[version]!!
+                val version = viewModel.list.keys.elementAt(index)
+                val changelog = viewModel.list[version]!!
 
                 Column(
                     modifier = Modifier

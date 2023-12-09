@@ -25,6 +25,10 @@ class Changelogs(val context: Context, val kvStorage: KVStorage? = null) {
         RevoltJson.decodeFromString(ChangelogIndex.serializer(), it)
     }
 
+    fun getList(): Map<String, Changelog> {
+        return index.list.entries.reversed().associate { it.key to it.value }
+    }
+
     fun getChangelog(version: String): String {
         return context.assets.open("changelogs/$version.md").use {
             it.reader().readText()
