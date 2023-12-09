@@ -245,23 +245,33 @@ fun ProfileSettingsScreen(
             }
         )
 
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .then(
+                    if (viewModel.isLoading) {
+                        Modifier
+                    } else {
+                        Modifier.verticalScroll(scrollState)
+                    }
+                ),
+            verticalArrangement = if (viewModel.isLoading) {
+                Arrangement.Center
+            } else {
+                Arrangement.Top
+            },
+            horizontalAlignment = if (viewModel.isLoading) {
+                Alignment.CenterHorizontally
+            } else {
+                Alignment.Start
+            }
         ) {
             if (viewModel.isLoading) {
-                Column(
+                CircularProgressIndicator(
                     modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(48.dp)
-                    )
-                }
+                        .size(48.dp)
+                )
             } else {
                 RevoltAPI.userCache[RevoltAPI.selfId]?.let {
                     RawUserOverview(
@@ -365,7 +375,7 @@ fun ProfileSettingsScreen(
 
                     AnimatedVisibility(visible = viewModel.bioError != null) {
                         Spacer(Modifier.height(8.dp))
-                        
+
                         Text(
                             text = viewModel.bioError ?: "",
                             style = MaterialTheme.typography.labelLarge.copy(

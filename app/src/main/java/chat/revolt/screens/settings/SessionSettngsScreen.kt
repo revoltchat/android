@@ -12,10 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,6 +50,7 @@ import chat.revolt.components.settings.sessions.SessionItem
 import kotlinx.coroutines.launch
 
 class SessionSettingsScreenViewModel : ViewModel() {
+    var isLoading by mutableStateOf(true)
     val sessions = mutableStateListOf<Session>()
     var currentSession by mutableStateOf<Session?>(null)
     var showLogoutOtherConfirmation by mutableStateOf(false)
@@ -61,6 +63,7 @@ class SessionSettingsScreenViewModel : ViewModel() {
                 "SessionSettingsScreen",
                 "Current session: $currentSession. Current session ID: ${RevoltAPI.sessionId}"
             )
+            isLoading = false
         }
     }
 
@@ -80,7 +83,7 @@ class SessionSettingsScreenViewModel : ViewModel() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SessionSettingsScreen(
     navController: NavController,
@@ -135,106 +138,122 @@ fun SessionSettingsScreen(
             }
         )
 
-        LazyColumn {
-            stickyHeader(key = "thisDevice") {
-                Text(
-                    text = stringResource(id = R.string.settings_sessions_this_device),
-                    style = MaterialTheme.typography.labelLarge,
+        if (viewModel.isLoading) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(10.dp)
+                        .size(48.dp)
                 )
             }
-
-            viewModel.currentSession?.let {
-                item(key = it.id) {
-                    Spacer(Modifier.height(8.dp))
-                    SessionItem(
-                        session = it,
-                        currentSession = true,
-                        onLogout = {},
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                }
-            } ?: run {
-                item(key = "noCurrentSession") {
-                    UIMarkdown(
-                        text = stringResource(id = R.string.settings_sessions_this_device_unavailable),
+        } else {
+            LazyColumn {
+                stickyHeader(key = "thisDevice") {
+                    Text(
+                        text = stringResource(id = R.string.settings_sessions_this_device),
+                        style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(MaterialTheme.colorScheme.background)
                             .padding(10.dp)
                     )
                 }
-            }
 
-            stickyHeader(key = "otherSessions") {
-                Text(
-                    text = stringResource(id = R.string.settings_sessions_other_sessions),
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(10.dp)
-                )
-            }
-
-            item(key = "logoutOtherSessions") {
-                Row(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                        .clip(shape = MaterialTheme.shapes.medium)
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
+                viewModel.currentSession?.let {
+                    item(key = it.id) {
+                        Spacer(Modifier.height(8.dp))
+                        SessionItem(
+                            session = it,
+                            currentSession = true,
+                            onLogout = {},
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(
+                    }
+                } ?: run {
+                    item(key = "noCurrentSession") {
+                        UIMarkdown(
+                            text = stringResource(id = R.string.settings_sessions_this_device_unavailable),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.background)
+                                .padding(10.dp)
+                        )
+                    }
+                }
+
+                stickyHeader(key = "otherSessions") {
+                    Text(
+                        text = stringResource(id = R.string.settings_sessions_other_sessions),
+                        style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 16.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.settings_sessions_log_out_other),
-                            style = MaterialTheme.typography.labelLarge
-                        )
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(10.dp)
+                    )
+                }
 
-                        Text(
-                            text = stringResource(
-                                R.string.settings_sessions_log_out_other_description
-                            ),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.Normal
+                item(key = "logoutOtherSessions") {
+                    Row(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                            .clip(shape = MaterialTheme.shapes.medium)
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
                             )
-                        )
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 16.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.settings_sessions_log_out_other),
+                                style = MaterialTheme.typography.labelLarge
+                            )
+
+                            Text(
+                                text = stringResource(
+                                    R.string.settings_sessions_log_out_other_description
+                                ),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.Normal
+                                )
+                            )
+                        }
+
+                        FilledTonalButton(onClick = {
+                            viewModel.showLogoutOtherConfirmation = true
+                        }) {
+                            Text(stringResource(R.string.logout))
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                items(viewModel.sessions.size) {
+                    val item = viewModel.sessions[it]
+
+                    if (item.isCurrent()) {
+                        return@items
                     }
 
-                    FilledTonalButton(onClick = { viewModel.showLogoutOtherConfirmation = true }) {
-                        Text(stringResource(R.string.logout))
-                    }
+                    SessionItem(
+                        session = item,
+                        onLogout = { session ->
+                            viewModel.logoutSession(session.id)
+                        },
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                    Spacer(Modifier.height(16.dp))
                 }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            items(viewModel.sessions.size) {
-                val item = viewModel.sessions[it]
-
-                if (item.isCurrent()) {
-                    return@items
-                }
-
-                SessionItem(
-                    session = item,
-                    onLogout = { session ->
-                        viewModel.logoutSession(session.id)
-                    },
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
-                Spacer(Modifier.height(16.dp))
             }
         }
     }
