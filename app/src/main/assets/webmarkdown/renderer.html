@@ -84,8 +84,8 @@
     window.addEventListener("load", () => {
         const style = document.querySelector("style")
         style.innerHTML = style.innerHTML
-            .replaceAll("{content}", Bridge.getContentColour())
-            .replaceAll("{primary}", Bridge.getPrimaryColour())
+            .replace("{content}", Bridge.getContentColour())
+            .replace("{primary}", Bridge.getPrimaryColour())
 
         renderMarkdown()
         Bridge.onLoaded()
