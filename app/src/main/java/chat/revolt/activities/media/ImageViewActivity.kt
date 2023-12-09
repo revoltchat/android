@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
@@ -49,10 +48,14 @@ import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.provider.getAttachmentContentUri
 import chat.revolt.ui.theme.RevoltTheme
-import com.bumptech.glide.Glide
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import io.ktor.client.request.get
 import io.ktor.client.statement.readBytes
 import kotlinx.coroutines.launch
+import me.saket.telephoto.zoomable.ZoomSpec
+import me.saket.telephoto.zoomable.glide.ZoomableGlideImage
+import me.saket.telephoto.zoomable.rememberZoomableImageState
+import me.saket.telephoto.zoomable.rememberZoomableState
 
 class ImageViewActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,6 +82,7 @@ class ImageViewActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ImageViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
     val resourceUrl = "$REVOLT_FILES/attachments/${resource.id}/${resource.filename}"
@@ -260,19 +264,16 @@ fun ImageViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
                             .clip(RectangleShape)
                             .fillMaxSize()
                     ) {
-                        AndroidView(
-                            factory = { context ->
-                                com.ortiz.touchview.TouchImageView(context).apply {
-                                    maxZoom = 10f
-                                    doubleTapScale = 3f
-                                }
-                            },
-                            update = {
-                                Glide.with(it).load(resourceUrl).into(it)
-                            },
+                        ZoomableGlideImage(
+                            model = resourceUrl,
+                            contentDescription = null,
+                            state = rememberZoomableImageState(
+                                rememberZoomableState(
+                                    zoomSpec = ZoomSpec(maxZoomFactor = 10f)
+                                )
+                            ),
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.background)
                         )
                     }
                 }
