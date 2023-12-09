@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -56,12 +59,14 @@ import javax.inject.Inject
 @Suppress("StaticFieldLeak")
 class ProfileSettingsScreenViewModel @Inject constructor(@ApplicationContext val context: Context) :
     ViewModel() {
+    var isLoading by mutableStateOf(true)
     var pfpModel by mutableStateOf<Any?>(null)
     var currentProfile by mutableStateOf<Profile?>(null)
     var pendingProfile by mutableStateOf<Profile?>(null)
     var backgroundModel by mutableStateOf<Any?>(null)
     var uploadProgress by mutableFloatStateOf(0f)
     var uploadError by mutableStateOf<String?>(null)
+    var bioError by mutableStateOf<String?>(null)
 
     init {
         RevoltAPI.selfId?.let { self ->
@@ -75,6 +80,8 @@ class ProfileSettingsScreenViewModel @Inject constructor(@ApplicationContext val
                 }
 
                 pendingProfile = currentProfile!!.copy()
+
+                isLoading = false
             }
         }
 
@@ -203,12 +210,17 @@ class ProfileSettingsScreenViewModel @Inject constructor(@ApplicationContext val
     }
 
     fun saveBio() {
+        bioError = null
         viewModelScope.launch {
-            patchSelf(bio = pendingProfile?.content)
+            try {
+                patchSelf(bio = pendingProfile?.content)
 
-            fetchUserProfile(RevoltAPI.selfId!!).let {
-                currentProfile = it
-                pendingProfile = it
+                fetchUserProfile(RevoltAPI.selfId!!).let {
+                    currentProfile = it
+                    pendingProfile = it
+                }
+            } catch (e: Exception) {
+                bioError = e.message
             }
         }
     }
@@ -238,126 +250,153 @@ fun ProfileSettingsScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            RevoltAPI.userCache[RevoltAPI.selfId]?.let {
-                RawUserOverview(
-                    it,
-                    viewModel.pendingProfile,
-                    viewModel.pfpModel?.toString(),
-                    viewModel.backgroundModel?.toString()
-                )
-            }
-
-            AnimatedVisibility(visible = viewModel.uploadProgress > 0f) {
-                LinearProgressIndicator(
-                    progress = viewModel.uploadProgress,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 0.dp)
-                )
-            }
-
-            AnimatedVisibility(visible = viewModel.uploadError != null) {
-                Text(
-                    text = viewModel.uploadError ?: "",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        color = MaterialTheme.colorScheme.error
-                    ),
-                    modifier = Modifier
-                        .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 0.dp)
-                )
-            }
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
+            if (viewModel.isLoading) {
                 Column(
                     modifier = Modifier
-                        .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 0.dp)
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Text(
-                        text = stringResource(id = R.string.settings_profile_profile_picture),
-                        style = MaterialTheme.typography.labelLarge
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(48.dp)
                     )
-
-                    Spacer(Modifier.height(10.dp))
-
-                    InlineMediaPicker(
-                        currentModel = viewModel.pfpModel,
-                        circular = true,
-                        onPick = {
-                            viewModel.pfpModel = it.toString()
-                            viewModel.saveNewPfp()
-                        },
-                        canRemove = true,
-                        onRemove = {
-                            viewModel.removePfp()
-                        }
+                }
+            } else {
+                RevoltAPI.userCache[RevoltAPI.selfId]?.let {
+                    RawUserOverview(
+                        it,
+                        viewModel.pendingProfile,
+                        viewModel.pfpModel?.toString(),
+                        viewModel.backgroundModel?.toString()
                     )
                 }
 
-                Column(
-                    modifier = Modifier
-                        .padding(20.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.settings_profile_custom_background),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-
-                    Spacer(Modifier.height(10.dp))
-
-                    InlineMediaPicker(
-                        currentModel = viewModel.backgroundModel,
-                        onPick = {
-                            viewModel.backgroundModel = it.toString()
-                            viewModel.saveNewBackground()
-                        },
-                        canRemove = true,
-                        onRemove = {
-                            viewModel.removeBackground()
-                        }
+                AnimatedVisibility(visible = viewModel.uploadProgress > 0f) {
+                    LinearProgressIndicator(
+                        progress = viewModel.uploadProgress,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 0.dp)
                     )
                 }
-            }
-            Column(
-                modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 20.dp)
-            ) {
-                OutlinedTextField(
-                    value = viewModel.pendingProfile?.content ?: "",
-                    onValueChange = { value ->
-                        viewModel.pendingProfile?.let {
-                            viewModel.pendingProfile = it.copy(content = value)
-                        }
-                    },
-                    label = {
+
+                AnimatedVisibility(visible = viewModel.uploadError != null) {
+                    Text(
+                        text = viewModel.uploadError ?: "",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            color = MaterialTheme.colorScheme.error
+                        ),
+                        modifier = Modifier
+                            .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 0.dp)
+                    )
+                }
+
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 0.dp)
+                    ) {
                         Text(
-                            text = stringResource(id = R.string.user_info_sheet_category_bio),
+                            text = stringResource(id = R.string.settings_profile_profile_picture),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+
+                        Spacer(Modifier.height(10.dp))
+
+                        InlineMediaPicker(
+                            currentModel = viewModel.pfpModel,
+                            circular = true,
+                            onPick = {
+                                viewModel.pfpModel = it.toString()
+                                viewModel.saveNewPfp()
+                            },
+                            canRemove = true,
+                            onRemove = {
+                                viewModel.removePfp()
+                            }
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .padding(20.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.settings_profile_custom_background),
                             style = MaterialTheme.typography.labelLarge,
                         )
-                    },
-                )
 
-                Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(10.dp))
 
-                TextButton(
-                    onClick = {
-                        viewModel.saveBio()
-                    },
-                    enabled = viewModel.pendingProfile?.content != viewModel.currentProfile?.content,
-                    modifier = Modifier.fillMaxWidth()
+                        InlineMediaPicker(
+                            currentModel = viewModel.backgroundModel,
+                            onPick = {
+                                viewModel.backgroundModel = it.toString()
+                                viewModel.saveNewBackground()
+                            },
+                            canRemove = true,
+                            onRemove = {
+                                viewModel.removeBackground()
+                            }
+                        )
+                    }
+                }
+                Column(
+                    modifier = Modifier
+                        .padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 20.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null
+                    OutlinedTextField(
+                        value = viewModel.pendingProfile?.content ?: "",
+                        onValueChange = { value ->
+                            viewModel.pendingProfile?.let {
+                                viewModel.pendingProfile = it.copy(content = value)
+                            }
+                        },
+                        label = {
+                            Text(
+                                text = stringResource(id = R.string.user_info_sheet_category_bio),
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        },
                     )
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    AnimatedVisibility(visible = viewModel.bioError != null) {
+                        Spacer(Modifier.height(8.dp))
+                        
+                        Text(
+                            text = viewModel.bioError ?: "",
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                color = MaterialTheme.colorScheme.error
+                            ),
+                            modifier = Modifier
+                                .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 0.dp)
+                        )
+                    }
 
-                    Text(
-                        text = stringResource(id = R.string.settings_profile_save),
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    Spacer(Modifier.height(8.dp))
+
+                    TextButton(
+                        onClick = {
+                            viewModel.saveBio()
+                        },
+                        enabled = viewModel.pendingProfile?.content != viewModel.currentProfile?.content,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = stringResource(id = R.string.settings_profile_save),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
         }
