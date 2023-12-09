@@ -294,7 +294,7 @@ fun AppearanceSettingsScreen(
                     .padding(start = 20.dp, end = 20.dp)
             ) {
                 ColourChip(
-                    color = Color(0xff1c243c),
+                    color = Color(0xff191919),
                     text = stringResource(id = R.string.settings_appearance_theme_revolt),
                     selected = GlobalState.theme == Theme.Revolt,
                     modifier = Modifier
@@ -327,7 +327,7 @@ fun AppearanceSettingsScreen(
                 }
 
                 ColourChip(
-                    color = if (isSystemInDarkTheme()) Color(0xff1c243c) else Color(0xfff7f7f7),
+                    color = if (isSystemInDarkTheme()) Color(0xff191919) else Color(0xfff7f7f7),
                     text = stringResource(id = R.string.settings_appearance_theme_none),
                     selected = GlobalState.theme == Theme.None,
                     modifier = Modifier
