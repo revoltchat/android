@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
@@ -37,12 +38,14 @@ import chat.revolt.api.internals.has
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.components.generic.SheetClickable
 import chat.revolt.components.screens.chat.ChannelSheetHeader
+import chat.revolt.screens.chat.dialogs.InviteDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChannelInfoSheet(channelId: String) {
     val channel = RevoltAPI.channelCache[channelId]
     var memberListSheetShown by remember { mutableStateOf(false) }
+    var inviteDialogShown by remember { mutableStateOf(false) }
 
     if (memberListSheetShown) {
         val memberListSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -56,6 +59,21 @@ fun ChannelInfoSheet(channelId: String) {
             MemberListSheet(
                 channelId = channelId,
                 serverId = channel?.server
+            )
+        }
+    }
+
+    if (inviteDialogShown) {
+        Dialog(
+            onDismissRequest = {
+                inviteDialogShown = false
+            }
+        ) {
+            InviteDialog(
+                channelId = channelId,
+                onDismissRequest = {
+                    inviteDialogShown = false
+                }
             )
         }
     }
@@ -167,6 +185,7 @@ fun ChannelInfoSheet(channelId: String) {
                             )
                         }
                     ) {
+                        inviteDialogShown = true
                     }
                 }
 

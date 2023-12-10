@@ -17,6 +17,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
 
@@ -78,7 +79,19 @@ data class EditMessageBody(
     val content: String?
 )
 
-suspend fun sendMessage(
+@kotlinx.serialization.Serializable
+data class CreateInviteResponse(
+    val type: String,
+    @SerialName("_id")
+    val id: String,
+    val server: String,
+    val creator: String,
+    val channel: String,
+)
+
+suspend
+
+fun sendMessage(
     channelId: String,
     content: String,
     nonce: String? = ULID.makeNext(),
@@ -142,4 +155,14 @@ suspend fun fetchGroupParticipants(channelId: String): List<User> {
         ListSerializer(User.serializer()),
         response
     )
+}
+
+suspend fun createInvite(channelId: String): CreateInviteResponse {
+    val response = RevoltHttp.post("/channels/$channelId/invites")
+        .bodyAsText()
+
+    val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
+    if (error.type != "Server") throw Error(error.type)
+
+    return RevoltJson.decodeFromString(CreateInviteResponse.serializer(), response)
 }

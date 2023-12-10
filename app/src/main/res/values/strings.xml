@@ -239,6 +239,11 @@
     <string name="channel_info_sheet_options_add">Add members</string>
     <string name="channel_info_sheet_options_notifications_manage">Manage notifications</string>
 
+    <string name="invite_dialog_header">Invite to #%1$s</string>
+    <string name="invite_dialog_description">Send this link to invite people to this channel.</string>
+    <string name="invite_dialog_copy">Copy</string>
+    <string name="invite_dialog_close">Close</string>
+
     <string name="message_context_sheet_actions_copy">Copy</string>
     <string name="message_context_sheet_actions_copy_failed_empty">Message is empty, nothing to copy</string>
     <string name="message_context_sheet_actions_reply">Reply</string>
