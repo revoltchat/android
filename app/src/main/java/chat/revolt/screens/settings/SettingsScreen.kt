@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
@@ -27,7 +28,9 @@ import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LabsAccessControlVariates
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.SheetClickable
 import chat.revolt.components.screens.settings.SelfUserOverview
@@ -186,6 +189,25 @@ fun SettingsScreen(
                         modifier = Modifier.testTag("settings_view_debug")
                     ) {
                         navController.navigate("settings/debug")
+                    }
+                }
+
+                if (FeatureFlags.labsAccessControl is LabsAccessControlVariates.Restricted &&
+                    (FeatureFlags.labsAccessControl as LabsAccessControlVariates.Restricted).predicate()
+                ) {
+                    SheetClickable(
+                        icon = { modifier ->
+                            Icon(
+                                imageVector = Icons.Default.ArrowForward,
+                                contentDescription = null,
+                                modifier = modifier
+                            )
+                        },
+                        label = { textStyle ->
+                            Text(text = "Labs", style = textStyle)
+                        },
+                    ) {
+                        navController.navigate("labs")
                     }
                 }
 

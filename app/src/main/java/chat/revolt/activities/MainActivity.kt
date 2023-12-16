@@ -33,6 +33,7 @@ import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
 import chat.revolt.screens.chat.ChatRouterScreen
 import chat.revolt.screens.chat.dialogs.FeedbackDialog
+import chat.revolt.screens.labs.LabsRootScreen
 import chat.revolt.screens.login.LoginGreetingScreen
 import chat.revolt.screens.login.LoginScreen
 import chat.revolt.screens.login.MfaScreen
@@ -159,6 +160,8 @@ fun AppEntrypoint(windowSizeClass: WindowSizeClass) {
 
                 composable("about") { AboutScreen(navController) }
                 composable("about/oss") { AttributionScreen(navController) }
+
+                composable("labs") { LabsRootScreen(navController) }
             }
         }
     }
