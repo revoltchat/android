@@ -35,6 +35,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -268,7 +269,7 @@ fun MemberListSheet(
     }
 
     Column {
-        PageHeader(text = "Members")
+        PageHeader(text = stringResource(R.string.channel_info_sheet_options_members))
 
         LazyColumn {
             viewModel.fullItemList.forEachIndexed { index, item ->
