@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.REVOLT_APP
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.routes.channel.react
 import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.SheetClickable
@@ -69,6 +70,7 @@ fun MessageContextSheet(
     val coroutineScope = rememberCoroutineScope()
 
     var showShareSheet by remember { mutableStateOf(false) }
+    var showReactSheet by remember { mutableStateOf(false) }
 
     if (showShareSheet) {
         val shareSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -234,6 +236,30 @@ fun MessageContextSheet(
         }
     }
 
+    if (showReactSheet) {
+        val reactSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+        ModalBottomSheet(
+            sheetState = reactSheetState,
+            onDismissRequest = {
+                showReactSheet = false
+            }
+        ) {
+            ReactSheet(messageId) {
+                if (it == null) return@ReactSheet
+
+                coroutineScope.launch {
+                    message.channel?.let { channelId ->
+                        react(channelId, messageId, it)
+                    }
+
+                    reactSheetState.hide()
+                    onHideSheet()
+                }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -292,15 +318,7 @@ fun MessageContextSheet(
                 )
             }
         ) {
-            Toast.makeText(
-                context,
-                context.getString(R.string.comingsoon_toast),
-                Toast.LENGTH_SHORT
-            ).show()
-
-            coroutineScope.launch {
-                onHideSheet()
-            }
+            showReactSheet = true
         }
 
         if (message.author == RevoltAPI.selfId) {
