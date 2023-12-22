@@ -360,6 +360,7 @@ fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
             Row(
                 modifier = Modifier
                     .horizontalScroll(categoryRowScrollState)
+                    .padding(vertical = 4.dp)
                     .height(37.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically
