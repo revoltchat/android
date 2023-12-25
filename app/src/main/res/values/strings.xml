@@ -529,4 +529,11 @@
     <string name="settings_changelogs_new_header">What\'s been cooking ✨</string>
     <string name="settings_changelogs_historical_version_header">Changelog for %1$s</string>
     <string name="settings_changelogs_historical_version_header_placeholder">that version</string>
+
+    <string name="share_target_heading">Share to Revolt</string>
+    <string name="share_target_login_first">Please log in before sharing to Revolt.</string>
+    <string name="share_target_invalid_intent">This is not a valid share intent.</string>
+    <string name="share_target_attachment_too_large">This attachment is too large for Revolt (max. $1$s).</string>
+    <string name="share_target_search_channels">Search channels</string>
+    <string name="share_target_select_channel">Please select a channel to share to.</string>
 </resources>

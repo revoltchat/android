@@ -156,6 +156,7 @@ fun NativeMessageField(
     channelName: String,
     modifier: Modifier = Modifier,
     forceSendButton: Boolean = false,
+    canAttach: Boolean = true,
     disabled: Boolean = false,
     serverId: String? = null,
     channelId: String? = null,
@@ -341,29 +342,31 @@ fun NativeMessageField(
         ) {
             Spacer(modifier = Modifier.width(8.dp))
 
-            Icon(
-                when {
-                    editMode -> Icons.Default.Close
-                    else -> Icons.Default.Add
-                },
-                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                contentDescription = stringResource(id = R.string.add_attachment_alt),
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .size(32.dp)
-                    .clickable {
-                        when {
-                            editMode -> cancelEdit()
-                            else -> {
-                                // hide keyboard because it's annoying
-                                clearFocus()
-                                onAddAttachment()
+            if (canAttach) {
+                Icon(
+                    when {
+                        editMode -> Icons.Default.Close
+                        else -> Icons.Default.Add
+                    },
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    contentDescription = stringResource(id = R.string.add_attachment_alt),
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .size(32.dp)
+                        .clickable {
+                            when {
+                                editMode -> cancelEdit()
+                                else -> {
+                                    // hide keyboard because it's annoying
+                                    clearFocus()
+                                    onAddAttachment()
+                                }
                             }
                         }
-                    }
-                    .padding(4.dp)
-                    .testTag("add_attachment")
-            )
+                        .padding(4.dp)
+                        .testTag("add_attachment")
+                )
+            }
 
             AndroidView(
                 factory = { context ->
@@ -599,6 +602,7 @@ fun NativeMessageFieldPreview() {
         channelName = "Test",
         modifier = Modifier,
         forceSendButton = false,
+        canAttach = true,
         disabled = false,
         editMode = false,
         cancelEdit = {},

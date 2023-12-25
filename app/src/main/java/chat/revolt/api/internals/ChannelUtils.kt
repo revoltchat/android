@@ -21,7 +21,7 @@ object ChannelUtils {
     }
 
     fun resolveDMPartner(channel: Channel): String? {
-        return channel.recipients?.first { u -> u != RevoltAPI.selfId }
+        return channel.recipients?.firstOrNull { u -> u != RevoltAPI.selfId }
     }
 
     fun categoriseServerFlat(server: Server): List<CategorisedChannelList> {

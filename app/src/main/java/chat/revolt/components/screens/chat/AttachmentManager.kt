@@ -36,7 +36,8 @@ fun AttachmentManager(
     attachments: List<FileArgs>,
     uploading: Boolean,
     uploadProgress: Float = 0f,
-    onRemove: (FileArgs) -> Unit
+    onRemove: (FileArgs) -> Unit,
+    canRemove: Boolean = true
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = uploadProgress,
@@ -69,11 +70,13 @@ fun AttachmentManager(
                         .padding(8.dp)
                 ) {
                     Text(attachment.filename, maxLines = 1)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = stringResource(R.string.remove_attachment_alt)
-                    )
+                    if (canRemove) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.remove_attachment_alt)
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             }
