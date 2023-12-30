@@ -19,6 +19,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,14 +41,17 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -174,7 +178,8 @@ fun Message(
     onAvatarClick: () -> Unit = {},
     onNameClick: (() -> Unit)? = null,
     canReply: Boolean = false,
-    onReply: () -> Unit = {}
+    onReply: () -> Unit = {},
+    onAddReaction: () -> Unit = {},
 ) {
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
     val context = LocalContext.current
@@ -499,6 +504,21 @@ fun Message(
                                         )
                                     }
                                 }
+                            }
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .clip(MaterialTheme.shapes.small)
+                                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+                                    .clickable(onClick = onAddReaction)
+                                    .padding(8.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_hamburger_plus_24dp),
+                                    contentDescription = stringResource(R.string.message_context_sheet_actions_react),
+                                    modifier = Modifier.size(16.dp)
+                                )
                             }
                         }
                         Spacer(modifier = Modifier.height(8.dp))

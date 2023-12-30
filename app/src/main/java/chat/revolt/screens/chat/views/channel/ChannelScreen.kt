@@ -68,6 +68,7 @@ import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
+import chat.revolt.api.routes.channel.react
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.ChannelType
@@ -88,6 +89,7 @@ import chat.revolt.internals.markdown.createCodeRule
 import chat.revolt.internals.markdown.createInlineCodeRule
 import chat.revolt.sheets.ChannelInfoSheet
 import chat.revolt.sheets.MessageContextSheet
+import chat.revolt.sheets.ReactSheet
 import com.discord.simpleast.core.simple.SimpleMarkdownRules
 import com.discord.simpleast.core.simple.SimpleRenderer
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -117,6 +119,9 @@ fun ChannelScreen(
 
     var messageContextSheetShown by remember { mutableStateOf(false) }
     var messageContextSheetTarget by remember { mutableStateOf("") }
+
+    var reactSheetShown by remember { mutableStateOf(false) }
+    var reactSheetTarget by remember { mutableStateOf("") }
 
     val focusManager = LocalFocusManager.current
 
@@ -226,6 +231,27 @@ fun ChannelScreen(
                     navController.navigate("report/message/$messageContextSheetTarget")
                 }
             )
+        }
+    }
+
+    if (reactSheetShown) {
+        val reactSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+        ModalBottomSheet(
+            sheetState = reactSheetState,
+            onDismissRequest = {
+                reactSheetShown = false
+            }
+        ) {
+            ReactSheet(reactSheetTarget) {
+                if (it == null) return@ReactSheet
+
+                coroutineScope.launch {
+                    react(channelId, reactSheetTarget, it)
+                    reactSheetState.hide()
+                    reactSheetShown = false
+                }
+            }
         }
     }
 
@@ -363,7 +389,13 @@ fun ChannelScreen(
                                     return@Message
                                 }
                                 viewModel.replyToMessage(message)
-                            }
+                            },
+                            onAddReaction = {
+                                message.id?.let {
+                                    reactSheetShown = true
+                                    reactSheetTarget = it
+                                }
+                            },
                         )
                     }
                 }
