@@ -305,165 +305,187 @@ fun ChannelScreen(
         }
 
         LaunchedEffect(viewModel.activeChannel, RevoltAPI.channelCache, RevoltAPI.serverCache) {
-            viewModel.checkShouldDenyMessageField()
+            viewModel.doInitialChecks()
         }
 
         Box(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.BottomEnd
         ) {
-            LazyColumn(state = lazyListState, reverseLayout = true) {
-                item {
-                    Spacer(modifier = Modifier.height(25.dp))
-                }
+            Crossfade(targetState = viewModel.showAgeGate, label = "Age gate shown/hidden") {
+                if (it) {
+                    ChannelScreenAgeGate(
+                        onAccept = {
+                            viewModel.showAgeGate = false
+                        },
+                        onDeny = {
+                            onToggleDrawer()
+                        }
+                    )
+                } else {
+                    LazyColumn(state = lazyListState, reverseLayout = true) {
+                        item {
+                            Spacer(modifier = Modifier.height(25.dp))
+                        }
 
-                items(
-                    items = viewModel.renderableMessages,
-                    key = { it.id!! }
-                ) { message ->
-                    when {
-                        message.system != null -> SystemMessage(message)
-                        else -> Message(
-                            message,
-                            parse = {
-                                val parser = MarkdownParser()
-                                    .addRules(
-                                        SimpleMarkdownRules.createEscapeRule()
-                                    )
-                                    .addRevoltRules(context)
-                                    .addRules(
-                                        createCodeRule(context, codeBlockColor.toArgb()),
-                                        createInlineCodeRule(context, codeBlockColor.toArgb())
-                                    )
-                                    .addRules(
-                                        SimpleMarkdownRules.createSimpleMarkdownRules(
-                                            includeEscapeRule = false
-                                        )
-                                    )
-
-                                SimpleRenderer.render(
-                                    source = it.content ?: "",
-                                    parser = parser,
-                                    initialState = MarkdownState(0),
-                                    renderContext = MarkdownContext(
-                                        memberMap = viewModel.activeChannel?.server?.let { serverId ->
-                                            RevoltAPI.members.markdownMemberMapFor(
-                                                serverId
+                        items(
+                            items = viewModel.renderableMessages,
+                            key = { it.id!! }
+                        ) { message ->
+                            when {
+                                message.system != null -> SystemMessage(message)
+                                else -> Message(
+                                    message,
+                                    parse = {
+                                        val parser = MarkdownParser()
+                                            .addRules(
+                                                SimpleMarkdownRules.createEscapeRule()
                                             )
-                                        } ?: mapOf(),
-                                        userMap = RevoltAPI.userCache.toMap(),
-                                        channelMap = RevoltAPI.channelCache.mapValues { ch ->
-                                            ch.value.name ?: ch.value.id ?: "#DeletedChannel"
-                                        },
-                                        emojiMap = RevoltAPI.emojiCache,
-                                        serverId = channel?.server ?: "",
-                                        // check if message consists solely of one *or more* custom emotes
-                                        useLargeEmojis = it.content?.matches(
-                                            Regex("(:([0-9A-Z]{26}):)+")
-                                        ) == true
+                                            .addRevoltRules(context)
+                                            .addRules(
+                                                createCodeRule(context, codeBlockColor.toArgb()),
+                                                createInlineCodeRule(
+                                                    context,
+                                                    codeBlockColor.toArgb()
+                                                )
+                                            )
+                                            .addRules(
+                                                SimpleMarkdownRules.createSimpleMarkdownRules(
+                                                    includeEscapeRule = false
+                                                )
+                                            )
+
+                                        SimpleRenderer.render(
+                                            source = it.content ?: "",
+                                            parser = parser,
+                                            initialState = MarkdownState(0),
+                                            renderContext = MarkdownContext(
+                                                memberMap = viewModel.activeChannel?.server?.let { serverId ->
+                                                    RevoltAPI.members.markdownMemberMapFor(
+                                                        serverId
+                                                    )
+                                                } ?: mapOf(),
+                                                userMap = RevoltAPI.userCache.toMap(),
+                                                channelMap = RevoltAPI.channelCache.mapValues { ch ->
+                                                    ch.value.name ?: ch.value.id
+                                                    ?: "#DeletedChannel"
+                                                },
+                                                emojiMap = RevoltAPI.emojiCache,
+                                                serverId = channel?.server ?: "",
+                                                // check if message consists solely of one *or more* custom emotes
+                                                useLargeEmojis = it.content?.matches(
+                                                    Regex("(:([0-9A-Z]{26}):)+")
+                                                ) == true
+                                            )
+                                        )
+                                    },
+                                    onMessageContextMenu = {
+                                        messageContextSheetShown = true
+                                        messageContextSheetTarget = message.id ?: ""
+                                    },
+                                    onAvatarClick = {
+                                        message.author?.let { author ->
+                                            onUserSheetOpenFor(author, channel?.server)
+                                        }
+                                    },
+                                    onNameClick = {
+                                        val author = message.author?.let { RevoltAPI.userCache[it] }
+                                            ?: return@Message
+                                        viewModel.putAtCursorPosition("@${author.username}#${author.discriminator}")
+                                    },
+                                    canReply = true,
+                                    onReply = {
+                                        if (viewModel.pendingReplies.size >= 5) {
+                                            Toast.makeText(
+                                                context,
+                                                context.getString(R.string.too_many_replies, 5),
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            return@Message
+                                        }
+                                        viewModel.replyToMessage(message)
+                                    },
+                                    onAddReaction = {
+                                        message.id?.let {
+                                            reactSheetShown = true
+                                            reactSheetTarget = it
+                                        }
+                                    },
+                                )
+                            }
+                        }
+
+                        item {
+                            if (viewModel.hasNoMoreMessages) {
+                                Text(
+                                    text = stringResource(R.string.start_of_conversation),
+                                    modifier = Modifier
+                                        .padding(
+                                            start = 8.dp,
+                                            end = 8.dp,
+                                            top = 64.dp,
+                                            bottom = 32.dp
+                                        )
+                                        .fillMaxWidth(),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    textAlign = TextAlign.Center
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .padding(16.dp)
                                     )
+                                }
+                            }
+                        }
+                    }
+
+                    androidx.compose.animation.AnimatedVisibility(
+                        !isScrolledToBottom.value,
+                        enter = slideInHorizontally(
+                            animationSpec = RevoltTweenInt,
+                            initialOffsetX = { it }
+                        ) + fadeIn(animationSpec = RevoltTweenFloat),
+                        exit = slideOutHorizontally(
+                            animationSpec = RevoltTweenInt,
+                            targetOffsetX = { it }
+                        ) + fadeOut(animationSpec = RevoltTweenFloat),
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                    ) {
+                        ExtendedFloatingActionButton(
+                            modifier = Modifier
+                                .padding(bottom = scrollDownFABPadding)
+                                .align(Alignment.BottomEnd)
+                                .padding(16.dp),
+                            text = {
+                                Text(stringResource(R.string.scroll_to_bottom))
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowDown,
+                                    contentDescription = stringResource(R.string.scroll_to_bottom)
                                 )
                             },
-                            onMessageContextMenu = {
-                                messageContextSheetShown = true
-                                messageContextSheetTarget = message.id ?: ""
-                            },
-                            onAvatarClick = {
-                                message.author?.let { author ->
-                                    onUserSheetOpenFor(author, channel?.server)
+                            onClick = {
+                                coroutineScope.launch {
+                                    lazyListState.animateScrollToItem(0)
                                 }
                             },
-                            onNameClick = {
-                                val author = message.author?.let { RevoltAPI.userCache[it] }
-                                    ?: return@Message
-                                viewModel.putAtCursorPosition("@${author.username}#${author.discriminator}")
-                            },
-                            canReply = true,
-                            onReply = {
-                                if (viewModel.pendingReplies.size >= 5) {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.too_many_replies, 5),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    return@Message
-                                }
-                                viewModel.replyToMessage(message)
-                            },
-                            onAddReaction = {
-                                message.id?.let {
-                                    reactSheetShown = true
-                                    reactSheetTarget = it
-                                }
-                            },
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            containerColor = MaterialTheme.colorScheme.primary
                         )
                     }
-                }
 
-                item {
-                    if (viewModel.hasNoMoreMessages) {
-                        Text(
-                            text = stringResource(R.string.start_of_conversation),
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp, top = 64.dp, bottom = 32.dp)
-                                .fillMaxWidth(),
-                            style = MaterialTheme.typography.labelLarge,
-                            textAlign = TextAlign.Center
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                            )
-                        }
-                    }
+                    TypingIndicator(
+                        users = viewModel.typingUsers
+                    )
                 }
             }
-
-            androidx.compose.animation.AnimatedVisibility(
-                !isScrolledToBottom.value,
-                enter = slideInHorizontally(
-                    animationSpec = RevoltTweenInt,
-                    initialOffsetX = { it }
-                ) + fadeIn(animationSpec = RevoltTweenFloat),
-                exit = slideOutHorizontally(
-                    animationSpec = RevoltTweenInt,
-                    targetOffsetX = { it }
-                ) + fadeOut(animationSpec = RevoltTweenFloat),
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-            ) {
-                ExtendedFloatingActionButton(
-                    modifier = Modifier
-                        .padding(bottom = scrollDownFABPadding)
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp),
-                    text = {
-                        Text(stringResource(R.string.scroll_to_bottom))
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = stringResource(R.string.scroll_to_bottom)
-                        )
-                    },
-                    onClick = {
-                        coroutineScope.launch {
-                            lazyListState.animateScrollToItem(0)
-                        }
-                    },
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            TypingIndicator(
-                users = viewModel.typingUsers
-            )
         }
 
         Column(
@@ -550,7 +572,7 @@ fun ChannelScreen(
                                 R.string.unknown
                             ),
                         forceSendButton = viewModel.pendingAttachments.isNotEmpty(),
-                        disabled = viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage,
+                        disabled = (viewModel.pendingAttachments.isNotEmpty() && viewModel.isSendingMessage) || viewModel.showAgeGate,
                         channelId = channelId,
                         serverId = channel?.server,
                         editMode = viewModel.editingMessage != null,

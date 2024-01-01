@@ -138,6 +138,19 @@
     <string name="no_active_channel">You\'re not in a channel right now.</string>
     <string name="no_active_channel_body">Select a server from the left to get started. If you\'re feeling adventurous, you can create a new server.</string>
 
+    <string name="channel_age_gate_title">This channel is marked as NSFW</string>
+    <string name="channel_age_gate_description">You must be 18 or older to view this channel.</string>
+    <string name="channel_age_gate_dob_section">Date of birth</string>
+    <string name="channel_age_gate_dob_day">Day</string>
+    <string name="channel_age_gate_dob_month">Month</string>
+    <string name="channel_age_gate_dob_year">Year</string>
+    <string name="channel_age_gate_dob_proceed">Proceed</string>
+    <string name="channel_age_gate_dob_cancel">Cancel</string>
+    <string name="channel_age_gate_dob_invalid">Enter your date of birth</string>
+    <string name="channel_age_gate_dob_too_young">You must be 18 or older to view this channel.</string>
+    <string name="channel_age_gate_dob_invalid_future">You can\'t be born in the future.</string>
+    <string name="channel_age_gate_dob_invalid_unlikely">You can\'t be born before %1$d.</string>
+
     <string name="avatar_alt">%1$s\'s avatar</string>
 
     <string name="direct_messages">Direct Messages</string>

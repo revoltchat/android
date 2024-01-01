@@ -86,6 +86,8 @@ class ChannelScreenViewModel : ViewModel() {
     var denyMessageField by mutableStateOf(false)
     var denyMessageFieldReasonResource by mutableIntStateOf(R.string.message_field_denied_generic)
 
+    var showAgeGate by mutableStateOf(false)
+
     private fun popAttachmentBatch() {
         pendingAttachments =
             pendingAttachments.drop(MAX_ATTACHMENTS_PER_MESSAGE).toMutableStateList()
@@ -518,7 +520,17 @@ class ChannelScreenViewModel : ViewModel() {
             currentSelection.first + content.length to currentSelection.first + content.length
     }
 
-    suspend fun checkShouldDenyMessageField() {
+    suspend fun doInitialChecks() {
+        checkShouldShowAgeGate()
+        checkShouldDenyMessageField()
+    }
+
+    private fun checkShouldShowAgeGate() {
+        if (activeChannel == null) return
+        showAgeGate = activeChannel!!.nsfw == true
+    }
+
+    private suspend fun checkShouldDenyMessageField() {
         if (activeChannel == null) return
 
         val selfUser = RevoltAPI.userCache[RevoltAPI.selfId] ?: return
