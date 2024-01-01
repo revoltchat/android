@@ -13,12 +13,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -39,6 +42,10 @@ import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.REVOLT_APP
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.PermissionBit
+import chat.revolt.api.internals.Roles
+import chat.revolt.api.internals.has
+import chat.revolt.api.routes.channel.deleteMessage
 import chat.revolt.api.routes.channel.react
 import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.components.chat.Message
@@ -71,6 +78,7 @@ fun MessageContextSheet(
 
     var showShareSheet by remember { mutableStateOf(false) }
     var showReactSheet by remember { mutableStateOf(false) }
+    var showDeleteMessageConfirmation by remember { mutableStateOf(false) }
 
     if (showShareSheet) {
         val shareSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -260,6 +268,52 @@ fun MessageContextSheet(
         }
     }
 
+    if (showDeleteMessageConfirmation) {
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteMessageConfirmation = false
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.message_context_sheet_actions_delete_confirmation_title)
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.message_context_sheet_actions_delete_confirmation_body)
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            message.channel?.let { channelId ->
+                                deleteMessage(channelId, messageId)
+                            }
+
+                            onHideSheet()
+                        }
+                        showDeleteMessageConfirmation = false
+                        coroutineScope.launch {
+                            onHideSheet()
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.message_context_sheet_actions_delete_confirmation_yes))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteMessageConfirmation = false
+                    }
+                ) {
+                    Text(stringResource(R.string.message_context_sheet_actions_delete_confirmation_no))
+                }
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -388,30 +442,32 @@ fun MessageContextSheet(
             showShareSheet = true
         }
 
-        SheetClickable(
-            icon = { modifier ->
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    modifier = modifier
+        if (
+            (message.channel?.let {
+                val channel = RevoltAPI.channelCache[it] ?: return@let null
+                Roles.permissionFor(
+                    channel,
+                    RevoltAPI.userCache[RevoltAPI.selfId]
                 )
-            },
-            label = { style ->
-                Text(
-                    text = stringResource(id = R.string.message_context_sheet_actions_delete),
-                    style = style
-                )
-            },
-            dangerous = true
+            } ?: 0) has PermissionBit.ManageMessages || message.author == RevoltAPI.selfId
         ) {
-            Toast.makeText(
-                context,
-                context.getString(R.string.comingsoon_toast),
-                Toast.LENGTH_SHORT
-            ).show()
-
-            coroutineScope.launch {
-                onHideSheet()
+            SheetClickable(
+                icon = { modifier ->
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        modifier = modifier
+                    )
+                },
+                label = { style ->
+                    Text(
+                        text = stringResource(id = R.string.message_context_sheet_actions_delete),
+                        style = style
+                    )
+                },
+                dangerous = true
+            ) {
+                showDeleteMessageConfirmation = true
             }
         }
 

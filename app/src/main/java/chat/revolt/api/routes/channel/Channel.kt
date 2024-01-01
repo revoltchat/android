@@ -8,6 +8,7 @@ import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.MessagesInChannel
 import chat.revolt.api.schemas.User
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
@@ -131,6 +132,10 @@ suspend fun editMessage(channelId: String, messageId: String, newContent: String
     } catch (e: SerializationException) {
         // Not an error
     }
+}
+
+suspend fun deleteMessage(channelId: String, messageId: String) {
+    RevoltHttp.delete("/channels/$channelId/messages/$messageId")
 }
 
 suspend fun ackChannel(channelId: String, messageId: String = ULID.makeNext()) {
