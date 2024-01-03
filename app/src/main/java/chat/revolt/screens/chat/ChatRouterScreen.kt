@@ -94,6 +94,7 @@ import chat.revolt.internals.Changelogs
 import chat.revolt.ndk.Pipebomb
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
+import chat.revolt.screens.chat.dialogs.safety.ReportServerDialog
 import chat.revolt.screens.chat.dialogs.safety.ReportUserDialog
 import chat.revolt.screens.chat.views.FriendsScreen
 import chat.revolt.screens.chat.views.HomeScreen
@@ -590,6 +591,9 @@ fun ChatRouterScreen(
                 onHideSheet = {
                     serverContextSheetState.hide()
                     showServerContextSheet = false
+                },
+                onReportServer = {
+                    navController.navigate("report/server/${serverContextSheetTarget}")
                 }
             )
         }
@@ -1084,6 +1088,16 @@ fun ChannelNavigator(
                     ReportMessageDialog(
                         navController = navController,
                         messageId = messageId
+                    )
+                }
+            }
+
+            dialog("report/server/{serverId}") { backStackEntry ->
+                val serverId = backStackEntry.arguments?.getString("serverId")
+                if (serverId != null) {
+                    ReportServerDialog(
+                        navController = navController,
+                        serverId = serverId
                     )
                 }
             }

@@ -1,28 +1,21 @@
 package chat.revolt.sheets
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,32 +23,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import chat.revolt.R
-import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.server.leaveOrDeleteServer
-import chat.revolt.api.schemas.ServerFlags
-import chat.revolt.api.schemas.has
-import chat.revolt.components.generic.IconPlaceholder
-import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.SheetClickable
 import chat.revolt.components.generic.UIMarkdown
+import chat.revolt.components.screens.settings.ServerOverview
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
 @Composable
-fun ServerContextSheet(serverId: String, onHideSheet: suspend () -> Unit) {
+fun ServerContextSheet(
+    serverId: String,
+    onReportServer: () -> Unit,
+    onHideSheet: suspend () -> Unit
+) {
     val server = RevoltAPI.serverCache[serverId]
 
     if (server == null) {
@@ -152,98 +140,7 @@ fun ServerContextSheet(serverId: String, onHideSheet: suspend () -> Unit) {
     Column(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(MaterialTheme.shapes.large),
-            contentAlignment = Alignment.BottomStart
-        ) {
-            server.banner?.let {
-                Box(
-                    modifier = Modifier
-                        .background(Color.Black.copy(alpha = 0.25f))
-                        .height(166.dp)
-                        .fillMaxWidth()
-                )
-
-                RemoteImage(
-                    url = "$REVOLT_FILES/banners/${it.id}",
-                    description = null,
-                    modifier = Modifier
-                        .height(166.dp)
-                        .fillMaxWidth(),
-                    contentScale = ContentScale.FillWidth
-                )
-
-                Box(
-                    modifier = Modifier
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(
-                                    Color.Transparent,
-                                    Color.Black.copy(alpha = 0.7f)
-                                )
-                            )
-                        )
-                        .height(166.dp)
-                        .fillMaxWidth()
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                server.icon?.let {
-                    RemoteImage(
-                        url = "$REVOLT_FILES/icons/${it.id}/server.png?max_side=256",
-                        description = null,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .height(48.dp)
-                            .width(48.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                } ?: run {
-                    IconPlaceholder(
-                        name = server.name ?: stringResource(R.string.unknown),
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .height(48.dp)
-                            .width(48.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                CompositionLocalProvider(LocalContentColor provides Color.White) {
-                    if (server.flags has ServerFlags.Official) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_revolt_decagram_24dp),
-                            contentDescription = stringResource(R.string.server_flag_official),
-                            modifier = Modifier
-                                .padding(end = 8.dp)
-                                .size(24.dp)
-                        )
-                    }
-                    if (server.flags has ServerFlags.Verified) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_check_decagram_24dp),
-                            contentDescription = stringResource(R.string.server_flag_verified),
-                            modifier = Modifier
-                                .padding(end = 8.dp)
-                                .size(24.dp)
-                        )
-                    }
-
-                    Text(
-                        text = server.name ?: stringResource(R.string.unknown),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontSize = 16.sp
-                    )
-                }
-            }
-        }
+        ServerOverview(server)
 
         Column(
             modifier = Modifier.padding(horizontal = 4.dp)
@@ -321,6 +218,21 @@ fun ServerContextSheet(serverId: String, onHideSheet: suspend () -> Unit) {
         }
 
         if (server.owner != RevoltAPI.selfId) {
+            SheetClickable(icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_flag_24dp),
+                    contentDescription = null,
+                    modifier = it
+                )
+            }, label = {
+                Text(
+                    text = stringResource(id = R.string.server_context_sheet_actions_report),
+                    style = it
+                )
+            }, dangerous = true) {
+                onReportServer()
+            }
+
             SheetClickable(icon = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_left_bold_box_24dp),

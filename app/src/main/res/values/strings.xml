@@ -295,6 +295,7 @@
     <string name="server_context_sheet_actions_leave_confirm_yes">Leave</string>
     <string name="server_context_sheet_actions_leave_confirm_no">Stay</string>
     <string name="server_context_sheet_actions_leave_silently">Leave Silently</string>
+    <string name="server_context_sheet_actions_report">Report</string>
 
     <string name="user_info_sheet_user_not_found">Can\'t resolve this user</string>
     <string name="user_info_sheet_user_not_found_description">This user may have been deleted or you may not have permission to view them.</string>
