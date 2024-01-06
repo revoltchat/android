@@ -286,16 +286,12 @@ fun MessageContextSheet(
             confirmButton = {
                 Button(
                     onClick = {
-                        coroutineScope.launch {
-                            message.channel?.let { channelId ->
-                                deleteMessage(channelId, messageId)
-                            }
-
-                            onHideSheet()
-                        }
                         showDeleteMessageConfirmation = false
                         coroutineScope.launch {
                             onHideSheet()
+                            message.channel?.let { channelId ->
+                                deleteMessage(channelId, messageId)
+                            }
                         }
                     }
                 ) {
