@@ -13,6 +13,7 @@ import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.MessageAppendFrame
+import chat.revolt.api.realtime.frames.receivable.MessageDeleteFrame
 import chat.revolt.api.realtime.frames.receivable.MessageFrame
 import chat.revolt.api.realtime.frames.receivable.MessageReactFrame
 import chat.revolt.api.realtime.frames.receivable.MessageUpdateFrame
@@ -254,6 +255,27 @@ object RealtimeSocket {
                 }
 
                 RevoltAPI.wsFrameChannel.send(messageUpdateFrame)
+            }
+
+            "MessageDelete" -> {
+                val messageDeleteFrame =
+                    RevoltJson.decodeFromString(MessageDeleteFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received message react frame for ${messageDeleteFrame.id}."
+                )
+
+                val message = RevoltAPI.messageCache[messageDeleteFrame.id]
+                if (message == null) {
+                    Log.d(
+                        "RealtimeSocket",
+                        "Message ${messageDeleteFrame.id} not found in cache. Will not delete."
+                    )
+                    return
+                }
+
+                RevoltAPI.messageCache.remove(messageDeleteFrame.id)
+                RevoltAPI.wsFrameChannel.send(messageDeleteFrame)
             }
 
             "MessageReact" -> {

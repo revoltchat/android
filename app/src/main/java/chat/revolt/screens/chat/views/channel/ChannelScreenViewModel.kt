@@ -403,6 +403,10 @@ class ChannelScreenViewModel : ViewModel() {
                         val newRenderableMessages = renderableMessages.filter { currentMsg ->
                             currentMsg.id != it.id
                         }
+
+                        renderableMessages.clear()
+                        renderableMessages.addAll(newRenderableMessages)
+
                         regroupMessages(newRenderableMessages)
                     }
 
