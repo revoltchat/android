@@ -480,11 +480,13 @@ fun ChannelScreen(
                             containerColor = MaterialTheme.colorScheme.primary
                         )
                     }
-
-                    TypingIndicator(
-                        users = viewModel.typingUsers
-                    )
                 }
+            }
+
+            if (!viewModel.showAgeGate) {
+                TypingIndicator(
+                    users = viewModel.typingUsers
+                )
             }
         }
 
