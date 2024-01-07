@@ -199,7 +199,7 @@ fun SessionSettingsScreen(
                 item(key = "logoutOtherSessions") {
                     Row(
                         modifier = Modifier
-                            .padding(8.dp)
+                            .padding(vertical = 8.dp, horizontal = 16.dp)
                             .fillMaxWidth()
                             .clip(shape = MaterialTheme.shapes.medium)
                             .background(
