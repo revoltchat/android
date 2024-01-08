@@ -278,31 +278,33 @@ fun SettingsScreen(
                         }
                 )
 
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.error) {
-                    ListItem(
-                        headlineContent = {
+                ListItem(
+                    headlineContent = {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.error) {
                             Text(
                                 text = stringResource(id = R.string.logout)
                             )
-                        },
-                        leadingContent = {
+                        }
+                    },
+                    leadingContent = {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.error) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = stringResource(id = R.string.logout),
                             )
-                        },
-                        modifier = Modifier
-                            .testTag("settings_view_logout")
-                            .clickable {
-                                viewModel.logout()
-                                navController.navigate("login/greeting") {
-                                    popUpTo("chat") {
-                                        inclusive = true
-                                    }
+                        }
+                    },
+                    modifier = Modifier
+                        .testTag("settings_view_logout")
+                        .clickable {
+                            viewModel.logout()
+                            navController.navigate("login/greeting") {
+                                popUpTo("chat") {
+                                    inclusive = true
                                 }
                             }
-                    )
-                }
+                        }
+                )
             }
         }
     }
