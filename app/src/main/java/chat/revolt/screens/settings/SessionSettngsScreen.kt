@@ -44,6 +44,7 @@ import chat.revolt.api.routes.auth.fetchAllSessions
 import chat.revolt.api.routes.auth.logoutAllSessions
 import chat.revolt.api.routes.auth.logoutSessionById
 import chat.revolt.api.schemas.Session
+import chat.revolt.components.generic.ListHeader
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.UIMarkdown
 import chat.revolt.components.settings.sessions.SessionItem
@@ -153,14 +154,9 @@ fun SessionSettingsScreen(
         } else {
             LazyColumn {
                 stickyHeader(key = "thisDevice") {
-                    Text(
-                        text = stringResource(id = R.string.settings_sessions_this_device),
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(10.dp)
-                    )
+                    ListHeader {
+                        Text(stringResource(id = R.string.settings_sessions_this_device))
+                    }
                 }
 
                 viewModel.currentSession?.let {
@@ -172,6 +168,7 @@ fun SessionSettingsScreen(
                             onLogout = {},
                             modifier = Modifier.padding(horizontal = 8.dp)
                         )
+                        Spacer(Modifier.height(8.dp))
                     }
                 } ?: run {
                     item(key = "noCurrentSession") {
@@ -186,14 +183,9 @@ fun SessionSettingsScreen(
                 }
 
                 stickyHeader(key = "otherSessions") {
-                    Text(
-                        text = stringResource(id = R.string.settings_sessions_other_sessions),
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(10.dp)
-                    )
+                    ListHeader {
+                        Text(stringResource(id = R.string.settings_sessions_other_sessions))
+                    }
                 }
 
                 item(key = "logoutOtherSessions") {

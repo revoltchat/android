@@ -67,6 +67,7 @@ import chat.revolt.api.RevoltCbor
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
+import chat.revolt.components.generic.ListHeader
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.screens.settings.appearance.ColourChip
 import chat.revolt.ui.theme.ClearRippleTheme
@@ -280,11 +281,9 @@ fun AppearanceSettingsScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            Text(
-                text = stringResource(id = R.string.settings_appearance_theme),
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 10.dp)
-            )
+            ListHeader {
+                Text(stringResource(R.string.settings_appearance_theme))
+            }
 
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
