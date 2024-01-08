@@ -1,5 +1,6 @@
 package chat.revolt.screens.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,15 +9,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -31,8 +34,8 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.LabsAccessControlVariates
+import chat.revolt.components.generic.ListHeader
 import chat.revolt.components.generic.PageHeader
-import chat.revolt.components.generic.SheetClickable
 import chat.revolt.components.screens.settings.SelfUserOverview
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -80,220 +83,225 @@ fun SettingsScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(10.dp)
+                    .padding(vertical = 10.dp)
             ) {
-                Text(
-                    text = stringResource(id = R.string.settings_category_account),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, top = 20.dp)
-                )
+                ListHeader {
+                    Text(stringResource(R.string.settings_category_account))
+                }
 
-                SheetClickable(
-                    icon = { modifier ->
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.settings_profile)
+                        )
+                    },
+                    leadingContent = {
                         Icon(
                             painter = painterResource(R.drawable.ic_card_account_details_24dp),
-                            contentDescription = stringResource(id = R.string.settings_profile),
-                            modifier = modifier
+                            contentDescription = stringResource(id = R.string.settings_profile)
                         )
                     },
-                    label = { textStyle ->
-                        Text(
-                            text = stringResource(id = R.string.settings_profile),
-                            style = textStyle
-                        )
-                    },
-                    modifier = Modifier.testTag("settings_view_profile")
-                ) {
-                    navController.navigate("settings/profile")
-                }
+                    modifier = Modifier
+                        .testTag("settings_view_profile")
+                        .clickable {
+                            navController.navigate("settings/profile")
+                        }
+                )
 
-                SheetClickable(
-                    icon = { modifier ->
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.settings_sessions)
+                        )
+                    },
+                    leadingContent = {
                         Icon(
                             painter = painterResource(R.drawable.ic_tablet_cellphone_24dp),
-                            contentDescription = stringResource(id = R.string.settings_sessions),
-                            modifier = modifier
+                            contentDescription = stringResource(id = R.string.settings_sessions)
                         )
                     },
-                    label = { textStyle ->
-                        Text(
-                            text = stringResource(id = R.string.settings_sessions),
-                            style = textStyle
-                        )
-                    },
-                    modifier = Modifier.testTag("settings_view_sessions")
-                ) {
-                    navController.navigate("settings/sessions")
-                }
-
-                Text(
-                    text = stringResource(id = R.string.settings_category_general),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, top = 20.dp)
+                    modifier = Modifier
+                        .testTag("settings_view_sessions")
+                        .clickable {
+                            navController.navigate("settings/sessions")
+                        }
                 )
 
-                SheetClickable(
-                    icon = { modifier ->
+                ListHeader {
+                    Text(stringResource(R.string.settings_category_general))
+                }
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.settings_appearance)
+                        )
+                    },
+                    leadingContent = {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_palette_24dp),
-                            contentDescription =
-                            stringResource(id = R.string.settings_appearance),
-                            modifier = modifier
+                            painter = painterResource(R.drawable.ic_palette_24dp),
+                            contentDescription = stringResource(id = R.string.settings_appearance)
                         )
                     },
-                    label = { textStyle ->
-                        Text(
-                            text = stringResource(id = R.string.settings_appearance),
-                            style = textStyle
-                        )
-                    },
-                    modifier = Modifier.testTag("settings_view_appearance")
-                ) {
-                    navController.navigate("settings/appearance")
-                }
-
-                Text(
-                    text = stringResource(id = R.string.settings_category_miscellaneous),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, top = 20.dp)
+                    modifier = Modifier
+                        .testTag("settings_view_appearance")
+                        .clickable {
+                            navController.navigate("settings/appearance")
+                        }
                 )
 
-                SheetClickable(
-                    icon = { modifier ->
+                ListHeader {
+                    Text(stringResource(R.string.settings_category_miscellaneous))
+                }
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.about)
+                        )
+                    },
+                    leadingContent = {
                         Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = stringResource(id = R.string.about),
-                            modifier = modifier
                         )
                     },
-                    label = { textStyle ->
-                        Text(text = stringResource(id = R.string.about), style = textStyle)
-                    },
-                    modifier = Modifier.testTag("settings_view_about")
-                ) {
-                    navController.navigate("about")
-                }
+                    modifier = Modifier
+                        .testTag("settings_view_about")
+                        .clickable {
+                            navController.navigate("about")
+                        }
+                )
 
                 if (BuildConfig.DEBUG) {
-                    SheetClickable(
-                        icon = { modifier ->
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = "Debug"
+                            )
+                        },
+                        leadingContent = {
                             Icon(
                                 imageVector = Icons.Default.Settings,
                                 contentDescription = "Debug",
-                                modifier = modifier
                             )
                         },
-                        label = { textStyle ->
-                            Text(text = "Debug", style = textStyle)
-                        },
-                        modifier = Modifier.testTag("settings_view_debug")
-                    ) {
-                        navController.navigate("settings/debug")
-                    }
+                        modifier = Modifier
+                            .testTag("settings_view_debug")
+                            .clickable {
+                                navController.navigate("settings/debug")
+                            }
+                    )
                 }
 
                 if (FeatureFlags.labsAccessControl is LabsAccessControlVariates.Restricted &&
                     (FeatureFlags.labsAccessControl as LabsAccessControlVariates.Restricted).predicate()
                 ) {
-                    SheetClickable(
-                        icon = { modifier ->
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = null,
-                                modifier = modifier
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = "Labs"
                             )
                         },
-                        label = { textStyle ->
-                            Text(text = "Labs", style = textStyle)
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Default.ArrowForward,
+                                contentDescription = "Labs",
+                            )
                         },
-                    ) {
-                        navController.navigate("labs")
-                    }
+                        modifier = Modifier
+                            .testTag("settings_view_labs")
+                            .clickable {
+                                navController.navigate("labs")
+                            }
+                    )
                 }
 
-                SheetClickable(
-                    icon = { modifier ->
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Closed Beta Updater",
-                            modifier = modifier
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = "Closed Beta Updater"
                         )
                     },
-                    label = { textStyle ->
-                        Text(text = "Closed Beta Updater", style = textStyle)
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = "Closed Beta Updater",
+                        )
                     },
-                    modifier = Modifier.testTag("settings_view_updater")
-                ) {
-                    navController.navigate("settings/updater")
-                }
-
-                Text(
-                    text = stringResource(
-                        id = R.string.settings_category_last,
-                        BuildConfig.VERSION_NAME
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(bottom = 10.dp, start = 10.dp, top = 20.dp)
+                    modifier = Modifier
+                        .testTag("settings_view_updater")
+                        .clickable {
+                            navController.navigate("settings/updater")
+                        }
                 )
 
-                SheetClickable(
-                    icon = { modifier ->
+                ListHeader {
+                    Text(stringResource(R.string.settings_category_last, BuildConfig.VERSION_NAME))
+                }
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.settings_changelogs)
+                        )
+                    },
+                    leadingContent = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = stringResource(id = R.string.settings_changelogs),
-                            modifier = modifier
                         )
                     },
-                    label = { textStyle ->
-                        Text(
-                            text = stringResource(id = R.string.settings_changelogs),
-                            style = textStyle
-                        )
-                    },
-                    modifier = Modifier.testTag("settings_view_changelogs")
-                ) {
-                    navController.navigate("settings/changelogs")
-                }
-
-                SheetClickable(
-                    icon = { modifier ->
-                        Icon(
-                            imageVector = Icons.Default.Build,
-                            contentDescription = stringResource(id = R.string.settings_feedback),
-                            modifier = modifier
-                        )
-                    },
-                    label = { textStyle ->
-                        Text(
-                            text = stringResource(id = R.string.settings_feedback),
-                            style = textStyle
-                        )
-                    },
-                    modifier = Modifier.testTag("settings_view_feedback")
-                ) {
-                    navController.navigate("settings/feedback")
-                }
-
-                SheetClickable(
-                    icon = { modifier ->
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(id = R.string.logout),
-                            modifier = modifier
-                        )
-                    },
-                    label = { textStyle ->
-                        Text(text = stringResource(id = R.string.logout), style = textStyle)
-                    },
-                    dangerous = true,
-                    modifier = Modifier.testTag("settings_view_logout")
-                ) {
-                    viewModel.logout()
-                    navController.navigate("login/greeting") {
-                        popUpTo("chat") {
-                            inclusive = true
+                    modifier = Modifier
+                        .testTag("settings_view_changelogs")
+                        .clickable {
+                            navController.navigate("settings/changelogs")
                         }
-                    }
+                )
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.settings_feedback)
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = stringResource(id = R.string.settings_feedback),
+                        )
+                    },
+                    modifier = Modifier
+                        .testTag("settings_view_feedback")
+                        .clickable {
+                            navController.navigate("settings/feedback")
+                        }
+                )
+
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.error) {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = stringResource(id = R.string.logout)
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(id = R.string.logout),
+                            )
+                        },
+                        modifier = Modifier
+                            .testTag("settings_view_logout")
+                            .clickable {
+                                viewModel.logout()
+                                navController.navigate("login/greeting") {
+                                    popUpTo("chat") {
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                    )
                 }
             }
         }
