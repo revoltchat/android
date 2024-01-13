@@ -41,6 +41,7 @@ import chat.revolt.api.internals.isUlid
 import chat.revolt.api.routes.custom.fetchEmoji
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.User
+import chat.revolt.components.chat.MemberListItem
 import chat.revolt.components.generic.RemoteImage
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -210,7 +211,12 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
                     null
                 }
 
-                MemberListMemberUser(user = user, member = member, serverId = channel.server) {}
+                MemberListItem(
+                    member = member,
+                    user = user,
+                    serverId = channel.server,
+                    userId = reaction,
+                )
             }
         }
 

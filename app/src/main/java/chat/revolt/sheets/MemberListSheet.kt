@@ -4,16 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,31 +29,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chat.revolt.R
-import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.PermissionBit
 import chat.revolt.api.internals.Roles
-import chat.revolt.api.internals.WebCompat
 import chat.revolt.api.internals.hasPermission
-import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.channel.fetchGroupParticipants
 import chat.revolt.api.routes.server.fetchMembers
 import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
+import chat.revolt.components.chat.MemberListItem
+import chat.revolt.components.generic.ListHeader
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.Presence
-import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -281,24 +272,26 @@ fun MemberListSheet(
                     }
 
                     is MemberListItem.MemberItem -> item(key = item.member.id!!.user) {
-                        MemberListMemberUser(
-                            user = RevoltAPI.userCache[item.member.id.user]!!,
+                        MemberListItem(
+                            user = RevoltAPI.userCache[item.member.id.user],
                             member = item.member,
                             serverId = serverId,
-                            onSelectUser = {
-                                userContextSheetTarget = it
+                            userId = item.member.id.user,
+                            modifier = Modifier.clickable {
+                                userContextSheetTarget = item.member.id.user
                                 showUserContextSheet = true
                             }
                         )
                     }
 
                     is MemberListItem.UserItem -> item(key = item.user.id!!) {
-                        MemberListMemberUser(
+                        MemberListItem(
                             user = item.user,
                             member = null,
                             serverId = serverId,
-                            onSelectUser = {
-                                userContextSheetTarget = it
+                            userId = item.user.id,
+                            modifier = Modifier.clickable {
+                                userContextSheetTarget = item.user.id
                                 showUserContextSheet = true
                             }
                         )
@@ -310,85 +303,22 @@ fun MemberListSheet(
 }
 
 @Composable
-fun MemberListMemberUser(
-    user: User,
-    member: Member?,
-    serverId: String?,
-    onSelectUser: (String) -> Unit
-) {
-    val highestColourRole = serverId?.let {
-        user.id?.let { userId ->
-            Roles.resolveHighestRole(
-                it,
-                userId,
-                true
-            )
-        }
-    }
-    val colour = highestColourRole?.colour?.let { WebCompat.parseColour(it) }
-        ?: Brush.solidColor(LocalContentColor.current)
-
-    Row(
-        modifier = Modifier
-            .clickable {
-                onSelectUser(user.id!!)
-            }
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        UserAvatar(
-            username = member?.nickname
-                ?: user.displayName
-                ?: user.username
-                ?: user.id!!,
-            avatar = user.avatar,
-            rawUrl = member?.avatar?.let { "$REVOLT_FILES/avatars/${it.id}?max_side=256" },
-            userId = user.id!!,
-            presence = presenceFromStatus(
-                user.status?.presence,
-                user.online ?: false
-            )
-        )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Text(
-            text = member?.nickname
-                ?: user.displayName
-                ?: user.username
-                ?: user.id,
-            style = LocalTextStyle.current.copy(
-                fontWeight = FontWeight.Bold,
-                brush = colour
-            ),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
-@Composable
 fun MemberListCategory(text: String, count: Int) {
-    Text(
-        text = AnnotatedString.Builder().apply {
-            pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append(text)
-            pop()
+    ListHeader(backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)) {
+        Text(
+            text = AnnotatedString.Builder().apply {
+                append(text)
 
-            pushStyle(
-                SpanStyle(
-                    fontWeight = FontWeight.Medium,
-                    fontSize = LocalTextStyle.current.fontSize * 0.8,
-                    color = LocalContentColor.current.copy(alpha = 0.6f)
+                pushStyle(
+                    SpanStyle(
+                        fontWeight = FontWeight.Medium,
+                        fontSize = LocalTextStyle.current.fontSize * 0.8,
+                        color = LocalContentColor.current.copy(alpha = 0.6f)
+                    )
                 )
-            )
-            append("—$count")
-            pop()
-        }.toAnnotatedString(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-    )
+                append("—$count")
+                pop()
+            }.toAnnotatedString()
+        )
+    }
 }
