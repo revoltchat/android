@@ -6,9 +6,9 @@ This is the official Android app for the [Revolt](https://revolt.chat) chat plat
 The codebase includes the app itself, as well as an internal library for interacting with the Revolt
 API.
 
-| Module      | Package                | Description          |
-|-------------|------------------------|----------------------|
-| `:app`      | `chat.revolt`          | The main app module. |
+| Module | Package       | Description          |
+|--------|---------------|----------------------|
+| `:app` | `chat.revolt` | The main app module. |
 
 The API library is part of the `app` module, and is not intended to be used as a standalone library,
 as it makes liberal use of Android-specific APIs for reactivity.
@@ -23,6 +23,10 @@ of the art for Android UI development.
 
 - [Kotlin](https://kotlinlang.org/)
 - [Jetpack Compose](https://developer.android.com/jetpack/compose)
+    - For some Material components, the View-based
+      [Material Components Android](https://github.com/material-components/material-components-android)
+      (MDC-Android) library is used.
+    - Additionally, some high-complexity non-Compose UI is built in [Litho](https://fblitho.com/).
 - [Ktor](https://ktor.io/)
 - [Dagger](https://dagger.dev/) with [Hilt](https://dagger.dev/hilt/)
 
