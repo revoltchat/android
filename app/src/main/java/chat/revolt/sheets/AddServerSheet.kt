@@ -5,10 +5,10 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,7 +32,6 @@ import chat.revolt.activities.InviteActivity
 import chat.revolt.api.REVOLT_APP
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.PageHeader
-import chat.revolt.components.screens.home.LinkOnHome
 
 @Composable
 fun AddServerSheet() {
@@ -41,7 +41,6 @@ fun AddServerSheet() {
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState())
     ) {
         if (joinFromInviteModalOpen.value) {
@@ -54,38 +53,38 @@ fun AddServerSheet() {
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        PageHeader(text = stringResource(id = R.string.add_server_sheet_title))
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        LinkOnHome(
-            heading = { Text(stringResource(id = R.string.add_server_sheet_join_by_invite)) },
-            icon = { modifier ->
-                Icon(
-                    imageVector = Icons.Default.ExitToApp,
-                    contentDescription = stringResource(
-                        id = R.string.add_server_sheet_join_by_invite
-                    ),
-                    modifier = modifier
-                )
-            },
-            onClick = {
-                joinFromInviteModalOpen.value = true
-            }
+        PageHeader(
+            text = stringResource(id = R.string.add_server_sheet_title)
         )
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        LinkOnHome(
-            heading = { Text(stringResource(id = R.string.add_server_sheet_create_new)) },
-            icon = { modifier ->
+        ListItem(
+            headlineContent = {
+                Text(stringResource(id = R.string.add_server_sheet_join_by_invite))
+            },
+            leadingContent = {
                 Icon(
-                    imageVector = Icons.Default.Build,
-                    contentDescription = stringResource(id = R.string.add_server_sheet_create_new),
-                    modifier = modifier
+                    imageVector = Icons.Default.ExitToApp,
+                    contentDescription = null
                 )
             },
-            onClick = {
+            modifier = Modifier.clickable {
+                joinFromInviteModalOpen.value = true
+            }
+        )
+
+        ListItem(
+            headlineContent = {
+                Text(stringResource(id = R.string.add_server_sheet_create_new))
+            },
+            leadingContent = {
+                Icon(
+                    imageVector = Icons.Default.Build,
+                    contentDescription = null
+                )
+            },
+            modifier = Modifier.clickable {
                 Toast.makeText(
                     context,
                     context.getString(
