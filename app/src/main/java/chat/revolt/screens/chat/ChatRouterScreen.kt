@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -22,6 +23,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.DismissibleNavigationDrawer
@@ -465,6 +467,17 @@ fun ChatRouterScreen(
         }
     }
 
+    var isTouchExplorationEnabled by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        val accessibilityManager =
+            context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+
+        isTouchExplorationEnabled = accessibilityManager.isTouchExplorationEnabled
+        accessibilityManager.addTouchExplorationStateChangeListener { enabled ->
+            isTouchExplorationEnabled = enabled
+        }
+    }
+
     if (!viewModel.latestChangelogRead) {
         val changelogSheetState = rememberModalBottomSheetState()
 
@@ -745,7 +758,11 @@ fun ChatRouterScreen(
                         },
                         onShowAddServerSheet = {
                             showAddServerSheet = true
-                        }
+                        },
+                        showSettingsButton = isTouchExplorationEnabled,
+                        onOpenSettings = {
+                            topNav.navigate("settings")
+                        },
                     )
                 }
                 ChannelNavigator(
@@ -783,6 +800,10 @@ fun ChatRouterScreen(
                             onShowAddServerSheet = {
                                 showAddServerSheet = true
                             },
+                            showSettingsButton = isTouchExplorationEnabled,
+                            onOpenSettings = {
+                                topNav.navigate("settings")
+                            },
                             drawerState = drawerState
                         )
                     }
@@ -818,7 +839,9 @@ fun Sidebar(
     drawerState: DrawerState? = null,
     onShowStatusSheet: () -> Unit,
     onShowServerContextSheet: (String) -> Unit,
-    onShowAddServerSheet: () -> Unit
+    onShowAddServerSheet: () -> Unit,
+    showSettingsButton: Boolean,
+    onOpenSettings: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -984,6 +1007,18 @@ fun Sidebar(
                         contentDescription = stringResource(id = R.string.discover_alt),
                         modifier = Modifier.padding(4.dp)
                     )
+                }
+
+                if (showSettingsButton) {
+                    DrawerServerlikeIcon(
+                        onClick = { onOpenSettings() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(id = R.string.settings),
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    }
                 }
             }
 
