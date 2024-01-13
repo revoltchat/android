@@ -26,7 +26,6 @@ of the art for Android UI development.
     - For some Material components, the View-based
       [Material Components Android](https://github.com/material-components/material-components-android)
       (MDC-Android) library is used.
-    - Additionally, some high-complexity non-Compose UI is built in [Litho](https://fblitho.com/).
 - [Ktor](https://ktor.io/)
 - [Dagger](https://dagger.dev/) with [Hilt](https://dagger.dev/hilt/)
 
