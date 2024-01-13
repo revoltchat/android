@@ -98,7 +98,7 @@ fun SettingsScreen(
                     leadingContent = {
                         Icon(
                             painter = painterResource(R.drawable.ic_card_account_details_24dp),
-                            contentDescription = stringResource(id = R.string.settings_profile)
+                            contentDescription = null,
                         )
                     },
                     modifier = Modifier
@@ -117,7 +117,7 @@ fun SettingsScreen(
                     leadingContent = {
                         Icon(
                             painter = painterResource(R.drawable.ic_tablet_cellphone_24dp),
-                            contentDescription = stringResource(id = R.string.settings_sessions)
+                            contentDescription = null,
                         )
                     },
                     modifier = Modifier
@@ -140,7 +140,7 @@ fun SettingsScreen(
                     leadingContent = {
                         Icon(
                             painter = painterResource(R.drawable.ic_palette_24dp),
-                            contentDescription = stringResource(id = R.string.settings_appearance)
+                            contentDescription = null,
                         )
                     },
                     modifier = Modifier
@@ -163,7 +163,7 @@ fun SettingsScreen(
                     leadingContent = {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = stringResource(id = R.string.about),
+                            contentDescription = null,
                         )
                     },
                     modifier = Modifier
@@ -183,7 +183,7 @@ fun SettingsScreen(
                         leadingContent = {
                             Icon(
                                 imageVector = Icons.Default.Settings,
-                                contentDescription = "Debug",
+                                contentDescription = null,
                             )
                         },
                         modifier = Modifier
@@ -206,7 +206,7 @@ fun SettingsScreen(
                         leadingContent = {
                             Icon(
                                 imageVector = Icons.Default.ArrowForward,
-                                contentDescription = "Labs",
+                                contentDescription = null,
                             )
                         },
                         modifier = Modifier
@@ -226,7 +226,7 @@ fun SettingsScreen(
                     leadingContent = {
                         Icon(
                             imageVector = Icons.Default.ArrowForward,
-                            contentDescription = "Closed Beta Updater",
+                            contentDescription = null,
                         )
                     },
                     modifier = Modifier
@@ -249,7 +249,7 @@ fun SettingsScreen(
                     leadingContent = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = stringResource(id = R.string.settings_changelogs),
+                            contentDescription = null,
                         )
                     },
                     modifier = Modifier
@@ -268,7 +268,7 @@ fun SettingsScreen(
                     leadingContent = {
                         Icon(
                             imageVector = Icons.Default.ArrowForward,
-                            contentDescription = stringResource(id = R.string.settings_feedback),
+                            contentDescription = null,
                         )
                     },
                     modifier = Modifier
@@ -290,7 +290,7 @@ fun SettingsScreen(
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.error) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(id = R.string.logout),
+                                contentDescription = null,
                             )
                         }
                     },
