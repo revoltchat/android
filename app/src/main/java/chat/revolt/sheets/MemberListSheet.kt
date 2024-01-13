@@ -61,10 +61,10 @@ val DO_NOT_FETCH_OFFLINE_MEMBERS_SERVERS = listOf(
     "01F7ZSBSFHQ8TA81725KQCSDDP" // Revolt Lounge
 )
 
-sealed class MemberListItem {
-    data class MemberItem(val member: Member) : MemberListItem()
-    data class UserItem(val user: User) : MemberListItem()
-    data class CategoryItem(val category: String, val count: Int) : MemberListItem()
+sealed class MemberListSheetItem {
+    data class MemberItem(val member: Member) : MemberListSheetItem()
+    data class UserItem(val user: User) : MemberListSheetItem()
+    data class CategoryItem(val category: String, val count: Int) : MemberListSheetItem()
 }
 
 @HiltViewModel
@@ -72,7 +72,7 @@ sealed class MemberListItem {
 class MemberListSheetViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
-    val fullItemList = mutableStateListOf<MemberListItem>()
+    val fullItemList = mutableStateListOf<MemberListSheetItem>()
 
     fun fetchServerMemberList(serverId: String, channelId: String) {
         viewModelScope.launch {
@@ -125,35 +125,35 @@ class MemberListSheetViewModel @Inject constructor(
             // Hoisted roles
             Roles.inOrder(serverId) { it.hoist == true }.forEach { role ->
                 val members = categories[role.name] ?: return@forEach
-                fullItemList.add(MemberListItem.CategoryItem(role.name ?: "", members.size))
+                fullItemList.add(MemberListSheetItem.CategoryItem(role.name ?: "", members.size))
                 members.forEach { member ->
-                    fullItemList.add(MemberListItem.MemberItem(member))
+                    fullItemList.add(MemberListSheetItem.MemberItem(member))
                 }
             }
 
             // Online
             if (!categories[defaultCategoryName].isNullOrEmpty()) {
                 fullItemList.add(
-                    MemberListItem.CategoryItem(
+                    MemberListSheetItem.CategoryItem(
                         defaultCategoryName,
                         categories[defaultCategoryName]?.size ?: 0
                     )
                 )
                 categories[defaultCategoryName]?.forEach { member ->
-                    fullItemList.add(MemberListItem.MemberItem(member))
+                    fullItemList.add(MemberListSheetItem.MemberItem(member))
                 }
             }
 
             // Offline
             if (!categories[offlineCategoryName].isNullOrEmpty()) {
                 fullItemList.add(
-                    MemberListItem.CategoryItem(
+                    MemberListSheetItem.CategoryItem(
                         offlineCategoryName,
                         categories[offlineCategoryName]?.size ?: 0
                     )
                 )
                 categories[offlineCategoryName]?.forEach { member ->
-                    fullItemList.add(MemberListItem.MemberItem(member))
+                    fullItemList.add(MemberListSheetItem.MemberItem(member))
                 }
             }
         }
@@ -180,27 +180,27 @@ class MemberListSheetViewModel @Inject constructor(
 
             if (userList.count(onlinePredicate) > 0) {
                 fullItemList.add(
-                    MemberListItem.CategoryItem(
+                    MemberListSheetItem.CategoryItem(
                         context.getString(R.string.status_online),
                         userList.count(onlinePredicate)
                     )
                 )
 
                 userList.filter(onlinePredicate).forEach { user ->
-                    fullItemList.add(MemberListItem.UserItem(user))
+                    fullItemList.add(MemberListSheetItem.UserItem(user))
                 }
             }
 
             if (userList.count(offlinePredicate) > 0) {
                 fullItemList.add(
-                    MemberListItem.CategoryItem(
+                    MemberListSheetItem.CategoryItem(
                         context.getString(R.string.status_offline),
                         userList.count(offlinePredicate)
                     )
                 )
 
                 userList.filter(offlinePredicate).forEach { user ->
-                    fullItemList.add(MemberListItem.UserItem(user))
+                    fullItemList.add(MemberListSheetItem.UserItem(user))
                 }
             }
         }
@@ -265,13 +265,13 @@ fun MemberListSheet(
         LazyColumn {
             viewModel.fullItemList.forEachIndexed { index, item ->
                 when (item) {
-                    is MemberListItem.CategoryItem -> stickyHeader(
+                    is MemberListSheetItem.CategoryItem -> stickyHeader(
                         key = "${item.category}-$index"
                     ) {
                         MemberListCategory(text = item.category, count = item.count)
                     }
 
-                    is MemberListItem.MemberItem -> item(key = item.member.id!!.user) {
+                    is MemberListSheetItem.MemberItem -> item(key = item.member.id!!.user) {
                         MemberListItem(
                             user = RevoltAPI.userCache[item.member.id.user],
                             member = item.member,
@@ -284,7 +284,7 @@ fun MemberListSheet(
                         )
                     }
 
-                    is MemberListItem.UserItem -> item(key = item.user.id!!) {
+                    is MemberListSheetItem.UserItem -> item(key = item.user.id!!) {
                         MemberListItem(
                             user = item.user,
                             member = null,
