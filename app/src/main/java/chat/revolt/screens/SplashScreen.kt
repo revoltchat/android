@@ -2,13 +2,10 @@ package chat.revolt.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,10 +31,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
-import chat.revolt.activities.WebChallengeActivity
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
-import chat.revolt.api.internals.WebChallenge
 import chat.revolt.api.routes.onboard.needsOnboarding
 import chat.revolt.components.screens.splash.DisconnectedScreen
 import chat.revolt.persistence.KVStorage
@@ -99,13 +93,6 @@ class SplashScreenViewModel @Inject constructor(
 
             if (!isConnected) return@launch
 
-            val needsCloudflare = WebChallenge.needsCloudflare()
-
-            if (needsCloudflare) {
-                setNavigateTo("webchallenge")
-                return@launch
-            }
-
             val token = kvStorage.get("sessionToken") ?: return@launch setNavigateTo("login")
             val id = kvStorage.get("sessionId") ?: ""
 
@@ -142,16 +129,6 @@ class SplashScreenViewModel @Inject constructor(
 
 @Composable
 fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel = hiltViewModel()) {
-    val context = LocalContext.current
-
-    val webChallengeActivityResult = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == 0) {
-            viewModel.checkLoggedInState()
-        }
-    }
-
     if (!viewModel.isConnected) {
         DisconnectedScreen(
             onRetry = {
@@ -195,11 +172,6 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel 
                         inclusive = true
                     }
                 }
-            }
-
-            "webchallenge" -> {
-                val intent = Intent(context, WebChallengeActivity::class.java)
-                webChallengeActivityResult.launch(intent)
             }
 
             "home" -> {

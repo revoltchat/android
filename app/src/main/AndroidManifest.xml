@@ -52,10 +52,6 @@
         </activity>
 
         <activity
-            android:name=".activities.WebChallengeActivity"
-            android:theme="@style/Theme.Revolt" />
-
-        <activity
             android:name=".activities.InviteActivity"
             android:theme="@style/Theme.Revolt"
             android:exported="true">
