@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextOverflow
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.internals.Roles
-import chat.revolt.api.internals.WebCompat
+import chat.revolt.api.internals.BrushCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
@@ -35,7 +35,7 @@ fun MemberListItem(
         }
     }
 
-    val colour = highestColourRole?.colour?.let { WebCompat.parseColour(it) }
+    val colour = highestColourRole?.colour?.let { BrushCompat.parseColour(it) }
         ?: Brush.solidColor(LocalContentColor.current)
 
     ListItem(

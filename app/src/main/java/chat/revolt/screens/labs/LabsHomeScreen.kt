@@ -126,6 +126,15 @@ fun LabsHomeScreen(navController: NavController) {
                             }
                         )
                         Divider()
+                        ListItem(
+                            headlineContent = {
+                                Text("XML Message Column")
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("mockups/xmlmessage")
+                            }
+                        )
+                        Divider()
                     }
                 }
             }

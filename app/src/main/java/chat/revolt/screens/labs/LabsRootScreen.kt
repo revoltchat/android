@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.LabsAccessControlVariates
 import chat.revolt.screens.labs.ui.mockups.CallScreenMockup
+import chat.revolt.screens.labs.ui.mockups.XMLMessageMockup
 
 annotation class LabsFeature
 
@@ -64,6 +65,10 @@ fun LabsRootScreen(topNav: NavController) {
 
                 composable("mockups/call") {
                     CallScreenMockup()
+                }
+
+                composable("mockups/xmlmessage") {
+                    XMLMessageMockup()
                 }
             }
         }

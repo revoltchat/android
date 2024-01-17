@@ -68,7 +68,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
-import chat.revolt.api.internals.WebCompat
+import chat.revolt.api.internals.BrushCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.channel.react
 import chat.revolt.api.routes.channel.unreact
@@ -86,7 +86,7 @@ import chat.revolt.api.schemas.Message as MessageSchema
 @Composable
 fun authorColour(message: MessageSchema): Brush {
     return if (message.masquerade?.colour != null) {
-        WebCompat.parseColour(message.masquerade.colour)
+        BrushCompat.parseColour(message.masquerade.colour)
     } else {
         val defaultColour = Brush.solidColor(LocalContentColor.current)
 
@@ -96,7 +96,7 @@ fun authorColour(message: MessageSchema): Brush {
             Roles.resolveHighestRole(serverId, it, withColour = true)
         } ?: return defaultColour
 
-        highestRole.colour?.let { WebCompat.parseColour(it) }
+        highestRole.colour?.let { BrushCompat.parseColour(it) }
             ?: defaultColour
     }
 }

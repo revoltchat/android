@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import chat.revolt.api.internals.WebCompat
+import chat.revolt.api.internals.BrushCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.Embed
@@ -51,7 +51,7 @@ fun RegularEmbed(
                 .width(4.dp)
                 .fillMaxHeight()
                 .background(
-                    embed.colour?.let { WebCompat.parseColour(it) }
+                    embed.colour?.let { BrushCompat.parseColour(it) }
                         ?: Brush.solidColor(MaterialTheme.colorScheme.primary)
                 )
         )

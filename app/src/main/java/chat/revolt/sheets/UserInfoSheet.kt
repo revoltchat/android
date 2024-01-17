@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ULID
-import chat.revolt.api.internals.WebCompat
+import chat.revolt.api.internals.BrushCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
@@ -120,7 +120,7 @@ fun UserInfoSheet(
                                     role?.let {
                                         RoleListEntry(
                                             label = role.name ?: "null",
-                                            brush = role.colour?.let { WebCompat.parseColour(it) }
+                                            brush = role.colour?.let { BrushCompat.parseColour(it) }
                                                 ?: Brush.solidColor(LocalContentColor.current)
                                         )
                                     }
@@ -136,7 +136,7 @@ fun UserInfoSheet(
                                 role?.let {
                                     RoleListEntry(
                                         label = role.name ?: "null",
-                                        brush = role.colour?.let { WebCompat.parseColour(it) }
+                                        brush = role.colour?.let { BrushCompat.parseColour(it) }
                                             ?: Brush.solidColor(LocalContentColor.current)
                                     )
                                 }

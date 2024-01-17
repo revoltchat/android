@@ -15,7 +15,7 @@ fun Brush.Companion.solidColor(colour: Color) = SolidColor(colour)
 // not exhaustive, but covers most of the ones I've seen in the wild
 // for the sake of all of us, please just use hex codes
 // reference: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
-private val ADDITIONAL_WEB_COLOURS = mapOf(
+val ADDITIONAL_WEB_COLOURS = mapOf(
     "orange" to Color(0xFFFFA500),
     "rebeccapurple" to Color(0xFF663399),
     "transparent" to Color.Transparent,
@@ -24,7 +24,7 @@ private val ADDITIONAL_WEB_COLOURS = mapOf(
     "unset" to Color.Unspecified
 )
 
-object WebCompat {
+object BrushCompat {
     @Composable
     private fun parseLinearGradient(gradient: String): Brush {
         val stops = mutableListOf<Pair<Float, Color>>()
@@ -85,8 +85,7 @@ object WebCompat {
         )
     }
 
-    @Composable
-    private fun parseFunctionColour(colourString: String): Color? {
+    fun parseFunctionColour(colourString: String): Color? {
         val cleanedString = colourString.trim()
 
         return try {
@@ -151,7 +150,7 @@ object WebCompat {
             val additionalWebColour = ADDITIONAL_WEB_COLOURS[colour]
             if (additionalWebColour != null) {
                 Log.d(
-                    "WebCompat",
+                    "BrushCompat",
                     "Parsed additional web colour $colour to $additionalWebColour"
                 )
                 return additionalWebColour
@@ -160,7 +159,7 @@ object WebCompat {
             Color(android.graphics.Color.parseColor(colour))
         } catch (e: IllegalArgumentException) {
             Log.d(
-                "WebCompat",
+                "BrushCompat",
                 "Failed to parse colour $colour, falling back to LocalContentColor.current"
             )
             LocalContentColor.current
@@ -172,7 +171,7 @@ object WebCompat {
         when {
             colour.startsWith("var(") -> {
                 Log.d(
-                    "WebCompat",
+                    "BrushCompat",
                     "Parsing variable $colour"
                 )
                 return parseVar(
