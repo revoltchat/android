@@ -40,6 +40,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +63,7 @@ import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.CategorisedChannelList
 import chat.revolt.api.internals.ChannelUtils
+import chat.revolt.api.routes.user.openDM
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.ServerFlags
 import chat.revolt.api.schemas.User
@@ -72,6 +74,7 @@ import chat.revolt.components.screens.chat.drawer.server.DrawerChannelIconType
 import chat.revolt.sheets.ChannelContextSheet
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import kotlinx.coroutines.launch
 import kotlin.math.max
 
 const val BANNER_HEIGHT_COMPACT = 56
@@ -144,6 +147,8 @@ fun RowScope.ChannelList(
     val categorisedChannels = server?.let {
         ChannelUtils.categoriseServerFlat(it)
     }
+
+    val scope = rememberCoroutineScope()
 
     Surface(
         tonalElevation = 1.dp,
@@ -224,7 +229,19 @@ fun RowScope.ChannelList(
                         selected = currentDestination == "channel/$notesChannelId",
                         hasUnread = false,
                         onClick = {
-                            onChannelClick(notesChannelId ?: return@DrawerChannel)
+                            if (notesChannelId != null) {
+                                onChannelClick(notesChannelId)
+                                return@DrawerChannel
+                            }
+
+                            scope.launch {
+                                val notesChannel = openDM(RevoltAPI.selfId ?: return@launch)
+                                if (notesChannel.id != null) {
+                                    if (RevoltAPI.channelCache[notesChannel.id] == null)
+                                        RevoltAPI.channelCache[notesChannel.id] = notesChannel
+                                }
+                                onChannelClick(notesChannel.id ?: return@launch)
+                            }
                         },
                         large = true
                     )
