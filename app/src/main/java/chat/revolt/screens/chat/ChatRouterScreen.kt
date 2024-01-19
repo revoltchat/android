@@ -293,6 +293,7 @@ class ChatRouterViewModel @Inject constructor(
 fun ChatRouterScreen(
     topNav: NavController,
     windowSizeClass: WindowSizeClass,
+    onNullifiedUser: () -> Unit,
     viewModel: ChatRouterViewModel = hiltViewModel()
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -385,11 +386,7 @@ fun ChatRouterScreen(
             .distinctUntilChanged()
             .collect { selfId ->
                 if (selfId == null) {
-                    topNav.popBackStack(
-                        topNav.graph.startDestinationRoute!!,
-                        inclusive = true
-                    )
-                    topNav.navigate("splash")
+                    onNullifiedUser()
                 }
             }
     }

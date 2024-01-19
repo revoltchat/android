@@ -93,7 +93,11 @@ val RevoltHttp = HttpClient(OkHttp) {
     engine {
         addInterceptor { chain ->
             val request = chain.request().newBuilder()
-                .header(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+                .apply {
+                    if (chain.request().headers[RevoltAPI.TOKEN_HEADER_NAME] == null) {
+                        header(RevoltAPI.TOKEN_HEADER_NAME, RevoltAPI.sessionToken)
+                    }
+                }
                 .build()
             chain.proceed(request)
         }

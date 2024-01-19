@@ -32,7 +32,7 @@ import chat.revolt.persistence.KVStorage
 import kotlinx.coroutines.launch
 
 @Composable
-fun OnboardingScreen(navController: NavController) {
+fun OnboardingScreen(navController: NavController, onOnboardingComplete: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -40,9 +40,12 @@ fun OnboardingScreen(navController: NavController) {
     val error = remember { mutableStateOf("") }
 
     fun onboardingComplete() {
-        navController.navigate("splash") {
-            popUpTo("register/onboarding") { inclusive = true }
-        }
+        onOnboardingComplete()
+        navController.popBackStack(
+            navController.graph.startDestinationRoute!!,
+            inclusive = true
+        )
+        navController.navigate("default")
     }
 
     suspend fun onboard() {
