@@ -12,11 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -30,9 +27,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -47,7 +41,7 @@ import chat.revolt.api.routes.server.fetchMembers
 import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
 import chat.revolt.components.chat.MemberListItem
-import chat.revolt.components.generic.ListHeader
+import chat.revolt.components.generic.CountableListHeader
 import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.Presence
 import chat.revolt.components.generic.presenceFromStatus
@@ -268,7 +262,11 @@ fun MemberListSheet(
                     is MemberListSheetItem.CategoryItem -> stickyHeader(
                         key = "${item.category}-$index"
                     ) {
-                        MemberListCategory(text = item.category, count = item.count)
+                        CountableListHeader(
+                            text = item.category,
+                            count = item.count,
+                            backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+                        )
                     }
 
                     is MemberListSheetItem.MemberItem -> item(key = item.member.id!!.user) {
@@ -299,26 +297,5 @@ fun MemberListSheet(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun MemberListCategory(text: String, count: Int) {
-    ListHeader(backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)) {
-        Text(
-            text = AnnotatedString.Builder().apply {
-                append(text)
-
-                pushStyle(
-                    SpanStyle(
-                        fontWeight = FontWeight.Medium,
-                        fontSize = LocalTextStyle.current.fontSize * 0.8,
-                        color = LocalContentColor.current.copy(alpha = 0.6f)
-                    )
-                )
-                append("—$count")
-                pop()
-            }.toAnnotatedString()
-        )
     }
 }
