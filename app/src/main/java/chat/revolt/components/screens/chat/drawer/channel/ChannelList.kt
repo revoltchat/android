@@ -173,7 +173,6 @@ fun RowScope.ChannelList(
                             .alpha(0.9f)
                             .height(BANNER_HEIGHT_COMPACT.dp + 8.dp) // due to padding in Text
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
                             .weight(1f)
                     ) {
