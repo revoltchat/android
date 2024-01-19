@@ -103,7 +103,7 @@ fun FriendsScreen(useDrawer: Boolean, onDrawerClicked: () -> Unit) {
 
     Column {
         PageHeader(
-            text = "Friends",
+            text = stringResource(R.string.friends),
             startButtons = {
                 if (useDrawer) {
                     IconButton(onClick = onDrawerClicked) {
