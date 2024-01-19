@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -101,7 +102,10 @@ fun FriendsScreen(useDrawer: Boolean, onDrawerClicked: () -> Unit) {
         }
     }
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+    ) {
         PageHeader(
             text = stringResource(R.string.friends),
             startButtons = {
