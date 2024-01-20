@@ -13,6 +13,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseInOutExpo
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -254,6 +255,9 @@ val RevoltTweenFloat: FiniteAnimationSpec<Float> = tween(400, easing = EaseInOut
 val RevoltTweenDp: FiniteAnimationSpec<Dp> = tween(400, easing = EaseInOutExpo)
 val RevoltTweenColour: FiniteAnimationSpec<Color> = tween(400, easing = EaseInOutExpo)
 
+val NavTweenInt: FiniteAnimationSpec<IntOffset> = tween(350, easing = EaseInOutExpo)
+val NavTweenFloat: FiniteAnimationSpec<Float> = tween(350, easing = EaseInOutExpo)
+
 @Composable
 fun AppEntrypoint(
     windowSizeClass: WindowSizeClass,
@@ -278,26 +282,30 @@ fun AppEntrypoint(
                 enterTransition = {
                     slideIntoContainer(
                         AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = RevoltTweenInt
-                    )
+                        animationSpec = NavTweenInt,
+                        initialOffset = { it / 3 }
+                    ) + fadeIn(animationSpec = NavTweenFloat)
                 },
                 exitTransition = {
                     slideOutOfContainer(
                         AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = RevoltTweenInt
-                    ) + fadeOut(animationSpec = RevoltTweenFloat)
+                        animationSpec = NavTweenInt,
+                        targetOffset = { it / 3 }
+                    ) + fadeOut(animationSpec = NavTweenFloat)
                 },
                 popEnterTransition = {
                     slideIntoContainer(
                         AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = RevoltTweenInt
-                    )
+                        animationSpec = NavTweenInt,
+                        initialOffset = { it / 3 }
+                    ) + fadeIn(animationSpec = NavTweenFloat)
                 },
                 popExitTransition = {
                     slideOutOfContainer(
                         AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = RevoltTweenInt
-                    )
+                        animationSpec = NavTweenInt,
+                        targetOffset = { it / 2 }
+                    ) + fadeOut(animationSpec = NavTweenFloat)
                 }
             ) {
                 composable("default") {
