@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ListHeader(
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelLarge) {
@@ -39,7 +39,7 @@ fun ListHeader(
 fun CountableListHeader(
     text: String,
     count: Int,
-    backgroundColor: Color = MaterialTheme.colorScheme.background
+    backgroundColor: Color = MaterialTheme.colorScheme.surface
 ) {
     ListHeader(backgroundColor = backgroundColor) {
         Text(

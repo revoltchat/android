@@ -37,7 +37,7 @@ val RevoltColorScheme = darkColorScheme(
     onBackground = Color(0xffffffff),
     surfaceVariant = Color(0xff242424),
     onSurfaceVariant = Color(0xffffffff),
-    surface = Color(0xff1e1e1e),
+    surface = Color(0xff191919),
     onSurface = Color(0xffffffff),
     surfaceTint = Color(0xFFC0C0C0),
 )
@@ -47,7 +47,7 @@ val AmoledColorScheme = RevoltColorScheme.copy(
     onBackground = Color(0xffffffff),
     surfaceVariant = Color(0xff131313),
     onSurfaceVariant = Color(0xffffffff),
-    surface = Color(0xff212121),
+    surface = Color(0xff000000),
     onSurface = Color(0xffffffff)
 )
 
@@ -68,7 +68,7 @@ val LightColorScheme = lightColorScheme(
     onBackground = Color(0xff000000),
     surfaceVariant = Color(0xffe0e0e0),
     onSurfaceVariant = Color(0xff000000),
-    surface = Color(0xfff5f5f5),
+    surface = Color(0xffffffff),
     onSurface = Color(0xff000000),
     surfaceTint = Color(0xff5658b9)
 )
