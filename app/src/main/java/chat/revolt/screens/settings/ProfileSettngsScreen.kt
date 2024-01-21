@@ -371,6 +371,7 @@ fun ProfileSettingsScreen(
                                 style = MaterialTheme.typography.labelLarge,
                             )
                         },
+                        modifier = Modifier.fillMaxWidth(),
                     )
 
                     AnimatedVisibility(visible = viewModel.bioError != null) {
