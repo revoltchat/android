@@ -12,13 +12,17 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -723,7 +727,6 @@ fun ChatRouterScreen(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .safeDrawingPadding()
     ) {
         AnimatedVisibility(
             visible = RealtimeSocket.disconnectionState != DisconnectionState.Connected
@@ -737,10 +740,17 @@ fun ChatRouterScreen(
             )
         }
 
+        AnimatedVisibility(
+            visible = RealtimeSocket.disconnectionState == DisconnectionState.Connected
+        ) {
+            Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
+        }
+
         if (useTabletAwareUI) {
             Row {
                 DismissibleDrawerSheet(
-                    drawerContainerColor = Color.Transparent
+                    drawerContainerColor = Color.Transparent,
+                    windowInsets = WindowInsets.navigationBars
                 ) {
                     Sidebar(
                         viewModel = viewModel,
@@ -781,7 +791,8 @@ fun ChatRouterScreen(
                 drawerState = drawerState,
                 drawerContent = {
                     DismissibleDrawerSheet(
-                        drawerContainerColor = Color.Transparent
+                        drawerContainerColor = Color.Transparent,
+                        windowInsets = WindowInsets.navigationBars
                     ) {
                         Sidebar(
                             viewModel = viewModel,
@@ -1044,7 +1055,6 @@ fun Sidebar(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChannelNavigator(
     navController: NavHostController,
@@ -1111,7 +1121,7 @@ fun ChannelNavigator(
                     toggleDrawer()
                 }
 
-                NoCurrentChannelScreen()
+                NoCurrentChannelScreen(useDrawer = useDrawer, onDrawerClicked = toggleDrawer)
             }
 
             dialog("report/message/{messageId}") { backStackEntry ->

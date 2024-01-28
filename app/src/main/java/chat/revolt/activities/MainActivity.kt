@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -212,6 +213,7 @@ class MainActivity : FragmentActivity() {
         super.onResume()
         DynamicColors.applyToActivityIfAvailable(this)
         DynamicColors.applyToActivitiesIfAvailable(RevoltApplication.instance)
+        window.statusBarColor = Color.Transparent.toArgb()
     }
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -223,6 +225,7 @@ class MainActivity : FragmentActivity() {
             options.release = BuildConfig.VERSION_NAME
         }
 
+        window.statusBarColor = Color.Transparent.toArgb()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         installSplashScreen().apply {
@@ -273,7 +276,8 @@ fun AppEntrypoint(
         colourOverrides = SyncedSettings.android.colourOverrides
     ) {
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
             NavHost(

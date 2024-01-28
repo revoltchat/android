@@ -12,12 +12,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +40,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.core.view.WindowCompat
 import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
@@ -45,7 +48,6 @@ import chat.revolt.api.RevoltHttp
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
-import chat.revolt.components.generic.PageHeader
 import chat.revolt.provider.getAttachmentContentUri
 import chat.revolt.ui.theme.RevoltTheme
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -82,7 +84,7 @@ class ImageViewActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ImageViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
     val resourceUrl = "$REVOLT_FILES/attachments/${resource.id}/${resource.filename}"
@@ -187,6 +189,81 @@ fun ImageViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
         colourOverrides = SyncedSettings.android.colourOverrides
     ) {
         Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(
+                                id = R.string.media_viewer_title_image,
+                                resource.filename ?: resource.id!!
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            onClose()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = stringResource(id = R.string.back)
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            shareSubmenuIsOpen.value = true
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_share_24dp),
+                                contentDescription = stringResource(id = R.string.share)
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = shareSubmenuIsOpen.value,
+                            onDismissRequest = {
+                                shareSubmenuIsOpen.value = false
+                            }
+                        ) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    shareUrl()
+                                },
+                                text = {
+                                    Text(
+                                        stringResource(id = R.string.media_viewer_share_url)
+                                    )
+                                }
+                            )
+                            DropdownMenuItem(
+                                onClick = {
+                                    shareImage()
+                                },
+                                text = {
+                                    Text(
+                                        stringResource(
+                                            id = R.string.media_viewer_share_image
+                                        )
+                                    )
+                                }
+                            )
+                        }
+
+                        IconButton(onClick = {
+                            saveToGallery()
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_download_24dp),
+                                contentDescription = stringResource(
+                                    id = R.string.media_viewer_save
+                                )
+                            )
+                        }
+                    }
+                )
+            },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
         ) { pv ->
             Surface(
@@ -195,87 +272,22 @@ fun ImageViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
                     .background(MaterialTheme.colorScheme.background)
                     .fillMaxSize()
             ) {
-                Column {
-                    PageHeader(
-                        text = stringResource(
-                            id = R.string.media_viewer_title_image,
-                            resource.filename ?: resource.id!!
+                Box(
+                    modifier = Modifier
+                        .clip(RectangleShape)
+                        .fillMaxSize()
+                ) {
+                    ZoomableGlideImage(
+                        model = resourceUrl,
+                        contentDescription = null,
+                        state = rememberZoomableImageState(
+                            rememberZoomableState(
+                                zoomSpec = ZoomSpec(maxZoomFactor = 10f)
+                            )
                         ),
-                        showBackButton = true,
-                        onBackButtonClicked = onClose,
-                        maxLines = 1,
-                        additionalButtons = {
-                            Row {
-                                IconButton(onClick = {
-                                    shareSubmenuIsOpen.value = true
-                                }) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_share_24dp),
-                                        contentDescription = stringResource(id = R.string.share)
-                                    )
-                                }
-
-                                DropdownMenu(
-                                    expanded = shareSubmenuIsOpen.value,
-                                    onDismissRequest = {
-                                        shareSubmenuIsOpen.value = false
-                                    }
-                                ) {
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            shareUrl()
-                                        },
-                                        text = {
-                                            Text(
-                                                stringResource(id = R.string.media_viewer_share_url)
-                                            )
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            shareImage()
-                                        },
-                                        text = {
-                                            Text(
-                                                stringResource(
-                                                    id = R.string.media_viewer_share_image
-                                                )
-                                            )
-                                        }
-                                    )
-                                }
-
-                                IconButton(onClick = {
-                                    saveToGallery()
-                                }) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_download_24dp),
-                                        contentDescription = stringResource(
-                                            id = R.string.media_viewer_save
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    )
-
-                    Box(
                         modifier = Modifier
-                            .clip(RectangleShape)
                             .fillMaxSize()
-                    ) {
-                        ZoomableGlideImage(
-                            model = resourceUrl,
-                            contentDescription = null,
-                            state = rememberZoomableImageState(
-                                rememberZoomableState(
-                                    zoomSpec = ZoomSpec(maxZoomFactor = 10f)
-                                )
-                            ),
-                            modifier = Modifier
-                                .fillMaxSize()
-                        )
-                    }
+                    )
                 }
             }
         }

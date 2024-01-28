@@ -12,12 +12,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +41,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.media3.common.MediaItem
@@ -50,7 +53,6 @@ import chat.revolt.api.RevoltHttp
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
-import chat.revolt.components.generic.PageHeader
 import chat.revolt.provider.getAttachmentContentUri
 import chat.revolt.ui.theme.RevoltTheme
 import io.ktor.client.request.get
@@ -82,6 +84,7 @@ class VideoViewActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun VideoViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
@@ -199,6 +202,81 @@ fun VideoViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
         colourOverrides = SyncedSettings.android.colourOverrides
     ) {
         Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(
+                                id = R.string.media_viewer_title_video,
+                                resource.filename ?: resource.id!!
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            onClose()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = stringResource(id = R.string.back)
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            shareSubmenuIsOpen.value = true
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_share_24dp),
+                                contentDescription = stringResource(id = R.string.share)
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = shareSubmenuIsOpen.value,
+                            onDismissRequest = {
+                                shareSubmenuIsOpen.value = false
+                            }
+                        ) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    shareUrl()
+                                },
+                                text = {
+                                    Text(
+                                        stringResource(id = R.string.media_viewer_share_url)
+                                    )
+                                }
+                            )
+                            DropdownMenuItem(
+                                onClick = {
+                                    shareVideo()
+                                },
+                                text = {
+                                    Text(
+                                        stringResource(
+                                            id = R.string.media_viewer_share_video
+                                        )
+                                    )
+                                }
+                            )
+                        }
+
+                        IconButton(onClick = {
+                            saveToGallery()
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_download_24dp),
+                                contentDescription = stringResource(
+                                    id = R.string.media_viewer_save
+                                )
+                            )
+                        }
+                    }
+                )
+            },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
         ) { pv ->
             Surface(
@@ -207,89 +285,24 @@ fun VideoViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
                     .background(MaterialTheme.colorScheme.background)
                     .fillMaxSize()
             ) {
-                Column {
-                    PageHeader(
-                        text = stringResource(
-                            id = R.string.media_viewer_title_video,
-                            resource.filename ?: resource.id!!
-                        ),
-                        showBackButton = true,
-                        onBackButtonClicked = onClose,
-                        maxLines = 1,
-                        additionalButtons = {
-                            Row {
-                                IconButton(onClick = {
-                                    shareSubmenuIsOpen.value = true
-                                }) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_share_24dp),
-                                        contentDescription = stringResource(id = R.string.share)
-                                    )
-                                }
-
-                                DropdownMenu(
-                                    expanded = shareSubmenuIsOpen.value,
-                                    onDismissRequest = {
-                                        shareSubmenuIsOpen.value = false
-                                    }
-                                ) {
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            shareUrl()
-                                        },
-                                        text = {
-                                            Text(
-                                                stringResource(id = R.string.media_viewer_share_url)
-                                            )
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            shareVideo()
-                                        },
-                                        text = {
-                                            Text(
-                                                stringResource(
-                                                    id = R.string.media_viewer_share_video
-                                                )
-                                            )
-                                        }
-                                    )
-                                }
-
-                                IconButton(onClick = {
-                                    saveToGallery()
-                                }) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_download_24dp),
-                                        contentDescription = stringResource(
-                                            id = R.string.media_viewer_save
-                                        )
-                                    )
-                                }
+                Box(
+                    modifier = Modifier
+                        .clip(RectangleShape)
+                        .fillMaxSize()
+                ) {
+                    AndroidView(
+                        factory = { context ->
+                            PlayerView(context).apply {
+                                setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
                             }
-                        }
-                    )
-
-                    Box(
+                        },
+                        update = {
+                            it.player = player
+                        },
                         modifier = Modifier
-                            .clip(RectangleShape)
                             .fillMaxSize()
-                    ) {
-                        AndroidView(
-                            factory = { context ->
-                                PlayerView(context).apply {
-                                    setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
-                                }
-                            },
-                            update = {
-                                it.player = player
-                            },
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.background)
-                        )
-                    }
+                            .background(MaterialTheme.colorScheme.background)
+                    )
                 }
             }
         }

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,7 +32,6 @@ import chat.revolt.R
 import chat.revolt.activities.InviteActivity
 import chat.revolt.api.REVOLT_APP
 import chat.revolt.components.generic.FormTextField
-import chat.revolt.components.generic.PageHeader
 
 @Composable
 fun AddServerSheet() {
@@ -53,8 +53,9 @@ fun AddServerSheet() {
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        PageHeader(
-            text = stringResource(id = R.string.add_server_sheet_title)
+        Text(
+            text = stringResource(id = R.string.add_server_sheet_title),
+            style = MaterialTheme.typography.headlineMedium
         )
 
         Spacer(modifier = Modifier.height(4.dp))

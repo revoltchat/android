@@ -10,6 +10,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -19,11 +20,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -33,10 +34,14 @@ import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -51,11 +56,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -68,7 +75,6 @@ import chat.revolt.api.RevoltJson
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.ListHeader
-import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.screens.settings.appearance.ColourChip
 import chat.revolt.ui.theme.ClearRippleTheme
 import chat.revolt.ui.theme.OverridableColourScheme
@@ -263,218 +269,234 @@ fun AppearanceSettingsScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .safeDrawingPadding()
-    ) {
-        PageHeader(
-            text = stringResource(id = R.string.settings_appearance),
-            showBackButton = true,
-            onBackButtonClicked = {
-                navController.popBackStack()
-            }
-        )
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            ListHeader {
-                Text(stringResource(R.string.settings_appearance_theme))
-            }
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
+                scrollBehavior = scrollBehavior,
+                title = {
+                    Text(
+                        text = stringResource(R.string.settings_appearance),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back)
+                        )
+                    }
+                },
+            )
+        },
+    ) { pv ->
+        Box(Modifier.padding(pv)) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
-                ColourChip(
-                    color = Color(0xff191919),
-                    text = stringResource(id = R.string.settings_appearance_theme_revolt),
-                    selected = GlobalState.theme == Theme.Revolt,
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("set_theme_revolt")
-                ) {
-                    viewModel.saveNewTheme(Theme.Revolt)
+                ListHeader {
+                    Text(stringResource(R.string.settings_appearance_theme))
                 }
 
-                ColourChip(
-                    color = Color(0xfff7f7f7),
-                    text = stringResource(id = R.string.settings_appearance_theme_light),
-                    selected = GlobalState.theme == Theme.Light,
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier
-                        .weight(1f)
-                        .testTag("set_theme_light")
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 20.dp)
                 ) {
-                    viewModel.saveNewTheme(Theme.Light)
-                }
-
-                ColourChip(
-                    color = Color(0xff000000),
-                    text = stringResource(id = R.string.settings_appearance_theme_amoled),
-                    selected = GlobalState.theme == Theme.Amoled,
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("set_theme_amoled")
-                ) {
-                    viewModel.saveNewTheme(Theme.Amoled)
-                }
-
-                ColourChip(
-                    color = if (isSystemInDarkTheme()) Color(0xff191919) else Color(0xfff7f7f7),
-                    text = stringResource(id = R.string.settings_appearance_theme_none),
-                    selected = GlobalState.theme == Theme.None,
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("set_theme_none")
-                ) {
-                    viewModel.saveNewTheme(Theme.None)
-                }
-
-                if (systemSupportsDynamicColors()) {
                     ColourChip(
-                        color = dynamicDarkColorScheme(LocalContext.current).primary,
-                        text = stringResource(id = R.string.settings_appearance_theme_m3dynamic),
-                        selected = GlobalState.theme == Theme.M3Dynamic,
+                        color = Color(0xff191919),
+                        text = stringResource(id = R.string.settings_appearance_theme_revolt),
+                        selected = GlobalState.theme == Theme.Revolt,
                         modifier = Modifier
                             .weight(1f)
-                            .testTag("set_theme_m3dynamic")
+                            .testTag("set_theme_revolt")
                     ) {
-                        viewModel.saveNewTheme(Theme.M3Dynamic)
+                        viewModel.saveNewTheme(Theme.Revolt)
                     }
-                } else {
+
                     ColourChip(
-                        color = Color(0xffa0a0a0),
-                        text = stringResource(
-                            id = R.string.settings_appearance_theme_m3dynamic_unsupported
-                        ),
-                        selected = false,
+                        color = Color(0xfff7f7f7),
+                        text = stringResource(id = R.string.settings_appearance_theme_light),
+                        selected = GlobalState.theme == Theme.Light,
                         modifier = Modifier
                             .weight(1f)
-                            .testTag("set_theme_m3dynamic_unsupported")
+                            .testTag("set_theme_light")
                     ) {
-                        Toast.makeText(
-                            context,
-                            context.getString(
-                                R.string.settings_appearance_theme_m3dynamic_unsupported_toast
-                            ),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        viewModel.saveNewTheme(Theme.Light)
                     }
-                }
-            }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier
-                    .clickable {
-                        viewModel.showColourOverrides = !viewModel.showColourOverrides
-                    }
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowRight,
-                        contentDescription = null,
+                    ColourChip(
+                        color = Color(0xff000000),
+                        text = stringResource(id = R.string.settings_appearance_theme_amoled),
+                        selected = GlobalState.theme == Theme.Amoled,
                         modifier = Modifier
-                            .padding(start = 20.dp, end = 4.dp)
-                            .rotate(colourOverridesOpenerArrowRotation)
-                    )
-                }
-
-                Text(
-                    text = stringResource(id = R.string.settings_appearance_colour_overrides),
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier
-                        .weight(1f)
-                )
-
-                if (LocalLayoutDirection.current == LayoutDirection.Rtl) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowLeft,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(start = 4.dp, end = 20.dp)
-                            .rotate(colourOverridesOpenerArrowRotation)
-                    )
-                }
-            }
-
-            AnimatedVisibility(viewModel.showColourOverrides) {
-                Column {
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
+                            .weight(1f)
+                            .testTag("set_theme_amoled")
                     ) {
-                        TextButton(
-                            onClick = {
-                                filePicker.launch(arrayOf("*/*"))
-                            },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_folder_24dp),
-                                contentDescription = null
-                            )
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Text(
-                                text = stringResource(id = R.string.settings_appearance_colour_overrides_import)
-                            )
-                        }
-
-                        TextButton(
-                            onClick = {
-                                fileSaver.launch("${SyncedSettings.android.theme}-colours.rato")
-                            },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_content_save_24dp),
-                                contentDescription = null
-                            )
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Text(
-                                text = stringResource(id = R.string.settings_appearance_colour_overrides_export)
-                            )
-                        }
+                        viewModel.saveNewTheme(Theme.Amoled)
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    ColourChip(
+                        color = if (isSystemInDarkTheme()) Color(0xff191919) else Color(0xfff7f7f7),
+                        text = stringResource(id = R.string.settings_appearance_theme_none),
+                        selected = GlobalState.theme == Theme.None,
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("set_theme_none")
+                    ) {
+                        viewModel.saveNewTheme(Theme.None)
+                    }
 
-                    OverridableColourScheme.fieldNames.forEach { fieldName ->
-                        val value =
-                            SyncedSettings.android.colourOverrides?.getFieldByName(fieldName)
-                                ?: MaterialTheme.colorScheme.getFieldByName(fieldName)
-
+                    if (systemSupportsDynamicColors()) {
                         ColourChip(
-                            color = Color(value ?: 0),
-                            text = OverridableColourScheme.fieldNameToResource[fieldName]
-                                ?.let { context.getString(it) }
-                                ?: fieldName,
+                            color = dynamicDarkColorScheme(LocalContext.current).primary,
+                            text = stringResource(id = R.string.settings_appearance_theme_m3dynamic),
+                            selected = GlobalState.theme == Theme.M3Dynamic,
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("set_theme_m3dynamic")
+                        ) {
+                            viewModel.saveNewTheme(Theme.M3Dynamic)
+                        }
+                    } else {
+                        ColourChip(
+                            color = Color(0xffa0a0a0),
+                            text = stringResource(
+                                id = R.string.settings_appearance_theme_m3dynamic_unsupported
+                            ),
+                            selected = false,
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("set_theme_m3dynamic_unsupported")
+                        ) {
+                            Toast.makeText(
+                                context,
+                                context.getString(
+                                    R.string.settings_appearance_theme_m3dynamic_unsupported_toast
+                                ),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Row(
+                    modifier = Modifier
+                        .clickable {
+                            viewModel.showColourOverrides = !viewModel.showColourOverrides
+                        }
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowRight,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(start = 20.dp, end = 4.dp)
+                                .rotate(colourOverridesOpenerArrowRotation)
+                        )
+                    }
+
+                    Text(
+                        text = stringResource(id = R.string.settings_appearance_colour_overrides),
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier
+                            .weight(1f)
+                    )
+
+                    if (LocalLayoutDirection.current == LayoutDirection.Rtl) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowLeft,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(start = 4.dp, end = 20.dp)
+                                .rotate(colourOverridesOpenerArrowRotation)
+                        )
+                    }
+                }
+
+                AnimatedVisibility(viewModel.showColourOverrides) {
+                    Column {
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 20.dp, end = 20.dp)
-                                .testTag("set_colour_override_$fieldName")
+                                .padding(horizontal = 20.dp)
                         ) {
-                            viewModel.selectedOverrideName = fieldName
-                            viewModel.selectedOverrideInitialValue = value
-                            viewModel.overridePickerSheetVisible = true
+                            TextButton(
+                                onClick = {
+                                    filePicker.launch(arrayOf("*/*"))
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_folder_24dp),
+                                    contentDescription = null
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Text(
+                                    text = stringResource(id = R.string.settings_appearance_colour_overrides_import)
+                                )
+                            }
+
+                            TextButton(
+                                onClick = {
+                                    fileSaver.launch("${SyncedSettings.android.theme}-colours.rato")
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_content_save_24dp),
+                                    contentDescription = null
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Text(
+                                    text = stringResource(id = R.string.settings_appearance_colour_overrides_export)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        OverridableColourScheme.fieldNames.forEach { fieldName ->
+                            val value =
+                                SyncedSettings.android.colourOverrides?.getFieldByName(fieldName)
+                                    ?: MaterialTheme.colorScheme.getFieldByName(fieldName)
+
+                            ColourChip(
+                                color = Color(value ?: 0),
+                                text = OverridableColourScheme.fieldNameToResource[fieldName]
+                                    ?.let { context.getString(it) }
+                                    ?: fieldName,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 20.dp, end = 20.dp)
+                                    .testTag("set_colour_override_$fieldName")
+                            ) {
+                                viewModel.selectedOverrideName = fieldName
+                                viewModel.selectedOverrideInitialValue = value
+                                viewModel.overridePickerSheetVisible = true
+                            }
                         }
                     }
                 }

@@ -2,9 +2,13 @@ package chat.revolt.components.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Refresh
@@ -44,32 +48,35 @@ private fun DisconnectedNoticeBase(
     canTapToRetry: Boolean = false,
     onRetry: () -> Unit = {}
 ) {
-    Row(
-        modifier = Modifier
-            .clickable(enabled = canTapToRetry, onClick = onRetry)
-            .fillMaxWidth()
-            .background(background)
-            .padding(vertical = 8.dp, horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            modifier = Modifier.padding(end = 8.dp),
-            imageVector = icon,
-            tint = foreground,
-            contentDescription = null
-        )
-        Text(
-            text = text,
-            color = foreground,
-            fontWeight = FontWeight.Bold
-        )
-        if (canTapToRetry) {
-            Text(
-                text = stringResource(R.string.tap_to_reconnect),
-                color = foreground,
-                modifier = Modifier.padding(start = 8.dp),
-                fontWeight = FontWeight.Normal
+    Column {
+        Row(
+            modifier = Modifier
+                .clickable(enabled = canTapToRetry, onClick = onRetry)
+                .fillMaxWidth()
+                .background(background)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                modifier = Modifier.padding(end = 8.dp),
+                imageVector = icon,
+                tint = foreground,
+                contentDescription = null
             )
+            Text(
+                text = text,
+                color = foreground,
+                fontWeight = FontWeight.Bold
+            )
+            if (canTapToRetry) {
+                Text(
+                    text = stringResource(R.string.tap_to_reconnect),
+                    color = foreground,
+                    modifier = Modifier.padding(start = 8.dp),
+                    fontWeight = FontWeight.Normal
+                )
+            }
         }
     }
 }

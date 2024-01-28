@@ -14,6 +14,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -42,7 +43,6 @@ import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
 import chat.revolt.components.chat.MemberListItem
 import chat.revolt.components.generic.CountableListHeader
-import chat.revolt.components.generic.PageHeader
 import chat.revolt.components.generic.Presence
 import chat.revolt.components.generic.presenceFromStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -254,7 +254,10 @@ fun MemberListSheet(
     }
 
     Column {
-        PageHeader(text = stringResource(R.string.channel_info_sheet_options_members))
+        Text(
+            text = stringResource(R.string.channel_info_sheet_options_members),
+            style = MaterialTheme.typography.headlineMedium
+        )
 
         LazyColumn {
             viewModel.fullItemList.forEachIndexed { index, item ->
