@@ -39,6 +39,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
+import java.net.SocketException
 import chat.revolt.api.schemas.Channel as ChannelSchema
 
 const val REVOLT_BASE = "https://api.revolt.chat"
@@ -156,7 +157,19 @@ object RevoltAPI {
         socketCoroutine = CoroutineScope(Dispatchers.IO).launch {
             try {
                 withContext(realtimeContext) {
-                    RealtimeSocket.connect(sessionToken)
+                    try {
+                        RealtimeSocket.connect(sessionToken)
+                    } catch (e: Exception) {
+                        if (e is SocketException) {
+                            Log.d(
+                                "RevoltAPI",
+                                "Socket closed, probably no big deal /// " + e.message
+                            )
+                        } else {
+                            Log.e("RevoltAPI", "WebSocket error", e)
+                        }
+                        RealtimeSocket.updateDisconnectionState(DisconnectionState.Disconnected)
+                    }
                 }
             } catch (e: Exception) {
                 if (e is InterruptedException) {
