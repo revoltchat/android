@@ -39,6 +39,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.MessageProcessor
 import chat.revolt.api.internals.isUlid
 import chat.revolt.api.routes.custom.fetchEmoji
+import chat.revolt.api.routes.user.fetchUser
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.User
 import chat.revolt.components.chat.MemberListItem
@@ -204,11 +205,18 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
             val reactionsForEmoji = reactions[reactionEmoji[selectedReactionIndex]]
             items(reactionsForEmoji?.size ?: 0) { index ->
                 val reaction = reactionsForEmoji?.get(index) ?: return@items
-                val user = RevoltAPI.userCache[reaction] ?: User.getPlaceholder(reaction)
+                val userOrNull = RevoltAPI.userCache[reaction]
+                val user = userOrNull ?: User.getPlaceholder(reaction)
                 val member = if (channel.server != null && user.id != null) {
                     RevoltAPI.members.getMember(channel.server, user.id)
                 } else {
                     null
+                }
+
+                LaunchedEffect(reaction) {
+                    if (reaction !in RevoltAPI.userCache) {
+                        RevoltAPI.userCache[reaction] = fetchUser(reaction)
+                    }
                 }
 
                 MemberListItem(
