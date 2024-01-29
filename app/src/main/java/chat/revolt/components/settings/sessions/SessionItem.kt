@@ -1,7 +1,7 @@
 package chat.revolt.components.settings.sessions
 
 import android.text.format.DateUtils
-import androidx.compose.material.IconButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
