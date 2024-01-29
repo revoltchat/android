@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextOverflow
 import chat.revolt.api.REVOLT_FILES
-import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.BrushCompat
+import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
@@ -51,6 +51,17 @@ fun MemberListItem(
                 overflow = TextOverflow.Ellipsis,
                 style = LocalTextStyle.current.copy(brush = colour),
             )
+        },
+        supportingContent = {
+            user?.status?.text?.let {
+                if (user.online == true) {
+                    Text(
+                        text = it,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
         },
         leadingContent = {
             UserAvatar(
