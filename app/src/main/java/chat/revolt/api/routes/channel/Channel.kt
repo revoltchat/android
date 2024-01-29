@@ -171,3 +171,13 @@ suspend fun createInvite(channelId: String): CreateInviteResponse {
 
     return RevoltJson.decodeFromString(CreateInviteResponse.serializer(), response)
 }
+
+suspend fun fetchSingleMessage(channelId: String, messageId: String): Message {
+    val response = RevoltHttp.get("/channels/$channelId/messages/$messageId")
+        .bodyAsText()
+
+    return RevoltJson.decodeFromString(
+        Message.serializer(),
+        response
+    )
+}

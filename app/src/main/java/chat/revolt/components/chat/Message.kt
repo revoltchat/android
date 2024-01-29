@@ -65,10 +65,10 @@ import chat.revolt.activities.media.ImageViewActivity
 import chat.revolt.activities.media.VideoViewActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.BrushCompat
 import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
-import chat.revolt.api.internals.BrushCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.channel.react
 import chat.revolt.api.routes.channel.unreact
@@ -212,18 +212,21 @@ fun Message(
             message.replies?.forEach { reply ->
                 val replyMessage = RevoltAPI.messageCache[reply]
 
-                InReplyTo(
-                    messageId = reply,
-                    withMention = replyMessage?.author?.let {
-                        message.mentions?.contains(
-                            replyMessage.author
-                        )
-                    }
-                        ?: false
-                ) {
-                    // TODO Add jump to message
-                    if (replyMessage == null) {
-                        Toast.makeText(context, "lmao prankd", Toast.LENGTH_SHORT).show()
+                message.channel?.let { chId ->
+                    InReplyTo(
+                        channelId = chId,
+                        messageId = reply,
+                        withMention = replyMessage?.author?.let {
+                            message.mentions?.contains(
+                                replyMessage.author
+                            )
+                        }
+                            ?: false
+                    ) {
+                        // TODO Add jump to message
+                        if (replyMessage == null) {
+                            Toast.makeText(context, "lmao prankd", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }

@@ -12,6 +12,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -25,11 +26,13 @@ import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.solidColor
+import chat.revolt.api.routes.channel.fetchSingleMessage
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 
 @Composable
 fun InReplyTo(
+    channelId: String,
     messageId: String,
     modifier: Modifier = Modifier,
     withMention: Boolean = false,
@@ -45,6 +48,12 @@ fun InReplyTo(
     val contentColor = LocalContentColor.current
     val usernameColor =
         message?.let { authorColour(it) } ?: Brush.solidColor(contentColor)
+
+    LaunchedEffect(messageId) {
+        if (messageId !in RevoltAPI.messageCache) {
+            RevoltAPI.messageCache[messageId] = fetchSingleMessage(channelId, messageId)
+        }
+    }
 
     Box(
         modifier = modifier
@@ -96,19 +105,32 @@ fun InReplyTo(
                     }
                 )
 
-                Text(
-                    text = message.content ?: "",
-                    fontSize = 12.sp,
-                    color = contentColor.copy(alpha = 0.7f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (message.content.isNullOrBlank()) {
+                    Text(
+                        text = stringResource(id = R.string.reply_message_empty_has_attachments),
+                        // TODO: inter has italics now, import and use them
+                        fontStyle = FontStyle.Italic, // inter doesn't have italics...
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily.Default, // ...so we use the default font
+                        color = contentColor.copy(alpha = 0.7f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                } else {
+                    Text(
+                        text = message.content,
+                        fontSize = 12.sp,
+                        color = contentColor.copy(alpha = 0.7f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             } else {
                 Text(
                     text = stringResource(id = R.string.reply_message_not_cached),
-                    fontStyle = FontStyle.Italic, // inter doesn't have italics...
+                    fontStyle = FontStyle.Italic, // inter _still_ doesn't have italics...
                     color = contentColor.copy(alpha = 0.7f),
-                    fontFamily = FontFamily.Default, // ...so we use the defaul t font
+                    fontFamily = FontFamily.Default, // ...so we use the default font
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
