@@ -240,25 +240,6 @@ fun SettingsScreen(
                         )
                     }
 
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                text = "Closed Beta Updater"
-                            )
-                        },
-                        leadingContent = {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = null,
-                            )
-                        },
-                        modifier = Modifier
-                            .testTag("settings_view_updater")
-                            .clickable {
-                                navController.navigate("settings/updater")
-                            }
-                    )
-
                     ListHeader {
                         Text(
                             stringResource(
