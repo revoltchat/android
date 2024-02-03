@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import chat.revolt.R
+import chat.revolt.components.generic.SheetHeaderPadding
 import chat.revolt.components.generic.WebMarkdown
 import chat.revolt.internals.Changelog
 import chat.revolt.internals.Changelogs
@@ -68,18 +69,20 @@ fun ChangelogSheet(
     }
 
     Column {
-        Text(
-            text = if (new) {
-                stringResource(R.string.settings_changelogs_new_header)
-            } else {
-                stringResource(
-                    R.string.settings_changelogs_historical_version_header,
-                    viewModel.changelog?.version
-                        ?: stringResource(R.string.settings_changelogs_historical_version_header_placeholder)
-                )
-            },
-            style = MaterialTheme.typography.headlineMedium
-        )
+        SheetHeaderPadding {
+            Text(
+                text = if (new) {
+                    stringResource(R.string.settings_changelogs_new_header)
+                } else {
+                    stringResource(
+                        R.string.settings_changelogs_historical_version_header,
+                        viewModel.changelog?.version
+                            ?: stringResource(R.string.settings_changelogs_historical_version_header_placeholder)
+                    )
+                },
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
 
         if (viewModel.changelogContents == null) {
             Box(

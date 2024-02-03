@@ -32,6 +32,7 @@ import chat.revolt.R
 import chat.revolt.activities.InviteActivity
 import chat.revolt.api.REVOLT_APP
 import chat.revolt.components.generic.FormTextField
+import chat.revolt.components.generic.SheetHeaderPadding
 
 @Composable
 fun AddServerSheet() {
@@ -51,14 +52,14 @@ fun AddServerSheet() {
             )
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        SheetHeaderPadding {
+            Text(
+                text = stringResource(id = R.string.add_server_sheet_title),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
 
-        Text(
-            text = stringResource(id = R.string.add_server_sheet_title),
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         ListItem(
             headlineContent = {

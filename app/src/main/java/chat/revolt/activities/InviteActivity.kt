@@ -71,8 +71,8 @@ class InviteActivity : ComponentActivity() {
 
         val inviteCode = intent.data?.lastPathSegment
 
-        window.statusBarColor = Color.Transparent.toArgb()
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = Color.Transparent.toArgb()
 
         setContent {
             InviteScreen(

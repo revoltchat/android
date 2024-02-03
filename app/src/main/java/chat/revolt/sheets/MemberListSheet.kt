@@ -44,6 +44,7 @@ import chat.revolt.api.schemas.User
 import chat.revolt.components.chat.MemberListItem
 import chat.revolt.components.generic.CountableListHeader
 import chat.revolt.components.generic.Presence
+import chat.revolt.components.generic.SheetHeaderPadding
 import chat.revolt.components.generic.presenceFromStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -254,10 +255,12 @@ fun MemberListSheet(
     }
 
     Column {
-        Text(
-            text = stringResource(R.string.channel_info_sheet_options_members),
-            style = MaterialTheme.typography.headlineMedium
-        )
+        SheetHeaderPadding {
+            Text(
+                text = stringResource(R.string.channel_info_sheet_options_members),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
 
         LazyColumn {
             viewModel.fullItemList.forEachIndexed { index, item ->
