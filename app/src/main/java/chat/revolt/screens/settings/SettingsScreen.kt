@@ -1,5 +1,6 @@
 package chat.revolt.screens.settings
 
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,16 +29,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
+import chat.revolt.activities.InviteActivity
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.GlobalState
@@ -68,6 +72,7 @@ fun SettingsScreen(
     navController: NavController,
     viewModel: SettingsScreenViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
@@ -274,16 +279,27 @@ fun SettingsScreen(
                                 text = stringResource(id = R.string.settings_feedback)
                             )
                         },
+                        supportingContent = {
+                            Text(
+                                text = stringResource(id = R.string.settings_feedback_description)
+                            )
+                        },
                         leadingContent = {
                             Icon(
-                                imageVector = Icons.Default.ArrowForward,
+                                painter = painterResource(R.drawable.ic_comment_quote_24dp),
                                 contentDescription = null,
                             )
                         },
                         modifier = Modifier
                             .testTag("settings_view_feedback")
                             .clickable {
-                                navController.navigate("settings/feedback")
+                                val intent = Intent(
+                                    context,
+                                    InviteActivity::class.java
+                                ).setAction(Intent.ACTION_VIEW)
+
+                                intent.data = "https://rvlt.gg/Testers".toUri()
+                                context.startActivity(intent)
                             }
                     )
 

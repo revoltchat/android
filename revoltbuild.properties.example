@@ -1,5 +1,3 @@
 sentry.dsn=
 sentry.upload_mappings=true
-analysis.enabled=false
-analysis.base_url=
 build.debug.app_name=

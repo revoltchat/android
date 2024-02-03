@@ -528,21 +528,7 @@
     <string name="settings_appearance_colour_overrides_import_error">This file is not a valid colour override file.</string>
 
     <string name="settings_feedback">Feedback</string>
-    <string name="settings_feedback_introduction">Any feedback you have for Revolt is greatly appreciated and all feedback is read by the development team of our Android app.</string>
-    <string name="settings_feedback_category">Category</string>
-    <string name="settings_feedback_category_satisfaction">General-purpose feedback</string>
-    <string name="settings_feedback_category_feature">Feature request</string>
-    <string name="settings_feedback_category_bug">Bug report</string>
-    <string name="settings_feedback_category_ux">User experience (UI/UX)</string>
-    <string name="settings_feedback_category_performance">Performance</string>
-    <string name="settings_feedback_category_security">Security</string>
-    <string name="settings_feedback_category_other">Other</string>
-    <string name="settings_feedback_message">Message</string>
-    <string name="settings_feedback_message_too_long">Message is too long. Please shorten it to %1$d characters or less.</string>
-    <string name="settings_feedback_error">An error occurred while sending your feedback. Please try again later.</string>
-
-    <string name="settings_feedback_disabled_title">Feedback unavailable</string>
-    <string name="settings_feedback_disabled_message">Feedback is not available on this build of Revolt. Support for this build is limited. (Build: %1$s %2$s)</string>
+    <string name="settings_feedback_description">Join the Revolt server to give feedback or suggestions and report bugs.</string>
 
     <string name="settings_changelogs">Changelogs</string>
     <string name="settings_changelogs_new_header">What\'s been cooking ✨</string>

@@ -35,7 +35,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
@@ -52,7 +51,6 @@ import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
 import chat.revolt.screens.chat.ChatRouterScreen
-import chat.revolt.screens.chat.dialogs.FeedbackDialog
 import chat.revolt.screens.labs.LabsRootScreen
 import chat.revolt.screens.login.LoginGreetingScreen
 import chat.revolt.screens.login.LoginScreen
@@ -375,7 +373,6 @@ fun AppEntrypoint(
                 composable("settings/appearance") { AppearanceSettingsScreen(navController) }
                 composable("settings/debug") { DebugSettingsScreen(navController) }
                 composable("settings/changelogs") { ChangelogsSettingsScreen(navController) }
-                dialog("settings/feedback") { FeedbackDialog(navController) }
 
                 composable("about") { AboutScreen(navController) }
                 composable("about/oss") { AttributionScreen(navController) }
