@@ -85,8 +85,8 @@ data class Library(
 
 @Serializable
 data class Organization(
-    val url: String,
-    val name: String
+    val url: String? = null,
+    val name: String? = null
 )
 
 @Serializable
