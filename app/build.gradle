@@ -245,9 +245,6 @@ dependencies {
     // JDK Desugaring - polyfill for new Java APIs
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 
-    // Markdown
-    implementation "com.github.discord:SimpleAST:2.7.0"
-
     // AndroidX Media3 w/ ExoPlayer
     implementation "androidx.media3:media3-exoplayer:$media3_version"
     implementation "androidx.media3:media3-exoplayer-hls:$media3_version"

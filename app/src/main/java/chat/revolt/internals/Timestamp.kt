@@ -1,13 +1,13 @@
-package chat.revolt.internals.markdown
+package chat.revolt.internals
 
 import android.text.format.DateUtils
 import android.util.Log
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toJavaInstant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 fun resolveTimestamp(timestamp: Long, modifier: String? = null): String {
     val normalisedModifier = modifier.orEmpty().removePrefix(":")

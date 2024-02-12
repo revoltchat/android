@@ -3,16 +3,7 @@ package chat.revolt.components.chat
 import android.content.Intent
 import android.icu.text.DateFormat
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
-import android.text.Selection
-import android.text.SpannableStringBuilder
-import android.text.SpannedString
-import android.text.TextUtils
 import android.text.format.DateUtils
-import android.view.MotionEvent
-import android.view.View
-import android.view.View.OnTouchListener
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,13 +34,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,9 +48,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.text.toSpannable
 import chat.revolt.R
 import chat.revolt.activities.media.ImageViewActivity
 import chat.revolt.activities.media.VideoViewActivity
@@ -79,7 +67,8 @@ import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
-import chat.revolt.internals.markdown.LongClickableSpan
+import chat.revolt.components.markdown.LocalMarkdownTreeConfig
+import chat.revolt.components.markdown.RichMarkdown
 import kotlinx.coroutines.launch
 import chat.revolt.api.schemas.Message as MessageSchema
 
@@ -172,8 +161,6 @@ fun formatLongAsTime(time: Long): String {
 @Composable
 fun Message(
     message: MessageSchema,
-    truncate: Boolean = false,
-    parse: (MessageSchema) -> SpannableStringBuilder = { SpannableStringBuilder(it.content) },
     onMessageContextMenu: () -> Unit = {},
     onAvatarClick: () -> Unit = {},
     onNameClick: (() -> Unit)? = null,
@@ -183,7 +170,6 @@ fun Message(
 ) {
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
     val context = LocalContext.current
-    val contentColor = LocalContentColor.current
 
     val scope = rememberCoroutineScope()
 
@@ -326,94 +312,13 @@ fun Message(
                         message.content?.let {
                             if (message.content.isBlank()) return@let // if only an attachment is sent
 
-                            AndroidView(
-                                factory = { ctx ->
-                                    androidx.appcompat.widget.AppCompatTextView(ctx).apply {
-                                        maxLines = if (truncate) 1 else Int.MAX_VALUE
-                                        ellipsize = TextUtils.TruncateAt.END
-                                        textSize = 16f
-                                        typeface = ResourcesCompat.getFont(ctx, R.font.inter)
-
-                                        setOnTouchListener(object : OnTouchListener {
-                                            private var longClickHandler: Handler? = null
-                                            private var isLongPressed = false
-
-                                            override fun onTouch(
-                                                widget: View?,
-                                                event: MotionEvent?
-                                            ): Boolean {
-                                                if (longClickHandler == null) {
-                                                    longClickHandler =
-                                                        Handler(Looper.getMainLooper())
-                                                }
-                                                if (event == null) return false
-
-                                                val action = event.action
-                                                if (action == MotionEvent.ACTION_CANCEL) {
-                                                    longClickHandler?.removeCallbacksAndMessages(
-                                                        null
-                                                    )
-                                                }
-                                                if (action == MotionEvent.ACTION_UP ||
-                                                    action == MotionEvent.ACTION_DOWN
-                                                ) {
-                                                    var x = event.x.toInt()
-                                                    var y = event.y.toInt()
-                                                    x -= (widget as androidx.appcompat.widget.AppCompatTextView).totalPaddingLeft
-                                                    y -= widget.totalPaddingTop
-                                                    x += widget.scrollX
-                                                    y += widget.scrollY
-
-                                                    val spannedString = widget.text as SpannedString
-
-                                                    val layout = widget.layout
-                                                    val line = layout.getLineForVertical(y)
-                                                    val off = layout.getOffsetForHorizontal(
-                                                        line,
-                                                        x.toFloat()
-                                                    )
-                                                    val link = spannedString.getSpans(
-                                                        off,
-                                                        off,
-                                                        LongClickableSpan::class.java
-                                                    )
-                                                    if (link.isNotEmpty()) {
-                                                        if (action == MotionEvent.ACTION_UP) {
-                                                            longClickHandler?.removeCallbacksAndMessages(
-                                                                null
-                                                            )
-                                                            if (!isLongPressed) {
-                                                                link[0].onClick(widget)
-                                                            }
-                                                            isLongPressed = false
-                                                        } else {
-                                                            Selection.setSelection(
-                                                                spannedString.toSpannable(),
-                                                                spannedString.getSpanStart(link[0]),
-                                                                spannedString.getSpanEnd(link[0])
-                                                            )
-                                                            longClickHandler?.postDelayed(
-                                                                {
-                                                                    link[0].onLongClick(widget)
-                                                                    isLongPressed = true
-                                                                },
-                                                                250L
-                                                            )
-                                                        }
-                                                        return true
-                                                    }
-                                                }
-                                                return false
-                                            }
-                                        })
-
-                                        setTextColor(contentColor.toArgb())
-                                    }
-                                },
-                                update = {
-                                    it.text = parse(message)
-                                }
-                            )
+                            CompositionLocalProvider(
+                                LocalMarkdownTreeConfig provides LocalMarkdownTreeConfig.current.copy(
+                                    currentServer = RevoltAPI.channelCache[message.channel]?.server
+                                )
+                            ) {
+                                RichMarkdown(input = message.content)
+                            }
                         }
                     }
 

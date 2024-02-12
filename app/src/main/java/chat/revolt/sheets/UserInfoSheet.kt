@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -29,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
-import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.BrushCompat
+import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
@@ -38,7 +41,7 @@ import chat.revolt.components.chat.RoleListEntry
 import chat.revolt.components.chat.UserBadgeList
 import chat.revolt.components.chat.UserBadgeRow
 import chat.revolt.components.generic.NonIdealState
-import chat.revolt.components.generic.WebMarkdown
+import chat.revolt.components.markdown.RichMarkdown
 import chat.revolt.components.screens.settings.RawUserOverview
 import chat.revolt.components.screens.settings.UserButtons
 import chat.revolt.components.sheets.SheetTile
@@ -252,10 +255,9 @@ fun UserInfoSheet(
                         )
                     }
                 ) {
-                    WebMarkdown(
-                        text = profile?.content!!,
-                        maskLoading = true
-                    )
+                    SelectionContainer(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        RichMarkdown(input = profile?.content!!)
+                    }
                 }
             }
         }

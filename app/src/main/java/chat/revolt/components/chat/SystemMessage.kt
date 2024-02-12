@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.schemas.Message
-import chat.revolt.components.generic.UIMarkdown
+import chat.revolt.components.markdown.RichMarkdown
 
 enum class SystemMessageType(val type: String) {
     CHANNEL_OWNERSHIP_CHANGED("channel_ownership_changed"),
@@ -78,7 +78,7 @@ fun SystemMessage(message: Message) {
 
             when (systemMessageType) {
                 SystemMessageType.CHANNEL_OWNERSHIP_CHANGED -> {
-                    UIMarkdown(
+                    RichMarkdown(
                         stringResource(
                             R.string.system_message_ownership_changed,
                             message.system.from.mention(),
@@ -88,7 +88,7 @@ fun SystemMessage(message: Message) {
                 }
 
                 SystemMessageType.CHANNEL_ICON_CHANGED -> {
-                    UIMarkdown(
+                    RichMarkdown(
                         stringResource(
                             R.string.system_message_channel_icon_changed,
                             message.system.by.mention()
@@ -97,7 +97,7 @@ fun SystemMessage(message: Message) {
                 }
 
                 SystemMessageType.CHANNEL_DESCRIPTION_CHANGED -> {
-                    UIMarkdown(
+                    RichMarkdown(
                         stringResource(
                             R.string.system_message_channel_description_changed,
                             message.system.by.mention()
@@ -106,7 +106,7 @@ fun SystemMessage(message: Message) {
                 }
 
                 SystemMessageType.CHANNEL_RENAMED -> {
-                    UIMarkdown(
+                    RichMarkdown(
                         stringResource(
                             R.string.system_message_channel_renamed,
                             message.system.by.mention(),
@@ -116,7 +116,7 @@ fun SystemMessage(message: Message) {
                 }
 
                 SystemMessageType.USER_REMOVE -> {
-                    UIMarkdown(
+                    RichMarkdown(
                         stringResource(
                             R.string.system_message_user_removed,
                             message.system.by.mention(),
@@ -126,7 +126,7 @@ fun SystemMessage(message: Message) {
                 }
 
                 SystemMessageType.USER_ADDED -> {
-                    UIMarkdown(
+                    RichMarkdown(
                         stringResource(
                             R.string.system_message_user_added,
                             message.system.by.mention(),
@@ -136,7 +136,7 @@ fun SystemMessage(message: Message) {
                 }
 
                 SystemMessageType.USER_BANNED -> {
-                    UIMarkdown(
+                    RichMarkdown(
                         stringResource(
                             R.string.system_message_user_banned,
                             message.system.id.mention()
@@ -145,7 +145,7 @@ fun SystemMessage(message: Message) {
                 }
 
                 SystemMessageType.USER_KICKED -> {
-                    UIMarkdown(
+                    RichMarkdown(
                         stringResource(
                             R.string.system_message_user_kicked,
                             message.system.id.mention()
@@ -154,7 +154,7 @@ fun SystemMessage(message: Message) {
                 }
 
                 SystemMessageType.USER_LEFT -> {
-                    UIMarkdown(
+                    RichMarkdown(
                         stringResource(
                             R.string.system_message_user_left,
                             message.system.id.mention()
@@ -163,7 +163,7 @@ fun SystemMessage(message: Message) {
                 }
 
                 SystemMessageType.USER_JOINED -> {
-                    UIMarkdown(
+                    RichMarkdown(
                         stringResource(
                             R.string.system_message_user_joined,
                             message.system.id.mention()
@@ -172,7 +172,7 @@ fun SystemMessage(message: Message) {
                 }
 
                 SystemMessageType.TEXT -> {
-                    message.system.content?.let { UIMarkdown(it) }
+                    message.system.content?.let { RichMarkdown(it) }
                 }
             }
         }

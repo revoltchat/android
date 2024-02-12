@@ -1,4 +1,4 @@
-package chat.revolt.internals.extensions
+package chat.revolt.components.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

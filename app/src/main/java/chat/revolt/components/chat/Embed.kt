@@ -28,9 +28,9 @@ import chat.revolt.api.internals.BrushCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.Embed
-import chat.revolt.api.schemas.Embed as EmbedSchema
 import chat.revolt.components.generic.RemoteImage
-import chat.revolt.components.generic.UIMarkdown
+import chat.revolt.components.markdown.RichMarkdown
+import chat.revolt.api.schemas.Embed as EmbedSchema
 
 @Composable
 fun RegularEmbed(
@@ -100,8 +100,8 @@ fun RegularEmbed(
 
                 // Description
                 embed.description?.let {
-                    UIMarkdown(
-                        text = it,
+                    RichMarkdown(
+                        input = it,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }

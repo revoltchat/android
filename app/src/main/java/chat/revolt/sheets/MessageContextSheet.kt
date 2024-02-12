@@ -325,8 +325,7 @@ fun MessageContextSheet(
                 message = message.copy(
                     tail = false,
                     masquerade = null
-                ),
-                truncate = true
+                )
             )
         }
 

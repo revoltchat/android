@@ -55,7 +55,7 @@ import chat.revolt.api.routes.auth.logoutAllSessions
 import chat.revolt.api.routes.auth.logoutSessionById
 import chat.revolt.api.schemas.Session
 import chat.revolt.components.generic.ListHeader
-import chat.revolt.components.generic.UIMarkdown
+import chat.revolt.components.markdown.RichMarkdown
 import chat.revolt.components.settings.sessions.SessionItem
 import kotlinx.coroutines.launch
 
@@ -201,12 +201,12 @@ fun SessionSettingsScreen(
                             }
                         } ?: run {
                             item(key = "noCurrentSession") {
-                                UIMarkdown(
-                                    text = stringResource(id = R.string.settings_sessions_this_device_unavailable),
+                                RichMarkdown(
+                                    input = stringResource(id = R.string.settings_sessions_this_device_unavailable),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .background(MaterialTheme.colorScheme.background)
-                                        .padding(10.dp)
+                                        .padding(16.dp)
                                 )
                             }
                         }

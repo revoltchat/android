@@ -33,7 +33,7 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.server.leaveOrDeleteServer
 import chat.revolt.components.generic.SheetClickable
-import chat.revolt.components.generic.UIMarkdown
+import chat.revolt.components.markdown.RichMarkdown
 import chat.revolt.components.screens.settings.ServerOverview
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
@@ -151,8 +151,8 @@ fun ServerContextSheet(
                 modifier = Modifier.padding(vertical = 14.dp)
             )
 
-            UIMarkdown(
-                text = if (server.description?.isBlank() == false) {
+            RichMarkdown(
+                input = if (server.description?.isBlank() == false) {
                     server.description
                 } else {
                     stringResource(

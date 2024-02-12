@@ -2,11 +2,8 @@ package chat.revolt.screens.chat
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -72,7 +69,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
-import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
@@ -82,9 +78,6 @@ import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.server.fetchMembers
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.User
-import chat.revolt.api.settings.ClosedBetaAccessControlVariates
-import chat.revolt.api.settings.FeatureFlag
-import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
@@ -97,7 +90,6 @@ import chat.revolt.components.screens.chat.drawer.server.DrawerServer
 import chat.revolt.components.screens.chat.drawer.server.DrawerServerlikeIcon
 import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
 import chat.revolt.internals.Changelogs
-import chat.revolt.ndk.Pipebomb
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
 import chat.revolt.screens.chat.dialogs.safety.ReportServerDialog
@@ -121,7 +113,6 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.sentry.Sentry
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -228,51 +219,14 @@ class ChatRouterViewModel @Inject constructor(
     fun navigateToChannel(channelId: String, navController: NavController, pure: Boolean = false) {
         if (!pure) setSaveCurrentChannel(channelId)
 
-        @FeatureFlag("ClosedBetaAccessControl")
-        if (RevoltAPI.channelCache.size > 0 &&
-            FeatureFlags.closedBetaAccessControl is ClosedBetaAccessControlVariates.Restricted &&
-            (FeatureFlags.closedBetaAccessControl as ClosedBetaAccessControlVariates.Restricted)
-                .predicate()
-                .not()
-        ) {
-            Pipebomb.incrementHardCrashCounter()
-
-            navController.navigate("no_current_channel") {
-                navController.graph.startDestinationRoute?.let { route ->
-                    popUpTo(route)
-                }
+        navController.navigate("channel/$channelId") {
+            navController.graph.startDestinationRoute?.let { route ->
+                popUpTo(route)
             }
+        }
 
-            if (Pipebomb.checkHardCrash()) {
-                Toast.makeText(
-                    context,
-                    "You do not have access to the closed beta.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                Sentry.init("") // we are about to crash on purpose, let's not send this to Sentry
-
-                val intent = Intent(Intent.ACTION_DELETE)
-                    .setData(Uri.parse("package:${BuildConfig.APPLICATION_ID}"))
-                    .setFlags(
-                        Intent.FLAG_ACTIVITY_NEW_TASK
-                    )
-                context.startActivity(
-                    intent
-                ) // i'm just messing with the user at this point, they know what they did
-
-                Pipebomb.doHardCrash()
-            }
-        } else {
-            // Navigate as normal
-            navController.navigate("channel/$channelId") {
-                navController.graph.startDestinationRoute?.let { route ->
-                    popUpTo(route)
-                }
-            }
-
-            viewModelScope.launch {
-                setSaveCurrentRoute("channel/$channelId")
-            }
+        viewModelScope.launch {
+            setSaveCurrentRoute("channel/$channelId")
         }
     }
 

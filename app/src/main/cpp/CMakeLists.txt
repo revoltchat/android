@@ -12,7 +12,8 @@ cmake_minimum_required(VERSION 3.22.1)
 # build script scope).
 project("revolt")
 
-set(LIB_NAME_ACCESS_CONTROL "pipebomb")
+# Compile cmark in external/cmark
+add_subdirectory(external/cmark)
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -27,15 +28,16 @@ set(LIB_NAME_ACCESS_CONTROL "pipebomb")
 # System.loadLibrary() and pass the name of the library defined here;
 # for GameActivity/NativeActivity derived applications, the same library name must be
 # used in the AndroidManifest.xml file.
-add_library(${LIB_NAME_ACCESS_CONTROL} SHARED
+add_library(stendal SHARED
         # List C/C++ source files with relative paths to this CMakeLists.txt.
-        lib${LIB_NAME_ACCESS_CONTROL}/${LIB_NAME_ACCESS_CONTROL}.cpp
+        stendal/stendal.cpp
 )
 
 # Specifies libraries CMake should link to your target library. You
 # can link libraries from various origins, such as libraries defined in this
 # build script, prebuilt third-party libraries, or Android system libraries.
-target_link_libraries(${LIB_NAME_ACCESS_CONTROL}
+target_link_libraries(stendal
         # List libraries link to the target library
+        cmark
         android
         log)

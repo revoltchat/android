@@ -55,7 +55,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -83,17 +82,9 @@ import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelHeader
 import chat.revolt.components.screens.chat.ReplyManager
 import chat.revolt.components.screens.chat.TypingIndicator
-import chat.revolt.internals.markdown.MarkdownContext
-import chat.revolt.internals.markdown.MarkdownParser
-import chat.revolt.internals.markdown.MarkdownState
-import chat.revolt.internals.markdown.addRevoltRules
-import chat.revolt.internals.markdown.createCodeRule
-import chat.revolt.internals.markdown.createInlineCodeRule
 import chat.revolt.sheets.ChannelInfoSheet
 import chat.revolt.sheets.MessageContextSheet
 import chat.revolt.sheets.ReactSheet
-import com.discord.simpleast.core.simple.SimpleMarkdownRules
-import com.discord.simpleast.core.simple.SimpleRenderer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.io.File
@@ -114,8 +105,6 @@ fun ChannelScreen(
     val context = LocalContext.current
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
-    val codeBlockColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
 
     var channelInfoSheetShown by remember { mutableStateOf(false) }
 
@@ -338,49 +327,6 @@ fun ChannelScreen(
                                 message.system != null -> SystemMessage(message)
                                 else -> Message(
                                     message,
-                                    parse = {
-                                        val parser = MarkdownParser()
-                                            .addRules(
-                                                SimpleMarkdownRules.createEscapeRule()
-                                            )
-                                            .addRevoltRules(context)
-                                            .addRules(
-                                                createCodeRule(context, codeBlockColor.toArgb()),
-                                                createInlineCodeRule(
-                                                    context,
-                                                    codeBlockColor.toArgb()
-                                                )
-                                            )
-                                            .addRules(
-                                                SimpleMarkdownRules.createSimpleMarkdownRules(
-                                                    includeEscapeRule = false
-                                                )
-                                            )
-
-                                        SimpleRenderer.render(
-                                            source = it.content ?: "",
-                                            parser = parser,
-                                            initialState = MarkdownState(0),
-                                            renderContext = MarkdownContext(
-                                                memberMap = viewModel.activeChannel?.server?.let { serverId ->
-                                                    RevoltAPI.members.markdownMemberMapFor(
-                                                        serverId
-                                                    )
-                                                } ?: mapOf(),
-                                                userMap = RevoltAPI.userCache.toMap(),
-                                                channelMap = RevoltAPI.channelCache.mapValues { ch ->
-                                                    ch.value.name ?: ch.value.id
-                                                    ?: "#DeletedChannel"
-                                                },
-                                                emojiMap = RevoltAPI.emojiCache,
-                                                serverId = channel?.server ?: "",
-                                                // check if message consists solely of one *or more* custom emotes
-                                                useLargeEmojis = it.content?.matches(
-                                                    Regex("(:([0-9A-Z]{26}):)+")
-                                                ) == true
-                                            )
-                                        )
-                                    },
                                     onMessageContextMenu = {
                                         messageContextSheetShown = true
                                         messageContextSheetTarget = message.id ?: ""
