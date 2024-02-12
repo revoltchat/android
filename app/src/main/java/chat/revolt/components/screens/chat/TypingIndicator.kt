@@ -40,7 +40,8 @@ fun StackedUserAvatars(users: List<String>, amount: Int = 3) {
             UserAvatar(
                 avatar = user?.avatar,
                 userId = userId,
-                username = user?.let { User.resolveDefaultName(it) } ?: stringResource(id = R.string.unknown),
+                username = user?.let { User.resolveDefaultName(it) }
+                    ?: stringResource(id = R.string.unknown),
                 size = 16.dp,
                 modifier = Modifier
                     .offset(
@@ -82,7 +83,7 @@ fun TypingIndicator(users: List<String>) {
                         topEnd = 16.dp
                     )
                 )
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.9f))
                 .padding(top = 4.dp, start = 16.dp, end = 16.dp)
         ) {
             StackedUserAvatars(users = users)
