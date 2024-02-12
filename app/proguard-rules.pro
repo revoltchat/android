@@ -108,3 +108,5 @@
     public static final <fields>;
     public <fields>;
 }
+
+-keep class chat.revolt.ndk.AstNode { *; }
