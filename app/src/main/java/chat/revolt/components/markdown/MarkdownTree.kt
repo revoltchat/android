@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
@@ -108,7 +107,7 @@ fun MarkdownTree(node: AstNode) {
                         .width(4.dp)
                         .fillMaxHeight()
                         .background(
-                            Brush.solidColor(LocalContentColor.current)
+                            Brush.solidColor(MaterialTheme.colorScheme.surfaceVariant)
                         )
                 )
 
