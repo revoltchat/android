@@ -182,7 +182,7 @@ fun UserButtons(
         }
 
         when (user.relationship) {
-            "Friend", "Incoming", "Outgoing", "None", "BlockedOther" -> {
+            "Friend", "Incoming", "Outgoing", "None", "Blocked", "BlockedOther" -> {
                 Column { // Prevent the dropdown menu from counting towards arrangement spacing
                     IconButton(
                         onClick = {
@@ -211,16 +211,20 @@ fun UserButtons(
                             }
                         }
 
-                        DropdownMenuItem(
-                            text = {
-                                Text(stringResource(R.string.user_info_sheet_block))
-                            },
-                            onClick = {
-                                scope.launch {
-                                    blockUser(user.id)
+                        when (user.relationship) {
+                            "Blocked" -> {}
+
+                            else -> DropdownMenuItem(
+                                text = {
+                                    Text(stringResource(R.string.user_info_sheet_block))
+                                },
+                                onClick = {
+                                    scope.launch {
+                                        blockUser(user.id)
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
 
                         DropdownMenuItem(
                             text = {
