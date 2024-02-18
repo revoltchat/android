@@ -7,7 +7,7 @@ import chat.revolt.internals.EmojiImpl
 object MessageProcessor {
     private val MentionRegex = Regex("@((?:\\p{L}|[\\d_.-])+)#([0-9]{4})", RegexOption.IGNORE_CASE)
     private val ChannelRegex = Regex("(?:\\s|^)#(.+?)(?:\\s|\$)", RegexOption.IGNORE_CASE)
-    private val EmojiRegex = Regex(":(.+?):", RegexOption.IGNORE_CASE)
+    private val EmojiRegex = Regex(":([a-zA-Z0-9_+-]+):", RegexOption.IGNORE_CASE)
 
     val emoji = EmojiImpl()
 
