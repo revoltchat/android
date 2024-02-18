@@ -65,7 +65,7 @@ fun UserInfoSheet(
     LaunchedEffect(user) {
         try {
             user?.id?.let { fetchUserProfile(it) }?.let { profile = it }
-        } catch (e: Error) {
+        } catch (e: Exception) {
             if (e.message == "NotFound") {
                 profileNotFound = true
             }
