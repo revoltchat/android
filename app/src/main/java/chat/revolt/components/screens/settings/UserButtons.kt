@@ -1,10 +1,13 @@
 package chat.revolt.components.screens.settings
 
 import android.widget.Toast
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
@@ -22,9 +25,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -51,6 +57,7 @@ fun UserButtons(
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
 
+    var botEasterEgg by remember { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
 
     if (user.id == null) return Row {
@@ -67,19 +74,46 @@ fun UserButtons(
     }
 
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         when (user.relationship) {
             "None" -> {
-                Button(
-                    onClick = {
-                        scope.launch {
-                            friendUser("${user.username}#${user.discriminator}")
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
+                if (user.bot == null) {
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                friendUser("${user.username}#${user.discriminator}")
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.user_info_sheet_add_friend))
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.Start),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .animateContentSize()
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable { botEasterEgg = true }
+                        .padding(8.dp)
+                        .weight(1f)
                 ) {
-                    Text(stringResource(R.string.user_info_sheet_add_friend))
+                    Icon(
+                        painter = painterResource(R.drawable.ic_robot_24dp),
+                        contentDescription = null
+                    )
+                    Text(
+                        if (botEasterEgg) {
+                            stringResource(R.string.user_info_sheet_user_is_bot_easter_egg)
+                        } else {
+                            stringResource(R.string.user_info_sheet_user_is_bot)
+                        },
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
 
