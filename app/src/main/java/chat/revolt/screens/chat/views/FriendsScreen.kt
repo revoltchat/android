@@ -10,14 +10,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import chat.revolt.R
@@ -35,61 +34,15 @@ import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.chat.MemberListItem
 import chat.revolt.components.generic.CountableListHeader
-import chat.revolt.components.generic.SheetClickable
 import chat.revolt.internals.extensions.zero
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Composable
-fun FriendsOptionsSheet(onDenyAll: () -> Unit) {
-    SheetClickable(
-        icon = { modifier ->
-            Icon(
-                modifier = modifier,
-                painter = painterResource(R.drawable.ic_account_cancel_24dp),
-                contentDescription = null
-            )
-        },
-        label = { style ->
-            Text(
-                text = stringResource(R.string.friends_deny_all_incoming),
-                style = style
-            )
-        },
-        onClick = { onDenyAll() }
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FriendsScreen(useDrawer: Boolean, onDrawerClicked: () -> Unit) {
-    var optionsSheetShown by remember { mutableStateOf(false) }
+    var overflowMenuShown by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-
-    if (optionsSheetShown) {
-        val sheetState = rememberModalBottomSheetState()
-
-        ModalBottomSheet(
-            onDismissRequest = {
-                optionsSheetShown = false
-            },
-            sheetState = sheetState
-        ) {
-            FriendsOptionsSheet(
-                onDenyAll = {
-                    scope.launch {
-                        sheetState.hide()
-                    }
-                    with(Dispatchers.IO) {
-                        scope.launch {
-                            FriendRequests.getIncoming()
-                                .forEach { it.id?.let { id -> unfriendUser(id) } }
-                        }
-                    }
-                }
-            )
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -115,11 +68,34 @@ fun FriendsScreen(useDrawer: Boolean, onDrawerClicked: () -> Unit) {
                 },
                 actions = {
                     IconButton(onClick = {
-                        optionsSheetShown = true
+                        overflowMenuShown = true
                     }) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = stringResource(R.string.menu)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = overflowMenuShown,
+                        onDismissRequest = {
+                            overflowMenuShown = false
+                        }
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(stringResource(R.string.friends_deny_all_incoming))
+                            },
+                            onClick = {
+                                scope.launch {
+                                    overflowMenuShown = false
+                                }
+                                with(Dispatchers.IO) {
+                                    scope.launch {
+                                        FriendRequests.getIncoming()
+                                            .forEach { it.id?.let { id -> unfriendUser(id) } }
+                                    }
+                                }
+                            }
                         )
                     }
                 },
