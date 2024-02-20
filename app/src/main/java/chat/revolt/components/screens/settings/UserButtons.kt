@@ -90,30 +90,33 @@ fun UserButtons(
                     ) {
                         Text(stringResource(R.string.user_info_sheet_add_friend))
                     }
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.Start),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .animateContentSize()
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable { botEasterEgg = true }
-                        .padding(8.dp)
-                        .weight(1f)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_robot_24dp),
-                        contentDescription = null
-                    )
-                    Text(
-                        if (botEasterEgg) {
-                            stringResource(R.string.user_info_sheet_user_is_bot_easter_egg)
-                        } else {
-                            stringResource(R.string.user_info_sheet_user_is_bot)
-                        },
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(
+                            8.dp,
+                            alignment = Alignment.Start
+                        ),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .animateContentSize()
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable { botEasterEgg = true }
+                            .padding(8.dp)
+                            .weight(1f)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_robot_24dp),
+                            contentDescription = null
+                        )
+                        Text(
+                            if (botEasterEgg) {
+                                stringResource(R.string.user_info_sheet_user_is_bot_easter_egg)
+                            } else {
+                                stringResource(R.string.user_info_sheet_user_is_bot)
+                            },
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
 
