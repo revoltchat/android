@@ -1038,6 +1038,7 @@ fun ChannelNavigator(
                     toggleDrawer()
                 }
                 FriendsScreen(
+                    topNav = topNav,
                     useDrawer = useDrawer,
                     onDrawerClicked = toggleDrawer,
                 )

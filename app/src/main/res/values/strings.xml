@@ -129,6 +129,13 @@
     <string name="friends_all">All</string>
     <string name="friends_blocked">Blocked</string>
     <string name="friends_deny_all_incoming">Clear all incoming requests</string>
+    <string name="frends_new_group">New Group</string>
+
+    <string name="create_group">Create a new group</string>
+    <string name="create_group_description">Round up your crew in a group chat. You can add up to %1$d people.</string>
+    <string name="create_group_name">Group Name</string>
+    <string name="create_group_search">Search Friends</string>
+    <string name="create_group_action">Create</string>
 
     <string name="server_plus_alt">Add server</string>
     <string name="discover_alt">Discover</string>

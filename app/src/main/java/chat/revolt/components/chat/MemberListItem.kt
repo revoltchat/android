@@ -24,6 +24,7 @@ fun MemberListItem(
     serverId: String?,
     userId: String,
     modifier: Modifier = Modifier,
+    trailingContent: @Composable (() -> Unit)? = null,
 ) {
     val highestColourRole = serverId?.let {
         user?.id?.let { userId ->
@@ -79,5 +80,6 @@ fun MemberListItem(
                 )
             )
         },
+        trailingContent = trailingContent
     )
 }

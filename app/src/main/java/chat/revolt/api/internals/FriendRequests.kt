@@ -30,7 +30,7 @@ object FriendRequests {
 
     fun getFriends(excludeOnline: Boolean = false): List<User> {
         return RevoltAPI.userCache.values.filter { user ->
-            user.relationship == "Friend" && (excludeOnline && user.online == false)
+            user.relationship == "Friend" && if (excludeOnline) user.online == false else true
         }
     }
 }

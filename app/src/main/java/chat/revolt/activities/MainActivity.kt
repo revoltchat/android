@@ -51,6 +51,7 @@ import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
 import chat.revolt.screens.chat.ChatRouterScreen
+import chat.revolt.screens.create.CreateGroupScreen
 import chat.revolt.screens.labs.LabsRootScreen
 import chat.revolt.screens.login.LoginGreetingScreen
 import chat.revolt.screens.login.LoginScreen
@@ -364,6 +365,8 @@ fun AppEntrypoint(
                         }
                     )
                 }
+
+                composable("create/group") { CreateGroupScreen(navController) }
 
                 composable("discover") { DiscoverScreen(navController) }
 

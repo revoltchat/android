@@ -25,8 +25,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.internals.FriendRequests
 import chat.revolt.api.routes.user.unfriendUser
@@ -40,7 +42,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun FriendsScreen(useDrawer: Boolean, onDrawerClicked: () -> Unit) {
+fun FriendsScreen(topNav: NavController, useDrawer: Boolean, onDrawerClicked: () -> Unit) {
     var overflowMenuShown by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -67,6 +69,14 @@ fun FriendsScreen(useDrawer: Boolean, onDrawerClicked: () -> Unit) {
                     }
                 },
                 actions = {
+                    IconButton(onClick = {
+                        topNav.navigate("create/group")
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_account_multiple_plus_24dp),
+                            contentDescription = stringResource(R.string.frends_new_group)
+                        )
+                    }
                     IconButton(onClick = {
                         overflowMenuShown = true
                     }) {
