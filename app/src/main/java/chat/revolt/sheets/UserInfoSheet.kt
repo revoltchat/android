@@ -182,7 +182,7 @@ fun UserInfoSheet(
                             overflow = TextOverflow.Ellipsis
                         )
 
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(4.dp))
                     }
 
                     accountAt?.let { _ ->

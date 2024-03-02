@@ -53,7 +53,7 @@ fun SheetTile(
                         header()
                     }
 
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(8.dp))
 
                     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
                         content()
@@ -76,7 +76,7 @@ fun SheetTile(
             header()
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(8.dp))
 
         CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
             contentPreview()
