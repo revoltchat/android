@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -72,6 +73,8 @@ import chat.revolt.api.routes.channel.react
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.ChannelType
+import chat.revolt.callbacks.Action
+import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.NativeMessageField
 import chat.revolt.components.chat.SystemMessage
@@ -188,7 +191,7 @@ fun ChannelScreen(
     }
 
     if (channelInfoSheetShown) {
-        val channelInfoSheetState = rememberModalBottomSheetState()
+        val channelInfoSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
         ModalBottomSheet(
             sheetState = channelInfoSheetState,
@@ -197,7 +200,11 @@ fun ChannelScreen(
             }
         ) {
             ChannelInfoSheet(
-                channelId = channelId
+                channelId = channelId,
+                onHideSheet = {
+                    channelInfoSheetState.hide()
+                    channelInfoSheetShown = false
+                }
             )
         }
     }

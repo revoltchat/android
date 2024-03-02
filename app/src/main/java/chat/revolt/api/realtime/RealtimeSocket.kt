@@ -9,6 +9,7 @@ import chat.revolt.api.RevoltJson
 import chat.revolt.api.realtime.frames.receivable.AnyFrame
 import chat.revolt.api.realtime.frames.receivable.BulkFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelAckFrame
+import chat.revolt.api.realtime.frames.receivable.ChannelDeleteFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelUpdateFrame
@@ -401,6 +402,45 @@ object RealtimeSocket {
                 )
 
                 RevoltAPI.channelCache[channelCreateFrame.id!!] = channelCreateFrame
+            }
+
+            "ChannelDelete" -> {
+                val channelDeleteFrame =
+                    RevoltJson.decodeFromString(ChannelDeleteFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received channel delete frame for ${channelDeleteFrame.id}. Removing from cache."
+                )
+
+                val currentChannel = RevoltAPI.channelCache[channelDeleteFrame.id]
+                if (currentChannel == null) {
+                    Log.d(
+                        "RealtimeSocket",
+                        "Channel ${channelDeleteFrame.id} not found in cache. Ignoring."
+                    )
+                    return
+                }
+
+                RevoltAPI.channelCache.remove(channelDeleteFrame.id)
+
+                if (currentChannel.server != null) {
+                    val existingServer = RevoltAPI.serverCache[currentChannel.server]
+
+                    if (existingServer == null) {
+                        Log.d(
+                            "RealtimeSocket",
+                            "Server ${currentChannel.server} not found in cache. Ignoring."
+                        )
+                        return
+                    }
+
+                    RevoltAPI.serverCache[currentChannel.server] = existingServer.copy(
+                        channels = existingServer.channels?.filter { it != channelDeleteFrame.id }
+                            ?: emptyList()
+                    )
+                }
+
+                RevoltAPI.wsFrameChannel.send(channelDeleteFrame)
             }
 
             "ChannelAck" -> {

@@ -14,6 +14,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import java.io.File
 
 const val MAX_ATTACHMENTS_PER_MESSAGE = 5
@@ -62,8 +63,11 @@ suspend fun uploadToAutumn(
             val error = RevoltJson.decodeFromString(AutumnError.serializer(), response.bodyAsText())
             throw Exception(error.type)
         } catch (e: Exception) {
-            if (response.status.value == 429) {
+            if (response.status == HttpStatusCode.TooManyRequests) {
                 throw Exception("Rate limited")
+            }
+            if (response.status == HttpStatusCode.PayloadTooLarge) {
+                throw Exception("File too large")
             }
             throw Exception("Unknown error")
         }

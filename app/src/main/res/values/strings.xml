@@ -544,6 +544,32 @@
     <string name="settings_changelogs_historical_version_header">Changelog for %1$s</string>
     <string name="settings_changelogs_historical_version_header_placeholder">that version</string>
 
+    <string name="channel_settings">Channel Settings</string>
+    <string name="channel_settings_header">#%1$s</string>
+    <string name="channel_settings_overview">Overview</string>
+    <string name="channel_settings_overview_update_info_error_fallback">There was an error updating the channel.</string>
+    <string name="channel_settings_overview_info">Channel Info</string>
+    <string name="channel_settings_overview_name">Channel Name</string>
+    <string name="channel_settings_overview_description">Channel Description</string>
+    <string name="channel_settings_overview_description_hint">This channel is exclusively for conversation about…</string>
+    <string name="channel_settings_overview_nsfw">Mark as NSFW</string>
+    <string name="channel_settings_overview_nsfw_description">Users are asked to confirm their age before joining NSFW channels.</string>
+    <string name="channel_settings_overview_nsfw_confirm_title">Mark this channel as NSFW?</string>
+    <string name="channel_settings_overview_nsfw_confirm_description">Users will be asked to confirm their age before joining this channel.</string>
+    <string name="channel_settings_overview_nsfw_confirm_yes">Mark as NSFW</string>
+    <string name="channel_settings_overview_nsfw_confirm_no">Keep as is</string>
+    <string name="channel_settings_overview_nsfw_undo_confirm_title">Unmark this channel as NSFW?</string>
+    <string name="channel_settings_overview_nsfw_undo_confirm_description">Users will no longer be asked to confirm their age before joining this channel. Please ensure the content is appropriate for all ages.</string>
+    <string name="channel_settings_overview_nsfw_undo_confirm_yes">Unmark as NSFW</string>
+    <string name="channel_settings_overview_nsfw_undo_confirm_no">Keep as is</string>
+    <string name="channel_settings_overview_save">Save</string>
+    <string name="channel_settings_permissions">Permissions</string>
+    <string name="channel_settings_delete">Delete Channel</string>
+    <string name="channel_settings_delete_confirm">Are you sure you want to delete this channel?</string>
+    <string name="channel_settings_delete_confirm_description">All messages and settings for this channel will be gone forever (a long time!)</string>
+    <string name="channel_settings_delete_confirm_yes">Delete</string>
+    <string name="channel_settings_delete_confirm_no">Keep</string>
+
     <string name="share_target_heading">Share to Revolt</string>
     <string name="share_target_login_first">Please log in before sharing to Revolt.</string>
     <string name="share_target_invalid_intent">This is not a valid share intent.</string>

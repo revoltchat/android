@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,16 +38,23 @@ import chat.revolt.api.internals.PermissionBit
 import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.has
 import chat.revolt.api.schemas.ChannelType
+import chat.revolt.callbacks.Action
+import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.generic.SheetClickable
 import chat.revolt.components.screens.chat.ChannelSheetHeader
+import chat.revolt.internals.extensions.rememberChannelPermissions
 import chat.revolt.screens.chat.dialogs.InviteDialog
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChannelInfoSheet(channelId: String) {
+fun ChannelInfoSheet(channelId: String, onHideSheet: suspend () -> Unit) {
     val channel = RevoltAPI.channelCache[channelId]
     var memberListSheetShown by remember { mutableStateOf(false) }
     var inviteDialogShown by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val permissions by rememberChannelPermissions(channelId)
 
     if (memberListSheetShown) {
         val memberListSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -229,6 +238,37 @@ fun ChannelInfoSheet(channelId: String) {
                 )
             }
         ) {
+        }
+
+        if (
+            (permissions has PermissionBit.ManageChannel || permissions has PermissionBit.ManageRole)
+            && (channel.channelType != ChannelType.SavedMessages && channel.channelType != ChannelType.DirectMessage)
+        ) {
+            SheetClickable(
+                icon = { modifier ->
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = null,
+                        modifier = modifier
+                    )
+                },
+                label = { style ->
+                    Text(
+                        text = stringResource(
+                            id = R.string.settings
+                        ),
+                        style = style
+                    )
+                }
+            ) {
+                scope.launch {
+                    onHideSheet()
+                }
+                scope.launch {
+                    delay(100) // wait for the sheet to close or at least start closing
+                    ActionChannel.send(Action.TopNavigate("settings/channel/${channel.id}"))
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))

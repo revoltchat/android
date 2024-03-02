@@ -36,15 +36,18 @@ import com.bumptech.glide.integration.compose.GlideImage
 @Composable
 fun InlineMediaPicker(
     currentModel: Any?,
+    modifier: Modifier = Modifier,
     mimeType: String = "image/*",
     circular: Boolean = false,
     onPick: (Uri) -> Unit,
     canRemove: Boolean = true,
-    onRemove: () -> Unit = {}
+    onRemove: () -> Unit = {},
+    enabled: Boolean = true
 ) {
     if (circular) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
         ) {
             InlineMediaPickerMediaPicker(
                 currentModel = currentModel,
@@ -60,7 +63,7 @@ fun InlineMediaPicker(
                     onClick = {
                         onRemove()
                     },
-                    enabled = currentModel != null
+                    enabled = (currentModel != null) && enabled
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -70,7 +73,7 @@ fun InlineMediaPicker(
             }
         }
     } else {
-        Column {
+        Column(modifier) {
             InlineMediaPickerMediaPicker(
                 currentModel = currentModel,
                 mimeType = mimeType,
@@ -85,7 +88,7 @@ fun InlineMediaPicker(
                     onClick = {
                         onRemove()
                     },
-                    enabled = currentModel != null,
+                    enabled = (currentModel != null) && enabled,
                     modifier = Modifier.width(480.dp)
                 ) {
                     Icon(
@@ -111,6 +114,7 @@ fun InlineMediaPickerMediaPicker(
     currentModel: Any?,
     mimeType: String = "image/*",
     circular: Boolean = false,
+    enabled: Boolean = true,
     onPick: (Uri) -> Unit
 ) {
     val documentsUiLauncher = rememberLauncherForActivityResult(
@@ -137,7 +141,7 @@ fun InlineMediaPickerMediaPicker(
                     .width(480.dp)
                     .height(140.dp)
             }.clickable {
-                documentsUiLauncher.launch(mimeType)
+                if (enabled) documentsUiLauncher.launch(mimeType)
             },
             transition = CrossFade,
         )
@@ -155,7 +159,7 @@ fun InlineMediaPickerMediaPicker(
                     .height(140.dp)
             }
                 .clickable {
-                    documentsUiLauncher.launch(mimeType)
+                    if (enabled) documentsUiLauncher.launch(mimeType)
                 }
                 .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f)),
             contentAlignment = Alignment.Center

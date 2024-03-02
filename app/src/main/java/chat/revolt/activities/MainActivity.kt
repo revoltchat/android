@@ -67,6 +67,9 @@ import chat.revolt.screens.settings.DebugSettingsScreen
 import chat.revolt.screens.settings.ProfileSettingsScreen
 import chat.revolt.screens.settings.SessionSettingsScreen
 import chat.revolt.screens.settings.SettingsScreen
+import chat.revolt.screens.settings.channel.ChannelSettingsHome
+import chat.revolt.screens.settings.channel.ChannelSettingsOverview
+import chat.revolt.screens.settings.channel.ChannelSettingsPermissions
 import chat.revolt.ui.theme.RevoltTheme
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.AndroidEntryPoint
@@ -376,6 +379,19 @@ fun AppEntrypoint(
                 composable("settings/appearance") { AppearanceSettingsScreen(navController) }
                 composable("settings/debug") { DebugSettingsScreen(navController) }
                 composable("settings/changelogs") { ChangelogsSettingsScreen(navController) }
+
+                composable("settings/channel/{channelId}") { backStackEntry ->
+                    val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
+                    ChannelSettingsHome(navController, channelId)
+                }
+                composable("settings/channel/{channelId}/overview") { backStackEntry ->
+                    val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
+                    ChannelSettingsOverview(navController, channelId)
+                }
+                composable("settings/channel/{channelId}/permissions") { backStackEntry ->
+                    val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
+                    ChannelSettingsPermissions(navController, channelId)
+                }
 
                 composable("about") { AboutScreen(navController) }
                 composable("about/oss") { AttributionScreen(navController) }

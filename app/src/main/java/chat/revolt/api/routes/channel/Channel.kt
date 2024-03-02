@@ -1,5 +1,7 @@
 package chat.revolt.api.routes.channel
 
+import android.util.Log
+import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
@@ -21,6 +23,9 @@ import io.ktor.http.contentType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.JsonElement
 
 suspend fun fetchMessagesFromChannel(
     channelId: String,
@@ -180,4 +185,73 @@ suspend fun fetchSingleMessage(channelId: String, messageId: String): Message {
         Message.serializer(),
         response
     )
+}
+
+suspend fun leaveDeleteOrCloseChannel(channelId: String, leaveSilently: Boolean = false) {
+    RevoltHttp.delete("/channels/$channelId") {
+        parameter("leave_silently", leaveSilently)
+    }
+}
+
+suspend fun patchChannel(
+    channelId: String,
+    name: String? = null,
+    description: String? = null,
+    icon: String? = null,
+    banner: String? = null,
+    remove: List<String>? = null,
+    nsfw: Boolean? = null,
+    pure: Boolean = false
+) {
+    val body = mutableMapOf<String, JsonElement>()
+
+    if (name != null) {
+        body["name"] = RevoltJson.encodeToJsonElement(String.serializer(), name)
+    }
+
+    if (description != null) {
+        body["description"] = RevoltJson.encodeToJsonElement(String.serializer(), description)
+    }
+
+    if (icon != null) {
+        body["icon"] = RevoltJson.encodeToJsonElement(String.serializer(), icon)
+    }
+
+    if (banner != null) {
+        body["banner"] = RevoltJson.encodeToJsonElement(String.serializer(), banner)
+    }
+
+    if (remove != null) {
+        body["remove"] = RevoltJson.encodeToJsonElement(ListSerializer(String.serializer()), remove)
+    }
+
+    if (nsfw != null) {
+        body["nsfw"] = RevoltJson.encodeToJsonElement(Boolean.serializer(), nsfw)
+    }
+
+    val response = RevoltHttp.patch("/channels/$channelId") {
+        contentType(ContentType.Application.Json)
+        setBody(
+            RevoltJson.encodeToString(
+                MapSerializer(
+                    String.serializer(),
+                    JsonElement.serializer()
+                ),
+                body
+            )
+        )
+    }
+        .bodyAsText()
+
+    try {
+        val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
+        throw Exception(error.type)
+    } catch (e: SerializationException) {
+        // Not an error
+    }
+
+    if (!pure) {
+        val channel = RevoltJson.decodeFromString(Channel.serializer(), response)
+        RevoltAPI.channelCache[channelId] = channel
+    }
 }

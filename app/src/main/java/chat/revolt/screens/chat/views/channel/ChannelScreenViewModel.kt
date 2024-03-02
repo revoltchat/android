@@ -21,6 +21,7 @@ import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.hasPermission
 import chat.revolt.api.realtime.RealtimeSocketFrames
+import chat.revolt.api.realtime.frames.receivable.ChannelDeleteFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStopTypingFrame
 import chat.revolt.api.realtime.frames.receivable.MessageAppendFrame
@@ -42,6 +43,8 @@ import chat.revolt.api.routes.server.fetchMember
 import chat.revolt.api.routes.user.addUserIfUnknown
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Message
+import chat.revolt.callbacks.Action
+import chat.revolt.callbacks.ActionChannel
 import chat.revolt.callbacks.UiCallback
 import chat.revolt.callbacks.UiCallbacks
 import io.ktor.http.ContentType
@@ -423,6 +426,13 @@ class ChannelScreenViewModel : ViewModel() {
                         if (!typingUsers.contains(it.user)) return@onEach
 
                         typingUsers.remove(it.user)
+                    }
+
+                    is ChannelDeleteFrame -> {
+                        // activeChannelId is used deliberately because it doesn't become null when the channel is deleted.
+                        if (it.id != activeChannelId) return@onEach
+                        // FIXME This is UI logic from the view model. Too bad!
+                        ActionChannel.send(Action.ChatNavigate("no_current_channel"))
                     }
 
                     is RealtimeSocketFrames.Reconnected -> {

@@ -12,8 +12,10 @@ data class Server(
     val description: String? = null,
     val channels: List<String>? = null,
     val categories: List<Category>? = null,
+    @SerialName("system_messages")
     val systemMessages: SystemMessages? = null,
     val roles: Map<String, Role>? = null,
+    @SerialName("default_permissions")
     val defaultPermissions: Long? = null,
     val icon: AutumnResource? = null,
     val banner: AutumnResource? = null,
