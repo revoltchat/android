@@ -28,14 +28,11 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.custom.fetchEmoji
@@ -45,6 +42,7 @@ import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.utils.detectTapGesturesConditionalConsume
 import chat.revolt.internals.resolveTimestamp
 import chat.revolt.ndk.AstNode
+import chat.revolt.ui.theme.FragmentMono
 import kotlinx.coroutines.launch
 
 
@@ -149,7 +147,7 @@ fun annotateText(node: AstNode): AnnotatedString {
                     pushStyle(
                         LocalTextStyle.current.toSpanStyle()
                             .copy(
-                                fontFamily = FontFamily(Font(R.font.jetbrainsmono_regular)),
+                                fontFamily = FragmentMono,
                                 background = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                             )
                     )
@@ -234,7 +232,7 @@ fun annotateText(node: AstNode): AnnotatedString {
                 pushStyle(
                     LocalTextStyle.current.toSpanStyle()
                         .copy(
-                            fontFamily = FontFamily(Font(R.font.jetbrainsmono_regular)),
+                            fontFamily = FragmentMono,
                             fontSynthesis = FontSynthesis.All,
                             background = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
                         )

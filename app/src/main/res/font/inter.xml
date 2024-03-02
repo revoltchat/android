@@ -36,4 +36,40 @@
         app:font="@font/inter_black"
         app:fontStyle="normal"
         app:fontWeight="900" />
+    <font
+        app:font="@font/inter_thin_italic"
+        app:fontStyle="italic"
+        app:fontWeight="100" />
+    <font
+        app:font="@font/inter_extralight_italic"
+        app:fontStyle="italic"
+        app:fontWeight="200" />
+    <font
+        app:font="@font/inter_light_italic"
+        app:fontStyle="italic"
+        app:fontWeight="300" />
+    <font
+        app:font="@font/inter_italic"
+        app:fontStyle="italic"
+        app:fontWeight="400" />
+    <font
+        app:font="@font/inter_medium_italic"
+        app:fontStyle="italic"
+        app:fontWeight="500" />
+    <font
+        app:font="@font/inter_semibold_italic"
+        app:fontStyle="italic"
+        app:fontWeight="600" />
+    <font
+        app:font="@font/inter_bold_italic"
+        app:fontStyle="italic"
+        app:fontWeight="700" />
+    <font
+        app:font="@font/inter_extrabold_italic"
+        app:fontStyle="italic"
+        app:fontWeight="800" />
+    <font
+        app:font="@font/inter_black_italic"
+        app:fontStyle="italic"
+        app:fontWeight="900" />
 </font-family>

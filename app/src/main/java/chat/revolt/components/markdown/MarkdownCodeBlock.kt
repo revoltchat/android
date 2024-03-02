@@ -9,11 +9,9 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import chat.revolt.R
 import chat.revolt.ndk.AstNode
+import chat.revolt.ui.theme.FragmentMono
 
 @Composable
 fun MarkdownCodeBlock(node: AstNode, modifier: Modifier = Modifier) {
@@ -32,7 +30,7 @@ fun MarkdownCodeBlock(node: AstNode, modifier: Modifier = Modifier) {
     ) {
         Text(
             text = node.text?.removeSuffix("\n") ?: "",
-            fontFamily = FontFamily(Font(R.font.jetbrainsmono_regular)),
+            fontFamily = FragmentMono,
         )
     }
 }

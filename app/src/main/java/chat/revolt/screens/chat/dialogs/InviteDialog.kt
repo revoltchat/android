@@ -36,15 +36,16 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.REVOLT_INVITES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.channel.createInvite
 import chat.revolt.internals.Platform
+import chat.revolt.ui.theme.FragmentMono
 
 private val inviteChars = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
@@ -144,8 +145,11 @@ fun InviteDialog(channelId: String, onDismissRequest: () -> Unit) {
                         ) { state ->
                             Text(
                                 state.char.toString(),
-                                style = MaterialTheme.typography.displayLarge,
-                                fontFamily = FontFamily(Font(R.font.jetbrainsmono_regular)),
+                                style = MaterialTheme.typography.displayLarge.copy(
+                                    fontSize = 48.sp,
+                                    fontWeight = FontWeight.Normal
+                                ),
+                                fontFamily = FragmentMono,
                                 modifier = Modifier
                                     .alpha(if (state.isActual) 1f else 0f)
                             )
