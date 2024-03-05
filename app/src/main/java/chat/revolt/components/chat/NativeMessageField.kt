@@ -158,6 +158,7 @@ fun NativeMessageField(
     forceSendButton: Boolean = false,
     canAttach: Boolean = true,
     disabled: Boolean = false,
+    failedValidation: Boolean = false,
     serverId: String? = null,
     channelId: String? = null,
     editMode: Boolean = false,
@@ -176,7 +177,8 @@ fun NativeMessageField(
     var requestFocus by remember { mutableStateOf({}) }
     var clearFocus by remember { mutableStateOf({}) }
 
-    val sendButtonVisible = (value.isNotBlank() || forceSendButton) && !disabled
+    val sendButtonVisible =
+        (value.isNotBlank() || forceSendButton) && !disabled && !failedValidation
 
     val density = LocalDensity.current
 
@@ -184,6 +186,7 @@ fun NativeMessageField(
 
     val selectionColour = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f).toArgb()
     val cursorColour = MaterialTheme.colorScheme.primary.toArgb()
+    val failedValidationColour = MaterialTheme.colorScheme.error.toArgb()
     val contentColour = LocalContentColor.current.toArgb()
     val placeholderColour = LocalContentColor.current.copy(alpha = 0.5f).toArgb()
 
@@ -524,6 +527,11 @@ fun NativeMessageField(
                     }
                     it.hint = it.context.getString(placeholderResource, channelName)
                     it.serverId = serverId
+                    if (failedValidation) {
+                        it.setTextColor(failedValidationColour)
+                    } else {
+                        it.setTextColor(contentColour)
+                    }
                 },
                 modifier = Modifier
                     .weight(1f)

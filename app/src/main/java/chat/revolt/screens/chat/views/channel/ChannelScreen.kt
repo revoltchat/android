@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -73,8 +72,6 @@ import chat.revolt.api.routes.channel.react
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.ChannelType
-import chat.revolt.callbacks.Action
-import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.NativeMessageField
 import chat.revolt.components.chat.SystemMessage
@@ -285,6 +282,12 @@ fun ChannelScreen(
                 val buffer = 6
 
                 lastVisibleItemIndex > (totalItemsNumber - buffer)
+            }
+        }
+
+        val isMessageTooLong by remember(viewModel.pendingMessageContent) {
+            derivedStateOf {
+                viewModel.pendingMessageContent.length > MAX_MESSAGE_LENGTH
             }
         }
 
@@ -530,6 +533,7 @@ fun ChannelScreen(
                         serverId = channel?.server,
                         editMode = viewModel.editingMessage != null,
                         cancelEdit = viewModel::cancelEditingMessage,
+                        failedValidation = isMessageTooLong,
                         onFocusChange = { nowFocused ->
                             if (nowFocused && viewModel.currentBottomPane != BottomPane.None) {
                                 viewModel.currentBottomPane = BottomPane.None

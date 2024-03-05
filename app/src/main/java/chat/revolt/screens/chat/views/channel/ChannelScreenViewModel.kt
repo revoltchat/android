@@ -59,6 +59,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 
+const val MAX_MESSAGE_LENGTH = 2000
+
 sealed class BottomPane {
     data object None : BottomPane()
     data object InbuiltMediaPicker : BottomPane()
