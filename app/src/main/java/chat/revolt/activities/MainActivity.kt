@@ -218,6 +218,14 @@ class MainActivity : FragmentActivity() {
         window.statusBarColor = Color.Transparent.toArgb()
     }
 
+    // Same as above for configuration changes (rotation, dark mode, etc.)
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        DynamicColors.applyToActivityIfAvailable(this)
+        DynamicColors.applyToActivitiesIfAvailable(RevoltApplication.instance)
+        window.statusBarColor = Color.Transparent.toArgb()
+    }
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

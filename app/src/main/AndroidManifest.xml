@@ -42,6 +42,7 @@
         <activity
             android:name=".activities.MainActivity"
             android:exported="true"
+            android:configChanges="orientation|screenSize|colorMode"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Revolt.Starting">
             <intent-filter>
