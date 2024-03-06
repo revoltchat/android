@@ -20,4 +20,9 @@ data class AndroidSpecificSettings(
      * Map of `primary, onPrimary, primaryContainer, onPrimaryContainer, inversePrimary, secondary, onSecondary, secondaryContainer, onSecondaryContainer, tertiary, onTertiary, tertiaryContainer, onTertiaryContainer, background, onBackground, surface, onSurface, surfaceVariant, onSurfaceVariant, surfaceTint, inverseSurface, inverseOnSurface, error, onError, errorContainer, onErrorContainer, outline, outlineVariant, scrim` to int colours.
      */
     var colourOverrides: OverridableColourScheme? = null,
+    /**
+     * Message reply style.
+     * Can be one of `{ None, SwipeFromEnd, DoubleTap }`
+     */
+    var messageReplyStyle: String? = null,
 )

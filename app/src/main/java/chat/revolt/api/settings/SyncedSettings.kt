@@ -10,7 +10,13 @@ import chat.revolt.api.schemas.OrderingSettings
 
 object SyncedSettings {
     private val _ordering = mutableStateOf(OrderingSettings())
-    private val _android = mutableStateOf(AndroidSpecificSettings("None"))
+    private val _android = mutableStateOf(
+        AndroidSpecificSettings(
+            theme = "None",
+            colourOverrides = null,
+            messageReplyStyle = "None"
+        )
+    )
 
     val ordering: OrderingSettings
         get() = _ordering.value

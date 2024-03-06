@@ -178,6 +178,25 @@ fun SettingsScreen(
                             }
                     )
 
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = stringResource(id = R.string.settings_chat)
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_message_text_24dp),
+                                contentDescription = null,
+                            )
+                        },
+                        modifier = Modifier
+                            .testTag("settings_view_chat")
+                            .clickable {
+                                navController.navigate("settings/chat")
+                            }
+                    )
+
                     ListHeader {
                         Text(stringResource(R.string.settings_category_miscellaneous))
                     }

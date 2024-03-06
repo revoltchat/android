@@ -536,6 +536,12 @@
     <string name="settings_appearance_colour_overrides_import">Import</string>
     <string name="settings_appearance_colour_overrides_import_error">This file is not a valid colour override file.</string>
 
+    <string name="settings_chat">Chat</string>
+    <string name="settings_chat_quick_reply">Quick Reply</string>
+    <string name="settings_chat_quick_reply_none">Long press to reply</string>
+    <string name="settings_chat_quick_reply_swipe_from_end">Swipe to reply</string>
+    <string name="settings_chat_quick_reply_double_tap">Double tap to reply</string>
+
     <string name="settings_feedback">Feedback</string>
     <string name="settings_feedback_description">Join the Revolt server to give feedback or suggestions and report bugs.</string>
 
