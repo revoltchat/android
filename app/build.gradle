@@ -139,7 +139,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion compose_compiler_version
     }
     packagingOptions {
         resources {
@@ -166,7 +166,7 @@ sentry {
 dependencies {
     // Android/Kotlin Core
     implementation 'androidx.core:core-ktx:1.12.0'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.9.10"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.9.22"
 
     // Kotlinx - various first-party extensions for Kotlin
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0"
@@ -237,7 +237,7 @@ dependencies {
     // Libraries used for legacy View-based UI
     implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha13"
     implementation "androidx.appcompat:appcompat:1.7.0-alpha03"
-    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'com.google.android.material:material:1.11.0'
 
     // hCaptcha - captcha provider
     implementation "com.github.hcaptcha:hcaptcha-android-sdk:3.8.1"
