@@ -243,10 +243,7 @@ class ChatRouterViewModel @Inject constructor(
     }
 }
 
-@OptIn(
-    ExperimentalComposeUiApi::class,
-    ExperimentalMaterial3Api::class
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatRouterScreen(
     topNav: NavController,

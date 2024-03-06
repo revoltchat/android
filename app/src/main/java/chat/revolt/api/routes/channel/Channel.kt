@@ -1,6 +1,5 @@
 package chat.revolt.api.routes.channel
 
-import android.util.Log
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp

@@ -27,6 +27,7 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,7 +57,7 @@ fun AudioPlayer(url: String, filename: String, contentType: String) {
 
     val showMenu = remember { mutableStateOf(false) }
 
-    val currentTime = remember { mutableStateOf(0L) }
+    val currentTime = remember { mutableLongStateOf(0L) }
     val isPlaying = remember { mutableStateOf(false) }
     val isLoading = remember { mutableStateOf(false) }
 
@@ -86,7 +87,7 @@ fun AudioPlayer(url: String, filename: String, contentType: String) {
 
     fun seekTo(position: Long) {
         player.seekTo(position)
-        currentTime.value = position
+        currentTime.longValue = position
     }
 
     fun formatTime(time: Long): String {
@@ -166,8 +167,8 @@ fun AudioPlayer(url: String, filename: String, contentType: String) {
 
     LaunchedEffect(Unit) {
         while (true) {
-            if (currentTime.value != player.currentPosition && player.isPlaying) {
-                currentTime.value = player.currentPosition
+            if (currentTime.longValue != player.currentPosition && player.isPlaying) {
+                currentTime.longValue = player.currentPosition
             }
 
             if (player.currentPosition == player.duration) {
@@ -176,7 +177,7 @@ fun AudioPlayer(url: String, filename: String, contentType: String) {
             }
 
             if (player.duration < 0) {
-                currentTime.value = 0
+                currentTime.longValue = 0
             }
 
             delay(100)
@@ -208,7 +209,7 @@ fun AudioPlayer(url: String, filename: String, contentType: String) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = formatTime(currentTime.value),
+                text = formatTime(currentTime.longValue),
                 fontWeight = FontWeight.Medium
             )
             if (player.duration >= 0) {

@@ -48,9 +48,9 @@ private fun argbAsCssColour(argb: Int): String {
 @Composable
 fun WebMarkdown(
     text: String,
+    modifier: Modifier = Modifier,
     maskLoading: Boolean = false,
     simpleLineBreaks: Boolean = true,
-    modifier: Modifier = Modifier
 ) {
     val contentColour = LocalContentColor.current
     val materialColourScheme = MaterialTheme.colorScheme
@@ -98,10 +98,10 @@ fun WebMarkdown(
                         // Capture clicks on invite links
                         if (webResourceRequest.url.host == "rvlt.gg" ||
                             (
-                                webResourceRequest.url.host?.endsWith("revolt.chat") == true && webResourceRequest.url.path?.startsWith(
-                                    "/invite"
-                                ) == true
-                                )
+                                    webResourceRequest.url.host?.endsWith("revolt.chat") == true && webResourceRequest.url.path?.startsWith(
+                                        "/invite"
+                                    ) == true
+                                    )
                         ) {
                             val intent = Intent(
                                 context,

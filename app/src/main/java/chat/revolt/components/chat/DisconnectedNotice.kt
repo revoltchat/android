@@ -18,7 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,19 +83,19 @@ private fun DisconnectedNoticeBase(
 
 @Composable
 fun DisconnectedNotice(state: DisconnectionState, onReconnect: () -> Unit) {
-    val retries = remember { mutableStateOf(0) }
+    val retries = remember { mutableIntStateOf(0) }
 
     LaunchedEffect(state) {
         when (state) {
             DisconnectionState.Disconnected -> {
-                if (retries.value < 3) {
+                if (retries.intValue < 3) {
                     onReconnect()
-                    retries.value++
+                    retries.intValue++
                 }
             }
 
             DisconnectionState.Connected -> {
-                retries.value = 0
+                retries.intValue = 0
             }
 
             else -> Unit

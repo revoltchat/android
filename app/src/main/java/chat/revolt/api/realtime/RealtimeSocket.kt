@@ -51,7 +51,7 @@ enum class DisconnectionState {
 }
 
 sealed class RealtimeSocketFrames {
-    data class Reconnected(val unit: Unit = Unit) : RealtimeSocketFrames()
+    data object Reconnected : RealtimeSocketFrames()
 }
 
 object RealtimeSocket {
@@ -598,6 +598,6 @@ object RealtimeSocket {
     }
 
     private suspend fun pushReconnectEvent() {
-        RevoltAPI.wsFrameChannel.send(RealtimeSocketFrames.Reconnected())
+        RevoltAPI.wsFrameChannel.send(RealtimeSocketFrames.Reconnected)
     }
 }

@@ -3,8 +3,6 @@
 #include <string>
 #include <cmark.h>
 
-#define TAG "Stendal"
-
 #define STENDAL_ASTNODE_CONSTRUCTOR_SIGNATURE "(ILjava/lang/String;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V"
 
 namespace Stendal {
@@ -25,10 +23,6 @@ namespace Stendal {
     inline bool string_ends_with(std::string const &value, std::string const &suffix) {
         if (suffix.size() > value.size()) return false;
         return std::equal(suffix.rbegin(), suffix.rend(), value.rbegin());
-    }
-
-    inline bool paragraph_is_math(std::string const &value) {
-        return string_starts_with(value, "$") && string_ends_with(value, "$");
     }
 
     void init(JNIEnv *env) {
@@ -146,12 +140,12 @@ namespace Stendal {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_chat_revolt_ndk_Stendal_init(JNIEnv *env, jobject thiz) {
+Java_chat_revolt_ndk_Stendal_init(JNIEnv *env, [[maybe_unused]] jobject thiz) {
     Stendal::init(env);
 }
 
 extern "C" JNIEXPORT jobject JNICALL
-Java_chat_revolt_ndk_Stendal_render(JNIEnv *env, jobject thiz, jstring input) {
+Java_chat_revolt_ndk_Stendal_render(JNIEnv *env, [[maybe_unused]] jobject thiz, jstring input) {
     const char *inputStr = env->GetStringUTFChars(input, nullptr);
     cmark_node *doc = cmark_parse_document(inputStr, strlen(inputStr),
                                            CMARK_OPT_DEFAULT | CMARK_OPT_HARDBREAKS |

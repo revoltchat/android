@@ -50,7 +50,6 @@ import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.provider.getAttachmentContentUri
 import chat.revolt.ui.theme.RevoltTheme
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import io.ktor.client.request.get
 import io.ktor.client.statement.readBytes
 import kotlinx.coroutines.launch
@@ -84,7 +83,7 @@ class ImageViewActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
     val resourceUrl = "$REVOLT_FILES/attachments/${resource.id}/${resource.filename}"
