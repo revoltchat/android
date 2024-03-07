@@ -575,7 +575,18 @@ fun ChannelScreen(
                                 contentValues
                             )
 
-                            pickCameraLauncher.launch(capturedPhotoUri.value)
+                            try {
+                                pickCameraLauncher.launch(capturedPhotoUri.value)
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(
+                                        R.string.file_picker_chip_camera_none_installed
+                                    ),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            
                             viewModel.currentBottomPane = BottomPane.None
                         },
                         onClose = {

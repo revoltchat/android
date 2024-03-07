@@ -447,6 +447,7 @@
     <string name="file_picker_permission_unpartialise_request_cta">Allow full access</string>
     <string name="file_picker_chip_documents">Attach a file</string>
     <string name="file_picker_chip_camera">Take a photo</string>
+    <string name="file_picker_chip_camera_none_installed">No camera app installed</string>
 
     <string name="inline_media_picker_current_description">Currently selected media</string>
     <string name="inline_media_picker_no_media_placeholder">Pick media…</string>
