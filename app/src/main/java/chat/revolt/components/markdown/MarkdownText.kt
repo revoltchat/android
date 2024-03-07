@@ -1,5 +1,6 @@
 package chat.revolt.components.markdown
 
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.height
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.custom.fetchEmoji
@@ -292,7 +294,16 @@ fun MarkdownText(textNode: AstNode, modifier: Modifier = Modifier) {
                             .build()
                     )
                     .build()
-                customTab.launchUrl(context, url.toUri())
+
+                try {
+                    customTab.launchUrl(context, url.toUri())
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.link_type_no_intent),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
 
                 return@handler true
             }
