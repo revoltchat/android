@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -63,7 +64,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import java.net.URI
 
-class AboutViewModel() : ViewModel() {
+class AboutViewModel : ViewModel() {
     var root by mutableStateOf<Root?>(null)
     var selectedTabIndex by mutableIntStateOf(0)
 
@@ -169,7 +170,7 @@ fun AboutScreen(navController: NavController, viewModel: AboutViewModel = viewMo
                         navController.popBackStack()
                     }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(id = R.string.back)
                         )
                     }

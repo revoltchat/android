@@ -24,12 +24,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -288,7 +287,7 @@ fun AppearanceSettingsScreen(
                         navController.popBackStack()
                     }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(id = R.string.back)
                         )
                     }
@@ -401,15 +400,13 @@ fun AppearanceSettingsScreen(
                         .padding(vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowRight,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(start = 20.dp, end = 4.dp)
-                                .rotate(colourOverridesOpenerArrowRotation)
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 20.dp, end = 4.dp)
+                            .rotate(colourOverridesOpenerArrowRotation)
+                    )
 
                     Text(
                         text = stringResource(id = R.string.settings_appearance_colour_overrides),
@@ -417,16 +414,6 @@ fun AppearanceSettingsScreen(
                         modifier = Modifier
                             .weight(1f)
                     )
-
-                    if (LocalLayoutDirection.current == LayoutDirection.Rtl) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowLeft,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(start = 4.dp, end = 20.dp)
-                                .rotate(colourOverridesOpenerArrowRotation)
-                        )
-                    }
                 }
 
                 AnimatedVisibility(viewModel.showColourOverrides) {

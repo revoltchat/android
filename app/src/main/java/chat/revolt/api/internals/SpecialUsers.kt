@@ -10,9 +10,9 @@ import org.intellij.lang.annotations.Language
 import androidx.compose.ui.graphics.Brush as AndroidBrush
 
 object SpecialUsers {
-    val JENNIFER = "01F1WKM5TK2V6KCZWR6DGBJDTZ"
+    const val JENNIFER = "01F1WKM5TK2V6KCZWR6DGBJDTZ"
 
-    val PLATFORM_MODERATION_USER = "01FC17E1WTM2BGE4F3ARN3FDAF"
+    const val PLATFORM_MODERATION_USER = "01FC17E1WTM2BGE4F3ARN3FDAF"
 
     val TRUSTED_MODERATION_BOTS = listOf(
         "01GXBYCNQ52A9QYCQ99RBPXPAW", // AutoMod

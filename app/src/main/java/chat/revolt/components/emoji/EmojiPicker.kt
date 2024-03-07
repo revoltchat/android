@@ -31,10 +31,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
@@ -338,11 +337,7 @@ fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
                         textAlign = TextAlign.Center
                     )
                     Icon(
-                        imageVector = if (LocalLayoutDirection.current == LayoutDirection.Rtl) {
-                            Icons.Default.KeyboardArrowLeft
-                        } else {
-                            Icons.Default.KeyboardArrowRight
-                        },
+                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
                         contentDescription = stringResource(
                             R.string.emoji_picker_close_skin_tone_menu
                         ),
@@ -542,7 +537,7 @@ fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
                         GridItemSpan(spanCount)
                     }
                 ) {
-                    Divider()
+                    HorizontalDivider()
                 }
             }
 

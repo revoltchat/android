@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -259,7 +259,7 @@ fun ProfileSettingsScreen(
                         navController.popBackStack()
                     }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(id = R.string.back)
                         )
                     }
@@ -270,7 +270,8 @@ fun ProfileSettingsScreen(
         Box(
             Modifier
                 .padding(pv)
-                .imePadding()) {
+                .imePadding()
+        ) {
             val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
@@ -310,7 +311,7 @@ fun ProfileSettingsScreen(
 
                     AnimatedVisibility(visible = viewModel.uploadProgress > 0f) {
                         LinearProgressIndicator(
-                            progress = viewModel.uploadProgress,
+                            progress = { viewModel.uploadProgress },
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 0.dp)

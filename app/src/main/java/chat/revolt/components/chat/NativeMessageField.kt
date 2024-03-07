@@ -34,10 +34,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -579,7 +579,7 @@ fun NativeMessageField(
                 Icon(
                     when {
                         editMode -> Icons.Default.Edit
-                        else -> Icons.Default.Send
+                        else -> Icons.AutoMirrored.Default.Send
                     },
                     tint = MaterialTheme.colorScheme.primary,
                     contentDescription = stringResource(id = R.string.send_alt),

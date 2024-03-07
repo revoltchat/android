@@ -84,7 +84,7 @@ fun AttachmentManager(
 
         AnimatedVisibility(visible = uploading) {
             LinearProgressIndicator(
-                progress = animatedProgress,
+                progress = { animatedProgress },
                 modifier = Modifier
                     .fillMaxWidth()
             )
