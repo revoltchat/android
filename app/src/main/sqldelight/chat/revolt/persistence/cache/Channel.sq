@@ -1,0 +1,50 @@
+CREATE TABLE Channel (
+    id TEXT PRIMARY KEY NOT NULL,
+    channelType TEXT NOT NULL,
+    userId TEXT,
+    name TEXT,
+    owner TEXT,
+    description TEXT,
+    dmPartner TEXT,
+    iconId TEXT,
+    lastMessageId TEXT,
+    active INTEGER,
+    nsfw INTEGER,
+    server TEXT,
+    FOREIGN KEY (server) REFERENCES Server(id)
+);
+
+CREATE INDEX idx_channel_server
+ON Channel (server);
+
+CREATE INDEX idx_channel_dmPartner
+ON Channel (dmPartner);
+
+selectAll:
+SELECT *
+FROM Channel;
+
+upsert:
+INSERT OR REPLACE
+INTO Channel (id, channelType, userId, name, owner, description, dmPartner, iconId, lastMessageId, active, nsfw, server)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+clear:
+DELETE
+FROM Channel;
+
+delete:
+DELETE
+FROM Channel
+WHERE id = ?;
+
+findDmByPartner:
+SELECT *
+FROM Channel
+WHERE channelType = 'DirectMessage'
+AND dmPartner = ?;
+
+findByServer:
+SELECT *
+FROM Channel
+WHERE server = ?;

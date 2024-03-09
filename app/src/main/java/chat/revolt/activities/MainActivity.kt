@@ -244,6 +244,8 @@ class MainActivity : FragmentActivity() {
             }
         }
 
+        RevoltAPI.hydrateFromPersistentCache()
+
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
             AppEntrypoint(

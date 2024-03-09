@@ -32,8 +32,11 @@ import chat.revolt.api.realtime.frames.sendable.AuthorizationFrame
 import chat.revolt.api.realtime.frames.sendable.PingFrame
 import chat.revolt.api.routes.server.fetchMember
 import chat.revolt.api.schemas.Channel
+import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
+import chat.revolt.persistence.Database
+import chat.revolt.persistence.SqlStorage
 import io.ktor.client.plugins.websocket.ws
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
@@ -55,6 +58,7 @@ sealed class RealtimeSocketFrames {
 }
 
 object RealtimeSocket {
+    val database = Database(SqlStorage.driver)
     var socket: WebSocketSession? = null
 
     private var _disconnectionState = mutableStateOf(DisconnectionState.Reconnecting)
@@ -148,13 +152,54 @@ object RealtimeSocket {
                 val serverMap = readyFrame.servers.associateBy { it.id!! }
                 RevoltAPI.serverCache.putAll(serverMap)
 
+                // Cache servers in persistent local database
+                readyFrame.servers.map {
+                    if (it.id == null || it.owner == null || it.name == null) {
+                        return@map
+                    }
+
+                    database.serverQueries.upsert(
+                        it.id,
+                        it.owner,
+                        it.name,
+                        it.description,
+                        it.icon?.id,
+                        it.banner?.id,
+                        it.flags
+                    )
+                }
+
                 Log.d("RealtimeSocket", "Adding channels to cache.")
                 val channelMap = readyFrame.channels.associateBy { it.id!! }
                 RevoltAPI.channelCache.putAll(channelMap)
 
+                // Cache channels in persistent local database
+                readyFrame.channels.map {
+                    if (it.id == null || it.name == null) {
+                        return@map
+                    }
+
+                    database.channelQueries.upsert(
+                        it.id,
+                        it.channelType?.value ?: ChannelType.TextChannel.value,
+                        it.user,
+                        it.name,
+                        it.owner,
+                        it.description,
+                        if (it.channelType == ChannelType.DirectMessage) it.recipients?.firstOrNull { u -> u != RevoltAPI.selfId } else null,
+                        it.icon?.id,
+                        it.lastMessageID,
+                        if (it.active == true) 1L else 0L,
+                        if (it.nsfw == true) 1L else 0L,
+                        it.server
+                    )
+                }
+
                 Log.d("RealtimeSocket", "Adding emojis to cache.")
                 val emojiMap = readyFrame.emojis.associateBy { it.id!! }
                 RevoltAPI.emojiCache.putAll(emojiMap)
+
+                RevoltAPI.closeHydration()
             }
 
             "Message" -> {
@@ -388,8 +433,23 @@ object RealtimeSocket {
                 val existing = RevoltAPI.channelCache[channelUpdateFrame.id]
                     ?: return // if we don't have the channel no point in updating it
 
-                RevoltAPI.channelCache[channelUpdateFrame.id] =
-                    existing.mergeWithPartial(channelUpdateFrame.data)
+                val combined = existing.mergeWithPartial(channelUpdateFrame.data)
+                RevoltAPI.channelCache[channelUpdateFrame.id] = combined
+
+                database.channelQueries.upsert(
+                    channelUpdateFrame.id,
+                    combined.channelType?.value ?: ChannelType.TextChannel.value,
+                    combined.user,
+                    combined.name,
+                    combined.owner,
+                    combined.description,
+                    if (combined.channelType == ChannelType.DirectMessage) combined.recipients?.firstOrNull { u -> u != RevoltAPI.selfId } else null,
+                    combined.icon?.id,
+                    combined.lastMessageID,
+                    if (combined.active == true) 1L else 0L,
+                    if (combined.nsfw == true) 1L else 0L,
+                    combined.server
+                )
             }
 
             "ChannelCreate" -> {
@@ -402,6 +462,20 @@ object RealtimeSocket {
                 )
 
                 RevoltAPI.channelCache[channelCreateFrame.id!!] = channelCreateFrame
+                database.channelQueries.upsert(
+                    channelCreateFrame.id,
+                    channelCreateFrame.channelType?.value ?: ChannelType.TextChannel.value,
+                    channelCreateFrame.user,
+                    channelCreateFrame.name,
+                    channelCreateFrame.owner,
+                    channelCreateFrame.description,
+                    if (channelCreateFrame.channelType == ChannelType.DirectMessage) channelCreateFrame.recipients?.firstOrNull { u -> u != RevoltAPI.selfId } else null,
+                    channelCreateFrame.icon?.id,
+                    channelCreateFrame.lastMessageID,
+                    if (channelCreateFrame.active == true) 1L else 0L,
+                    if (channelCreateFrame.nsfw == true) 1L else 0L,
+                    channelCreateFrame.server
+                )
             }
 
             "ChannelDelete" -> {
@@ -422,6 +496,7 @@ object RealtimeSocket {
                 }
 
                 RevoltAPI.channelCache.remove(channelDeleteFrame.id)
+                database.channelQueries.delete(channelDeleteFrame.id)
 
                 if (currentChannel.server != null) {
                     val existingServer = RevoltAPI.serverCache[currentChannel.server]
@@ -467,6 +542,18 @@ object RealtimeSocket {
                 serverCreateFrame.channels.forEach { channel ->
                     if (channel.id == null) return@forEach
                     RevoltAPI.channelCache[channel.id] = channel
+                }
+
+                if (serverCreateFrame.server.owner != null && serverCreateFrame.server.name != null) {
+                    database.serverQueries.upsert(
+                        serverCreateFrame.id,
+                        serverCreateFrame.server.owner,
+                        serverCreateFrame.server.name,
+                        serverCreateFrame.server.description,
+                        serverCreateFrame.server.icon?.id,
+                        serverCreateFrame.server.banner?.id,
+                        serverCreateFrame.server.flags
+                    )
                 }
             }
 
@@ -516,6 +603,22 @@ object RealtimeSocket {
                 }
 
                 RevoltAPI.serverCache[serverUpdateFrame.id] = updated
+
+                if (updated.id != null && updated.owner != null && updated.name != null) {
+                    try {
+                        database.serverQueries.upsert(
+                            updated.id!!,
+                            updated.owner!!,
+                            updated.name!!,
+                            updated.description,
+                            updated.icon?.id,
+                            updated.banner?.id,
+                            updated.flags
+                        )
+                    } catch (e: Exception) {
+                        Log.e("RealtimeSocket", "Failed to update server in local database.")
+                    }
+                }
             }
 
             "ServerDelete" -> {
@@ -527,6 +630,7 @@ object RealtimeSocket {
                 )
 
                 RevoltAPI.serverCache.remove(serverDeleteFrame.id)
+                database.serverQueries.delete(serverDeleteFrame.id)
             }
 
             "ServerMemberUpdate" -> {

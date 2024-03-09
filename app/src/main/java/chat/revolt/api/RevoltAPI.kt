@@ -9,11 +9,15 @@ import chat.revolt.api.internals.Members
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.user.fetchSelf
+import chat.revolt.api.schemas.AutumnResource
+import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.Server
 import chat.revolt.api.schemas.User
 import chat.revolt.api.unreads.Unreads
+import chat.revolt.persistence.Database
+import chat.revolt.persistence.SqlStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.DefaultRequest
@@ -25,6 +29,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
+import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -138,6 +143,8 @@ object RevoltAPI {
 
     private var socketCoroutine: Job? = null
 
+    private var openForLocalHydration = true
+
     fun setSessionHeader(token: String) {
         sessionToken = token
     }
@@ -231,6 +238,8 @@ object RevoltAPI {
 
         socketCoroutine?.cancel()
         mainHandler.removeCallbacksAndMessages(null)
+
+        clearPersistentCache()
     }
 
     /**
@@ -244,6 +253,87 @@ object RevoltAPI {
         } catch (e: Exception) {
             false
         }
+    }
+
+    /**
+     * Hydrate caches from a local database.
+     */
+    fun hydrateFromPersistentCache() {
+        if (!openForLocalHydration) {
+            Log.w("RevoltAPI", "Hydration is closed, but was called")
+            // Stale data is worst case, let's track it even in prod
+            Sentry.captureMessage("Local hydration called twice or after real data was fetched")
+            return
+        }
+
+        val db = Database(SqlStorage.driver)
+
+        val channels = db.channelQueries.selectAll().executeAsList().map {
+            ChannelSchema(
+                id = it.id,
+                channelType = try {
+                    ChannelType.valueOf(it.channelType)
+                } catch (e: Exception) {
+                    null
+                },
+                user = it.userId,
+                name = it.name,
+                owner = it.owner,
+                description = it.description,
+                recipients = selfId?.let { selfId ->
+                    it.userId?.let { u -> listOf(u, selfId) }
+                } ?: it.userId?.let { u -> listOf(u) },
+                icon = AutumnResource(
+                    id = it.iconId,
+                ),
+                server = it.server,
+                lastMessageID = it.lastMessageId,
+                active = it.active == 1L,
+                nsfw = it.nsfw == 1L
+            )
+        }
+        channelCache.clear()
+        channelCache.putAll(channels.associateBy { it.id!! })
+
+        val servers = db.serverQueries.selectAll().executeAsList().map {
+            Server(
+                id = it.id,
+                owner = it.owner,
+                name = it.name,
+                description = it.description,
+                icon = AutumnResource(
+                    id = it.iconId,
+                ),
+                banner = AutumnResource(
+                    id = it.bannerId,
+                ),
+                flags = it.flags,
+                channels = channels
+                    .filter { c -> c.server == it.id }
+                    .filterNot { c -> c.id == null }
+                    .map { c -> c.id!! },
+            )
+        }
+        serverCache.clear()
+        serverCache.putAll(servers.associateBy { it.id!! })
+
+        openForLocalHydration = false
+    }
+
+    /**
+     * Clear the local caching database.
+     */
+    private fun clearPersistentCache() {
+        val db = Database(SqlStorage.driver)
+        db.serverQueries.clear()
+        db.channelQueries.clear()
+    }
+
+    /**
+     * Marks database as hydrated (after real data was fetched, for example).
+     */
+    fun closeHydration() {
+        openForLocalHydration = false
     }
 }
 

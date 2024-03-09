@@ -7,6 +7,7 @@ plugins {
     id 'com.google.devtools.ksp'
     id 'org.jmailen.kotlinter'
     id "io.sentry.android.gradle" version "3.4.2"
+    id "app.cash.sqldelight" version "2.0.1"
 
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
@@ -213,7 +214,7 @@ dependencies {
 
     // Glide - Image Loading
     implementation "com.github.bumptech.glide:glide:$glide_version"
-    implementation "com.github.bumptech.glide:compose:1.0.0-beta1-SNAPSHOT"
+    implementation "com.github.bumptech.glide:compose:1.0.0-beta01"
     ksp "com.github.bumptech.glide:ksp:$glide_version"
 
     // AboutLibraries - automated OSS library attribution
@@ -230,8 +231,6 @@ dependencies {
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation "androidx.browser:browser:1.7.0"
     implementation "androidx.webkit:webkit:1.9.0"
-    implementation "androidx.datastore:datastore-preferences:1.1.0-alpha07"
-    implementation "androidx.datastore:datastore:1.1.0-alpha07"
     implementation "androidx.core:core-splashscreen:1.0.1"
 
     // Libraries used for legacy View-based UI
@@ -255,4 +254,17 @@ dependencies {
     implementation "com.github.skydoves:colorpicker-compose:1.0.5"
     implementation "me.saket.telephoto:zoomable-image:1.0.0-alpha02"
     implementation "me.saket.telephoto:zoomable-image-glide:1.0.0-alpha02"
+
+    // Persistence
+    implementation "app.cash.sqldelight:android-driver:2.0.1"
+    implementation "androidx.datastore:datastore:1.1.0-beta02"
+    implementation "androidx.datastore:datastore-preferences:1.1.0-beta02"
+}
+
+sqldelight {
+    databases {
+        Database {
+            packageName = "chat.revolt.persistence"
+        }
+    }
 }

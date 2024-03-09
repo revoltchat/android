@@ -4,3 +4,5 @@
 /kotlinc.xml
 /appInsightsSettings.xml
 /other.xml
+# GitHub Copilot persisted chat sessions
+/copilot/chatSessions

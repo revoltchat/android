@@ -158,9 +158,9 @@ fun GroupIcon(
             .size(size),
         contentAlignment = Alignment.BottomEnd
     ) {
-        if (icon != null) {
+        if (icon?.id != null) {
             RemoteImage(
-                url = rawUrl ?: "$REVOLT_FILES/icons/${icon.id!!}/group.png",
+                url = rawUrl ?: "$REVOLT_FILES/icons/${icon.id}/group.png",
                 contentScale = ContentScale.Crop,
                 description = stringResource(id = R.string.avatar_alt, name),
                 modifier = Modifier

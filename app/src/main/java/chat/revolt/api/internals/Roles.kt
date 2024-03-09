@@ -14,7 +14,8 @@ object Roles {
     // lowest rank = highest role
     private fun highestRoleWithPredicate(roles: List<Role?>, predicate: (Role) -> Boolean): Role? {
         return roles.filter { role ->
-            predicate(role!!)
+            if (role == null) return@filter false
+            predicate(role)
         }.minByOrNull { role ->
             role?.rank ?: 0.0
         }
@@ -80,7 +81,7 @@ object Roles {
 
             ChannelType.TextChannel, ChannelType.VoiceChannel -> {
                 val server = RevoltAPI.serverCache[channel.server]
-                    // FIXME this is a stupid patch to prevent it from showing "no permission" on a channel on launch
+                // FIXME this is a stupid patch to prevent it from showing "no permission" on a channel on launch
                     ?: return PermissionBit.GrantAllSafe.value
 
                 if (server.owner == user?.id) return PermissionBit.GrantAllSafe.value

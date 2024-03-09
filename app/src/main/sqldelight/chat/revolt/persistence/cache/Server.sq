@@ -1,0 +1,30 @@
+CREATE TABLE Server (
+    id TEXT PRIMARY KEY NOT NULL,
+    owner TEXT NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    iconId TEXT,
+    bannerId TEXT,
+    flags INTEGER
+);
+
+CREATE INDEX idx_server_name
+ON Server (name);
+
+selectAll:
+SELECT *
+FROM Server;
+
+upsert:
+INSERT OR REPLACE
+INTO Server (id, owner, name, description, iconId, bannerId, flags)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+clear:
+DELETE
+FROM Server;
+
+delete:
+DELETE
+FROM Server
+WHERE id = ?;
