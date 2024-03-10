@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
@@ -93,11 +94,17 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
                                         description = null,
                                         modifier = Modifier.size(16.dp)
                                     )
-                                    Spacer(Modifier.size(4.dp))
-                                    Text("${reactions[emoji]?.size ?: 0}")
+                                    Spacer(Modifier.size(6.dp))
+                                    Text(
+                                        "${reactions[emoji]?.size ?: 0}",
+                                        style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum")
+                                    )
                                 }
                             } else {
-                                Text("$emoji ${reactions[emoji]?.size ?: 0}")
+                                Text(
+                                    "$emoji ${reactions[emoji]?.size ?: 0}",
+                                    style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum")
+                                )
                             }
                         },
                         selected = selectedReactionIndex == index,
