@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +47,9 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.channel.createInvite
 import chat.revolt.internals.Platform
 import chat.revolt.ui.theme.FragmentMono
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private val inviteChars = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
@@ -83,15 +87,35 @@ fun InviteDialog(channelId: String, onDismissRequest: () -> Unit) {
 
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var swapInviteJob by remember { mutableStateOf<Job?>(null) }
 
     LaunchedEffect(Unit) {
         try {
             val invite = createInvite(channelId)
+            swapInviteJob?.cancel()
             isActual = true
             inviteCode = invite.id
         } catch (e: Error) {
             isActual = true
             inviteCode = "error"
+        }
+    }
+
+    fun swapInviteCode() {
+        if (isActual) return
+        inviteCode = placeholderInviteCode()
+    }
+
+    // Every second, swap the invite code to a new one. When we have a real invite, stop swapping.
+    LaunchedEffect(inviteCode) {
+        if (isActual || swapInviteJob != null) return@LaunchedEffect
+        swapInviteJob = scope.launch {
+            while (!isActual) {
+                swapInviteCode()
+                delay(500)
+            }
         }
     }
 
@@ -151,7 +175,7 @@ fun InviteDialog(channelId: String, onDismissRequest: () -> Unit) {
                                 ),
                                 fontFamily = FragmentMono,
                                 modifier = Modifier
-                                    .alpha(if (state.isActual) 1f else 0f)
+                                    .alpha(if (state.isActual) 1f else 0.4f)
                             )
                         }
                     }
