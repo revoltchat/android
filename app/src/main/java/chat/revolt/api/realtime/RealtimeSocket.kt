@@ -29,6 +29,8 @@ import chat.revolt.api.realtime.frames.receivable.ServerUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.UserRelationshipFrame
 import chat.revolt.api.realtime.frames.receivable.UserUpdateFrame
 import chat.revolt.api.realtime.frames.sendable.AuthorizationFrame
+import chat.revolt.api.realtime.frames.sendable.BeginTypingFrame
+import chat.revolt.api.realtime.frames.sendable.EndTypingFrame
 import chat.revolt.api.realtime.frames.sendable.PingFrame
 import chat.revolt.api.routes.server.fetchMember
 import chat.revolt.api.schemas.Channel
@@ -703,5 +705,29 @@ object RealtimeSocket {
 
     private suspend fun pushReconnectEvent() {
         RevoltAPI.wsFrameChannel.send(RealtimeSocketFrames.Reconnected)
+    }
+
+    suspend fun beginTyping(channelId: String) {
+        if (disconnectionState != DisconnectionState.Connected) return
+
+        val beginTypingFrame = BeginTypingFrame("BeginTyping", channelId)
+        socket?.send(
+            RevoltJson.encodeToString(
+                BeginTypingFrame.serializer(),
+                beginTypingFrame
+            )
+        )
+    }
+
+    suspend fun endTyping(channelId: String) {
+        if (disconnectionState != DisconnectionState.Connected) return
+
+        val endTypingFrame = EndTypingFrame("EndTyping", channelId)
+        socket?.send(
+            RevoltJson.encodeToString(
+                EndTypingFrame.serializer(),
+                endTypingFrame
+            )
+        )
     }
 }

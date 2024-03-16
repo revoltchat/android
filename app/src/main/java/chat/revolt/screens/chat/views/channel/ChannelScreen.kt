@@ -487,10 +487,7 @@ fun ChannelScreen(
                 } else {
                     NativeMessageField(
                         value = viewModel.pendingMessageContent,
-                        onValueChange = {
-                            viewModel.pendingMessageContent = it
-                            // viewModel.textSelection = it.selection
-                        },
+                        onValueChange = viewModel::updatePendingMessageContent,
                         onSendMessage = viewModel::sendPendingMessage,
                         onAddAttachment = {
                             val isTiramisu = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
@@ -586,7 +583,7 @@ fun ChannelScreen(
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
-                            
+
                             viewModel.currentBottomPane = BottomPane.None
                         },
                         onClose = {

@@ -20,6 +20,7 @@ import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.hasPermission
+import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.realtime.RealtimeSocketFrames
 import chat.revolt.api.realtime.frames.receivable.ChannelDeleteFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelStartTypingFrame
@@ -57,6 +58,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 
 const val MAX_MESSAGE_LENGTH = 2000
@@ -106,6 +108,57 @@ class ChannelScreenViewModel : ViewModel() {
     private fun addReply(reply: SendMessageReply) {
         if (pendingReplies.any { it.id == reply.id }) return
         pendingReplies.add(reply)
+    }
+
+    private var lastSentBeginTyping: Instant? = null
+
+    private fun startTyping() {
+        if (editingMessage != null) return
+        if (lastSentBeginTyping != null) {
+            val diff = Clock.System.now() - lastSentBeginTyping!!
+            if (diff.inWholeSeconds < 1) return
+        }
+
+        viewModelScope.launch {
+            withContext(RevoltAPI.realtimeContext) {
+                activeChannelId?.let {
+                    RealtimeSocket.beginTyping(it)
+                }
+            }
+        }
+
+        lastSentBeginTyping = Clock.System.now()
+    }
+
+    private var stopTypingJob: Job? = null
+
+    private fun queueStopTyping() {
+        stopTypingJob = viewModelScope.launch {
+            delay(5000)
+            stopTyping()
+        }
+    }
+
+    private fun stopTyping() {
+        if (editingMessage != null) return
+        viewModelScope.launch {
+            withContext(RevoltAPI.realtimeContext) {
+                activeChannelId?.let {
+                    RealtimeSocket.endTyping(it)
+                }
+            }
+        }
+    }
+
+    fun updatePendingMessageContent(newContent: String) {
+        pendingMessageContent = newContent
+        if (newContent.isNotBlank()) {
+            startTyping()
+            stopTypingJob?.cancel()
+            queueStopTyping()
+        } else {
+            stopTyping()
+        }
     }
 
     fun toggleReplyMentionFor(reply: SendMessageReply) {
@@ -229,7 +282,7 @@ class ChannelScreenViewModel : ViewModel() {
                 replies = pendingReplies
             )
 
-            pendingMessageContent = ""
+            updatePendingMessageContent("")
             hasNoMoreMessages = false
             isSendingMessage = false
             pendingUploadProgress = 0f
@@ -248,7 +301,7 @@ class ChannelScreenViewModel : ViewModel() {
                 newContent = pendingMessageContent.trimIndent()
             )
 
-            pendingMessageContent = ""
+            updatePendingMessageContent("")
             isSendingMessage = false
         }
 
@@ -466,7 +519,7 @@ class ChannelScreenViewModel : ViewModel() {
                         val message = renderableMessages.find { msg ->
                             msg.id == it.messageId
                         } ?: return@onEach
-                        pendingMessageContent = message.content ?: ""
+                        updatePendingMessageContent(message.content ?: "")
                         textSelection =
                             (message.content?.length ?: 0) to (message.content?.length ?: 0)
                     }
@@ -512,7 +565,7 @@ class ChannelScreenViewModel : ViewModel() {
 
     fun cancelEditingMessage() {
         editingMessage = null
-        pendingMessageContent = ""
+        updatePendingMessageContent("")
     }
 
     fun putAtCursorPosition(content: String) {
@@ -521,7 +574,7 @@ class ChannelScreenViewModel : ViewModel() {
 
         // if out of bounds, just append
         if (currentSelection.first > currentContent.length) {
-            pendingMessageContent = currentContent + content
+            updatePendingMessageContent(currentContent + content)
             textSelection =
                 currentSelection.first + content.length to currentSelection.first + content.length
             return
@@ -531,7 +584,7 @@ class ChannelScreenViewModel : ViewModel() {
                 content +
                 currentContent.substring(currentSelection.second)
 
-        pendingMessageContent = newContent
+        updatePendingMessageContent(newContent)
         textSelection =
             currentSelection.first + content.length to currentSelection.first + content.length
     }
