@@ -63,6 +63,8 @@ import chat.revolt.api.routes.channel.unreact
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.User
+import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.MessageReplyStyle
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.generic.UserAvatar
@@ -222,7 +224,7 @@ fun Message(
                     .combinedClickable(
                         onClick = {},
                         onDoubleClick = {
-                            if (canReply) {
+                            if (canReply && GlobalState.messageReplyStyle == MessageReplyStyle.DoubleTap) {
                                 onReply()
                             }
                         },
