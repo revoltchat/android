@@ -313,7 +313,8 @@
     <string name="user_info_sheet_category_joined">Joined</string>
     <string name="user_info_sheet_category_joined_revolt" translatable="false">Revolt</string>
     <string name="user_info_sheet_category_badges">Badges</string>
-    <string name="user_info_sheet_category_bot">Bot</string>
+    <string name="user_info_sheet_category_owner">Owner</string>
+    <string name="user_info_sheet_owner_not_found">Could not fetch owner information</string>
     <string name="user_info_sheet_add_friend">Add Friend</string>
     <string name="user_info_sheet_send_message">Send Message</string>
     <string name="user_info_sheet_remove_friend">Remove Friend</string>
