@@ -471,6 +471,7 @@ class ChannelScreenViewModel : ViewModel() {
                     is ChannelStartTypingFrame -> {
                         if (it.id != activeChannel?.id) return@onEach
                         if (typingUsers.contains(it.user)) return@onEach
+                        if (it.user == RevoltAPI.selfId) return@onEach
 
                         addUserIfUnknown(it.user)
                         typingUsers.add(it.user)
