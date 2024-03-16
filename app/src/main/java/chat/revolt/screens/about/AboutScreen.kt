@@ -72,6 +72,7 @@ class AboutViewModel : ViewModel() {
         return mapOf(
             "App ID" to BuildConfig.APPLICATION_ID,
             "App Version" to BuildConfig.VERSION_NAME,
+            "App Type" to BuildConfig.FLAVOUR_ID,
             "API Host" to URI(REVOLT_BASE).host,
             "API Version" to (root?.revolt ?: "Unknown"),
             "Runtime SDK" to Build.VERSION.SDK_INT.toString(),

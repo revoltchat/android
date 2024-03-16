@@ -115,6 +115,7 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "SENTRY_DSN", "\"${buildproperty('sentry.dsn', 'RVX_SENTRY_DSN')}\""
+            buildConfigField "String", "FLAVOUR_ID", "\"${buildproperty('build.flavour_id', 'RVX_BUILD_FLAVOUR_ID')}\""
         }
 
         debug {
@@ -125,6 +126,7 @@ android {
             resValue "string", "app_name", buildproperty('build.debug.app_name', 'RVX_DEBUG_APP_NAME')
 
             buildConfigField "String", "SENTRY_DSN", "\"${buildproperty('sentry.dsn', 'RVX_SENTRY_DSN')}\""
+            buildConfigField "String", "FLAVOUR_ID", "\"${buildproperty('build.flavour_id', 'RVX_BUILD_FLAVOUR_ID')}\""
         }
     }
     compileOptions {
