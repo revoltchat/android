@@ -6,3 +6,5 @@
 /other.xml
 # GitHub Copilot persisted chat sessions
 /copilot/chatSessions
+# User-specific files
+/deploymentTargetSelector.xml

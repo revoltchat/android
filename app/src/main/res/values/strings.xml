@@ -304,6 +304,7 @@
     <string name="server_context_sheet_actions_leave_silently">Leave Silently</string>
     <string name="server_context_sheet_actions_report">Report</string>
 
+    <string name="user_info_sheet_open">Open user info</string>
     <string name="user_info_sheet_user_not_found">Can\'t resolve this user</string>
     <string name="user_info_sheet_user_not_found_description">This user may have been deleted or you may not have permission to view them.</string>
     <string name="user_info_sheet_category_bio">Bio</string>
@@ -329,6 +330,9 @@
     <string name="user_info_sheet_failed_to_open_dm">Could not open DM with this user.</string>
     <string name="user_info_sheet_user_is_bot">This is a bot.</string>
     <string name="user_info_sheet_user_is_bot_easter_egg">This is a bot. It has a plan.</string>
+
+    <string name="member_context_sheet_open">Open member options</string>
+    <string name="member_context_sheet_remove_from_channel">Remove from %1$s</string>
 
     <string name="user_badge_developer">Developer</string>
     <string name="user_badge_translator">Translator</string>

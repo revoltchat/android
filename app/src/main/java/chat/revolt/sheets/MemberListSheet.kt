@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -209,8 +209,10 @@ fun MemberListSheet(
     serverId: String? = null,
     viewModel: MemberListSheetViewModel = hiltViewModel()
 ) {
-    var showUserContextSheet by remember { mutableStateOf(false) }
-    var userContextSheetTarget by remember { mutableStateOf("") }
+    var showUserInfoSheet by remember { mutableStateOf(false) }
+    var userInfoSheetTarget by remember { mutableStateOf("") }
+    var showMemberContextSheet by remember { mutableStateOf(false) }
+    var memberContextSheetTarget by remember { mutableStateOf("") }
 
     // We use LaunchedEffect to make sure that this is called every time any of the users status changes
     LaunchedEffect(RevoltAPI.userCache) {
@@ -223,23 +225,61 @@ fun MemberListSheet(
         }
     }
 
-    if (showUserContextSheet) {
+    if (showUserInfoSheet) {
         val userContextSheetState = rememberModalBottomSheetState()
 
         ModalBottomSheet(
             sheetState = userContextSheetState,
             onDismissRequest = {
-                showUserContextSheet = false
+                showUserInfoSheet = false
             }
         ) {
             UserInfoSheet(
-                userId = userContextSheetTarget,
+                userId = userInfoSheetTarget,
                 serverId = serverId,
                 dismissSheet = {
                     userContextSheetState.hide()
-                    showUserContextSheet = false
+                    showUserInfoSheet = false
                 }
             )
+        }
+    }
+
+    if (showMemberContextSheet) {
+        val memberContextSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = memberContextSheetState,
+            onDismissRequest = {
+                showMemberContextSheet = false
+            }
+        ) {
+            if (serverId != null) {
+                ServerMemberContextSheet(
+                    userId = memberContextSheetTarget,
+                    serverId = serverId,
+                    channelId = channelId,
+                    onRequestUpdateMembers = {
+                        viewModel.fetchServerMemberList(serverId, channelId)
+                    },
+                    dismissSheet = {
+                        memberContextSheetState.hide()
+                        showMemberContextSheet = false
+                    }
+                )
+            } else {
+                GroupDMMemberContextSheet(
+                    userId = memberContextSheetTarget,
+                    channelId = channelId,
+                    onRequestUpdateMembers = {
+                        viewModel.fetchGroupMemberList(channelId)
+                    },
+                    dismissSheet = {
+                        memberContextSheetState.hide()
+                        showMemberContextSheet = false
+                    }
+                )
+            }
         }
     }
 
@@ -281,10 +321,19 @@ fun MemberListSheet(
                             member = item.member,
                             serverId = serverId,
                             userId = item.member.id.user,
-                            modifier = Modifier.clickable {
-                                userContextSheetTarget = item.member.id.user
-                                showUserContextSheet = true
-                            }
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = {
+                                        userInfoSheetTarget = item.member.id.user
+                                        showUserInfoSheet = true
+                                    },
+                                    onClickLabel = stringResource(R.string.user_info_sheet_open),
+                                    onLongClick = {
+                                        memberContextSheetTarget = item.member.id.user
+                                        showMemberContextSheet = true
+                                    },
+                                    onLongClickLabel = stringResource(R.string.member_context_sheet_open)
+                                )
                         )
                     }
 
@@ -294,10 +343,18 @@ fun MemberListSheet(
                             member = null,
                             serverId = serverId,
                             userId = item.user.id,
-                            modifier = Modifier.clickable {
-                                userContextSheetTarget = item.user.id
-                                showUserContextSheet = true
-                            }
+                            modifier = Modifier.combinedClickable(
+                                onClick = {
+                                    userInfoSheetTarget = item.user.id
+                                    showUserInfoSheet = true
+                                },
+                                onClickLabel = stringResource(R.string.user_info_sheet_open),
+                                onLongClick = {
+                                    memberContextSheetTarget = item.user.id
+                                    showMemberContextSheet = true
+                                },
+                                onLongClickLabel = stringResource(R.string.member_context_sheet_open)
+                            )
                         )
                     }
                 }

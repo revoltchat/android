@@ -5,11 +5,14 @@ import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.schemas.Channel
 import chat.revolt.screens.create.MAX_ADDABLE_PEOPLE_IN_GROUP
+import io.ktor.client.request.delete
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 
@@ -37,4 +40,20 @@ suspend fun createGroupDM(name: String, members: List<String>): Channel {
     }
 
     return RevoltJson.decodeFromString(Channel.serializer(), response)
+}
+
+suspend fun removeMember(channelId: String, userId: String) {
+    val response = RevoltHttp.delete("/channels/$channelId/recipients/$userId")
+
+    if (!response.status.isSuccess()) {
+        throw Error(response.status.toString())
+    }
+}
+
+suspend fun addMember(channelId: String, userId: String) {
+    val response = RevoltHttp.put("/channels/$channelId/recipients/$userId")
+
+    if (!response.status.isSuccess()) {
+        throw Error(response.status.toString())
+    }
 }
