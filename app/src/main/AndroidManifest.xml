@@ -24,6 +24,7 @@
         android:name=".RevoltApplication"
         android:theme="@style/Theme.Revolt"
         android:localeConfig="@xml/locale_config"
+        android:enableOnBackInvokedCallback="true"
         tools:targetApi="tiramisu">
         <provider
             android:name="androidx.core.content.FileProvider"
