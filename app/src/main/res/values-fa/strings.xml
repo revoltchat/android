@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_onboarding_heading">جامعه خود را پیدا کنید، با جهان ارتباط برقرار کنید.</string>
+    <string name="login_onboarding_body">ریولت یکی از بهترین راه‌ها برای در ارتباط ماندن با دوستان و جامعه، در هر کجا و در هر زمان است.</string>
+    <string name="password_forgot_instructions">ایمیل خود را وارد کنید و ما دستورالعمل هایی را در مورد نحوه تنظیم مجدد رمز عبور برای شما ارسال خواهیم کرد.</string>
+    <string name="register_instructions">این مانند مکانی است برای نشستن، دور هم جمع شدن و صحبت کردن در مورد مسائل. بهترین بخش، این است که در اینترنت است.</string>
+    <string name="register_password_rules">هشت یا بیشتر، موارد رایج بد هستند. نمادها و اعداد توصیه می شود.</string>
+    <string name="verify_then_choose_username">ایمیل خود را تأیید کنید و سپس به انتخاب نام کاربری شما می پردازیم.</string>
+    <string name="onboarding_changeable">اما اگر نظر خود را تغییر دادید، می توانید نام کاربری خود را در هر زمان که بخواهید در تنظیمات کاربر خود تغییر دهید.</string>
+    <string name="mfa_type_recovery">از یک کد بازیابی استفاده کنید</string>
+    <string name="mfa_recovery_lead">یکی از کدهای بازیابی خود را وارد کنید.</string>
+    <string name="about_brought_to_you_by">با ❤️ توسط تیم ریولت برای شما آورده شده است.</string>
+    <string name="oss_attribution_body_2">ما از توسعه دهندگان این پروژه ها به خاطر در دسترس قرار دادن کار خود در جهان سپاسگزاریم.</string>
+    <string name="typing_many">%1$s در حال تایپ…</string>
+    <string name="remove_attachment_alt">حذف پیوست</string>
+    <string name="home_join_jenvolt_description">جنولت فضایی است که توسط توسعه‌دهندگان برای همه برنامه‌های اندروید و موارد دیگر اجرا می‌شود. پشتیبانی، بازخورد به اینجا بروید. شاید بتوانید ویژگی های جدید را امتحان کنید! 👀</string>
+    <string name="create_group_description">خدمه خود را در یک گپ گروهی جمع کنید. می‌توانید تا %1$d نفر اضافه کنید.</string>
+    <string name="back">→ بازگشت</string>
+    <string name="next">← بعد</string>
+    <string name="ok">باشه</string>
+    <string name="cancel">لغو</string>
+    <string name="share">اشتراک گذاری</string>
+    <string name="lets_go">بزن بریم</string>
+    <string name="loading">در حال گرفتن اطلاعات، منتظر بمانید…</string>
+    <string name="terms_of_service">شرایط استفاده از خدمات</string>
+    <string name="privacy_policy">سیاست حفظ حریم خصوصی</string>
+    <string name="community_guidelines">دستورالعمل های انجمن</string>
+    <string name="email">ایمیل</string>
+    <string name="password">رمز عبور</string>
+    <string name="login">ورود به سیستم</string>
+    <string name="signup">ثبت نام</string>
+    <string name="resend">ارسال مجدد</string>
+    <string name="send_email">ایمیل بفرست</string>
+    <string name="login_heading">بیایید شما را وارد کنیم</string>
+    <string name="password_forgot">رمز عبور را فراموش کرده اید؟</string>
+    <string name="resend_verification">ایمیل تأیید را مجدد ارسال کنید</string>
+    <string name="password_manager_hint">از مدیر رمز عبور استفاده می کنید؟</string>
+    <string name="password_forgot_heading">رمز عبور خود را فراموش کرده اید؟</string>
+    <string name="register_heading">به ریولت خوش آمدید</string>
+    <string name="register_image_alt">از ریولت برای گپ زدن در مورد موارد استفاده کنید.</string>
+    <string name="register_form_heading">بیایید شما را راه اندازی کنیم.</string>
+    <string name="register_data">اطلاعات شما نزد ما ایمن هست. ما آن را نمی فروشیم و از آن برای نشان دادن تبلیغات به شما استفاده نمی کنیم.</string>
+    <string name="register_email">ایمیل</string>
+    <string name="register_email_verification_hint">برای تأیید حساب شما یک ایمیل تأیید برای شما ارسال می کنیم.</string>
+    <string name="register_password">رمز عبور</string>
+    <string name="check_mail">ایمیل خود را چک کنید!</string>
+    <string name="instructions_at_mail">ما دستورالعمل های بیشتری را به %1$s ارسال کرده ایم.</string>
+    <string name="open_mail_app">برنامه ایمیل را باز کنید</string>
+    <string name="onboarding_welcome">خوش آمدی!</string>
+    <string name="onboarding_lead">زمان انتخاب نام کاربری فرا رسیده است!</string>
+    <string name="onboarding_others">دیگران شما را خواهند یافت، می شناسند و با این نام ذکر می کنند.</string>
+    <string name="onboarding_username">نام کاربری</string>
+    <string name="token_invalid_toast">شما خارج شده اید. لطفا دوباره وارد شوید.</string>
+    <string name="mfa_interstitial_header">یک چیز دیگر</string>
+    <string name="mfa_interstitial_lead">شما 2FA را فعال کرده اید تا حساب خود را ایمن نگه دارید.</string>
+    <string name="mfa_type_otp">از رمز عبور یکبار مصرف استفاده کنید</string>
+    <string name="mfa_totp_header">یک کد شش رقمی وارد کنید</string>
+    <string name="mfa_totp_lead">کد شش رقمی را از برنامه احراز هویت خود وارد کنید.</string>
+    <string name="mfa_totp_code">کد</string>
+    <string name="mfa_recovery_header">یک کد بازیابی وارد کنید</string>
+    <string name="mfa_recovery_code">کد</string>
+    <string name="mfa_password_header">رمز عبور خود را وارد کنید</string>
+    <string name="mfa_password_lead">برای ادامه رمز عبور خود را وارد کنید.</string>
+    <string name="about">درباره</string>
+    <string name="about_full_name">ریولت‏ در اندروید</string>
+    <string name="about_tab_version">نسخه</string>
+    <string name="about_tab_details">جزئیات</string>
+    <string name="oss_attribution_body">ریولت با کمک این پروژه های متن باز عالی ساخته شده است.</string>
+    <string name="oss_attribution_warning">لیست زیر به طور خودکار ایجاد می شود. ممکن است ناقص یا نادرست باشد.</string>
+    <string name="oss_attribution_generation_date">آخرین به روز رسانی: %1$s</string>
+    <string name="oss_attribution_tap_to_view_license">برای مشاهده مجوز ضربه بزنید</string>
+    <string name="comingsoon_toast">با عرض پوزش، این ویژگی هنوز آماده نیست.</string>
+    <string name="typing_one">%1$s در حال تایپ است…</string>
+    <string name="typing_several">چند نفر در حال تایپ کردن هستند</string>
+    <string name="send_alt">ارسال</string>
+    <string name="pick_emoji_alt">ایموجی را انتخاب کنید</string>
+    <string name="oss_attribution">OSS انتساب</string>
+    <string name="add_attachment_alt">اضافه کردن پیوست</string>
+    <string name="remove_reply_alt">حذف پاسخ</string>
+    <string name="reply_mention_on">\@ روشن</string>
+    <string name="reply_mention_off">\@ خاموش</string>
+    <string name="too_many_replies">هر بار فقط می‌توانید به %1$d پیام پاسخ دهید.</string>
+    <string name="emoji_category_smileys">شکلک ها و احساسات</string>
+    <string name="emoji_category_people">مردم و بدن</string>
+    <string name="emoji_category_animals">حیوانات و طبیعت</string>
+    <string name="emoji_category_food">غذا و نوشیدنی</string>
+    <string name="emoji_category_travel">سفر و مکان ها</string>
+    <string name="emoji_category_activities">فعالیت ها</string>
+    <string name="emoji_category_objects">اشیاء</string>
+    <string name="emoji_category_symbols">نمادها</string>
+    <string name="emoji_category_flags">پرچم ها</string>
+    <string name="badge_bot_alt">ربات</string>
+    <string name="badge_masquerade_alt">از کانال لینک شده</string>
+    <string name="badge_platform_moderation_alt">تعدیل پلتفرم</string>
+    <string name="badge_team_member_alt">عضو تیم ریولت</string>
+    <string name="unknown">ناشناخته</string>
+    <string name="home">خانه</string>
+    <string name="menu">منو</string>
+    <string name="logout">خروج</string>
+    <string name="home_join_jenvolt">به جنولت بپیوندید</string>
+    <string name="friends">دوستان</string>
+    <string name="friends_incoming_requests">درخواست های دریافتی</string>
+    <string name="friends_outgoing_requests">درخواست های خروجی</string>
+    <string name="friends_all">همه</string>
+    <string name="friends_blocked">مسدود</string>
+    <string name="friends_deny_all_incoming">تمام درخواست های دریافتی را پاک کنید</string>
+    <string name="frends_new_group">گروه جدید</string>
+    <string name="create_group">یک گروه جدید ایجاد کنید</string>
+    <string name="create_group_name">اسم گروه</string>
+    <string name="create_group_search">جستجوی دوستان</string>
+    <string name="create_group_action">ایجاد کردن</string>
+    <string name="server_plus_alt">اضافه کردن سرور</string>
+    <string name="discover_alt">كشف كردن</string>
+    <string name="no_channels_heading">کمی ناجور.</string>
+    <string name="no_channels_body">هیچ کانالی در این سرور وجود ندارد. حتی یک کانال خوش آمدید. چقدر بی ادب.</string>
+    <string name="no_active_channel">شما اکنون در یک کانال نیستید.</string>
+    <string name="no_active_channel_body">برای شروع یک سرور از سمت چپ انتخاب کنید. اگر احساس ماجراجویی می کنید، می توانید یک سرور جدید ایجاد کنید.</string>
+    <string name="channel_age_gate_title">این کانال به عنوان +18 مشخص شده است</string>
+    <string name="channel_age_gate_description">شما باید 18 سال یا بالاتر باشید تا این کانال را ببینید.</string>
+    <string name="channel_age_gate_dob_section">تاریخ تولد</string>
+    <string name="channel_age_gate_dob_day">روز</string>
+    <string name="channel_age_gate_dob_month">ماه</string>
+    <string name="channel_age_gate_dob_year">سال</string>
+    <string name="channel_age_gate_dob_proceed">ادامه دهید</string>
+    <string name="channel_age_gate_dob_cancel">انصراف</string>
+    <string name="channel_age_gate_dob_invalid">تاریخ تولد خود را وارد کنید</string>
+</resources>

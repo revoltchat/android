@@ -201,9 +201,6 @@
     <string name="settings_appearance_theme_m3dynamic_unsupported">Material You (ikke støttet)</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">Material You er ikke støttet på denne enheten.</string>
     <string name="settings_feedback">Tilbakemelding</string>
-    <string name="settings_feedback_introduction">Alle tilbakemeldinger for Revolt blir satt stor pris på, og alle tilbakemeldinger blir lest av teamet som jobber på våres Android app.</string>
-    <string name="settings_feedback_category">Kategori</string>
-    <string name="settings_feedback_category_satisfaction">Generell tilbakemelding</string>
     <string name="login_onboarding_body">Revolt er en av de beste måtene å holde kontakt med vennene og felleskapene dine, fra hvor som helst, når som helst.</string>
     <string name="register_form_heading">La oss sette deg opp.</string>
     <string name="register_email_verification_hint">Vi kommer til å sende deg en bekreftelses-e-post for å bekrefte kontoen din.</string>
@@ -222,15 +219,4 @@
     <string name="invite_error_no_invite">Ingen invitasjonskode ble gitt.</string>
     <string name="media_viewer_save_failed_audio">Kunne ikke lagre lyd</string>
     <string name="spark_sidebar_settings_tutorial_description_1">Du kan åpne sidelinja med å sveipe fra venstre kant av skjermen.</string>
-    <string name="settings_feedback_category_feature">Funksjonsforespørsel</string>
-    <string name="settings_feedback_category_bug">Feilrapport</string>
-    <string name="settings_feedback_category_ux">Brukeropplevelse (UI/UX)</string>
-    <string name="settings_feedback_category_performance">Hastighet</string>
-    <string name="settings_feedback_category_security">Sikkerhet</string>
-    <string name="settings_feedback_category_other">Annen</string>
-    <string name="settings_feedback_message">Melding</string>
-    <string name="settings_feedback_message_too_long">Meldingen er altfor lang. Kan du minske den til %1$d bokstaver eller mindre\?</string>
-    <string name="settings_feedback_error">Noe gikk galt med å sende tilbakemeldingen din. Prøv igjen senere.</string>
-    <string name="settings_feedback_disabled_title">Tilbakemelding er utilgjengelig</string>
-    <string name="settings_feedback_disabled_message">Tilbakemelding er ikke tilgjengelig på denne versjonen av Revolt. Støtte for denne versjonen er begrenset. (Build: %1$s%2$s)</string>
 </resources>

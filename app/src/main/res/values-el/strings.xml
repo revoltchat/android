@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="ok">OK</string>
+    <string name="ok">ΟΚ</string>
     <string name="lets_go">Φύγαμε</string>
     <string name="loading">Φέρνω κάποιες πληροφορίες, υπομονή…</string>
     <string name="community_guidelines">Οδηγίες Κοινότητας</string>
@@ -61,4 +61,31 @@
     <string name="mfa_recovery_header">Πληκτρολόγησε έναν κωδικό ανάκτησης</string>
     <string name="mfa_password_lead">Πληκτρολόγησε τον κωδικό πρόσβασής σου για να συνεχίσεις.</string>
     <string name="comingsoon_toast">Λυπούμαστε, αυτή η λειτουργία δεν είναι ακόμα έτοιμη.</string>
+    <string name="check_mail">Ελέγξτε τα mail σας!</string>
+    <string name="oss_attribution_body">Το Revolt δημιουργείται με τη βοήθεια έργων ανοιχτού κώδικα.</string>
+    <string name="about_brought_to_you_by">Με ❤️ από την ομάδα της Revolt.</string>
+    <string name="about_tab_version">Έκδοση</string>
+    <string name="about_tab_details">Λεπτομέριες</string>
+    <string name="remove_reply_alt">Αφαίρεση απάντησης</string>
+    <string name="reply_mention_on">\@ ενεργό</string>
+    <string name="reply_mention_off">\@ ανενεργό</string>
+    <string name="too_many_replies">Μπορείς να απαντήσεις μόνο σε %1$d μηνύματα.</string>
+    <string name="emoji_category_smileys">Φατσούλες &amp; Εμότζι</string>
+    <string name="emoji_category_people">Άτομα &amp; Σώμα</string>
+    <string name="emoji_category_animals">Ζώα &amp; Φύση</string>
+    <string name="emoji_category_food">Φαγητά &amp; Ποτά</string>
+    <string name="emoji_category_travel">Ταξίδια &amp; Μέρη</string>
+    <string name="emoji_category_activities">Δραστηριότητες</string>
+    <string name="emoji_category_objects">Αντικείμενα</string>
+    <string name="emoji_category_symbols">Σύμβολα</string>
+    <string name="emoji_category_flags">Σημαίες</string>
+    <string name="badge_bot_alt">Bot</string>
+    <string name="badge_masquerade_alt">Από συνδεδεμένο κανάλι</string>
+    <string name="badge_platform_moderation_alt">Διαχείριση πλατφόρμας</string>
+    <string name="badge_team_member_alt">Μέλος ομάδας Revolt</string>
+    <string name="unknown">Άγνωστο</string>
+    <string name="home">Αρχική Σελίδα</string>
+    <string name="menu">Μενού</string>
+    <string name="logout">Αποσύνδεση</string>
+    <string name="about_full_name">Revolt στο Android</string>
 </resources>

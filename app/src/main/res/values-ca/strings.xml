@@ -170,14 +170,6 @@
     <string name="settings_appearance_theme_m3dynamic">Material You</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">Material You no és compatible amb aquest dispositiu.</string>
     <string name="settings_feedback">Comentaris</string>
-    <string name="settings_feedback_category">Categoria</string>
-    <string name="settings_feedback_category_satisfaction">Comentaris de propòsit general</string>
-    <string name="settings_feedback_category_feature">Sol·licitud de característica</string>
-    <string name="settings_feedback_category_bug">Informe d\'error</string>
-    <string name="settings_feedback_category_ux">Experiència d\'usuari (UI/UX)</string>
-    <string name="settings_feedback_category_performance">Rendiment</string>
-    <string name="settings_feedback_category_security">Seguretat</string>
-    <string name="settings_feedback_category_other">Altre</string>
     <string name="server_plus_alt">Afegir servidor</string>
     <string name="add_server_sheet_join_by_invite_modal_join">Unir-se</string>
     <string name="privacy_policy">Política de Privacitat</string>
@@ -229,10 +221,14 @@
     <string name="invite_error_unknown">S\'ha produït un error desconegut.</string>
     <string name="spark_sidebar_settings_tutorial_description_1">Pots obrir la barra lateral fent lliscar el dit des de la vora esquerra de la pantalla.</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported">Material You (sense suport)</string>
-    <string name="settings_feedback_introduction">Qualsevol comentaris que tinguis sobre Revolt s\'aprecia molt i tots els comentaris són llegits per l\'equip de desenvolupament de la nostra aplicació d\'Android.</string>
-    <string name="settings_feedback_message">Missatge</string>
-    <string name="settings_feedback_message_too_long">El missatge és massa llarg. Si us plau, redueix-lo a %1$d caràcters o menys.</string>
-    <string name="settings_feedback_error">S\'ha produït un error mentre enviaves els teus comentaris. Si us plau, intenta-ho un altre cop més tard.</string>
-    <string name="settings_feedback_disabled_title">Comentaris no disponibles</string>
-    <string name="settings_feedback_disabled_message">No hi ha comentaris disponibles en aquesta versió de Revolt. El suport per aquesta versió és limitat. (Versió: %1$s %2$s)</string>
+    <string name="oss_attribution_body_2">Estem agraïts als desenvolupadors d\'aquests projectes per fer que el seu treball estigui disponible al món.</string>
+    <string name="oss_attribution_body">Revolt es construeix amb l\'ajuda d\'aquests fantàstics projectes de codi obert.</string>
+    <string name="oss_attribution_warning">La llista següent es genera automàticament. Pot ser incomplet o inexacte.</string>
+    <string name="oss_attribution_generation_date">Última actualització: %1$s</string>
+    <string name="about_brought_to_you_by">Portat amb ❤️ per l\'equip de Revolt.</string>
+    <string name="about_tab_version">Versió</string>
+    <string name="about_tab_details">Detalls</string>
+    <string name="oss_attribution_tap_to_view_license">Toqueu per veure la llicència</string>
+    <string name="about_full_name">Revolt a Android</string>
+    <string name="pick_emoji_alt">Tria emoji</string>
 </resources>

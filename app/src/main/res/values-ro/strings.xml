@@ -108,15 +108,7 @@
     <string name="settings_appearance_theme_light">Luminos</string>
     <string name="settings_appearance_theme_m3dynamic">Material You</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported">Material You (nu este acceptat)</string>
-    <string name="settings_feedback_category">Categorie</string>
     <string name="settings_feedback">Feedback</string>
-    <string name="settings_feedback_category_feature">Solicitare de caracteristici</string>
-    <string name="settings_feedback_category_ux">Experiența utilizatorului (UI/UX)</string>
-    <string name="settings_feedback_category_security">Securitate</string>
-    <string name="settings_feedback_category_other">Altele</string>
-    <string name="settings_feedback_message">Mesaj</string>
-    <string name="settings_feedback_disabled_title">Feedback indisponibil</string>
-    <string name="settings_feedback_disabled_message">Feedback-ul nu este disponibil pe această versiune de Revolt. Sprijinul pentru această versiune este limitat. (Build: %1$s %2$s)</string>
     <string name="back">← Înapoi</string>
     <string name="next">Următor →</string>
     <string name="ok">OK</string>
@@ -217,12 +209,6 @@
     <string name="settings_appearance_theme_none">Sistem</string>
     <string name="settings_appearance_theme_amoled">Negru pur</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">Material You nu este acceptat pe acest dispozitiv.</string>
-    <string name="settings_feedback_introduction">Orice feedback pe care îl ai despre Revolt este foarte apreciat, iar toate comentariile sunt citite de echipa de dezvoltare a aplicației noastre pentru Android.</string>
-    <string name="settings_feedback_category_satisfaction">Feedback general</string>
-    <string name="settings_feedback_category_bug">Raport de erori</string>
-    <string name="settings_feedback_category_performance">Performanță</string>
-    <string name="settings_feedback_message_too_long">Mesajul este prea lung. Te rugăm să îl scurtezi la %1$d caractere sau mai puțin.</string>
-    <string name="settings_feedback_error">S-a produs o eroare în timpul trimiterii feedback-ului tău. Te rugăm să încerci din nou mai târziu.</string>
     <string name="add_server_sheet_join_by_invite">Alătură-te cu un cod de invitație sau un link</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Cod de invitație sau link</string>
     <string name="add_server_sheet_join_by_invite_modal_description">Introdu un link precum rvlt.gg/Testers sau un cod de invitație precum Testers</string>
@@ -235,4 +221,11 @@
     <string name="report_user">Îți mulțumim pentru timpul acordat reclamării acestui utilizator. Te rugăm să precizezi motivul reclamației acestui utilizator.</string>
     <string name="report_reason_content_promotes_harm">Promovează vătămarea</string>
     <string name="report_reason_content_spam_abuse">Spam sau abuz de platformă similar</string>
+    <string name="about_full_name">Revolt pe Android</string>
+    <string name="oss_attribution_warning">Lista de mai jos este generată automat. Aceasta poate fi incompletă sau inexactă.</string>
+    <string name="about_brought_to_you_by">Oferit cu ❤️ de către echipa Revolt.</string>
+    <string name="oss_attribution_body">Revolt este construit cu ajutorul acestor minunate proiecte open-source.</string>
+    <string name="oss_attribution_body_2">Suntem recunoscători dezvoltatorilor acestor proiecte pentru că și-au pus munca la dispoziția lumii.</string>
+    <string name="about_tab_version">Versiunea</string>
+    <string name="about_tab_details">Detalii</string>
 </resources>

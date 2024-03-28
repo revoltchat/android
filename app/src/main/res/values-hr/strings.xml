@@ -37,15 +37,7 @@
     <string name="settings_appearance_theme">Tema</string>
     <string name="settings_appearance_theme_none">Sistem</string>
     <string name="settings_appearance_theme_revolt">Revolt</string>
-    <string name="settings_feedback_category">Kategorija</string>
     <string name="settings_feedback">Povratne informacije</string>
-    <string name="settings_feedback_category_satisfaction">Opće povratne informacije</string>
-    <string name="settings_feedback_category_bug">Prijava greške</string>
-    <string name="settings_feedback_category_performance">Perfomanse</string>
-    <string name="settings_feedback_category_security">Sigurnost</string>
-    <string name="settings_feedback_message_too_long">Poruka je predugačka. Molimo skratite je na %1$d znakova ili manje.</string>
-    <string name="settings_feedback_disabled_title">Povratne informacije nedostupne</string>
-    <string name="settings_feedback_disabled_message">Povratne informacije nisu podržane na ovoj verziji Revolt aplikacije. Podrška za ovu verziju je limitirana (Verzija: %1$s %2$s)</string>
     <string name="onboarding_lead">Vrijeme je da izabereš korisničko ime!</string>
     <string name="comingsoon_toast">Oprosti, ova značajka nije još spremna.</string>
     <string name="no_active_channel_body">Odaberi server sa lijeve strane da započneš. Ako se osjećaš hrabro, možeš napraviti novi server.</string>
@@ -119,10 +111,6 @@
     <string name="settings_appearance_theme_m3dynamic">Materijal You</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported">Materijal You (nepodržano)</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">Materijal You nije podržan na ovom uređaju.</string>
-    <string name="settings_feedback_category_feature">Zahtjev značajke</string>
-    <string name="settings_feedback_category_ux">Korisničko sučelje (UI/UX)</string>
-    <string name="settings_feedback_category_other">Drugo</string>
-    <string name="settings_feedback_message">Poruka</string>
     <string name="onboarding_changeable">Ali, ako promjenite mišljenje, možete promijeniti korisničko ime bilo kada u vašim korisničkim postavkama.</string>
     <string name="reply_message_not_cached">Nepoznata poruka, pritisnite za skok</string>
     <string name="add_server_sheet_join_by_invite_modal_description">Upišite link poput rvlt.gg/Testers ili pozivnički kod poput Testers</string>
@@ -140,8 +128,6 @@
     <string name="spark_sidebar_settings_tutorial">Postavke su u traci sa strane</string>
     <string name="spark_sidebar_settings_tutorial_description_1">Možete otvoriti bočnu traku povlačenjem sa lijevog ruba ekrana.</string>
     <string name="spark_sidebar_settings_tutorial_description_2">Onda dugo pritisnite vašu korisničku sliku da bi otvorili postavke.</string>
-    <string name="settings_feedback_introduction">Sve povratne informacije koje imate za Revolt su veoma dobrodošle i sve povratne informacije čita razvojni tim naše Android aplikacije.</string>
-    <string name="settings_feedback_error">Dogodila se greška sa slanjem povratnih informacija. Molimo pokušajte ponovo kasnije.</string>
     <string name="ok">OK</string>
     <string name="share">Podijeli</string>
     <string name="lets_go">Krenimo</string>

@@ -5,4 +5,6 @@
     <string name="ok">හරි</string>
     <string name="cancel">අවලංගු</string>
     <string name="share">බෙදාගන්න</string>
+    <string name="login">පිවිසෙන්න</string>
+    <string name="signup">ලියාපදිංචිය</string>
 </resources>
