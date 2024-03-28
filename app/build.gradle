@@ -68,6 +68,7 @@ android {
 
         // Please keep this list sorted alphabetically.
         resourceConfigurations += ['ar',
+                                   'ast',
                                    'b+es+419',
                                    'be',
                                    'bg',
@@ -77,8 +78,10 @@ android {
                                    'cs',
                                    'de',
                                    'el',
+                                   'eo',
                                    'en',
                                    'es',
+                                   'fa',
                                    'fi',
                                    'fil',
                                    'fr',
@@ -88,7 +91,9 @@ android {
                                    'hu',
                                    'id',
                                    'in',
+                                   'it',
                                    'ja',
+                                   'lt',
                                    'mwl',
                                    'nb-rNO',
                                    'nl',
@@ -98,9 +103,11 @@ android {
                                    'ro',
                                    'ru',
                                    'si',
+                                   'th',
                                    'tr',
                                    'uk',
-                                   'zh-rCN']
+                                   'zh-rCN',
+                                   'zh-rTW']
 
         externalNativeBuild {
             cmake {
