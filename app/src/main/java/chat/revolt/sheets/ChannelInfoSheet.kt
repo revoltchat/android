@@ -1,13 +1,11 @@
 package chat.revolt.sheets
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
@@ -15,8 +13,8 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -40,7 +38,8 @@ import chat.revolt.api.internals.has
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
-import chat.revolt.components.generic.SheetClickable
+import chat.revolt.components.generic.SheetButton
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.screens.chat.ChannelSheetHeader
 import chat.revolt.internals.extensions.rememberChannelPermissions
 import chat.revolt.screens.chat.dialogs.InviteDialog
@@ -98,169 +97,130 @@ fun ChannelInfoSheet(channelId: String, onHideSheet: suspend () -> Unit) {
         return
     }
 
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        val isDM = ChannelUtils.resolveDMPartner(channel) != null
-        val partner = ChannelUtils
-            .resolveDMPartner(channel)
-            ?.let {
-                RevoltAPI.userCache[it]
-            }
+    val partner = ChannelUtils
+        .resolveDMPartner(channel)
+        ?.let {
+            RevoltAPI.userCache[it]
+        }
 
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 4.dp),
+    ) {
         ChannelSheetHeader(
             channelName = channel.name
                 ?: ChannelUtils.resolveDMName(channel)
                 ?: stringResource(id = R.string.unknown),
             channelIcon = channel.icon,
             channelType = channel.channelType ?: ChannelType.TextChannel,
+            channelDescription = channel.description,
             dmPartner = partner
         )
+        HorizontalDivider()
+    }
 
-        if (!isDM) {
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = stringResource(id = R.string.channel_info_sheet_description),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
-            Text(
-                text = if (channel.description.isNullOrBlank()) {
-                    stringResource(
-                        id = R.string.channel_info_sheet_description_empty
+    when (channel.channelType) {
+        ChannelType.TextChannel, ChannelType.VoiceChannel, ChannelType.Group -> {
+            SheetButton(
+                headlineContent = {
+                    Text(
+                        text = stringResource(id = R.string.channel_info_sheet_options_members),
                     )
-                } else {
-                    channel.description
                 },
-                modifier = Modifier.padding(bottom = 10.dp)
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.List,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    memberListSheetShown = true
+                }
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        else -> {}
+    }
 
-        Text(
-            text = stringResource(id = R.string.channel_info_sheet_options),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-
+    if (
+        Roles.permissionFor(
+            channel,
+            RevoltAPI.userCache[RevoltAPI.selfId]
+        ) has PermissionBit.InviteOthers
+    ) {
         when (channel.channelType) {
-            ChannelType.TextChannel, ChannelType.VoiceChannel, ChannelType.Group -> {
-                SheetClickable(
-                    icon = { modifier ->
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.List,
-                            contentDescription = null,
-                            modifier = modifier
+            ChannelType.TextChannel, ChannelType.VoiceChannel -> {
+                SheetButton(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.channel_info_sheet_options_invite),
                         )
                     },
-                    label = { style ->
-                        Text(
-                            text = stringResource(id = R.string.channel_info_sheet_options_members),
-                            style = style
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null
                         )
+                    },
+                    onClick = {
+                        inviteDialogShown = true
                     }
-                ) {
-                    memberListSheetShown = true
-                }
+                )
+            }
+
+            ChannelType.Group -> {
+                SheetButton(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.channel_info_sheet_options_add),
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null
+                        )
+                    },
+                    onClick = {}
+                )
             }
 
             else -> {}
         }
+    }
 
-        if (
-            Roles.permissionFor(
-                channel,
-                RevoltAPI.userCache[RevoltAPI.selfId]
-            ) has PermissionBit.InviteOthers
-        ) {
-            when (channel.channelType) {
-                ChannelType.TextChannel, ChannelType.VoiceChannel -> {
-                    SheetClickable(
-                        icon = { modifier ->
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = null,
-                                modifier = modifier
-                            )
-                        },
-                        label = { style ->
-                            Text(
-                                text = stringResource(id = R.string.channel_info_sheet_options_invite),
-                                style = style
-                            )
-                        }
-                    ) {
-                        inviteDialogShown = true
-                    }
-                }
+    SheetButton(
+        headlineContent = {
+            Text(
+                text = stringResource(id = R.string.channel_info_sheet_options_notifications_manage),
+            )
+        },
+        leadingContent = {
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = null
+            )
+        },
+        onClick = {}
+    )
 
-                ChannelType.Group -> {
-                    SheetClickable(
-                        icon = { modifier ->
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = null,
-                                modifier = modifier
-                            )
-                        },
-                        label = { style ->
-                            Text(
-                                text = stringResource(id = R.string.channel_info_sheet_options_add),
-                                style = style
-                            )
-                        }
-                    ) {
-                    }
-                }
-
-                else -> {}
-            }
-        }
-
-        SheetClickable(
-            icon = { modifier ->
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = null,
-                    modifier = modifier
+    if (
+        (permissions has PermissionBit.ManageChannel || permissions has PermissionBit.ManageRole)
+        && (channel.channelType != ChannelType.SavedMessages && channel.channelType != ChannelType.DirectMessage)
+    ) {
+        SheetButton(
+            headlineContent = {
+                Text(
+                    text = stringResource(id = R.string.settings),
                 )
             },
-            label = { style ->
-                Text(
-                    text = stringResource(
-                        id = R.string.channel_info_sheet_options_notifications_manage
-                    ),
-                    style = style
+            leadingContent = {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = null
                 )
-            }
-        ) {
-        }
-
-        if (
-            (permissions has PermissionBit.ManageChannel || permissions has PermissionBit.ManageRole)
-            && (channel.channelType != ChannelType.SavedMessages && channel.channelType != ChannelType.DirectMessage)
-        ) {
-            SheetClickable(
-                icon = { modifier ->
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = null,
-                        modifier = modifier
-                    )
-                },
-                label = { style ->
-                    Text(
-                        text = stringResource(
-                            id = R.string.settings
-                        ),
-                        style = style
-                    )
-                }
-            ) {
+            },
+            onClick = {
                 scope.launch {
                     onHideSheet()
                 }
@@ -269,8 +229,8 @@ fun ChannelInfoSheet(channelId: String, onHideSheet: suspend () -> Unit) {
                     ActionChannel.send(Action.TopNavigate("settings/channel/${channel.id}"))
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
+        )
     }
+
+    SheetEnd()
 }

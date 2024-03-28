@@ -2,7 +2,6 @@ package chat.revolt.sheets
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.CircularProgressIndicator
@@ -20,7 +19,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
-import chat.revolt.components.generic.SheetClickable
+import chat.revolt.components.generic.SheetButton
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
@@ -43,23 +43,20 @@ fun ChannelContextSheet(channelId: String, onHideSheet: suspend () -> Unit) {
 
     val coroutineScope = rememberCoroutineScope()
 
-    Column {
-        SheetClickable(
-            icon = { modifier ->
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_content_copy_id_24dp),
-                    contentDescription = null,
-                    modifier = modifier
-                )
-            },
-            label = { style ->
-                Text(
-                    text = stringResource(id = R.string.channel_context_sheet_actions_copy_id),
-                    style = style
-                )
-            }
-        ) {
-            if (channel.id == null) return@SheetClickable
+    SheetButton(
+        headlineContent = {
+            Text(
+                text = stringResource(id = R.string.channel_context_sheet_actions_copy_id),
+            )
+        },
+        leadingContent = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_content_copy_id_24dp),
+                contentDescription = null
+            )
+        },
+        onClick = {
+            if (channel.id == null) return@SheetButton
 
             clipboardManager.setText(AnnotatedString(channel.id))
 
@@ -75,22 +72,21 @@ fun ChannelContextSheet(channelId: String, onHideSheet: suspend () -> Unit) {
                 onHideSheet()
             }
         }
+    )
 
-        SheetClickable(
-            icon = { modifier ->
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_eye_check_24dp),
-                    contentDescription = null,
-                    modifier = modifier
-                )
-            },
-            label = { style ->
-                Text(
-                    text = stringResource(id = R.string.channel_context_sheet_actions_mark_read),
-                    style = style
-                )
-            }
-        ) {
+    SheetButton(
+        headlineContent = {
+            Text(
+                text = stringResource(id = R.string.channel_context_sheet_actions_mark_read),
+            )
+        },
+        leadingContent = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_eye_check_24dp),
+                contentDescription = null
+            )
+        },
+        onClick = {
             coroutineScope.launch {
                 channel.lastMessageID?.let {
                     RevoltAPI.unreads.markAsRead(channelId, it, sync = true)
@@ -98,5 +94,7 @@ fun ChannelContextSheet(channelId: String, onHideSheet: suspend () -> Unit) {
                 onHideSheet()
             }
         }
-    }
+    )
+
+    SheetEnd()
 }

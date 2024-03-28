@@ -1,10 +1,9 @@
 package chat.revolt.sheets
 
 import android.widget.Toast
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,18 +12,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -49,8 +48,10 @@ import chat.revolt.api.routes.channel.deleteMessage
 import chat.revolt.api.routes.channel.react
 import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.components.chat.Message
-import chat.revolt.components.generic.SheetClickable
+import chat.revolt.components.generic.SheetButton
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.Platform
+import chat.revolt.ui.theme.ClearRippleTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,28 +92,70 @@ fun MessageContextSheet(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                SheetClickable(
-                    icon = { modifier ->
+                SheetButton(
+                    leadingContent = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_content_copy_24dp),
-                            contentDescription = null,
-                            modifier = modifier
+                            contentDescription = null
                         )
                     },
-                    label = { style ->
+                    headlineContent = {
                         Text(
-                            text = stringResource(id = R.string.message_context_sheet_actions_copy),
-                            style = style
+                            text = stringResource(id = R.string.message_context_sheet_actions_copy)
                         )
-                    }
-                ) {
-                    if (message.content.isNullOrEmpty()) {
+                    },
+                    onClick = {
+                        if (message.content.isNullOrEmpty()) {
+                            coroutineScope.launch {
+                                shareSheetState.hide()
+                                onHideSheet()
+                                Toast.makeText(
+                                    context,
+                                    context.getString(
+                                        R.string.message_context_sheet_actions_copy_failed_empty
+                                    ),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            return@SheetButton
+                        }
+
+                        if (Platform.needsShowClipboardNotification()) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.copied),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
                         coroutineScope.launch {
                             shareSheetState.hide()
+                        }
+                        coroutineScope.launch {
+                            clipboardManager.setText(AnnotatedString(message.content))
                             onHideSheet()
+                        }
+                    }
+                )
+
+                SheetButton(
+                    leadingContent = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_link_variant_24dp),
+                            contentDescription = null
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(
+                                id = R.string.message_context_sheet_actions_copy_link
+                            )
+                        )
+                    },
+                    onClick = {
+                        if (message.content.isNullOrEmpty()) {
                             Toast.makeText(
                                 context,
                                 context.getString(
@@ -120,52 +163,33 @@ fun MessageContextSheet(
                                 ),
                                 Toast.LENGTH_SHORT
                             ).show()
+
+                            coroutineScope.launch {
+                                shareSheetState.hide()
+                            }
+                            coroutineScope.launch {
+                                onHideSheet()
+                            }
+
+                            return@SheetButton
                         }
-                        return@SheetClickable
-                    }
 
-                    if (Platform.needsShowClipboardNotification()) {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.copied),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                        val server = RevoltAPI.serverCache.values.find { server ->
+                            server.channels?.contains(message.channel) ?: false
+                        }
+                        val messageLink =
+                            "$REVOLT_APP/server/${server?.id}/channel/${message.channel}/${message.id}"
 
-                    coroutineScope.launch {
-                        shareSheetState.hide()
-                    }
-                    coroutineScope.launch {
-                        clipboardManager.setText(AnnotatedString(message.content))
-                        onHideSheet()
-                    }
-                }
-
-                SheetClickable(
-                    icon = { modifier ->
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_link_variant_24dp),
-                            contentDescription = null,
-                            modifier = modifier
-                        )
-                    },
-                    label = { style ->
-                        Text(
-                            text = stringResource(
-                                id = R.string.message_context_sheet_actions_copy_link
-                            ),
-                            style = style
-                        )
-                    }
-                ) {
-                    if (message.content.isNullOrEmpty()) {
-                        Toast.makeText(
-                            context,
-                            context.getString(
-                                R.string.message_context_sheet_actions_copy_failed_empty
-                            ),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        clipboardManager.setText(AnnotatedString(messageLink))
+                        if (Platform.needsShowClipboardNotification()) {
+                            Toast.makeText(
+                                context,
+                                context.getString(
+                                    R.string.message_context_sheet_actions_copy_link_copied
+                                ),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
 
                         coroutineScope.launch {
                             shareSheetState.hide()
@@ -173,74 +197,49 @@ fun MessageContextSheet(
                         coroutineScope.launch {
                             onHideSheet()
                         }
-
-                        return@SheetClickable
                     }
+                )
 
-                    val server = RevoltAPI.serverCache.values.find { server ->
-                        server.channels?.contains(message.channel) ?: false
-                    }
-                    val messageLink =
-                        "$REVOLT_APP/server/${server?.id}/channel/${message.channel}/${message.id}"
-
-                    clipboardManager.setText(AnnotatedString(messageLink))
-                    if (Platform.needsShowClipboardNotification()) {
-                        Toast.makeText(
-                            context,
-                            context.getString(
-                                R.string.message_context_sheet_actions_copy_link_copied
-                            ),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                    coroutineScope.launch {
-                        shareSheetState.hide()
-                    }
-                    coroutineScope.launch {
-                        onHideSheet()
-                    }
-                }
-
-                SheetClickable(
-                    icon = { modifier ->
+                SheetButton(
+                    leadingContent = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_content_copy_id_24dp),
-                            contentDescription = null,
-                            modifier = modifier
+                            contentDescription = null
                         )
                     },
-                    label = { style ->
+                    headlineContent = {
                         Text(
                             text = stringResource(
                                 id = R.string.message_context_sheet_actions_copy_id
-                            ),
-                            style = style
+                            )
                         )
-                    }
-                ) {
-                    if (message.id == null) return@SheetClickable
+                    },
+                    onClick = {
+                        if (message.id == null) return@SheetButton
 
-                    clipboardManager.setText(AnnotatedString(message.id))
+                        clipboardManager.setText(AnnotatedString(message.id))
 
-                    if (Platform.needsShowClipboardNotification()) {
-                        Toast.makeText(
-                            context,
-                            context.getString(
-                                R.string.message_context_sheet_actions_copy_id_copied
-                            ),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                        if (Platform.needsShowClipboardNotification()) {
+                            Toast.makeText(
+                                context,
+                                context.getString(
+                                    R.string.message_context_sheet_actions_copy_id_copied
+                                ),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
 
-                    coroutineScope.launch {
-                        shareSheetState.hide()
+                        coroutineScope.launch {
+                            shareSheetState.hide()
+                        }
+                        coroutineScope.launch {
+                            onHideSheet()
+                        }
                     }
-                    coroutineScope.launch {
-                        onHideSheet()
-                    }
-                }
+                )
             }
+
+            SheetEnd()
         }
     }
 
@@ -312,130 +311,124 @@ fun MessageContextSheet(
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        Box(
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp))
-                .padding(bottom = 8.dp)
-        ) {
-            Message(
-                message = message.copy(
-                    tail = false,
-                    masquerade = null
+        CompositionLocalProvider(value = LocalRippleTheme provides ClearRippleTheme) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 4.dp),
+            ) {
+                Message(
+                    message = message.copy(
+                        tail = false,
+                        masquerade = null
+                    )
                 )
-            )
+
+                HorizontalDivider()
+            }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        SheetClickable(
-            icon = { modifier ->
+        SheetButton(
+            leadingContent = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_reply_24dp),
-                    contentDescription = null,
-                    modifier = modifier
+                    contentDescription = null
                 )
             },
-            label = { style ->
+            headlineContent = {
                 Text(
                     text = stringResource(id = R.string.message_context_sheet_actions_reply),
-                    style = style
-                )
-            }
-        ) {
-            coroutineScope.launch {
-                UiCallbacks.replyToMessage(messageId)
-                onHideSheet()
-            }
-        }
-
-        SheetClickable(
-            icon = { modifier ->
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_hamburger_plus_24dp),
-                    contentDescription = null,
-                    modifier = modifier
                 )
             },
-            label = { style ->
-                Text(
-                    text = stringResource(id = R.string.message_context_sheet_actions_react),
-                    style = style
-                )
-            }
-        ) {
-            showReactSheet = true
-        }
-
-        if (message.author == RevoltAPI.selfId) {
-            SheetClickable(
-                icon = { modifier ->
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        modifier = modifier
-                    )
-                },
-                label = { style ->
-                    Text(
-                        text = stringResource(id = R.string.message_context_sheet_actions_edit),
-                        style = style
-                    )
-                }
-            ) {
+            onClick = {
                 coroutineScope.launch {
-                    UiCallbacks.editMessage(messageId)
+                    UiCallbacks.replyToMessage(messageId)
                     onHideSheet()
                 }
             }
-        }
+        )
 
-        SheetClickable(
-            icon = { modifier ->
+        SheetButton(
+            leadingContent = {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_eye_off_24dp),
-                    contentDescription = null,
-                    modifier = modifier
+                    painter = painterResource(id = R.drawable.ic_hamburger_plus_24dp),
+                    contentDescription = null
                 )
             },
-            label = { style ->
+            headlineContent = {
                 Text(
-                    text = stringResource(id = R.string.message_context_sheet_actions_mark_unread),
-                    style = style
+                    text = stringResource(id = R.string.message_context_sheet_actions_react),
                 )
+            },
+            onClick = {
+                showReactSheet = true
             }
-        ) {
-            Toast.makeText(
-                context,
-                context.getString(R.string.comingsoon_toast),
-                Toast.LENGTH_SHORT
-            ).show()
+        )
 
-            coroutineScope.launch {
-                onHideSheet()
-            }
+        if (message.author == RevoltAPI.selfId) {
+            SheetButton(
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null
+                    )
+                },
+                headlineContent = {
+                    Text(
+                        text = stringResource(id = R.string.message_context_sheet_actions_edit),
+                    )
+                },
+                onClick = {
+                    coroutineScope.launch {
+                        UiCallbacks.editMessage(messageId)
+                        onHideSheet()
+                    }
+                }
+            )
         }
 
-        SheetClickable(
-            icon = { modifier ->
+        SheetButton(
+            leadingContent = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_eye_off_24dp),
+                    contentDescription = null
+                )
+            },
+            headlineContent = {
+                Text(
+                    text = stringResource(id = R.string.message_context_sheet_actions_mark_unread),
+                )
+            },
+            onClick = {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.comingsoon_toast),
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                coroutineScope.launch {
+                    onHideSheet()
+                }
+            }
+        )
+
+        SheetButton(
+            leadingContent = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_share_24dp),
                     contentDescription = null,
-                    modifier = modifier
                 )
             },
-            label = { style ->
+            headlineContent = {
                 Text(
                     text = stringResource(id = R.string.share),
-                    style = style
                 )
+            },
+            onClick = {
+                showShareSheet = true
             }
-        ) {
-            showShareSheet = true
-        }
+        )
 
         if (
             (message.channel?.let {
@@ -446,47 +439,47 @@ fun MessageContextSheet(
                 )
             } ?: 0) has PermissionBit.ManageMessages || message.author == RevoltAPI.selfId
         ) {
-            SheetClickable(
-                icon = { modifier ->
+            SheetButton(
+                leadingContent = {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        modifier = modifier
+                        contentDescription = null
                     )
                 },
-                label = { style ->
+                headlineContent = {
                     Text(
                         text = stringResource(id = R.string.message_context_sheet_actions_delete),
-                        style = style
                     )
                 },
-                dangerous = true
-            ) {
-                showDeleteMessageConfirmation = true
-            }
+                dangerous = true,
+                onClick = {
+                    showDeleteMessageConfirmation = true
+                }
+            )
         }
 
         if (message.author != RevoltAPI.selfId) {
-            SheetClickable(
-                icon = { modifier ->
+            SheetButton(
+                leadingContent = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_flag_24dp),
-                        contentDescription = null,
-                        modifier = modifier
+                        contentDescription = null
                     )
                 },
-                label = { style ->
+                headlineContent = {
                     Text(
                         text = stringResource(id = R.string.message_context_sheet_actions_report),
-                        style = style
                     )
                 },
-                dangerous = true
-            ) {
-                coroutineScope.launch {
-                    onReportMessage()
-                }
-            }
+                dangerous = true,
+                onClick = {
+                    coroutineScope.launch {
+                        onReportMessage()
+                    }
+                },
+            )
         }
+
+        SheetEnd()
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 fun SheetHeaderPadding(content: @Composable BoxScope.() -> Unit) {
     Box(
         Modifier
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-            .fillMaxWidth(), content = content)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+            .fillMaxWidth(), content = content
+    )
 }

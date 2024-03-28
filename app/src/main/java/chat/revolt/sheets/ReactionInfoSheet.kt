@@ -1,14 +1,16 @@
 package chat.revolt.sheets
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalTextStyle
@@ -16,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
@@ -45,6 +45,7 @@ import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.User
 import chat.revolt.components.chat.MemberListItem
 import chat.revolt.components.generic.RemoteImage
+import chat.revolt.components.generic.SheetEnd
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -118,94 +119,97 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
         if (reactionEmoji?.isNotEmpty() == true) {
             item("info") {
                 val current = reactionEmoji[selectedReactionIndex]
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .clip(MaterialTheme.shapes.medium)
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp))
-                ) {
-                    if (current.isUlid()) {
-                        val cached = extendedEmojiInfo.find { it.id == current }
-                        RemoteImage(
-                            url = "$REVOLT_FILES/emojis/$current/emoji.gif",
-                            description = cached?.name,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .size(32.dp)
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .size(32.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = current,
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center,
-                                    platformStyle = PlatformTextStyle(
-                                        includeFontPadding = false
-                                    )
-                                ),
-                                modifier = Modifier
-                                    .size(64.dp)
-                            )
-                        }
-                    }
 
-                    Column(
-                        modifier = Modifier.padding(
-                            top = 16.dp,
-                            start = 0.dp,
-                            end = 16.dp,
-                            bottom = 16.dp
-                        )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(
+                        top = 16.dp,
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 4.dp
+                    ),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (current.isUlid()) {
                             val cached = extendedEmojiInfo.find { it.id == current }
-                            Text(
-                                text = ":${cached?.name ?: current}:",
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.15.sp
+                            RemoteImage(
+                                url = "$REVOLT_FILES/emojis/$current/emoji.gif",
+                                description = cached?.name,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .size(32.dp)
                             )
                         } else {
-                            Text(
-                                text = MessageProcessor.emoji.unicodeAsShortcode(current)
-                                    ?: current,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.15.sp
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = current,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontSize = 28.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center,
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false
+                                        )
+                                    ),
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                )
+                            }
                         }
 
-                        Text(
-                            text = if (current.isUlid()) {
-                                val cached = extendedEmojiInfo.find { it.id == current }
-                                if (cached?.parent != null) {
-                                    when (cached.parent.type) {
-                                        "Server" -> RevoltAPI.serverCache[cached.parent.id]?.name?.let {
-                                            stringResource(
-                                                id = R.string.emote_info_from_server,
-                                                it
-                                            )
-                                        }
-                                            ?: stringResource(id = R.string.emote_info_from_server_unknown)
+                        Spacer(modifier = Modifier.width(16.dp))
 
-                                        else -> stringResource(id = R.string.emote_info_from_server_unknown)
+                        Column {
+                            if (current.isUlid()) {
+                                val cached = extendedEmojiInfo.find { it.id == current }
+                                Text(
+                                    text = ":${cached?.name ?: current}:",
+                                    fontWeight = FontWeight.SemiBold,
+                                    letterSpacing = 1.15.sp
+                                )
+                            } else {
+                                Text(
+                                    text = MessageProcessor.emoji.unicodeAsShortcode(current)
+                                        ?: current,
+                                    fontWeight = FontWeight.SemiBold,
+                                    letterSpacing = 1.15.sp
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(4.dp))
+
+                            Text(
+                                text = if (current.isUlid()) {
+                                    val cached = extendedEmojiInfo.find { it.id == current }
+                                    if (cached?.parent != null) {
+                                        when (cached.parent.type) {
+                                            "Server" -> RevoltAPI.serverCache[cached.parent.id]?.name?.let {
+                                                stringResource(
+                                                    id = R.string.emote_info_from_server,
+                                                    it
+                                                )
+                                            }
+                                                ?: stringResource(id = R.string.emote_info_from_server_unknown)
+
+                                            else -> stringResource(id = R.string.emote_info_from_server_unknown)
+                                        }
+                                    } else {
+                                        stringResource(id = R.string.emote_info_from_server_unknown)
                                     }
                                 } else {
-                                    stringResource(id = R.string.emote_info_from_server_unknown)
+                                    stringResource(id = R.string.emote_info_from_unicode)
                                 }
-                            } else {
-                                stringResource(id = R.string.emote_info_from_unicode)
-                            }
-                        )
+                            )
+                        }
                     }
+
+                    HorizontalDivider()
                 }
             }
 
@@ -236,7 +240,7 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
         }
 
         item("bottom") {
-            Spacer(Modifier.size(16.dp))
+            SheetEnd()
         }
     }
 }

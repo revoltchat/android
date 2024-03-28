@@ -1,10 +1,8 @@
 package chat.revolt.sheets
 
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -12,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -22,6 +19,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.channel.removeMember
+import chat.revolt.components.generic.SheetButton
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
@@ -46,7 +45,7 @@ fun ColumnScope.GroupDMMemberContextSheet(
     if (channel == null) return
 
     if (channel.owner == RevoltAPI.selfId && userId != RevoltAPI.selfId) {
-        ListItem(
+        SheetButton(
             headlineContent = {
                 CompositionLocalProvider(value = LocalContentColor provides MaterialTheme.colorScheme.error) {
                     Text(
@@ -67,7 +66,7 @@ fun ColumnScope.GroupDMMemberContextSheet(
                     )
                 }
             },
-            modifier = Modifier.clickable {
+            onClick = {
                 scope.launch {
                     removeMember(channelId, userId)
                     onRequestUpdateMembers()
@@ -78,7 +77,7 @@ fun ColumnScope.GroupDMMemberContextSheet(
     }
 
     // TODO replace with something useful (currently so that your sheet is not empty if you don't have permissions)
-    ListItem(
+    SheetButton(
         headlineContent = {
             Text(stringResource(R.string.user_info_sheet_copy_id))
         },
@@ -88,7 +87,7 @@ fun ColumnScope.GroupDMMemberContextSheet(
                 contentDescription = null
             )
         },
-        modifier = Modifier.clickable {
+        onClick = {
             clipboardManager.setText(AnnotatedString(userId))
 
             if (Platform.needsShowClipboardNotification()) {
@@ -100,6 +99,8 @@ fun ColumnScope.GroupDMMemberContextSheet(
             }
         }
     )
+
+    SheetEnd()
 }
 
 @Composable
@@ -126,7 +127,7 @@ fun ColumnScope.ServerMemberContextSheet(
     // TODO add something useful (moderation actions)
 
     // TODO replace with something useful (currently so that your sheet is not empty if you don't have permissions)
-    ListItem(
+    SheetButton(
         headlineContent = {
             Text(stringResource(R.string.user_info_sheet_copy_id))
         },
@@ -136,7 +137,7 @@ fun ColumnScope.ServerMemberContextSheet(
                 contentDescription = null
             )
         },
-        modifier = Modifier.clickable {
+        onClick = {
             clipboardManager.setText(AnnotatedString(userId))
 
             if (Platform.needsShowClipboardNotification()) {
@@ -148,4 +149,6 @@ fun ColumnScope.ServerMemberContextSheet(
             }
         }
     )
+
+    SheetEnd()
 }

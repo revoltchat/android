@@ -1,18 +1,20 @@
 package chat.revolt.sheets
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,7 +34,8 @@ import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.server.leaveOrDeleteServer
-import chat.revolt.components.generic.SheetClickable
+import chat.revolt.components.generic.SheetButton
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.markdown.RichMarkdown
 import chat.revolt.components.screens.settings.ServerOverview
 import chat.revolt.internals.Platform
@@ -138,19 +141,12 @@ fun ServerContextSheet(
     }
 
     Column(
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 4.dp),
     ) {
         ServerOverview(server)
 
-        Column(
-            modifier = Modifier.padding(horizontal = 4.dp)
-        ) {
-            Text(
-                text = stringResource(id = R.string.server_context_sheet_category_description),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(vertical = 14.dp)
-            )
-
+        SelectionContainer {
             RichMarkdown(
                 input = if (server.description?.isBlank() == false) {
                     server.description
@@ -160,27 +156,25 @@ fun ServerContextSheet(
                     )
                 }
             )
-
-            Text(
-                text = stringResource(id = R.string.server_context_sheet_category_actions),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 14.dp, bottom = 10.dp)
-            )
         }
 
-        SheetClickable(icon = {
+        HorizontalDivider()
+    }
+
+    SheetButton(
+        leadingContent = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_content_copy_id_24dp),
-                contentDescription = null,
-                modifier = it
+                contentDescription = null
             )
-        }, label = {
+        },
+        headlineContent = {
             Text(
-                text = stringResource(id = R.string.server_context_sheet_actions_copy_id),
-                style = it
+                text = stringResource(id = R.string.server_context_sheet_actions_copy_id)
             )
-        }) {
-            if (server.id == null) return@SheetClickable
+        },
+        onClick = {
+            if (server.id == null) return@SheetButton
 
             clipboardManager.setText(AnnotatedString(server.id))
 
@@ -196,19 +190,21 @@ fun ServerContextSheet(
                 onHideSheet()
             }
         }
+    )
 
-        SheetClickable(icon = {
+    SheetButton(
+        leadingContent = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_eye_check_24dp),
-                contentDescription = null,
-                modifier = it
+                contentDescription = null
             )
-        }, label = {
+        },
+        headlineContent = {
             Text(
-                text = stringResource(id = R.string.server_context_sheet_actions_mark_read),
-                style = it
+                text = stringResource(id = R.string.server_context_sheet_actions_mark_read)
             )
-        }) {
+        },
+        onClick = {
             coroutineScope.launch {
                 server.id?.let {
                     RevoltAPI.unreads.markServerAsRead(it, sync = true)
@@ -216,37 +212,45 @@ fun ServerContextSheet(
                 onHideSheet()
             }
         }
+    )
 
-        if (server.owner != RevoltAPI.selfId) {
-            SheetClickable(icon = {
+    if (server.owner != RevoltAPI.selfId) {
+        SheetButton(
+            leadingContent = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_flag_24dp),
-                    contentDescription = null,
-                    modifier = it
+                    contentDescription = null
                 )
-            }, label = {
+            },
+            headlineContent = {
                 Text(
                     text = stringResource(id = R.string.server_context_sheet_actions_report),
-                    style = it
                 )
-            }, dangerous = true) {
+            },
+            dangerous = true,
+            onClick = {
                 onReportServer()
             }
+        )
 
-            SheetClickable(icon = {
+        SheetButton(
+            leadingContent = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_left_bold_box_24dp),
                     contentDescription = null,
-                    modifier = it
                 )
-            }, label = {
+            },
+            headlineContent = {
                 Text(
-                    text = stringResource(id = R.string.server_context_sheet_actions_leave),
-                    style = it
+                    text = stringResource(id = R.string.server_context_sheet_actions_leave)
                 )
-            }, dangerous = true) {
+            },
+            dangerous = true,
+            onClick = {
                 showLeaveConfirmation = true
             }
-        }
+        )
     }
+
+    SheetEnd()
 }

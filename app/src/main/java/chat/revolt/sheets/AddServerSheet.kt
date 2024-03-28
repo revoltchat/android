@@ -5,7 +5,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -16,7 +15,6 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,6 +30,8 @@ import chat.revolt.R
 import chat.revolt.activities.InviteActivity
 import chat.revolt.api.REVOLT_APP
 import chat.revolt.components.generic.FormTextField
+import chat.revolt.components.generic.SheetButton
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.generic.SheetHeaderPadding
 
 @Composable
@@ -61,7 +61,7 @@ fun AddServerSheet() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        ListItem(
+        SheetButton(
             headlineContent = {
                 Text(stringResource(id = R.string.add_server_sheet_join_by_invite))
             },
@@ -71,12 +71,12 @@ fun AddServerSheet() {
                     contentDescription = null
                 )
             },
-            modifier = Modifier.clickable {
+            onClick = {
                 joinFromInviteModalOpen.value = true
             }
         )
 
-        ListItem(
+        SheetButton(
             headlineContent = {
                 Text(stringResource(id = R.string.add_server_sheet_create_new))
             },
@@ -86,7 +86,7 @@ fun AddServerSheet() {
                     contentDescription = null
                 )
             },
-            modifier = Modifier.clickable {
+            onClick = {
                 Toast.makeText(
                     context,
                     context.getString(
@@ -97,7 +97,7 @@ fun AddServerSheet() {
             }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        SheetEnd()
     }
 }
 

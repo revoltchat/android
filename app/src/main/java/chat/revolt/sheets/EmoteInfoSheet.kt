@@ -1,20 +1,17 @@
 package chat.revolt.sheets
 
 import android.widget.Toast
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,7 +21,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -41,7 +37,8 @@ import chat.revolt.api.routes.custom.fetchEmoji
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.Server
 import chat.revolt.components.generic.RemoteImage
-import chat.revolt.components.generic.SheetClickable
+import chat.revolt.components.generic.SheetButton
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
@@ -62,39 +59,30 @@ fun EmoteInfoSheet(id: String, onDismiss: () -> Unit) {
     }
 
     Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .verticalScroll(rememberScrollState())
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 4.dp),
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.medium)
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(0.dp))
+            verticalAlignment = Alignment.CenterVertically
         ) {
             RemoteImage(
                 url = "$REVOLT_FILES/emojis/$id",
                 description = emoteInfo?.name,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .padding(16.dp)
                     .size(32.dp)
             )
 
-            Column(
-                modifier = Modifier.padding(
-                    top = 16.dp,
-                    start = 0.dp,
-                    end = 16.dp,
-                    bottom = 16.dp
-                )
-            ) {
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column {
                 Text(
-                    text = emoteInfo?.name ?: id,
-                    fontWeight = FontWeight.Bold,
+                    text = ":${emoteInfo?.name ?: id}:",
+                    fontWeight = FontWeight.SemiBold,
                     letterSpacing = 1.15.sp
                 )
+
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = if (parentServer != null) {
@@ -109,23 +97,22 @@ fun EmoteInfoSheet(id: String, onDismiss: () -> Unit) {
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider()
+    }
 
-        SheetClickable(
-            icon = { modifier ->
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_content_copy_24dp),
-                    contentDescription = null,
-                    modifier = modifier
-                )
-            },
-            label = { style ->
-                Text(
-                    text = stringResource(id = R.string.copy),
-                    style = style
-                )
-            }
-        ) {
+    SheetButton(
+        headlineContent = {
+            Text(
+                text = stringResource(id = R.string.copy)
+            )
+        },
+        leadingContent = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_content_copy_24dp),
+                contentDescription = null
+            )
+        },
+        onClick = {
             coroutineScope.launch {
                 clipboardManager.setText(AnnotatedString(":$id:"))
                 if (Platform.needsShowClipboardNotification()) {
@@ -138,5 +125,7 @@ fun EmoteInfoSheet(id: String, onDismiss: () -> Unit) {
             }
             onDismiss()
         }
-    }
+    )
+
+    SheetEnd()
 }

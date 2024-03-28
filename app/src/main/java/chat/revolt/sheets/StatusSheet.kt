@@ -19,7 +19,8 @@ import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.user.patchSelf
-import chat.revolt.components.generic.SheetClickable
+import chat.revolt.components.generic.SheetButton
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.generic.asApiName
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.settings.UserOverview
@@ -52,24 +53,25 @@ fun StatusSheet(onBeforeNavigation: () -> Unit, onGoSettings: () -> Unit) {
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+    }
 
-        SheetClickable(
-            icon = { modifier ->
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = null,
-                    modifier = modifier
-                )
-            },
-            label = { style ->
-                Text(
-                    text = stringResource(id = R.string.settings),
-                    style = style
-                )
-            }
-        ) {
+    SheetButton(
+        leadingContent = {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = null
+            )
+        },
+        headlineContent = {
+            Text(
+                text = stringResource(id = R.string.settings)
+            )
+        },
+        onClick = {
             onBeforeNavigation()
             onGoSettings()
         }
-    }
+    )
+
+    SheetEnd()
 }
