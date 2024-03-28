@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">← Atgal</string>
+    <string name="ok">Gerai</string>
+    <string name="cancel">Atšaukti</string>
+    <string name="share">Bendrinti</string>
+    <string name="community_guidelines">Bendruomenės gairės</string>
+    <string name="email">El. paštas</string>
+    <string name="login">Prisijungti</string>
+    <string name="signup">Registruotis</string>
+    <string name="send_email">Siųsti el. laišką</string>
+    <string name="password_forgot">Pamiršote slaptažodį\?</string>
+    <string name="register_heading">Sveiki atvykę į Revolt</string>
+    <string name="register_email">El. paštas</string>
+    <string name="onboarding_welcome">Sveiki!</string>
+    <string name="next">Pirmyn →</string>
+    <string name="terms_of_service">Naudojimo sąlygos</string>
+    <string name="privacy_policy">Privatumo politika</string>
+    <string name="password">Slaptažodis</string>
+    <string name="resend">Siųsti iš naujo</string>
+    <string name="password_forgot_heading">Pamiršote slaptažodį\?</string>
+    <string name="register_password">Slaptažodis</string>
+    <string name="onboarding_lead">Laikas pasirinkti naudotojo vardą!</string>
+</resources>

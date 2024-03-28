@@ -140,12 +140,6 @@
     <string name="settings_appearance_theme_none">システム</string>
     <string name="settings_appearance_theme_m3dynamic">マテリアル ユー</string>
     <string name="settings_feedback">フィードバック</string>
-    <string name="settings_feedback_category_bug">バグレポート</string>
-    <string name="settings_feedback_category_ux">ユーザー体験 (UI/UX)</string>
-    <string name="settings_feedback_category_security">セキュリティ</string>
-    <string name="settings_feedback_category_other">その他</string>
-    <string name="settings_feedback_message">メッセージ</string>
-    <string name="settings_feedback_disabled_title">フィードバックは利用できません</string>
     <string name="community_guidelines">コミュニティガイドライン</string>
     <string name="resend_verification">認証メールを再送します</string>
     <string name="password_forgot_heading">パスワードをお忘れですか？</string>
@@ -223,14 +217,6 @@
     <string name="settings_appearance_theme_amoled">ピュアブラック</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported">マテリアル ユー (未対応)</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">マテリアル ユーはこのデバイスでサポートされていません。</string>
-    <string name="settings_feedback_introduction">Revoltに対するフィードバックは非常に高く評価され、すべてのフィードバックはAndroidアプリの開発チームによって読まれます。</string>
-    <string name="settings_feedback_category">カテゴリー</string>
-    <string name="settings_feedback_category_satisfaction">汎用フィードバック</string>
-    <string name="settings_feedback_category_feature">機能リクエスト</string>
-    <string name="settings_feedback_category_performance">パフォーマンス</string>
-    <string name="settings_feedback_message_too_long">メッセージが長すぎます。%1$d文字以内にしてください。</string>
-    <string name="settings_feedback_error">フィードバックの送信中にエラーが発生しました。後でやり直してください。</string>
-    <string name="settings_feedback_disabled_message">このRevoltのビルドではフィードバックは利用できません。このビルドのサポートは限られています。(ビルド: %1$s %2$s)</string>
     <string name="report_submit_error">レポートの送信中にエラーが発生しました。後でやり直してください。</string>
     <string name="login_onboarding_body">Revoltは、いつでもどこでも、友人やコミュニティとのつながりを維持するための最良の方法の1つです。</string>
     <string name="register_instructions">たむろしたり、集まったり、話したりするための場所のようなものです。インターネット上にあることが素晴らしいです。</string>
