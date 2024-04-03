@@ -319,7 +319,9 @@ fun Message(
                                     currentServer = RevoltAPI.channelCache[message.channel]?.server
                                 )
                             ) {
+                                Spacer(modifier = Modifier.height(4.dp))
                                 RichMarkdown(input = message.content)
+                                Spacer(modifier = Modifier.height(4.dp))
                             }
                         }
                     }
