@@ -269,6 +269,9 @@ dependencies {
     implementation "app.cash.sqldelight:android-driver:2.0.1"
     implementation "androidx.datastore:datastore:1.1.0-beta02"
     implementation "androidx.datastore:datastore-preferences:1.1.0-beta02"
+
+    // Livekit
+    implementation "io.livekit:livekit-android:$livekit_version"
 }
 
 sqldelight {
