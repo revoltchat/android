@@ -1,8 +1,7 @@
 package chat.revolt.screens.labs.ui.mockups
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.EaseInOutExpo
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -64,7 +63,7 @@ fun CallScreenMockup() {
         } else {
             MaterialTheme.colorScheme.secondaryContainer
         },
-        animationSpec = tween(200, easing = EaseInOutExpo),
+        animationSpec = spring(),
         label = "pttBackground"
     )
     val pttText by animateColorAsState(
@@ -73,7 +72,7 @@ fun CallScreenMockup() {
         } else {
             MaterialTheme.colorScheme.onSecondaryContainer
         },
-        animationSpec = tween(200, easing = EaseInOutExpo),
+        animationSpec = spring(),
         label = "pttText"
     )
 
