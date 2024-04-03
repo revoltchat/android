@@ -53,7 +53,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -254,7 +253,6 @@ fun ChatRouterScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val view = LocalView.current
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     val navController = rememberNavController()
 
@@ -309,7 +307,6 @@ fun ChatRouterScreen(
             .distinctUntilChanged()
             .collect { state ->
                 if (state == DrawerValue.Open) {
-                    keyboardController?.hide()
                     val keyboard =
                         context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     keyboard.hideSoftInputFromWindow(view.windowToken, 0)
