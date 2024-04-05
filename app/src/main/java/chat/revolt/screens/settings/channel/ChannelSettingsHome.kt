@@ -47,7 +47,6 @@ import chat.revolt.api.internals.hasPermission
 import chat.revolt.api.routes.channel.leaveDeleteOrCloseChannel
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.settings.FeatureFlags
-import chat.revolt.api.settings.LabsAccessControlVariates
 import chat.revolt.internals.extensions.rememberChannelPermissions
 import kotlinx.coroutines.launch
 
@@ -151,7 +150,7 @@ fun ChannelSettingsHome(navController: NavController, channelId: String) {
                     }
 
                     // TODO Implement permissions UI and remove the predicate check
-                    if (permissions.hasPermission(PermissionBit.ManageRole) && (FeatureFlags.labsAccessControl is LabsAccessControlVariates.Restricted && (FeatureFlags.labsAccessControl as LabsAccessControlVariates.Restricted).predicate())) {
+                    if (permissions.hasPermission(PermissionBit.ManageRole) && FeatureFlags.labsAccessControlGranted) {
                         ListItem(
                             headlineContent = {
                                 Text(

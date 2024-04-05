@@ -87,6 +87,7 @@ import chat.revolt.components.screens.chat.drawer.channel.ChannelList
 import chat.revolt.components.screens.chat.drawer.server.DrawerServer
 import chat.revolt.components.screens.chat.drawer.server.DrawerServerlikeIcon
 import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
+import chat.revolt.components.screens.voice.VoiceChannelOverlay
 import chat.revolt.internals.Changelogs
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
@@ -290,6 +291,9 @@ fun ChatRouterScreen(
 
     var useTabletAwareUI by remember { mutableStateOf(false) }
 
+    var voiceChannelOverlay by remember { mutableStateOf(false) }
+    var voiceChannelOverlayChannelId by remember { mutableStateOf("") }
+
     val toggleDrawerLambda = remember {
         {
             scope.launch {
@@ -409,6 +413,11 @@ fun ChatRouterScreen(
 
                     is Action.ChatNavigate -> {
                         navController.navigate(action.route)
+                    }
+
+                    is Action.OpenVoiceChannelOverlay -> {
+                        voiceChannelOverlayChannelId = action.channelId
+                        voiceChannelOverlay = true
                     }
                 }
             }
@@ -668,6 +677,12 @@ fun ChatRouterScreen(
                     showReactionInfoSheet = false
                 }
             )
+        }
+    }
+
+    if (voiceChannelOverlay) {
+        VoiceChannelOverlay(voiceChannelOverlayChannelId) {
+            voiceChannelOverlay = false
         }
     }
 

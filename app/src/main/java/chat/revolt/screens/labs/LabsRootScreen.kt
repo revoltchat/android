@@ -12,16 +12,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import chat.revolt.api.settings.FeatureFlags
-import chat.revolt.api.settings.LabsAccessControlVariates
 import chat.revolt.screens.labs.ui.mockups.CallScreenMockup
 
 annotation class LabsFeature
 
 @Composable
 fun LabsGuard(onTurnBack: () -> Unit = {}, content: @Composable () -> Unit) {
-    if (FeatureFlags.labsAccessControl is LabsAccessControlVariates.Restricted &&
-        (FeatureFlags.labsAccessControl as LabsAccessControlVariates.Restricted).predicate().not()
-    ) {
+    if (!FeatureFlags.labsAccessControlGranted) {
         AlertDialog(
             onDismissRequest = { onTurnBack() },
             confirmButton = {

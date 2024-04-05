@@ -45,7 +45,6 @@ import chat.revolt.activities.InviteActivity
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.GlobalState
-import chat.revolt.api.settings.LabsAccessControlVariates
 import chat.revolt.components.generic.ListHeader
 import chat.revolt.components.screens.settings.SelfUserOverview
 import chat.revolt.persistence.KVStorage
@@ -241,9 +240,7 @@ fun SettingsScreen(
                         )
                     }
 
-                    if (FeatureFlags.labsAccessControl is LabsAccessControlVariates.Restricted &&
-                        (FeatureFlags.labsAccessControl as LabsAccessControlVariates.Restricted).predicate()
-                    ) {
+                    if (FeatureFlags.labsAccessControlGranted) {
                         ListItem(
                             headlineContent = {
                                 Text(

@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -72,6 +73,9 @@ import chat.revolt.api.routes.channel.react
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.ChannelType
+import chat.revolt.api.settings.FeatureFlags
+import chat.revolt.callbacks.Action
+import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.NativeMessageField
 import chat.revolt.components.chat.SystemMessage
@@ -266,6 +270,20 @@ fun ChannelScreen(
             onToggleDrawer = onToggleDrawer,
             useDrawer = useDrawer
         )
+
+        if (FeatureFlags.mediaConversationsGranted && channel?.channelType == ChannelType.VoiceChannel) {
+            Button(onClick = {
+                coroutineScope.launch {
+                    ActionChannel.send(
+                        Action.OpenVoiceChannelOverlay(
+                            channelId
+                        )
+                    )
+                }
+            }) {
+                Text("Open voice channel overlay")
+            }
+        }
 
         val isScrolledToBottom = remember(lazyListState) {
             derivedStateOf {
