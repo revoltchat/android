@@ -1,5 +1,6 @@
 package chat.revolt.components.markdown
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
@@ -35,9 +36,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import chat.revolt.R
+import chat.revolt.activities.InviteActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.custom.fetchEmoji
+import chat.revolt.api.schemas.isInviteUri
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.generic.RemoteImage
@@ -286,6 +289,22 @@ fun MarkdownText(textNode: AstNode, modifier: Modifier = Modifier) {
                 end = offset
             ).firstOrNull()?.let { annotation ->
                 val url = annotation.item
+
+                try {
+                    val uri = url.toUri()
+                    if (uri.isInviteUri()) {
+                        scope.launch {
+                            Intent(context, InviteActivity::class.java).apply {
+                                data = uri
+                                context.startActivity(this)
+                            }
+                        }
+                        return@handler true
+                    }
+                } catch (e: Exception) {
+                    // no-op
+                }
+
                 val customTab = CustomTabsIntent.Builder()
                     .setShowTitle(true)
                     .setDefaultColorSchemeParams(
