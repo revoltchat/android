@@ -187,6 +187,8 @@
     <string name="reply_message_not_cached">Unknown message</string>
     <string name="reply_message_empty_has_attachments">Sent attachments</string>
 
+    <string name="message_blocked">Blocked message</string>
+
     <string name="system_message_ownership_changed_alt">Ownership changed</string>
     <string name="system_message_channel_icon_changed_alt">Channel icon changed</string>
     <string name="system_message_channel_description_changed_alt">Channel description changed</string>
