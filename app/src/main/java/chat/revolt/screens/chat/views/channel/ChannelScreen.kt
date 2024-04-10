@@ -472,7 +472,7 @@ fun ChannelScreen(
                 )
                 .clip(MaterialTheme.shapes.medium)
         ) {
-            AnimatedVisibility(visible = viewModel.pendingReplies.isNotEmpty()) {
+            AnimatedVisibility(visible = viewModel.pendingReplies.isNotEmpty() && !viewModel.denyMessageField) {
                 ReplyManager(
                     replies = viewModel.pendingReplies,
                     onRemove = { viewModel.pendingReplies.remove(it) },
@@ -480,7 +480,7 @@ fun ChannelScreen(
                 )
             }
 
-            AnimatedVisibility(visible = viewModel.pendingAttachments.isNotEmpty()) {
+            AnimatedVisibility(visible = viewModel.pendingAttachments.isNotEmpty() && !viewModel.denyMessageField) {
                 AttachmentManager(
                     attachments = viewModel.pendingAttachments,
                     uploading = viewModel.isSendingMessage,
