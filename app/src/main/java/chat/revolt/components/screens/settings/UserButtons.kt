@@ -280,7 +280,7 @@ fun UserButtons(
                             },
                             onClick = {
                                 scope.launch {
-                                    ActionChannel.send(Action.ChatNavigate("report/user/${user.id}"))
+                                    ActionChannel.send(Action.ReportUser(user.id))
 
                                     if (Platform.needsShowClipboardNotification()) {
                                         Toast.makeText(

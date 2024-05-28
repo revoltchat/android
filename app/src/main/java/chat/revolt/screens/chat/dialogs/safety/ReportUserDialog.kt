@@ -32,7 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.safety.putUserReport
@@ -51,10 +50,10 @@ enum class UserReportFlowState {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportUserDialog(navController: NavController, userId: String) {
+fun ReportUserDialog(onDismiss: () -> Unit, userId: String) {
     val user = RevoltAPI.userCache[userId]
     if (user == null) {
-        navController.popBackStack()
+        onDismiss()
         return
     }
 
@@ -167,7 +166,7 @@ fun ReportUserDialog(navController: NavController, userId: String) {
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_cancel")
                     ) {
@@ -231,7 +230,7 @@ fun ReportUserDialog(navController: NavController, userId: String) {
 
             AlertDialog(
                 onDismissRequest = {
-                    navController.popBackStack()
+                    onDismiss()
                 },
                 icon = {
                     Icon(
@@ -272,7 +271,7 @@ fun ReportUserDialog(navController: NavController, userId: String) {
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_block_no")
                     ) {
@@ -285,7 +284,7 @@ fun ReportUserDialog(navController: NavController, userId: String) {
                             scope.launch {
                                 blockUser(userId)
                             }
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_block_yes")
                     ) {
@@ -298,7 +297,7 @@ fun ReportUserDialog(navController: NavController, userId: String) {
         UserReportFlowState.Error -> {
             AlertDialog(
                 onDismissRequest = {
-                    navController.popBackStack()
+                    onDismiss()
                 },
                 icon = {
                     Icon(
@@ -325,7 +324,7 @@ fun ReportUserDialog(navController: NavController, userId: String) {
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_error_ok")
                     ) {

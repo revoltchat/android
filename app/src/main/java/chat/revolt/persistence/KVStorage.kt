@@ -7,9 +7,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.flow.firstOrNull
 
 val Context.revoltKVStorage: DataStore<Preferences> by preferencesDataStore(name = "revolt_kv")
 
@@ -37,6 +37,16 @@ class KVStorage @Inject constructor(
 
     suspend fun getBoolean(key: String): Boolean? {
         return dataStore.data.firstOrNull()?.get(stringPreferencesKey(key))?.toBoolean()
+    }
+
+    suspend fun set(key: String, value: Int) {
+        dataStore.edit { preferences ->
+            preferences[stringPreferencesKey(key)] = value.toString()
+        }
+    }
+
+    suspend fun getInt(key: String): Int? {
+        return dataStore.data.firstOrNull()?.get(stringPreferencesKey(key))?.toInt()
     }
 
     suspend fun remove(key: String) {

@@ -40,7 +40,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.safety.putMessageReport
@@ -59,10 +58,10 @@ enum class MessageReportFlowState {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportMessageDialog(navController: NavController, messageId: String) {
+fun ReportMessageDialog(onDismiss: () -> Unit, messageId: String) {
     val message = RevoltAPI.messageCache[messageId]
     if (message == null) {
-        navController.popBackStack()
+        onDismiss()
         return
     }
 
@@ -206,7 +205,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_cancel")
                     ) {
@@ -270,7 +269,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
 
             AlertDialog(
                 onDismissRequest = {
-                    navController.popBackStack()
+                    onDismiss()
                 },
                 icon = {
                     Icon(
@@ -311,7 +310,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_block_no")
                     ) {
@@ -324,7 +323,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
                             scope.launch {
                                 blockUser(message.author ?: return@launch)
                             }
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_block_yes")
                     ) {
@@ -337,7 +336,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
         MessageReportFlowState.Error -> {
             AlertDialog(
                 onDismissRequest = {
-                    navController.popBackStack()
+                    onDismiss()
                 },
                 icon = {
                     Icon(
@@ -364,7 +363,7 @@ fun ReportMessageDialog(navController: NavController, messageId: String) {
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_error_ok")
                     ) {

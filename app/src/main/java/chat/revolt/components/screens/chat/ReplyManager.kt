@@ -31,8 +31,8 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.routes.channel.SendMessageReply
-import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.Message
+import chat.revolt.components.chat.authorAvatarUrl
 import chat.revolt.components.chat.authorColour
 import chat.revolt.components.chat.authorName
 import chat.revolt.components.generic.UserAvatar
@@ -73,11 +73,12 @@ fun ManageableReply(reply: SendMessageReply, onToggleMention: () -> Unit, onRemo
 
         Spacer(modifier = Modifier.width(8.dp))
 
+
         UserAvatar(
             username = authorName(message = replyMessage),
             userId = replyAuthor.id ?: ULID.makeSpecial(0),
             avatar = replyAuthor.avatar,
-            rawUrl = replyMessage.masquerade?.avatar?.let { asJanuaryProxyUrl(it) },
+            rawUrl = authorAvatarUrl(message = replyMessage),
             size = 16.dp
         )
 
@@ -86,9 +87,6 @@ fun ManageableReply(reply: SendMessageReply, onToggleMention: () -> Unit, onRemo
         Text(
             text = authorName(message = replyMessage),
             modifier = Modifier
-                .clickable {
-                    onToggleMention()
-                }
                 .padding(4.dp),
             style = LocalTextStyle.current.copy(
                 brush = authorColour(message = replyMessage),
@@ -103,9 +101,6 @@ fun ManageableReply(reply: SendMessageReply, onToggleMention: () -> Unit, onRemo
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
-                .clickable {
-                    onToggleMention()
-                }
                 .padding(4.dp)
                 .weight(1f)
         )

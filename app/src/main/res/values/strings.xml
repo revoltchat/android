@@ -99,6 +99,9 @@
     <string name="reply_mention_off">\@ off</string>
     <string name="too_many_replies">You can only reply to %1$d messages at a time.</string>
 
+    <string name="attachment_preview_remove">Remove</string>
+    <string name="attachment_preview_close">Close</string>
+
     <string name="emoji_category_smileys">Smileys &amp; Emotions</string>
     <string name="emoji_category_people">People &amp; Body</string>
     <string name="emoji_category_animals">Animals &amp; Nature</string>
@@ -184,10 +187,14 @@
     <string name="message_field_denied_no_permission">You don\'t have permission to send messages in this channel.</string>
     <string name="message_field_denied_platform_moderation">This is a trusted channel for notices from our moderation team. You can\'t send messages here.</string>
 
+    <string name="message_field_editing_message">Editing message</string>
+    <string name="message_field_editing_message_cancel_alt">Cancel editing</string>
+
     <string name="reply_message_not_cached">Unknown message</string>
     <string name="reply_message_empty_has_attachments">Sent attachments</string>
 
     <string name="message_blocked">Blocked message</string>
+    <string name="message_failed_to_send">Failed to send, long press for options</string>
 
     <string name="system_message_ownership_changed_alt">Ownership changed</string>
     <string name="system_message_channel_icon_changed_alt">Channel icon changed</string>

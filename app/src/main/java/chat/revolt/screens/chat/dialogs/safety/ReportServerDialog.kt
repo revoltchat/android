@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.safety.putServerReport
@@ -49,10 +48,10 @@ enum class ServerReportFlowState {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportServerDialog(navController: NavController, serverId: String) {
+fun ReportServerDialog(onDismiss: () -> Unit, serverId: String) {
     val server = RevoltAPI.serverCache[serverId]
     if (server == null) {
-        navController.popBackStack()
+        onDismiss()
         return
     }
 
@@ -171,7 +170,7 @@ fun ReportServerDialog(navController: NavController, serverId: String) {
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_cancel")
                     ) {
@@ -233,7 +232,7 @@ fun ReportServerDialog(navController: NavController, serverId: String) {
         ServerReportFlowState.Done -> {
             AlertDialog(
                 onDismissRequest = {
-                    navController.popBackStack()
+                    onDismiss()
                 },
                 icon = {
                     Icon(
@@ -265,7 +264,7 @@ fun ReportServerDialog(navController: NavController, serverId: String) {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_close")
                     ) {
@@ -278,7 +277,7 @@ fun ReportServerDialog(navController: NavController, serverId: String) {
         ServerReportFlowState.Error -> {
             AlertDialog(
                 onDismissRequest = {
-                    navController.popBackStack()
+                    onDismiss()
                 },
                 icon = {
                     Icon(
@@ -305,7 +304,7 @@ fun ReportServerDialog(navController: NavController, serverId: String) {
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            navController.popBackStack()
+                            onDismiss()
                         },
                         modifier = Modifier.testTag("report_error_ok")
                     ) {

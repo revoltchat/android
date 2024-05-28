@@ -36,7 +36,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -345,25 +344,20 @@ fun NativeMessageField(
         ) {
             Spacer(modifier = Modifier.width(8.dp))
 
-            if (canAttach) {
+            // Note: There is an assumption that editing a message implies canAttach = false and editMode = true
+            AnimatedVisibility(canAttach) {
                 Icon(
-                    when {
-                        editMode -> Icons.Default.Close
-                        else -> Icons.Default.Add
-                    },
+                    Icons.Default.Add,
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     contentDescription = stringResource(id = R.string.add_attachment_alt),
                     modifier = Modifier
                         .clip(CircleShape)
                         .size(32.dp)
                         .clickable {
-                            when {
-                                editMode -> cancelEdit()
-                                else -> {
-                                    // hide keyboard because it's annoying
-                                    clearFocus()
-                                    onAddAttachment()
-                                }
+                            if (!editMode) {
+                                // hide keyboard because it's annoying
+                                clearFocus()
+                                onAddAttachment()
                             }
                         }
                         .padding(4.dp)

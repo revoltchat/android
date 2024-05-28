@@ -102,6 +102,7 @@ fun InbuiltMediaPicker(
     onClose: () -> Unit,
     onMediaSelected: (Media) -> Unit,
     pendingMedia: List<String>,
+    modifier: Modifier = Modifier,
     disabled: Boolean = false
 ) {
     val context = LocalContext.current
@@ -265,9 +266,9 @@ fun InbuiltMediaPicker(
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.5f)
+            .fillMaxHeight()
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

@@ -12,12 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -25,23 +23,27 @@ import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.activities.RevoltTweenInt
+import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 
 @Composable
-fun StackedUserAvatars(users: List<String>, amount: Int = 3) {
+fun StackedUserAvatars(users: List<String>, amount: Int = 3, serverId: String?) {
     Box(
         modifier = Modifier
             .size(16.dp + (8.dp * minOf(users.size, amount)), 16.dp)
     ) {
         users.take(amount).forEachIndexed { index, userId ->
             val user = RevoltAPI.userCache[userId]
+            val maybeMember = serverId?.let { RevoltAPI.members.getMember(serverId, userId) }
+
             UserAvatar(
                 avatar = user?.avatar,
                 userId = userId,
                 username = user?.let { User.resolveDefaultName(it) }
                     ?: stringResource(id = R.string.unknown),
+                rawUrl = maybeMember?.avatar?.let { "$REVOLT_FILES/avatars/${it.id}?max_side=256" },
                 size = 16.dp,
                 modifier = Modifier
                     .offset(
@@ -53,7 +55,7 @@ fun StackedUserAvatars(users: List<String>, amount: Int = 3) {
 }
 
 @Composable
-fun TypingIndicator(users: List<String>) {
+fun TypingIndicator(users: List<String>, serverId: String?) {
     fun typingMessageResource(): Int {
         return when (users.size) {
             0 -> R.string.typing_blank
@@ -77,24 +79,21 @@ fun TypingIndicator(users: List<String>) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp
-                    )
-                )
                 .background(MaterialTheme.colorScheme.background.copy(alpha = 0.9f))
-                .padding(top = 4.dp, start = 16.dp, end = 16.dp)
+                .padding(vertical = 8.dp, horizontal = 16.dp)
         ) {
-            StackedUserAvatars(users = users)
+            StackedUserAvatars(users = users, serverId = serverId)
 
             Text(
                 text = stringResource(
                     id = typingMessageResource(),
-                    users.joinToString {
-                        RevoltAPI.userCache[it]?.let { u ->
-                            User.resolveDefaultName(u)
-                        } ?: it
+                    users.joinToString { userId ->
+                        RevoltAPI.userCache[userId]?.let { u ->
+                            val maybeMember =
+                                serverId?.let { RevoltAPI.members.getMember(serverId, userId) }
+                            
+                            maybeMember?.nickname ?: User.resolveDefaultName(u)
+                        } ?: userId
                     }
                 ),
                 fontSize = 12.sp,

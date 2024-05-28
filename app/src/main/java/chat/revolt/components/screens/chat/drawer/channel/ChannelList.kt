@@ -71,6 +71,7 @@ import chat.revolt.api.schemas.has
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannelIconType
+import chat.revolt.screens.chat.ChatRouterDestination
 import chat.revolt.sheets.ChannelContextSheet
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -83,11 +84,9 @@ const val BANNER_HEIGHT_EXPANDED = 128
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun RowScope.ChannelList(
-    serverId: String,
-    currentDestination: String?,
-    currentChannel: String?,
-    onChannelClick: (String) -> Unit,
-    onSpecialClick: (String) -> Unit,
+    serverId: String?,
+    currentDestination: ChatRouterDestination,
+    onDestinationChange: (ChatRouterDestination) -> Unit,
     onServerSheetOpenFor: (String) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
@@ -163,7 +162,7 @@ fun RowScope.ChannelList(
                 .fillMaxSize(),
             state = lazyListState
         ) {
-            if (serverId == "home") {
+            if (serverId == null) {
                 stickyHeader(
                     key = "header"
                 ) {
@@ -192,10 +191,10 @@ fun RowScope.ChannelList(
                     DrawerChannel(
                         name = stringResource(R.string.home),
                         iconType = DrawerChannelIconType.Painter(painterResource(R.drawable.ic_home_24dp)),
-                        selected = currentDestination == "home",
+                        selected = currentDestination == ChatRouterDestination.Home,
                         hasUnread = false,
                         onClick = {
-                            onSpecialClick("home")
+                            onDestinationChange(ChatRouterDestination.Home)
                         },
                         large = true
                     )
@@ -207,10 +206,10 @@ fun RowScope.ChannelList(
                     DrawerChannel(
                         name = stringResource(R.string.friends),
                         iconType = DrawerChannelIconType.Painter(painterResource(R.drawable.ic_human_greeting_variant_24dp)),
-                        selected = currentDestination == "friends",
+                        selected = currentDestination == ChatRouterDestination.Friends,
                         hasUnread = false,
                         onClick = {
-                            onSpecialClick("friends")
+                            onDestinationChange(ChatRouterDestination.Friends)
                         },
                         large = true
                     )
@@ -225,11 +224,13 @@ fun RowScope.ChannelList(
                     DrawerChannel(
                         name = stringResource(R.string.channel_notes),
                         iconType = DrawerChannelIconType.Channel(ChannelType.SavedMessages),
-                        selected = currentDestination == "channel/$notesChannelId",
+                        selected = currentDestination == ChatRouterDestination.Channel(
+                            notesChannelId ?: ""
+                        ),
                         hasUnread = false,
                         onClick = {
                             if (notesChannelId != null) {
-                                onChannelClick(notesChannelId)
+                                onDestinationChange(ChatRouterDestination.Channel(notesChannelId))
                                 return@DrawerChannel
                             }
 
@@ -239,7 +240,11 @@ fun RowScope.ChannelList(
                                     if (RevoltAPI.channelCache[notesChannel.id] == null)
                                         RevoltAPI.channelCache[notesChannel.id] = notesChannel
                                 }
-                                onChannelClick(notesChannel.id ?: return@launch)
+                                onDestinationChange(
+                                    ChatRouterDestination.Channel(
+                                        notesChannel.id ?: return@launch
+                                    )
+                                )
                             }
                         },
                         large = true
@@ -284,7 +289,9 @@ fun RowScope.ChannelList(
                         iconType = DrawerChannelIconType.Channel(
                             channel.channelType ?: ChannelType.TextChannel
                         ),
-                        selected = currentDestination == "channel/${channel.id}",
+                        selected = currentDestination == ChatRouterDestination.Channel(
+                            channel.id ?: ""
+                        ),
                         hasUnread = channel.lastMessageID?.let { lastMessageID ->
                             RevoltAPI.unreads.hasUnread(
                                 channel.id!!,
@@ -299,7 +306,11 @@ fun RowScope.ChannelList(
                             online = partner?.online ?: false
                         ),
                         onClick = {
-                            onChannelClick(channel.id ?: return@DrawerChannel)
+                            onDestinationChange(
+                                ChatRouterDestination.Channel(
+                                    channel.id ?: return@DrawerChannel
+                                )
+                            )
                         },
                         onLongClick = {
                             channelContextSheetTarget = channel.id ?: return@DrawerChannel
@@ -476,7 +487,7 @@ fun RowScope.ChannelList(
                             )
 
                             IconButton(onClick = {
-                                onServerSheetOpenFor(serverId)
+                                onServerSheetOpenFor(serverId ?: return@IconButton)
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.MoreVert,
@@ -497,7 +508,7 @@ fun RowScope.ChannelList(
                 if (categorisedChannels.isNullOrEmpty()) {
                     item {
                         Column(
-                            Modifier.weight(1f),
+                            Modifier.padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
@@ -550,7 +561,9 @@ fun RowScope.ChannelList(
                                     iconType = DrawerChannelIconType.Channel(
                                         channel.channelType ?: ChannelType.TextChannel
                                     ),
-                                    selected = currentDestination == "channel/${channel.id}",
+                                    selected = currentDestination == ChatRouterDestination.Channel(
+                                        channel.id ?: ""
+                                    ),
                                     hasUnread = channel.lastMessageID?.let { lastMessageID ->
                                         RevoltAPI.unreads.hasUnread(
                                             channel.id!!,
@@ -569,7 +582,11 @@ fun RowScope.ChannelList(
                                         online = partner?.online ?: false
                                     ),
                                     onClick = {
-                                        onChannelClick(channel.id ?: return@DrawerChannel)
+                                        onDestinationChange(
+                                            ChatRouterDestination.Channel(
+                                                channel.id ?: return@DrawerChannel
+                                            )
+                                        )
                                     },
                                     onLongClick = {
                                         channelContextSheetTarget =

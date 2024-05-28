@@ -53,15 +53,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
@@ -79,7 +79,11 @@ import chat.revolt.internals.UnicodeEmojiSection
 import kotlinx.coroutines.launch
 
 @Composable
-fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
+fun EmojiPicker(
+    onSearchFocus: (Boolean) -> Unit = {},
+    bottomInset: Dp = 0.dp,
+    onEmojiSelected: (String) -> Unit,
+) {
     val view = LocalView.current
     val focusManager = LocalFocusManager.current
 
@@ -214,6 +218,9 @@ fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
                     .fillMaxWidth(.9f)
                     .alpha(searchFieldOpacity)
                     .align(Alignment.CenterStart)
+                    .onFocusChanged {
+                        onSearchFocus(it.isFocused)
+                    }
             ) { innerTextField ->
                 Box(
                     modifier = Modifier
@@ -558,6 +565,15 @@ fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
                     onClick = onEmojiClick,
                     onServerEmoteInfo = onServerEmoteInfo
                 )
+            }
+
+            item(
+                key = "bottomInset",
+                span = {
+                    GridItemSpan(spanCount)
+                }
+            ) {
+                Spacer(Modifier.height(bottomInset))
             }
         }
     }

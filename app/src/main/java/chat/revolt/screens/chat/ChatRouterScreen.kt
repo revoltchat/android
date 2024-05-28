@@ -62,18 +62,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
-import androidx.navigation.compose.rememberNavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.internals.DirectMessages
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
-import chat.revolt.api.routes.server.fetchMembers
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.User
 import chat.revolt.api.settings.SyncedSettings
@@ -96,7 +90,7 @@ import chat.revolt.screens.chat.dialogs.safety.ReportUserDialog
 import chat.revolt.screens.chat.views.FriendsScreen
 import chat.revolt.screens.chat.views.HomeScreen
 import chat.revolt.screens.chat.views.NoCurrentChannelScreen
-import chat.revolt.screens.chat.views.channel.ChannelScreen
+import chat.revolt.screens.chat.views.channel.ChannelScreen2
 import chat.revolt.sheets.AddServerSheet
 import chat.revolt.sheets.ChangelogSheet
 import chat.revolt.sheets.EmoteInfoSheet
@@ -116,15 +110,49 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class ChatRouterDestination {
+    data object Home : ChatRouterDestination()
+    data object Friends : ChatRouterDestination()
+    data class Channel(val channelId: String) : ChatRouterDestination()
+    data class NoCurrentChannel(val serverId: String?) : ChatRouterDestination()
+
+    fun asSerialisedString(): String {
+        return when (this) {
+            is Home -> "home"
+            is Friends -> "friends"
+            is Channel -> "channel/$channelId"
+            is NoCurrentChannel -> "no_current_channel/$serverId"
+        }
+    }
+
+    companion object {
+        val default = Home
+        val defaultForDMList = Home
+
+        fun fromString(destination: String): ChatRouterDestination {
+            return when {
+                destination == "home" -> Home
+                destination == "friends" -> Friends
+                destination.startsWith("no_current_channel/") -> NoCurrentChannel(
+                    destination.removePrefix(
+                        "no_current_channel/"
+                    )
+                )
+
+                destination.startsWith("channel/") -> Channel(destination.removePrefix("channel/"))
+                else -> default
+            }
+        }
+    }
+}
+
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
 class ChatRouterViewModel @Inject constructor(
     private val kvStorage: KVStorage,
     @ApplicationContext val context: Context
 ) : ViewModel() {
-    var currentServer by mutableStateOf("home")
-    var currentChannel by mutableStateOf<String?>(null)
-    var currentRoute by mutableStateOf("home")
+    var currentDestination by mutableStateOf<ChatRouterDestination>(ChatRouterDestination.default)
     var sidebarSparkDisplayed by mutableStateOf(true)
     var latestChangelogRead by mutableStateOf(true)
     var latestChangelog by mutableStateOf("")
@@ -133,9 +161,8 @@ class ChatRouterViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            currentServer = kvStorage.get("currentServer") ?: "home"
-            currentChannel = kvStorage.get("currentChannel")
-            currentRoute = kvStorage.get("currentRoute") ?: "home"
+            val current = kvStorage.get("currentDestination")
+            setSaveDestination(ChatRouterDestination.fromString(current ?: ""))
 
             sidebarSparkDisplayed = if (kvStorage.getBoolean("sidebarSpark") == null) {
                 false
@@ -151,27 +178,18 @@ class ChatRouterViewModel @Inject constructor(
         }
     }
 
-    private suspend fun setSaveCurrentServer(serverId: String) {
-        currentServer = serverId
-
-        kvStorage.set("currentServer", serverId)
-
-        if (serverId != "home") fetchMembers(serverId, includeOffline = false, pure = false)
-    }
-
-    private fun setSaveCurrentRoute(route: String) {
-        currentRoute = route
+    fun setSaveDestination(destination: ChatRouterDestination) {
+        currentDestination = destination
 
         viewModelScope.launch {
-            kvStorage.set("currentRoute", route)
-        }
-    }
+            kvStorage.set("currentDestination", destination.asSerialisedString())
 
-    private fun setSaveCurrentChannel(channelId: String) {
-        currentChannel = channelId
-
-        viewModelScope.launch {
-            kvStorage.set("currentChannel", channelId)
+            if (destination is ChatRouterDestination.Channel) {
+                val server = RevoltAPI.channelCache[destination.channelId]?.server
+                if (server != null) {
+                    kvStorage.set("lastChannel/$server", destination.channelId)
+                }
+            }
         }
     }
 
@@ -180,64 +198,17 @@ class ChatRouterViewModel @Inject constructor(
         sidebarSparkDisplayed = true
     }
 
-    fun navigateToServer(serverId: String, navController: NavController) {
-        if (serverId == "home") {
-            navController.navigate("home") {
-                navController.graph.startDestinationRoute?.let { route ->
-                    popUpTo(route)
-                }
-            }
-            viewModelScope.launch {
-                setSaveCurrentServer("home")
-                setSaveCurrentRoute("home")
-            }
-            return
-        }
-
-        val channelId = RevoltAPI.serverCache[serverId]?.channels?.firstOrNull()
-
+    fun navigateToServer(serverId: String) {
         viewModelScope.launch {
-            setSaveCurrentServer(serverId)
-        }
+            val savedLastChannel = kvStorage.get("lastChannel/$serverId")
+            val channelId =
+                savedLastChannel ?: RevoltAPI.serverCache[serverId]?.channels?.firstOrNull()
 
-        if (channelId != null) {
-            navigateToChannel(channelId, navController)
-        } else {
-            navController.navigate("no_current_channel") {
-                navController.graph.startDestinationRoute?.let { route ->
-                    popUpTo(route)
-                }
+            if (channelId != null) {
+                setSaveDestination(ChatRouterDestination.Channel(channelId))
+            } else {
+                setSaveDestination(ChatRouterDestination.NoCurrentChannel(serverId))
             }
-
-            viewModelScope.launch {
-                setSaveCurrentRoute("no_current_channel")
-            }
-        }
-    }
-
-    fun navigateToChannel(channelId: String, navController: NavController, pure: Boolean = false) {
-        if (!pure) setSaveCurrentChannel(channelId)
-
-        navController.navigate("channel/$channelId") {
-            navController.graph.startDestinationRoute?.let { route ->
-                popUpTo(route)
-            }
-        }
-
-        viewModelScope.launch {
-            setSaveCurrentRoute("channel/$channelId")
-        }
-    }
-
-    fun navigateToSpecial(destination: String, navController: NavController) {
-        navController.navigate(destination) {
-            navController.graph.startDestinationRoute?.let { route ->
-                popUpTo(route)
-            }
-        }
-
-        viewModelScope.launch {
-            setSaveCurrentRoute(destination)
         }
     }
 }
@@ -254,8 +225,6 @@ fun ChatRouterScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val view = LocalView.current
-
-    val navController = rememberNavController()
 
     val showSidebarSpark = remember { mutableStateOf(false) }
     val sidebarSparkComposition by rememberLottieComposition(
@@ -294,6 +263,15 @@ fun ChatRouterScreen(
     var voiceChannelOverlay by remember { mutableStateOf(false) }
     var voiceChannelOverlayChannelId by remember { mutableStateOf("") }
 
+    var showReportUser by remember { mutableStateOf(false) }
+    var reportUserTarget by remember { mutableStateOf("") }
+
+    var showReportMessage by remember { mutableStateOf(false) }
+    var reportMessageTarget by remember { mutableStateOf("") }
+
+    var showReportServer by remember { mutableStateOf(false) }
+    var reportServerTarget by remember { mutableStateOf("") }
+
     val toggleDrawerLambda = remember {
         {
             scope.launch {
@@ -306,6 +284,20 @@ fun ChatRouterScreen(
         }
     }
 
+    val currentServer = remember(viewModel.currentDestination) {
+        when (viewModel.currentDestination) {
+            is ChatRouterDestination.Channel -> {
+                RevoltAPI.channelCache[(viewModel.currentDestination as ChatRouterDestination.Channel).channelId]?.server
+            }
+
+            is ChatRouterDestination.NoCurrentChannel -> {
+                (viewModel.currentDestination as ChatRouterDestination.NoCurrentChannel).serverId
+            }
+
+            else -> null
+        }
+    }
+
     LaunchedEffect(drawerState) {
         snapshotFlow { drawerState.currentValue }
             .distinctUntilChanged()
@@ -314,16 +306,6 @@ fun ChatRouterScreen(
                     val keyboard =
                         context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     keyboard.hideSoftInputFromWindow(view.windowToken, 0)
-                }
-            }
-    }
-
-    LaunchedEffect(viewModel.currentChannel) {
-        snapshotFlow { viewModel.currentChannel }
-            .distinctUntilChanged()
-            .collect { channelId ->
-                if (channelId != null) {
-                    viewModel.navigateToChannel(channelId, navController, pure = true)
                 }
             }
     }
@@ -383,12 +365,7 @@ fun ChatRouterScreen(
                             return@let
                         }
 
-                        if (resolvedChannel.server != null) {
-                            viewModel.navigateToServer(resolvedChannel.server, navController)
-                        } else {
-                            viewModel.navigateToServer("home", navController)
-                        }
-                        viewModel.navigateToChannel(action.channelId, navController)
+                        viewModel.setSaveDestination(ChatRouterDestination.Channel(action.channelId))
                     }
 
                     is Action.LinkInfo -> {
@@ -412,7 +389,17 @@ fun ChatRouterScreen(
                     }
 
                     is Action.ChatNavigate -> {
-                        navController.navigate(action.route)
+                        viewModel.setSaveDestination(action.destination)
+                    }
+
+                    is Action.ReportUser -> {
+                        reportUserTarget = action.userId
+                        showReportUser = true
+                    }
+
+                    is Action.ReportMessage -> {
+                        reportMessageTarget = action.messageId
+                        showReportMessage = true
                     }
 
                     is Action.OpenVoiceChannelOverlay -> {
@@ -501,8 +488,7 @@ fun ChatRouterScreen(
                 TextButton(onClick = {
                     showPlatformModDMHint = false
                     DirectMessages.getPlatformModerationDM()?.id?.let {
-                        viewModel.navigateToServer("home", navController)
-                        viewModel.navigateToChannel(it, navController)
+                        viewModel.setSaveDestination(ChatRouterDestination.Channel(it))
                     }
                 }) {
                     Text(stringResource(id = R.string.notice_platform_mod_dm_acknowledge))
@@ -563,7 +549,8 @@ fun ChatRouterScreen(
                     showServerContextSheet = false
                 },
                 onReportServer = {
-                    navController.navigate("report/server/${serverContextSheetTarget}")
+                    reportServerTarget = currentServer ?: ""
+                    showReportServer = true
                 }
             )
         }
@@ -587,6 +574,27 @@ fun ChatRouterScreen(
                 }
             )
         }
+    }
+
+    if (showReportUser) {
+        ReportUserDialog(
+            onDismiss = { showReportUser = false },
+            userId = reportUserTarget
+        )
+    }
+
+    if (showReportMessage) {
+        ReportMessageDialog(
+            onDismiss = { showReportMessage = false },
+            messageId = reportMessageTarget
+        )
+    }
+
+    if (showReportServer) {
+        ReportServerDialog(
+            onDismiss = { showReportServer = false },
+            serverId = reportServerTarget
+        )
     }
 
     if (showChannelUnavailableAlert) {
@@ -717,7 +725,7 @@ fun ChatRouterScreen(
                     Sidebar(
                         viewModel = viewModel,
                         topNav = topNav,
-                        navController = navController,
+                        currentServer = currentServer,
                         onShowStatusSheet = {
                             showStatusSheet = true
                         },
@@ -735,16 +743,11 @@ fun ChatRouterScreen(
                     )
                 }
                 ChannelNavigator(
-                    navController = navController,
+                    dest = viewModel.currentDestination,
                     topNav = topNav,
                     useDrawer = false,
                     toggleDrawer = {
                         toggleDrawerLambda()
-                    },
-                    onShowUserContextSheet = { target, server ->
-                        userContextSheetTarget = target
-                        userContextSheetServer = server
-                        showUserContextSheet = true
                     }
                 )
             }
@@ -759,7 +762,7 @@ fun ChatRouterScreen(
                         Sidebar(
                             viewModel = viewModel,
                             topNav = topNav,
-                            navController = navController,
+                            currentServer = currentServer,
                             onShowStatusSheet = {
                                 showStatusSheet = true
                             },
@@ -781,18 +784,13 @@ fun ChatRouterScreen(
                 content = {
                     Row(Modifier.fillMaxSize()) {
                         ChannelNavigator(
-                            navController = navController,
+                            dest = viewModel.currentDestination,
                             topNav = topNav,
                             useDrawer = true,
                             toggleDrawer = {
                                 toggleDrawerLambda()
                             },
-                            drawerState = drawerState,
-                            onShowUserContextSheet = { target, server ->
-                                userContextSheetTarget = target
-                                userContextSheetServer = server
-                                showUserContextSheet = true
-                            }
+                            drawerState = drawerState
                         )
                     }
                 }
@@ -804,8 +802,8 @@ fun ChatRouterScreen(
 @Composable
 fun Sidebar(
     viewModel: ChatRouterViewModel,
+    currentServer: String?,
     topNav: NavController,
-    navController: NavHostController,
     drawerState: DrawerState? = null,
     onShowStatusSheet: () -> Unit,
     onShowServerContextSheet: (String) -> Unit,
@@ -839,7 +837,7 @@ fun Sidebar(
                     size = 48.dp,
                     presenceSize = 16.dp,
                     onClick = {
-                        viewModel.navigateToServer("home", navController)
+                        viewModel.setSaveDestination(ChatRouterDestination.defaultForDMList)
                     },
                     onLongClick = onShowStatusSheet,
                     modifier = Modifier
@@ -854,14 +852,7 @@ fun Sidebar(
                             size = 48.dp,
                             onClick = {
                                 it.id?.let { id ->
-                                    viewModel.navigateToServer(
-                                        "home",
-                                        navController
-                                    )
-                                    viewModel.navigateToChannel(
-                                        id,
-                                        navController
-                                    )
+                                    viewModel.setSaveDestination(ChatRouterDestination.Channel(id))
                                 }
                             },
                             icon = it.icon,
@@ -898,13 +889,10 @@ fun Sidebar(
                                 presenceSize = 16.dp,
                                 onClick = {
                                     it.id?.let { id ->
-                                        viewModel.navigateToServer(
-                                            "home",
-                                            navController
-                                        )
-                                        viewModel.navigateToChannel(
-                                            id,
-                                            navController
+                                        viewModel.setSaveDestination(
+                                            ChatRouterDestination.Channel(
+                                                id
+                                            )
                                         )
                                     }
                                 },
@@ -952,10 +940,7 @@ fun Sidebar(
                                 onShowServerContextSheet(server.id)
                             }
                         ) {
-                            viewModel.navigateToServer(
-                                server.id,
-                                navController
-                            )
+                            viewModel.navigateToServer(server.id)
                         }
                     }
 
@@ -993,20 +978,17 @@ fun Sidebar(
             }
 
             Crossfade(
-                targetState = viewModel.currentServer,
+                targetState = currentServer,
                 label = "Channel List"
             ) {
                 ChannelList(
                     serverId = it,
-                    currentDestination = viewModel.currentRoute,
-                    currentChannel = viewModel.currentChannel,
-                    onChannelClick = { channelId ->
-                        viewModel.navigateToChannel(channelId, navController)
-                        scope.launch { drawerState?.close() }
-                    },
-                    onSpecialClick = { destination ->
-                        viewModel.navigateToSpecial(destination, navController)
-                        scope.launch { drawerState?.close() }
+                    currentDestination = viewModel.currentDestination,
+                    onDestinationChange = { destination ->
+                        viewModel.setSaveDestination(destination)
+                        scope.launch {
+                            drawerState?.close()
+                        }
                     },
                     onServerSheetOpenFor = { target ->
                         onShowServerContextSheet(target)
@@ -1019,21 +1001,21 @@ fun Sidebar(
 
 @Composable
 fun ChannelNavigator(
-    navController: NavHostController,
+    dest: ChatRouterDestination,
     topNav: NavController,
     useDrawer: Boolean,
     toggleDrawer: () -> Unit,
-    drawerState: DrawerState? = null,
-    onShowUserContextSheet: (String, String?) -> Unit
+    drawerState: DrawerState? = null
 ) {
     val scope = rememberCoroutineScope()
 
+    BackHandler(enabled = useDrawer) {
+        toggleDrawer()
+    }
+
     Column(Modifier.fillMaxSize()) {
-        NavHost(navController = navController, startDestination = "home") {
-            composable("home") {
-                BackHandler(enabled = useDrawer) {
-                    toggleDrawer()
-                }
+        when (dest) {
+            is ChatRouterDestination.Home -> {
                 HomeScreen(
                     navController = topNav,
                     useDrawer = useDrawer,
@@ -1041,10 +1023,7 @@ fun ChannelNavigator(
                 )
             }
 
-            composable("friends") {
-                BackHandler(enabled = useDrawer) {
-                    toggleDrawer()
-                }
+            is ChatRouterDestination.Friends -> {
                 FriendsScreen(
                     topNav = topNav,
                     useDrawer = useDrawer,
@@ -1052,69 +1031,24 @@ fun ChannelNavigator(
                 )
             }
 
-            composable("channel/{channelId}") { backStackEntry ->
-                BackHandler(enabled = useDrawer) {
-                    toggleDrawer()
-                }
-
-                val channelId = backStackEntry.arguments?.getString("channelId")
-                if (channelId != null) {
-                    ChannelScreen(
-                        navController = navController,
-                        channelId = channelId,
-                        onToggleDrawer = {
-                            scope.launch {
-                                if (drawerState?.isOpen == true) {
-                                    drawerState.close()
-                                } else {
-                                    drawerState?.open()
-                                }
+            is ChatRouterDestination.Channel -> {
+                ChannelScreen2(
+                    channelId = dest.channelId,
+                    onToggleDrawer = {
+                        scope.launch {
+                            if (drawerState?.isOpen == true) {
+                                drawerState.close()
+                            } else {
+                                drawerState?.open()
                             }
-                        },
-                        onUserSheetOpenFor = { target, server ->
-                            onShowUserContextSheet(target, server)
-                        },
-                        useDrawer = useDrawer
-                    )
-                }
+                        }
+                    },
+                    useDrawer = useDrawer
+                )
             }
 
-            composable("no_current_channel") {
-                BackHandler(enabled = useDrawer) {
-                    toggleDrawer()
-                }
-
+            is ChatRouterDestination.NoCurrentChannel -> {
                 NoCurrentChannelScreen(useDrawer = useDrawer, onDrawerClicked = toggleDrawer)
-            }
-
-            dialog("report/message/{messageId}") { backStackEntry ->
-                val messageId = backStackEntry.arguments?.getString("messageId")
-                if (messageId != null) {
-                    ReportMessageDialog(
-                        navController = navController,
-                        messageId = messageId
-                    )
-                }
-            }
-
-            dialog("report/server/{serverId}") { backStackEntry ->
-                val serverId = backStackEntry.arguments?.getString("serverId")
-                if (serverId != null) {
-                    ReportServerDialog(
-                        navController = navController,
-                        serverId = serverId
-                    )
-                }
-            }
-
-            dialog("report/user/{userId}") { backStackEntry ->
-                val userId = backStackEntry.arguments?.getString("userId")
-                if (userId != null) {
-                    ReportUserDialog(
-                        navController = navController,
-                        userId = userId
-                    )
-                }
             }
         }
     }

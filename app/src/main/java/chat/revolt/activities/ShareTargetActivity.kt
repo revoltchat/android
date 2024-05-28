@@ -69,7 +69,7 @@ import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
 import chat.revolt.components.screens.chat.drawer.server.DrawerChannelIconType
 import chat.revolt.persistence.KVStorage
-import chat.revolt.screens.chat.views.channel.BottomPane
+import chat.revolt.screens.chat.views.channel.ChannelScreenActivePane
 import chat.revolt.ui.theme.RevoltTheme
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -174,7 +174,7 @@ class ShareTargetScreenViewModel @Inject constructor(
     var attachments = mutableStateListOf<FileArgs>()
     var attachmentsUploading by mutableStateOf(false)
     var attachmentProgress by mutableFloatStateOf(0f)
-    var activeBottomPane by mutableStateOf<BottomPane>(BottomPane.None)
+    var activeBottomPane by mutableStateOf<ChannelScreenActivePane>(ChannelScreenActivePane.None)
 
     suspend fun isLoggedIn(): Boolean {
         return kvStorage.get("sessionToken") != null
@@ -411,10 +411,10 @@ fun ShareTargetScreen(
                             onAddAttachment = {},
                             onCommitAttachment = {},
                             onPickEmoji = {
-                                if (viewModel.activeBottomPane is BottomPane.EmojiPicker) {
-                                    viewModel.activeBottomPane = BottomPane.None
+                                if (viewModel.activeBottomPane is ChannelScreenActivePane.EmojiPicker) {
+                                    viewModel.activeBottomPane = ChannelScreenActivePane.None
                                 } else {
-                                    viewModel.activeBottomPane = BottomPane.EmojiPicker
+                                    viewModel.activeBottomPane = ChannelScreenActivePane.EmojiPicker
                                 }
                             },
                             onSendMessage = {
@@ -436,9 +436,9 @@ fun ShareTargetScreen(
                             channelName = RevoltAPI.channelCache[selectedChannel]?.name ?: "",
                         )
 
-                        AnimatedVisibility(viewModel.activeBottomPane is BottomPane.EmojiPicker) {
-                            BackHandler(enabled = viewModel.activeBottomPane == BottomPane.EmojiPicker) {
-                                viewModel.activeBottomPane = BottomPane.None
+                        AnimatedVisibility(viewModel.activeBottomPane is ChannelScreenActivePane.EmojiPicker) {
+                            BackHandler(enabled = viewModel.activeBottomPane == ChannelScreenActivePane.EmojiPicker) {
+                                viewModel.activeBottomPane = ChannelScreenActivePane.None
                             }
 
                             Column(

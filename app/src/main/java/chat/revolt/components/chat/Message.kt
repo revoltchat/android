@@ -358,11 +358,9 @@ fun Message(
                                 CompositionLocalProvider(
                                     LocalMarkdownTreeConfig provides LocalMarkdownTreeConfig.current.copy(
                                         currentServer = RevoltAPI.channelCache[message.channel]?.server
-                                    ),
-                                    LocalTextStyle provides LocalTextStyle.current.copy(
-                                        lineHeight = 25.sp,
                                     )
                                 ) {
+                                    Spacer(modifier = Modifier.height(2.dp))
                                     RichMarkdown(input = message.content)
                                 }
                             }

@@ -1,5 +1,6 @@
 package chat.revolt.callbacks
 
+import chat.revolt.screens.chat.ChatRouterDestination
 import kotlinx.coroutines.channels.Channel
 
 sealed class Action {
@@ -9,7 +10,9 @@ sealed class Action {
     data class EmoteInfo(val emoteId: String) : Action()
     data class MessageReactionInfo(val messageId: String, val emoji: String) : Action()
     data class TopNavigate(val route: String) : Action()
-    data class ChatNavigate(val route: String) : Action()
+    data class ChatNavigate(val destination: ChatRouterDestination) : Action()
+    data class ReportUser(val userId: String) : Action()
+    data class ReportMessage(val messageId: String) : Action()
     data class OpenVoiceChannelOverlay(val channelId: String) : Action()
 }
 

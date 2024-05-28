@@ -11,6 +11,7 @@ import chat.revolt.api.schemas.MessagesInChannel
 import chat.revolt.api.schemas.User
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
@@ -94,25 +95,25 @@ data class CreateInviteResponse(
     val channel: String,
 )
 
-suspend
-
-fun sendMessage(
+suspend fun sendMessage(
     channelId: String,
     content: String,
-    nonce: String? = ULID.makeNext(),
+    nonce: String = ULID.makeNext(),
     replies: List<SendMessageReply>? = null,
-    attachments: List<String>? = null
+    attachments: List<String>? = null,
+    idempotencyKey: String = ULID.makeNext()
 ): String {
     val response = RevoltHttp.post("/channels/$channelId/messages") {
         contentType(ContentType.Application.Json)
         setBody(
             SendMessageBody(
                 content = content,
-                nonce = nonce ?: ULID.makeNext(),
+                nonce = nonce,
                 replies = replies ?: emptyList(),
                 attachments = attachments
             )
         )
+        header("Idempotency-Key", idempotencyKey)
     }
         .bodyAsText()
 

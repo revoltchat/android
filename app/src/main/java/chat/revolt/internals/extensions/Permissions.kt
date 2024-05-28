@@ -4,15 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.Roles
 
 @Composable
-fun rememberChannelPermissions(channelId: String): MutableLongState {
-    val permissions = remember { mutableLongStateOf(0L) }
+fun rememberChannelPermissions(channelId: String, key1: Any = Unit): MutableLongState {
+    val permissions = rememberSaveable { mutableLongStateOf(0L) }
 
-    LaunchedEffect(channelId) {
+    LaunchedEffect(channelId, key1) {
         if (RevoltAPI.selfId == null) return@LaunchedEffect
         if (RevoltAPI.userCache[RevoltAPI.selfId] == null) return@LaunchedEffect
         if (RevoltAPI.channelCache[channelId] == null) return@LaunchedEffect
