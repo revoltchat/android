@@ -158,11 +158,11 @@ private fun pxAsDp(px: Int): Dp {
     ExperimentalAnimationApi::class
 )
 @Composable
-fun ChannelScreen2(
+fun ChannelScreen(
     channelId: String,
     onToggleDrawer: () -> Unit,
     useDrawer: Boolean,
-    viewModel: ChannelScreen2ViewModel = hiltViewModel()
+    viewModel: ChannelScreenViewModel = hiltViewModel()
 ) {
     // Setup
 
@@ -296,7 +296,7 @@ fun ChannelScreen2(
             .distinctUntilChanged()
             .collect { isNearTop ->
                 if (isNearTop) {
-                    Log.d("ChannelScreen2", "Loading more messages")
+                    Log.d("ChannelScreen", "Loading more messages")
                     viewModel.loadMessages(before = viewModel.items.lastOrNull {
                         it is ChannelScreenItem.RegularMessage || it is ChannelScreenItem.SystemMessage
                     }?.let {
@@ -615,7 +615,7 @@ fun ChannelScreen2(
                             is ChannelScreenItem.LoadTrigger -> {
                                 LaunchedEffect(Unit) {
                                     Log.d(
-                                        "ChannelScreen2",
+                                        "ChannelScreen",
                                         "LoadTrigger: After ${item.after} Before ${item.before}"
                                     )
                                 }

@@ -66,7 +66,7 @@ import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
-class ChannelScreen2ViewModel @Inject constructor(
+class ChannelScreenViewModel @Inject constructor(
     private val kvStorage: KVStorage,
 ) : ViewModel() {
     var items = mutableStateListOf<ChannelScreenItem>()
@@ -268,7 +268,7 @@ class ChannelScreen2ViewModel @Inject constructor(
             )
             putDraftContent("")
         } catch (e: Exception) {
-            Log.e("ChannelScreen2ViewModel", "Failed to edit message", e)
+            Log.e("ChannelScreenViewModel", "Failed to edit message", e)
         }
     }
 
@@ -292,7 +292,7 @@ class ChannelScreen2ViewModel @Inject constructor(
         viewModelScope.launch {
             val attachmentIds = arrayListOf<String>()
             val takenAttachments =
-                this@ChannelScreen2ViewModel.draftAttachments.take(MAX_ATTACHMENTS_PER_MESSAGE)
+                this@ChannelScreenViewModel.draftAttachments.take(MAX_ATTACHMENTS_PER_MESSAGE)
             val totalTaken = takenAttachments.size
 
             takenAttachments.forEachIndexed { index, it ->
@@ -309,7 +309,7 @@ class ChannelScreen2ViewModel @Inject constructor(
                     )
                     attachmentIds.add(id)
                 } catch (e: Exception) {
-                    Log.e("ChannelScreen2ViewModel", "Failed to upload attachment", e)
+                    Log.e("ChannelScreenViewModel", "Failed to upload attachment", e)
                     attachmentUploadProgress = 0f
                     // TODO show error message
                     return@launch
@@ -343,7 +343,7 @@ class ChannelScreen2ViewModel @Inject constructor(
             draftReplyTo.clear()
             attachmentUploadProgress = 0f
 
-            this@ChannelScreen2ViewModel.draftAttachments.removeAll(takenAttachments)
+            this@ChannelScreenViewModel.draftAttachments.removeAll(takenAttachments)
 
             try {
                 sendMessage(
@@ -355,7 +355,7 @@ class ChannelScreen2ViewModel @Inject constructor(
                     idempotencyKey = ULID.makeNext()
                 )
             } catch (e: Exception) {
-                Log.e("ChannelScreen2ViewModel", "Failed to send message", e)
+                Log.e("ChannelScreenViewModel", "Failed to send message", e)
                 updateItems(listOf(ChannelScreenItem.FailedMessage(prospectiveMessage)) + items.filter { it !is ChannelScreenItem.ProspectiveMessage })
             }
         }
@@ -433,7 +433,7 @@ class ChannelScreen2ViewModel @Inject constructor(
 
                     updateItems(newItemsWithPosition)
                 } catch (e: Exception) {
-                    Log.e("ChannelScreen2ViewModel", "Failed to fetch messages", e)
+                    Log.e("ChannelScreenViewModel", "Failed to fetch messages", e)
                 }
             }
         }
@@ -466,7 +466,7 @@ class ChannelScreen2ViewModel @Inject constructor(
                                         fetchMember(serverId, userId)
                                     }
                                 } catch (e: Exception) {
-                                    Log.e("ChannelScreen2ViewModel", "Failed to fetch member", e)
+                                    Log.e("ChannelScreenViewModel", "Failed to fetch member", e)
                                 }
                             }
 
@@ -664,7 +664,7 @@ class ChannelScreen2ViewModel @Inject constructor(
                             } as? ChannelScreenItem.RegularMessage ?: return@onEach
 
                             putDraftContent(message.message.content ?: "")
-                            this@ChannelScreen2ViewModel.draftAttachments.clear()
+                            this@ChannelScreenViewModel.draftAttachments.clear()
                             draftReplyTo.clear()
                         }
                     }
@@ -691,7 +691,7 @@ class ChannelScreen2ViewModel @Inject constructor(
             // [Deviation from spec: if M is not a [Regular/System]Message we just put it in the list...]
             if (m !is ChannelScreenItem.RegularMessage && m !is ChannelScreenItem.SystemMessage) {
                 groupedItems.add(m)
-                Log.d("ChannelScreen2ViewModel", "Non-regular message: $m. Skipping grouping.")
+                Log.d("ChannelScreenViewModel", "Non-regular message: $m. Skipping grouping.")
                 return@forEachIndexed
             }
 

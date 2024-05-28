@@ -90,7 +90,7 @@ import chat.revolt.screens.chat.dialogs.safety.ReportUserDialog
 import chat.revolt.screens.chat.views.FriendsScreen
 import chat.revolt.screens.chat.views.HomeScreen
 import chat.revolt.screens.chat.views.NoCurrentChannelScreen
-import chat.revolt.screens.chat.views.channel.ChannelScreen2
+import chat.revolt.screens.chat.views.channel.ChannelScreen
 import chat.revolt.sheets.AddServerSheet
 import chat.revolt.sheets.ChangelogSheet
 import chat.revolt.sheets.EmoteInfoSheet
@@ -1032,7 +1032,7 @@ fun ChannelNavigator(
             }
 
             is ChatRouterDestination.Channel -> {
-                ChannelScreen2(
+                ChannelScreen(
                     channelId = dest.channelId,
                     onToggleDrawer = {
                         scope.launch {
