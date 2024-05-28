@@ -13,6 +13,7 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ChannelUtils
+import chat.revolt.api.internals.MessageProcessor
 import chat.revolt.api.internals.PermissionBit
 import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.SpecialUsers
@@ -285,7 +286,7 @@ class ChannelScreenViewModel @Inject constructor(
         // 1. they will be cleared
         // 2. if the user changes the content while the message is being sent we want to persist
         //    the original content
-        val content = draftContent
+        val content = MessageProcessor.processOutgoing(draftContent, channel?.server)
         val replyTo = draftReplyTo.toList()
 
         // First we upload (the next 5) attachments...
