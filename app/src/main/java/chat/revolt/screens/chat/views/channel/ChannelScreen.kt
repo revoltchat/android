@@ -777,6 +777,9 @@ fun ChannelScreen(
                                 },
                                 forceSendButton = viewModel.draftAttachments.isNotEmpty(),
                                 canAttach = (channelPermissions has PermissionBit.UploadFiles) && viewModel.editingMessage == null,
+                                serverId = viewModel.channel?.server,
+                                channelId = channelId,
+                                failedValidation = viewModel.draftContent.length > 2000,
                             )
                         }
                     } else {
