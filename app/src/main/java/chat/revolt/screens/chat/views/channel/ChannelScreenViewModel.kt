@@ -234,7 +234,9 @@ class ChannelScreenViewModel @Inject constructor(
     }
 
     suspend fun addReplyTo(messageId: String) {
+        if (draftReplyTo.size >= 5) return
         if (draftReplyTo.any { it.id == messageId }) return
+
         val shouldMention = kvStorage.getBoolean("mentionOnReply") ?: false
         draftReplyTo.add(SendMessageReply(messageId, shouldMention))
     }
