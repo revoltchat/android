@@ -92,6 +92,8 @@ class ChannelScreenViewModel @Inject constructor(
 
     var editingMessage by mutableStateOf<String?>(null)
 
+    var ageGateUnlocked by mutableStateOf(false)
+
     init {
         viewModelScope.launch {
             keyboardHeight = kvStorage.getInt("keyboardHeight") ?: 900 // reasonable default for now
@@ -110,6 +112,7 @@ class ChannelScreenViewModel @Inject constructor(
         this.denyMessageField = false
         this.denyMessageFieldReasonResource = R.string.typing_blank
         this.editingMessage = null
+        this.ageGateUnlocked = channel?.nsfw != true
 
         viewModelScope.launch {
             draftContent = kvStorage.get("draftContent/$id") ?: ""

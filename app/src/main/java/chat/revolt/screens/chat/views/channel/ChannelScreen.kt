@@ -13,6 +13,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateIntAsState
@@ -469,479 +470,505 @@ fun ChannelScreen(
             )
         }
     ) { pv ->
-        Column(
-            modifier = Modifier
-                .padding(pv)
-        ) {
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                LazyColumn(
-                    state = lazyListState,
-                    reverseLayout = true,
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
-                ) {
-
-                    // If we don't have a guaranteed first item, the message list will not scroll
-                    // to the bottom when new messages are added. Evil hack to make our other evil
-                    // hack (clear/addAll) work. Too bad!
-                    item(key = "guaranteed_first") {
-                        Box {}
+        Crossfade(
+            targetState = viewModel.ageGateUnlocked,
+            label = "ageGateUnlocked"
+        ) { ageGateUnlocked ->
+            if (!ageGateUnlocked) {
+                ChannelScreenAgeGate(
+                    onAccept = {
+                        viewModel.ageGateUnlocked = true
+                    },
+                    onDeny = {
+                        onToggleDrawer()
                     }
+                )
+            } else {
+                Column(
+                    modifier = Modifier
+                        .padding(pv)
+                ) {
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
+                        LazyColumn(
+                            state = lazyListState,
+                            reverseLayout = true,
+                            contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
+                        ) {
 
-                    items(
-                        viewModel.items.size,
-                        key = { index ->
-                            when (val item = viewModel.items[index]) {
-                                is ChannelScreenItem.RegularMessage -> item.message.id!!
-                                is ChannelScreenItem.ProspectiveMessage -> item.message.id!!
-                                is ChannelScreenItem.FailedMessage -> item.message.id!!
-                                is ChannelScreenItem.SystemMessage -> item.message.id!!
-                                is ChannelScreenItem.DateDivider -> item.instant.toEpochMilliseconds()
-                                is ChannelScreenItem.LoadTrigger -> index
-                                is ChannelScreenItem.Loading -> index
+                            // If we don't have a guaranteed first item, the message list will not scroll
+                            // to the bottom when new messages are added. Evil hack to make our other evil
+                            // hack (clear/addAll) work. Too bad!
+                            item(key = "guaranteed_first") {
+                                Box {}
                             }
-                        },
-                        contentType = { index ->
-                            when (viewModel.items.getOrNull(index)) {
-                                null -> null
-                                is ChannelScreenItem.RegularMessage -> "RegularMessage"
-                                is ChannelScreenItem.ProspectiveMessage -> "ProspectiveMessage"
-                                is ChannelScreenItem.FailedMessage -> "FailedMessage"
-                                is ChannelScreenItem.SystemMessage -> "SystemMessage"
-                                is ChannelScreenItem.DateDivider -> "DateDivider"
-                                is ChannelScreenItem.LoadTrigger -> "LoadTrigger"
-                                is ChannelScreenItem.Loading -> "Loading"
-                            }
-                        }
-                    ) { index ->
-                        when (val item = viewModel.items[index]) {
-                            is ChannelScreenItem.RegularMessage -> {
-                                Message(
-                                    message = item.message,
-                                    onMessageContextMenu = {
-                                        item.message.id?.let { messageId ->
-                                            messageContextSheetTarget = messageId
-                                            messageContextSheetShown = true
-                                        }
-                                    },
-                                    onAvatarClick = {
-                                        item.message.author?.let { author ->
-                                            scope.launch {
-                                                ActionChannel.send(
-                                                    Action.OpenUserSheet(
-                                                        author,
-                                                        viewModel.channel?.server
-                                                    )
-                                                )
-                                            }
-                                        }
-                                    },
-                                    onNameClick = {
-                                        val author =
-                                            item.message.author?.let { RevoltAPI.userCache[it] }
-                                                ?: return@Message
-                                        viewModel.putAtCursorPosition("@${author.username}#${author.discriminator}")
-                                    },
-                                    canReply = true,
-                                    onReply = {
-                                        item.message.id?.let { messageId ->
-                                            scope.launch { viewModel.addReplyTo(messageId) }
-                                        }
-                                    },
-                                    onAddReaction = {
-                                        item.message.id?.let { messageId ->
-                                            reactSheetTarget = messageId
-                                            reactSheetShown = true
-                                        }
+
+                            items(
+                                viewModel.items.size,
+                                key = { index ->
+                                    when (val item = viewModel.items[index]) {
+                                        is ChannelScreenItem.RegularMessage -> item.message.id!!
+                                        is ChannelScreenItem.ProspectiveMessage -> item.message.id!!
+                                        is ChannelScreenItem.FailedMessage -> item.message.id!!
+                                        is ChannelScreenItem.SystemMessage -> item.message.id!!
+                                        is ChannelScreenItem.DateDivider -> item.instant.toEpochMilliseconds()
+                                        is ChannelScreenItem.LoadTrigger -> index
+                                        is ChannelScreenItem.Loading -> index
                                     }
-                                )
-                            }
-
-                            is ChannelScreenItem.ProspectiveMessage -> {
-                                Box(Modifier.alpha(0.5f)) {
-                                    Message(
-                                        message = item.message,
-                                        onMessageContextMenu = {
-                                            // TODO Context menu that allows you to cancel send
-                                        },
-                                        onAvatarClick = {},
-                                        onNameClick = {},
-                                        canReply = false,
-                                        onReply = {},
-                                        onAddReaction = {}
-                                    )
+                                },
+                                contentType = { index ->
+                                    when (viewModel.items.getOrNull(index)) {
+                                        null -> null
+                                        is ChannelScreenItem.RegularMessage -> "RegularMessage"
+                                        is ChannelScreenItem.ProspectiveMessage -> "ProspectiveMessage"
+                                        is ChannelScreenItem.FailedMessage -> "FailedMessage"
+                                        is ChannelScreenItem.SystemMessage -> "SystemMessage"
+                                        is ChannelScreenItem.DateDivider -> "DateDivider"
+                                        is ChannelScreenItem.LoadTrigger -> "LoadTrigger"
+                                        is ChannelScreenItem.Loading -> "Loading"
+                                    }
                                 }
-                            }
-
-                            is ChannelScreenItem.FailedMessage -> {
-                                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.error) {
-                                    Column {
+                            ) { index ->
+                                when (val item = viewModel.items[index]) {
+                                    is ChannelScreenItem.RegularMessage -> {
                                         Message(
                                             message = item.message,
-                                            onMessageContextMenu = {},
-                                            onAvatarClick = {},
-                                            onNameClick = {},
-                                            canReply = false,
-                                            onReply = {},
-                                            onAddReaction = {}
-                                        )
-                                        Row {
-                                            UserAvatarWidthPlaceholder()
-                                            Text(
-                                                stringResource(R.string.message_failed_to_send),
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
-                                                modifier = Modifier.padding(
-                                                    top = 4.dp,
-                                                    bottom = 4.dp,
-                                                    start = 20.dp
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                            is ChannelScreenItem.SystemMessage -> {
-                                SystemMessage(message = item.message)
-                            }
-
-                            is ChannelScreenItem.DateDivider -> {
-                                DateDivider(instant = item.instant)
-                            }
-
-                            is ChannelScreenItem.LoadTrigger -> {
-                                LaunchedEffect(Unit) {
-                                    Log.d(
-                                        "ChannelScreen",
-                                        "LoadTrigger: After ${item.after} Before ${item.before}"
-                                    )
-                                }
-                            }
-
-                            is ChannelScreenItem.Loading -> {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .padding(16.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                TypingIndicator(
-                    users = viewModel.typingUsers,
-                    serverId = viewModel.channel?.server
-                )
-
-                androidx.compose.animation.AnimatedVisibility(
-                    !isScrolledToBottom.value,
-                    enter = slideInVertically(
-                        animationSpec = RevoltTweenInt,
-                        initialOffsetY = { it }
-                    ) + fadeIn(animationSpec = RevoltTweenFloat),
-                    exit = slideOutVertically(
-                        animationSpec = RevoltTweenInt,
-                        targetOffsetY = { it }
-                    ) + fadeOut(animationSpec = RevoltTweenFloat)
-                ) {
-                    SmallFloatingActionButton(
-                        modifier = Modifier
-                            .padding(bottom = scrollDownFABPadding)
-                            .align(Alignment.BottomCenter)
-                            .padding(16.dp),
-                        onClick = {
-                            scope.launch {
-                                lazyListState.animateScrollToItem(0)
-                            }
-                        },
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_down_24dp),
-                            contentDescription = stringResource(R.string.scroll_to_bottom)
-                        )
-                    }
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                AnimatedContent(
-                    targetState = viewModel.denyMessageField,
-                    label = "denyMessageField"
-                ) { deny ->
-                    if (!deny) {
-                        Column {
-                            AnimatedVisibility(
-                                visible = viewModel.draftReplyTo.isNotEmpty() && !viewModel.denyMessageField
-                            ) {
-                                ReplyManager(
-                                    replies = viewModel.draftReplyTo,
-                                    onToggleMention = {
-                                        scope.launch { viewModel.toggleMentionOnReply(it.id) }
-                                    },
-                                    onRemove = {
-                                        viewModel.draftReplyTo.remove(it)
-                                    }
-                                )
-                            }
-
-                            AnimatedVisibility(
-                                visible = viewModel.draftAttachments.isNotEmpty() && !viewModel.denyMessageField
-                            ) {
-                                AttachmentManager(
-                                    attachments = viewModel.draftAttachments,
-                                    uploading = viewModel.attachmentUploadProgress > 0,
-                                    uploadProgress = viewModel.attachmentUploadProgress,
-                                    canRemove = true,
-                                    canPreview = true,
-                                    onRemove = {
-                                        viewModel.draftAttachments.remove(it)
-                                    }
-                                )
-                            }
-
-                            AnimatedVisibility(visible = viewModel.editingMessage != null) {
-                                Row(Modifier.padding(start = 24.dp, top = 8.dp)) {
-                                    AssistChip(
-                                        onClick = {
-                                            viewModel.editingMessage = null
-                                            viewModel.putDraftContent("")
-                                        },
-                                        label = {
-                                            Text(stringResource(R.string.message_field_editing_message))
-                                        },
-                                        leadingIcon = {
-                                            Icon(
-                                                imageVector = Icons.Default.Edit,
-                                                contentDescription = null
-                                            )
-                                        },
-                                        trailingIcon = {
-                                            Icon(
-                                                imageVector = Icons.Default.Close,
-                                                contentDescription = stringResource(R.string.message_field_editing_message_cancel_alt),
-                                                tint = MaterialTheme.colorScheme.onSurface,
-                                                modifier = Modifier.alpha(0.8f)
-                                            )
-                                        }
-                                    )
-                                }
-                            }
-
-                            NativeMessageField(
-                                value = viewModel.draftContent,
-                                onValueChange = viewModel::putDraftContent,
-                                onAddAttachment = {
-                                    if (viewModel.activePane == ChannelScreenActivePane.AttachmentPicker) {
-                                        viewModel.activePane = ChannelScreenActivePane.None
-                                    } else {
-                                        viewModel.activePane =
-                                            ChannelScreenActivePane.AttachmentPicker
-                                    }
-                                },
-                                onCommitAttachment = {
-                                    processFileUri(it, null)
-                                },
-                                onPickEmoji = {
-                                    if (viewModel.activePane == ChannelScreenActivePane.EmojiPicker) {
-                                        viewModel.activePane = ChannelScreenActivePane.None
-                                    } else {
-                                        viewModel.activePane = ChannelScreenActivePane.EmojiPicker
-                                    }
-                                },
-                                onSendMessage = viewModel::sendPendingMessage,
-                                channelType = viewModel.channel?.channelType
-                                    ?: ChannelType.TextChannel,
-                                channelName = viewModel.channel?.name
-                                    ?: stringResource(R.string.unknown),
-                                onFocusChange = { isFocused ->
-                                    if (isFocused && viewModel.activePane != ChannelScreenActivePane.None) {
-                                        viewModel.activePane = ChannelScreenActivePane.None
-                                        imeInTransition = true
-                                    }
-                                },
-                                forceSendButton = viewModel.draftAttachments.isNotEmpty(),
-                                canAttach = (channelPermissions has PermissionBit.UploadFiles) && viewModel.editingMessage == null,
-                                serverId = viewModel.channel?.server,
-                                channelId = channelId,
-                                failedValidation = viewModel.draftContent.length > 2000,
-                            )
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 32.dp, vertical = 16.dp)
-                        ) {
-                            Text(
-                                stringResource(viewModel.denyMessageFieldReasonResource),
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodyMedium,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                }
-
-                if (viewModel.activePane == ChannelScreenActivePane.None && !imeInTransition) {
-                    Spacer(
-                        Modifier
-                            .imePadding()
-                            .navigationBarsPadding()
-                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
-                    )
-                } else {
-                    Box(
-                        Modifier
-                            .heightIn(min = pxAsDp(fallbackKeyboardHeight))
-                    ) {
-                        Box(
-                            Modifier.then(
-                                if (emojiSearchFocused) {
-                                    Modifier.requiredHeight(
-                                        pxAsDp(
-                                            max(
-                                                imeCurrentInset * 2,
-                                                fallbackKeyboardHeight
-                                            )
-                                        )
-                                    )
-                                } else {
-                                    Modifier.requiredHeight(pxAsDp(fallbackKeyboardHeight))
-                                }
-                            )
-                        ) {
-                            when (viewModel.activePane) {
-                                ChannelScreenActivePane.EmojiPicker -> {
-                                    BackHandler(enabled = viewModel.activePane == ChannelScreenActivePane.EmojiPicker) {
-                                        viewModel.activePane = ChannelScreenActivePane.None
-                                    }
-
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .background(
-                                                MaterialTheme.colorScheme.surfaceColorAtElevation(
-                                                    1.dp
-                                                )
-                                            )
-                                            .padding(4.dp)
-                                            .navigationBarsPadding()
-                                    ) {
-                                        EmojiPicker(
-                                            onEmojiSelected = viewModel::putAtCursorPosition,
-                                            bottomInset = pxAsDp(
-                                                max(
-                                                    imeCurrentInset - navigationBarsInset,
-                                                    0
-                                                )
-                                            ),
-                                            onSearchFocus = {
-                                                emojiSearchFocused = it
-                                            }
-                                        )
-                                    }
-                                }
-
-                                ChannelScreenActivePane.AttachmentPicker -> {
-                                    BackHandler(enabled = viewModel.activePane == ChannelScreenActivePane.AttachmentPicker) {
-                                        viewModel.activePane = ChannelScreenActivePane.None
-                                    }
-
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                        InbuiltMediaPicker(
-                                            onOpenDocumentsUi = {
-                                                pickFileLauncher.launch(arrayOf("*/*"))
-                                                viewModel.activePane = ChannelScreenActivePane.None
-                                            },
-                                            onOpenCamera = {
-                                                // Create a new content URI to store the captured image.
-                                                val contentResolver = context.contentResolver
-                                                val contentValues = ContentValues().apply {
-                                                    put(
-                                                        MediaStore.MediaColumns.DISPLAY_NAME,
-                                                        "RVL_${System.currentTimeMillis()}.jpg"
-                                                    )
-                                                    put(
-                                                        MediaStore.MediaColumns.MIME_TYPE,
-                                                        "image/jpeg"
-                                                    )
-                                                    put(
-                                                        MediaStore.MediaColumns.RELATIVE_PATH,
-                                                        Environment.DIRECTORY_PICTURES
-                                                    )
+                                            onMessageContextMenu = {
+                                                item.message.id?.let { messageId ->
+                                                    messageContextSheetTarget = messageId
+                                                    messageContextSheetShown = true
                                                 }
-
-                                                capturedPhotoUri.value = contentResolver.insert(
-                                                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                                                    contentValues
-                                                )
-
-                                                try {
-                                                    pickCameraLauncher.launch(capturedPhotoUri.value)
-                                                } catch (e: Exception) {
-                                                    Toast.makeText(
-                                                        context,
-                                                        context.getString(
-                                                            R.string.file_picker_chip_camera_none_installed
-                                                        ),
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                }
-
-                                                viewModel.activePane = ChannelScreenActivePane.None
                                             },
-                                            onClose = {
-                                                viewModel.activePane = ChannelScreenActivePane.None
-                                            },
-                                            onMediaSelected = { media ->
-                                                try {
-                                                    processFileUri(
-                                                        media.uri,
-                                                        media.uri.lastPathSegment
-                                                    )
-                                                } catch (e: Exception) {
-                                                    if (e is FileNotFoundException) {
-                                                        Toast.makeText(
-                                                            context,
-                                                            context.getString(
-                                                                R.string.file_picker_cannot_attach_file_invalid
-                                                            ),
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
+                                            onAvatarClick = {
+                                                item.message.author?.let { author ->
+                                                    scope.launch {
+                                                        ActionChannel.send(
+                                                            Action.OpenUserSheet(
+                                                                author,
+                                                                viewModel.channel?.server
+                                                            )
+                                                        )
                                                     }
                                                 }
                                             },
-                                            pendingMedia = viewModel.draftAttachments
-                                                .filterNot { it.pickerIdentifier == null }
-                                                .map { it.pickerIdentifier!! },
-                                            modifier = Modifier
-                                                .imePadding()
-                                                .navigationBarsPadding()
+                                            onNameClick = {
+                                                val author =
+                                                    item.message.author?.let { RevoltAPI.userCache[it] }
+                                                        ?: return@Message
+                                                viewModel.putAtCursorPosition("@${author.username}#${author.discriminator}")
+                                            },
+                                            canReply = true,
+                                            onReply = {
+                                                item.message.id?.let { messageId ->
+                                                    scope.launch { viewModel.addReplyTo(messageId) }
+                                                }
+                                            },
+                                            onAddReaction = {
+                                                item.message.id?.let { messageId ->
+                                                    reactSheetTarget = messageId
+                                                    reactSheetShown = true
+                                                }
+                                            }
                                         )
                                     }
-                                }
 
-                                else -> {
-                                    // Do nothing
+                                    is ChannelScreenItem.ProspectiveMessage -> {
+                                        Box(Modifier.alpha(0.5f)) {
+                                            Message(
+                                                message = item.message,
+                                                onMessageContextMenu = {
+                                                    // TODO Context menu that allows you to cancel send
+                                                },
+                                                onAvatarClick = {},
+                                                onNameClick = {},
+                                                canReply = false,
+                                                onReply = {},
+                                                onAddReaction = {}
+                                            )
+                                        }
+                                    }
+
+                                    is ChannelScreenItem.FailedMessage -> {
+                                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.error) {
+                                            Column {
+                                                Message(
+                                                    message = item.message,
+                                                    onMessageContextMenu = {},
+                                                    onAvatarClick = {},
+                                                    onNameClick = {},
+                                                    canReply = false,
+                                                    onReply = {},
+                                                    onAddReaction = {}
+                                                )
+                                                Row {
+                                                    UserAvatarWidthPlaceholder()
+                                                    Text(
+                                                        stringResource(R.string.message_failed_to_send),
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        color = MaterialTheme.colorScheme.error.copy(
+                                                            alpha = 0.8f
+                                                        ),
+                                                        modifier = Modifier.padding(
+                                                            top = 4.dp,
+                                                            bottom = 4.dp,
+                                                            start = 20.dp
+                                                        )
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    is ChannelScreenItem.SystemMessage -> {
+                                        SystemMessage(message = item.message)
+                                    }
+
+                                    is ChannelScreenItem.DateDivider -> {
+                                        DateDivider(instant = item.instant)
+                                    }
+
+                                    is ChannelScreenItem.LoadTrigger -> {
+                                        LaunchedEffect(Unit) {
+                                            Log.d(
+                                                "ChannelScreen",
+                                                "LoadTrigger: After ${item.after} Before ${item.before}"
+                                            )
+                                        }
+                                    }
+
+                                    is ChannelScreenItem.Loading -> {
+                                        Box(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier
+                                                    .padding(16.dp)
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
-                        Box(Modifier.imePadding())
+
+                        TypingIndicator(
+                            users = viewModel.typingUsers,
+                            serverId = viewModel.channel?.server
+                        )
+
+                        androidx.compose.animation.AnimatedVisibility(
+                            !isScrolledToBottom.value,
+                            enter = slideInVertically(
+                                animationSpec = RevoltTweenInt,
+                                initialOffsetY = { it }
+                            ) + fadeIn(animationSpec = RevoltTweenFloat),
+                            exit = slideOutVertically(
+                                animationSpec = RevoltTweenInt,
+                                targetOffsetY = { it }
+                            ) + fadeOut(animationSpec = RevoltTweenFloat)
+                        ) {
+                            SmallFloatingActionButton(
+                                modifier = Modifier
+                                    .padding(bottom = scrollDownFABPadding)
+                                    .align(Alignment.BottomCenter)
+                                    .padding(16.dp),
+                                onClick = {
+                                    scope.launch {
+                                        lazyListState.animateScrollToItem(0)
+                                    }
+                                },
+                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_arrow_down_24dp),
+                                    contentDescription = stringResource(R.string.scroll_to_bottom)
+                                )
+                            }
+                        }
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        AnimatedContent(
+                            targetState = viewModel.denyMessageField,
+                            label = "denyMessageField"
+                        ) { deny ->
+                            if (!deny) {
+                                Column {
+                                    AnimatedVisibility(
+                                        visible = viewModel.draftReplyTo.isNotEmpty() && !viewModel.denyMessageField
+                                    ) {
+                                        ReplyManager(
+                                            replies = viewModel.draftReplyTo,
+                                            onToggleMention = {
+                                                scope.launch { viewModel.toggleMentionOnReply(it.id) }
+                                            },
+                                            onRemove = {
+                                                viewModel.draftReplyTo.remove(it)
+                                            }
+                                        )
+                                    }
+
+                                    AnimatedVisibility(
+                                        visible = viewModel.draftAttachments.isNotEmpty() && !viewModel.denyMessageField
+                                    ) {
+                                        AttachmentManager(
+                                            attachments = viewModel.draftAttachments,
+                                            uploading = viewModel.attachmentUploadProgress > 0,
+                                            uploadProgress = viewModel.attachmentUploadProgress,
+                                            canRemove = true,
+                                            canPreview = true,
+                                            onRemove = {
+                                                viewModel.draftAttachments.remove(it)
+                                            }
+                                        )
+                                    }
+
+                                    AnimatedVisibility(visible = viewModel.editingMessage != null) {
+                                        Row(Modifier.padding(start = 24.dp, top = 8.dp)) {
+                                            AssistChip(
+                                                onClick = {
+                                                    viewModel.editingMessage = null
+                                                    viewModel.putDraftContent("")
+                                                },
+                                                label = {
+                                                    Text(stringResource(R.string.message_field_editing_message))
+                                                },
+                                                leadingIcon = {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Edit,
+                                                        contentDescription = null
+                                                    )
+                                                },
+                                                trailingIcon = {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Close,
+                                                        contentDescription = stringResource(R.string.message_field_editing_message_cancel_alt),
+                                                        tint = MaterialTheme.colorScheme.onSurface,
+                                                        modifier = Modifier.alpha(0.8f)
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    }
+
+                                    NativeMessageField(
+                                        value = viewModel.draftContent,
+                                        onValueChange = viewModel::putDraftContent,
+                                        onAddAttachment = {
+                                            if (viewModel.activePane == ChannelScreenActivePane.AttachmentPicker) {
+                                                viewModel.activePane = ChannelScreenActivePane.None
+                                            } else {
+                                                viewModel.activePane =
+                                                    ChannelScreenActivePane.AttachmentPicker
+                                            }
+                                        },
+                                        onCommitAttachment = {
+                                            processFileUri(it, null)
+                                        },
+                                        onPickEmoji = {
+                                            if (viewModel.activePane == ChannelScreenActivePane.EmojiPicker) {
+                                                viewModel.activePane = ChannelScreenActivePane.None
+                                            } else {
+                                                viewModel.activePane =
+                                                    ChannelScreenActivePane.EmojiPicker
+                                            }
+                                        },
+                                        onSendMessage = viewModel::sendPendingMessage,
+                                        channelType = viewModel.channel?.channelType
+                                            ?: ChannelType.TextChannel,
+                                        channelName = viewModel.channel?.name
+                                            ?: stringResource(R.string.unknown),
+                                        onFocusChange = { isFocused ->
+                                            if (isFocused && viewModel.activePane != ChannelScreenActivePane.None) {
+                                                viewModel.activePane = ChannelScreenActivePane.None
+                                                imeInTransition = true
+                                            }
+                                        },
+                                        forceSendButton = viewModel.draftAttachments.isNotEmpty(),
+                                        canAttach = (channelPermissions has PermissionBit.UploadFiles) && viewModel.editingMessage == null,
+                                        serverId = viewModel.channel?.server,
+                                        channelId = channelId,
+                                        failedValidation = viewModel.draftContent.length > 2000,
+                                    )
+                                }
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(horizontal = 32.dp, vertical = 16.dp)
+                                ) {
+                                    Text(
+                                        stringResource(viewModel.denyMessageFieldReasonResource),
+                                        color = MaterialTheme.colorScheme.error,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+
+                        if (viewModel.activePane == ChannelScreenActivePane.None && !imeInTransition) {
+                            Spacer(
+                                Modifier
+                                    .imePadding()
+                                    .navigationBarsPadding()
+                                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                            )
+                        } else {
+                            Box(
+                                Modifier
+                                    .heightIn(min = pxAsDp(fallbackKeyboardHeight))
+                            ) {
+                                Box(
+                                    Modifier.then(
+                                        if (emojiSearchFocused) {
+                                            Modifier.requiredHeight(
+                                                pxAsDp(
+                                                    max(
+                                                        imeCurrentInset * 2,
+                                                        fallbackKeyboardHeight
+                                                    )
+                                                )
+                                            )
+                                        } else {
+                                            Modifier.requiredHeight(pxAsDp(fallbackKeyboardHeight))
+                                        }
+                                    )
+                                ) {
+                                    when (viewModel.activePane) {
+                                        ChannelScreenActivePane.EmojiPicker -> {
+                                            BackHandler(enabled = viewModel.activePane == ChannelScreenActivePane.EmojiPicker) {
+                                                viewModel.activePane = ChannelScreenActivePane.None
+                                            }
+
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .background(
+                                                        MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                                            1.dp
+                                                        )
+                                                    )
+                                                    .padding(4.dp)
+                                                    .navigationBarsPadding()
+                                            ) {
+                                                EmojiPicker(
+                                                    onEmojiSelected = viewModel::putAtCursorPosition,
+                                                    bottomInset = pxAsDp(
+                                                        max(
+                                                            imeCurrentInset - navigationBarsInset,
+                                                            0
+                                                        )
+                                                    ),
+                                                    onSearchFocus = {
+                                                        emojiSearchFocused = it
+                                                    }
+                                                )
+                                            }
+                                        }
+
+                                        ChannelScreenActivePane.AttachmentPicker -> {
+                                            BackHandler(enabled = viewModel.activePane == ChannelScreenActivePane.AttachmentPicker) {
+                                                viewModel.activePane = ChannelScreenActivePane.None
+                                            }
+
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                InbuiltMediaPicker(
+                                                    onOpenDocumentsUi = {
+                                                        pickFileLauncher.launch(arrayOf("*/*"))
+                                                        viewModel.activePane =
+                                                            ChannelScreenActivePane.None
+                                                    },
+                                                    onOpenCamera = {
+                                                        // Create a new content URI to store the captured image.
+                                                        val contentResolver =
+                                                            context.contentResolver
+                                                        val contentValues = ContentValues().apply {
+                                                            put(
+                                                                MediaStore.MediaColumns.DISPLAY_NAME,
+                                                                "RVL_${System.currentTimeMillis()}.jpg"
+                                                            )
+                                                            put(
+                                                                MediaStore.MediaColumns.MIME_TYPE,
+                                                                "image/jpeg"
+                                                            )
+                                                            put(
+                                                                MediaStore.MediaColumns.RELATIVE_PATH,
+                                                                Environment.DIRECTORY_PICTURES
+                                                            )
+                                                        }
+
+                                                        capturedPhotoUri.value =
+                                                            contentResolver.insert(
+                                                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                                                contentValues
+                                                            )
+
+                                                        try {
+                                                            pickCameraLauncher.launch(
+                                                                capturedPhotoUri.value
+                                                            )
+                                                        } catch (e: Exception) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                context.getString(
+                                                                    R.string.file_picker_chip_camera_none_installed
+                                                                ),
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+
+                                                        viewModel.activePane =
+                                                            ChannelScreenActivePane.None
+                                                    },
+                                                    onClose = {
+                                                        viewModel.activePane =
+                                                            ChannelScreenActivePane.None
+                                                    },
+                                                    onMediaSelected = { media ->
+                                                        try {
+                                                            processFileUri(
+                                                                media.uri,
+                                                                media.uri.lastPathSegment
+                                                            )
+                                                        } catch (e: Exception) {
+                                                            if (e is FileNotFoundException) {
+                                                                Toast.makeText(
+                                                                    context,
+                                                                    context.getString(
+                                                                        R.string.file_picker_cannot_attach_file_invalid
+                                                                    ),
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            }
+                                                        }
+                                                    },
+                                                    pendingMedia = viewModel.draftAttachments
+                                                        .filterNot { it.pickerIdentifier == null }
+                                                        .map { it.pickerIdentifier!! },
+                                                    modifier = Modifier
+                                                        .imePadding()
+                                                        .navigationBarsPadding()
+                                                )
+                                            }
+                                        }
+
+                                        else -> {
+                                            // Do nothing
+                                        }
+                                    }
+                                }
+                                Box(Modifier.imePadding())
+                            }
+                        }
                     }
                 }
             }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -116,7 +117,7 @@ fun ChannelScreenAgeGate(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
     ) {
@@ -181,7 +182,7 @@ fun ChannelScreenAgeGate(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun AgeGateScreenPreview() {
     ChannelScreenAgeGate(onAccept = { /*TODO*/ }, onDeny = { /*TODO*/ })
