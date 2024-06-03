@@ -324,7 +324,7 @@ class ChannelScreenViewModel @Inject constructor(
                 id = nonce,
                 channel = channel?.id,
                 author = RevoltAPI.selfId,
-                content = draftContent,
+                content = content,
                 nonce = nonce,
                 attachments = listOf(),
                 replies = listOf(),
