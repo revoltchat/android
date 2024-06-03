@@ -444,7 +444,7 @@ class ChannelScreenViewModel @Inject constructor(
         ackChannel(channel?.id ?: return, messageId)
     }
 
-    suspend fun startListening() {
+    suspend fun startListening(createUiCallbackListener: Boolean = true) {
         viewModelScope.launch {
             withContext(RevoltAPI.realtimeContext) {
                 flow {
@@ -633,7 +633,7 @@ class ChannelScreenViewModel @Inject constructor(
                         is RealtimeSocketFrames.Reconnected -> {
                             Log.d("ChannelScreen", "Reconnected to WS.")
                             loadMessages(50, ignoreExisting = true)
-                            startListening()
+                            startListening(createUiCallbackListener = false)
                         }
                     }
                 }.catch {
@@ -641,37 +641,43 @@ class ChannelScreenViewModel @Inject constructor(
                 }.launchIn(this)
             }
         }
-        viewModelScope.launch {
-            withContext(Dispatchers.Main) {
-                UiCallbacks.uiCallbackFlow.onEach {
-                    Log.d("ChannelScreen", "Received UI callback: $it")
 
-                    when (it) {
-                        is UiCallback.ReplyToMessage -> {
-                            val message = items.find { m ->
-                                m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
-                            } as? ChannelScreenItem.RegularMessage ?: return@onEach
+        if (createUiCallbackListener) {
+            viewModelScope.launch {
+                withContext(Dispatchers.Main) {
+                    UiCallbacks.uiCallbackFlow.onEach {
+                        Log.d("ChannelScreen", "Received UI callback: $it")
 
-                            val shouldMention = kvStorage.getBoolean("mentionOnReply") ?: false
-                            draftReplyTo.add(
-                                SendMessageReply(message.message.id ?: return@onEach, shouldMention)
-                            )
+                        when (it) {
+                            is UiCallback.ReplyToMessage -> {
+                                val message = items.find { m ->
+                                    m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
+                                } as? ChannelScreenItem.RegularMessage ?: return@onEach
+
+                                val shouldMention = kvStorage.getBoolean("mentionOnReply") ?: false
+                                draftReplyTo.add(
+                                    SendMessageReply(
+                                        message.message.id ?: return@onEach,
+                                        shouldMention
+                                    )
+                                )
+                            }
+
+                            is UiCallback.EditMessage -> {
+                                editingMessage = it.messageId
+                                val message = items.find { m ->
+                                    m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
+                                } as? ChannelScreenItem.RegularMessage ?: return@onEach
+
+                                putDraftContent(message.message.content ?: "")
+                                this@ChannelScreenViewModel.draftAttachments.clear()
+                                draftReplyTo.clear()
+                            }
                         }
-
-                        is UiCallback.EditMessage -> {
-                            editingMessage = it.messageId
-                            val message = items.find { m ->
-                                m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
-                            } as? ChannelScreenItem.RegularMessage ?: return@onEach
-
-                            putDraftContent(message.message.content ?: "")
-                            this@ChannelScreenViewModel.draftAttachments.clear()
-                            draftReplyTo.clear()
-                        }
-                    }
-                }.catch {
-                    Log.e("ChannelScreen", "Failed to receive UI callback", it)
-                }.launchIn(this)
+                    }.catch {
+                        Log.e("ChannelScreen", "Failed to receive UI callback", it)
+                    }.launchIn(this)
+                }
             }
         }
     }

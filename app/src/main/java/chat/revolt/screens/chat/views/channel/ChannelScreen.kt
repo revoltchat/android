@@ -170,7 +170,7 @@ fun ChannelScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.startListening()
+        viewModel.startListening(createUiCallbackListener = true)
     }
 
     // Load/switch channel
