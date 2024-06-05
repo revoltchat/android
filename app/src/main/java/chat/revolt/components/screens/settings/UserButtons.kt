@@ -5,7 +5,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -218,81 +217,82 @@ fun UserButtons(
             "BlockedOther" -> Box(Modifier.weight(1f))
         }
 
-        when (user.relationship) {
-            "Friend", "Incoming", "Outgoing", "None", "Blocked", "BlockedOther" -> {
-                Column { // Prevent the dropdown menu from counting towards arrangement spacing
-                    IconButton(
-                        onClick = {
-                            menuOpen = true
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = stringResource(R.string.menu)
-                        )
-                    }
-
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        when (user.relationship) {
-                            "Friend" -> {
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(stringResource(R.string.user_info_sheet_remove_friend))
-                                    },
-                                    onClick = {
-                                        scope.launch {
-                                            unfriendUser(user.id)
-                                        }
-                                    }
-                                )
-                            }
-                        }
-
-                        when (user.relationship) {
-                            "Blocked" -> {}
-
-                            else -> DropdownMenuItem(
+        if (user.relationship != "User") {
+            Row { // Prevent the dropdown menu from counting towards arrangement spacing
+                DropdownMenu(
+                    expanded = menuOpen,
+                    onDismissRequest = { menuOpen = false }
+                ) {
+                    when (user.relationship) {
+                        "Friend" -> {
+                            DropdownMenuItem(
                                 text = {
-                                    Text(stringResource(R.string.user_info_sheet_block))
+                                    Text(stringResource(R.string.user_info_sheet_remove_friend))
                                 },
                                 onClick = {
                                     scope.launch {
-                                        blockUser(user.id)
+                                        unfriendUser(user.id)
                                     }
                                 }
                             )
                         }
+                    }
 
-                        DropdownMenuItem(
+                    when (user.relationship) {
+                        "Blocked" -> {}
+
+                        else -> DropdownMenuItem(
                             text = {
-                                Text(stringResource(R.string.user_info_sheet_copy_id))
+                                Text(stringResource(R.string.user_info_sheet_block))
                             },
                             onClick = {
                                 scope.launch {
-                                    clipboard.setText(AnnotatedString(user.id))
-                                }
-                            }
-                        )
-
-                        DropdownMenuItem(
-                            text = {
-                                Text(stringResource(R.string.user_info_sheet_report))
-                            },
-                            onClick = {
-                                scope.launch {
-                                    ActionChannel.send(Action.ReportUser(user.id))
-
-                                    if (Platform.needsShowClipboardNotification()) {
-                                        Toast.makeText(
-                                            context,
-                                            context.getString(R.string.copied),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                                    blockUser(user.id)
                                 }
                             }
                         )
                     }
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(stringResource(R.string.user_info_sheet_copy_id))
+                        },
+                        onClick = {
+                            scope.launch {
+                                clipboard.setText(AnnotatedString(user.id))
+                            }
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(stringResource(R.string.user_info_sheet_report))
+                        },
+                        onClick = {
+                            scope.launch {
+                                ActionChannel.send(Action.ReportUser(user.id))
+
+                                if (Platform.needsShowClipboardNotification()) {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.copied),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        menuOpen = true
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = stringResource(R.string.menu)
+                    )
                 }
             }
         }
