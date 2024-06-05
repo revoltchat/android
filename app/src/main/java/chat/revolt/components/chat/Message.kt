@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -186,7 +187,7 @@ fun Message(
 
     val authorIsBlocked = remember(author) { author.relationship == "Blocked" }
 
-    Column {
+    Column(Modifier.animateContentSize()) {
         if (message.tail == false) {
             Spacer(modifier = Modifier.height(10.dp))
         }
