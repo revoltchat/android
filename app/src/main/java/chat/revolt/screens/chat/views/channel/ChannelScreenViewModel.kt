@@ -92,7 +92,7 @@ class ChannelScreenViewModel @Inject constructor(
 
     var editingMessage by mutableStateOf<String?>(null)
 
-    var ageGateUnlocked by mutableStateOf(false)
+    var ageGateUnlocked by mutableStateOf<Boolean?>(null)
 
     init {
         viewModelScope.launch {
@@ -405,7 +405,11 @@ class ChannelScreenViewModel @Inject constructor(
                         }
                     }
 
-                    if (!didInitialChannelFetch) didInitialChannelFetch = true
+                    val ackNewest: Boolean
+                    if (!didInitialChannelFetch) {
+                        didInitialChannelFetch = true
+                        ackNewest = true
+                    } else ackNewest = false
 
                     val newItems = messages.filter {
                         if (ignoreExisting) {
@@ -438,6 +442,19 @@ class ChannelScreenViewModel @Inject constructor(
                     }
 
                     updateItems(newItemsWithPosition)
+
+                    // If ackNewest is true, we ack the newest (first, as initial fetch is newest to oldest) message.
+                    if (ackNewest) {
+                        ackMessage(newItemsWithPosition.first {
+                            it is ChannelScreenItem.RegularMessage || it is ChannelScreenItem.SystemMessage
+                        }.let {
+                            when (it) {
+                                is ChannelScreenItem.RegularMessage -> it.message.id
+                                is ChannelScreenItem.SystemMessage -> it.message.id
+                                else -> null
+                            }
+                        } ?: return@launch)
+                    }
                 } catch (e: Exception) {
                     Log.e("ChannelScreenViewModel", "Failed to fetch messages", e)
                 }

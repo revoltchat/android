@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
@@ -514,7 +515,7 @@ fun ChannelScreen(
             targetState = viewModel.ageGateUnlocked,
             label = "ageGateUnlocked"
         ) { ageGateUnlocked ->
-            if (!ageGateUnlocked) {
+            if (ageGateUnlocked == false) {
                 ChannelScreenAgeGate(
                     onAccept = {
                         viewModel.ageGateUnlocked = true
@@ -523,7 +524,11 @@ fun ChannelScreen(
                         onToggleDrawer()
                     }
                 )
-            } else {
+            } else if (ageGateUnlocked == null) {
+                Box(Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                }
+            } else if (ageGateUnlocked == true) {
                 Column(
                     modifier = Modifier
                         .padding(pv)
