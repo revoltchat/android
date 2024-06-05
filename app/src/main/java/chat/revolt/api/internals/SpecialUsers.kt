@@ -77,7 +77,15 @@ object SpecialUsers {
                     Color(0xFF1000AF)
                 )
             )
-        ) // zomatree
+        ), // zomatree
+        "01FDVES092RQR3YTY4JBGA0VCA" to TeamMemberFlair.Brush(
+            AndroidBrush.verticalGradient(
+                listOf(
+                    Color(0xFFBB4681),
+                    Color(0xFF9CA87F)
+                )
+            )
+        ) // tom
     )
 
     fun teamFlairAsBrush(context: Context, id: String): AndroidBrush? {
