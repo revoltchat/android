@@ -64,6 +64,8 @@ object MarkdownTextRegularExpressions {
     val Channel = Regex("<#([0-9A-Z]{26})>")
     val CustomEmote = Regex(":([0-9A-Z]{26}):")
     val Timestamp = Regex("<t:([0-9]+?)(:[tTDfFR])?>")
+    val UrlFallback =
+        Regex("<?https?://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,4}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)>?")
 }
 
 /**
@@ -80,6 +82,7 @@ fun annotateText(node: AstNode): AnnotatedString {
                 val channels = MarkdownTextRegularExpressions.Channel.findAll(text)
                 val customEmotes = MarkdownTextRegularExpressions.CustomEmote.findAll(text)
                 val timestamps = MarkdownTextRegularExpressions.Timestamp.findAll(text)
+                val urls = MarkdownTextRegularExpressions.UrlFallback.findAll(text)
 
                 var lastIndex = 0
                 for (mention in mentions) {
@@ -181,6 +184,30 @@ fun annotateText(node: AstNode): AnnotatedString {
                     )
                     pop()
                     lastIndex = timestamp.range.last + 1
+                }
+
+                // Yes, cmark should handle this, but for gTLDs like .chat it doesn't.
+                // As a service with a .chat TLD, this is a problem. Duct tape fix, their fault.
+                for (url in urls) {
+                    try {
+                        append(text.substring(lastIndex, url.range.first))
+                    } catch (e: Exception) {
+                        // no-op
+                    }
+                    pushStringAnnotation(
+                        tag = Annotations.URL.tag,
+                        annotation = url.value
+                    )
+                    pushStyle(
+                        LocalTextStyle.current.toSpanStyle()
+                            .copy(
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                    )
+                    append(url.value)
+                    pop()
+                    pop()
+                    lastIndex = url.range.last + 1
                 }
 
                 append(text.substring(lastIndex, text.length))
