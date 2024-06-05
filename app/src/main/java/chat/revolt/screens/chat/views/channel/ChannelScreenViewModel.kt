@@ -460,6 +460,8 @@ class ChannelScreenViewModel @Inject constructor(
                     when (it) {
                         is MessageFrame -> {
                             if (it.channel != channel?.id) return@onEach
+                            // If we already have the message we are just catching up on the WebSocket connection. Skip
+                            if (items.any { m -> (m is ChannelScreenItem.RegularMessage && m.message.id == it.id) || (m is ChannelScreenItem.SystemMessage && m.message.id == it.id) }) return@onEach
 
                             it.author?.let { userId ->
                                 if (RevoltAPI.userCache[userId] == null) {
