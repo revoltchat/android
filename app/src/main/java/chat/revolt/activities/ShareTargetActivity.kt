@@ -331,7 +331,7 @@ fun ShareTargetScreen(
                                 channelSearchContent,
                                 ignoreCase = true
                             ) == true
-                                    || ChannelUtils.resolveDMName(it)
+                                    || ChannelUtils.resolveName(it)
                                 ?.contains(
                                     channelSearchContent,
                                     ignoreCase = true
@@ -347,7 +347,7 @@ fun ShareTargetScreen(
                                         channel.channelType ?: ChannelType.TextChannel
                                     ),
                                     name = (if (channel.server != null) "${channel.name} (${RevoltAPI.serverCache[channel.server]?.name})" else channel.name)
-                                        ?: ChannelUtils.resolveDMName(channel)
+                                        ?: ChannelUtils.resolveName(channel)
                                         ?: stringResource(R.string.unknown),
                                     selected = selectedChannel == channel.id,
                                     hasUnread = false,
@@ -357,7 +357,7 @@ fun ShareTargetScreen(
                                     dmPartnerIcon = ChannelUtils.resolveDMPartner(
                                         channel
                                     )?.let { u -> RevoltAPI.userCache[u] }?.avatar,
-                                    dmPartnerName = ChannelUtils.resolveDMName(
+                                    dmPartnerName = ChannelUtils.resolveName(
                                         channel
                                     ),
                                     dmPartnerStatus = ChannelUtils.resolveDMPartner(

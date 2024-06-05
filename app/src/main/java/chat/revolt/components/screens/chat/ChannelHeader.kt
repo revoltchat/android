@@ -78,7 +78,7 @@ fun ChannelHeader(
         ) {
             Text(
                 text = channel.name
-                    ?: ChannelUtils.resolveDMName(channel)
+                    ?: ChannelUtils.resolveName(channel)
                     ?: if (channel.channelType == ChannelType.SavedMessages) {
                         stringResource(R.string.channel_notes)
                     } else {

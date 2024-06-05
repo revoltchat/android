@@ -109,7 +109,7 @@ fun ChannelInfoSheet(channelId: String, onHideSheet: suspend () -> Unit) {
     ) {
         ChannelSheetHeader(
             channelName = channel.name
-                ?: ChannelUtils.resolveDMName(channel)
+                ?: ChannelUtils.resolveName(channel)
                 ?: stringResource(id = R.string.unknown),
             channelIcon = channel.icon,
             channelType = channel.channelType ?: ChannelType.TextChannel,

@@ -432,7 +432,7 @@ fun ChannelScreen(
                                     )
 
                                     ChannelType.DirectMessage -> Text(
-                                        ChannelUtils.resolveDMName(it)
+                                        ChannelUtils.resolveName(it)
                                             ?: stringResource(R.string.unknown),
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
@@ -785,7 +785,9 @@ fun ChannelScreen(
                                         onSendMessage = viewModel::sendPendingMessage,
                                         channelType = viewModel.channel?.channelType
                                             ?: ChannelType.TextChannel,
-                                        channelName = viewModel.channel?.name
+                                        channelName = viewModel.channel?.let { channel ->
+                                            ChannelUtils.resolveName(channel)
+                                        }
                                             ?: stringResource(R.string.unknown),
                                         onFocusChange = { isFocused ->
                                             if (isFocused && viewModel.activePane != ChannelScreenActivePane.None) {

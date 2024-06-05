@@ -11,7 +11,13 @@ sealed class CategorisedChannelList {
 }
 
 object ChannelUtils {
-    fun resolveDMName(channel: Channel): String? {
+    /**
+     * Resolves the name of a channel, preferring the name of the channel itself, then the name of the first recipient.
+     * @param channel The channel to resolve the name of.
+     * @return The name of the channel, or the name of the first recipient if the channel is a DM.
+     * @see User.resolveDefaultName
+     */
+    fun resolveName(channel: Channel): String? {
         return channel.name
             ?: RevoltAPI.userCache[channel.recipients?.first { u -> u != RevoltAPI.selfId }]?.let {
                 User.resolveDefaultName(
