@@ -83,7 +83,11 @@ fun annotateText(node: AstNode): AnnotatedString {
 
                 var lastIndex = 0
                 for (mention in mentions) {
-                    append(text.substring(lastIndex, mention.range.first))
+                    try {
+                        append(text.substring(lastIndex, mention.range.first))
+                    } catch (e: Exception) {
+                        // no-op
+                    }
                     pushStringAnnotation(
                         tag = Annotations.UserMention.tag,
                         annotation = mention.groupValues[1]
@@ -108,7 +112,11 @@ fun annotateText(node: AstNode): AnnotatedString {
                 }
 
                 for (channel in channels) {
-                    append(text.substring(lastIndex, channel.range.first))
+                    try {
+                        append(text.substring(lastIndex, channel.range.first))
+                    } catch (e: Exception) {
+                        // no-op
+                    }
                     pushStringAnnotation(
                         tag = Annotations.ChannelMention.tag,
                         annotation = channel.groupValues[1]
@@ -130,7 +138,11 @@ fun annotateText(node: AstNode): AnnotatedString {
                 }
 
                 for (emote in customEmotes) {
-                    append(text.substring(lastIndex, emote.range.first))
+                    try {
+                        append(text.substring(lastIndex, emote.range.first))
+                    } catch (e: Exception) {
+                        // no-op
+                    }
                     pushStringAnnotation(
                         tag = Annotations.CustomEmote.tag,
                         annotation = emote.groupValues[1]
@@ -141,7 +153,11 @@ fun annotateText(node: AstNode): AnnotatedString {
                 }
 
                 for (timestamp in timestamps) {
-                    append(text.substring(lastIndex, timestamp.range.first))
+                    try {
+                        append(text.substring(lastIndex, timestamp.range.first))
+                    } catch (e: Exception) {
+                        // no-op
+                    }
                     pushStringAnnotation(
                         tag = Annotations.Timestamp.tag,
                         annotation = timestamp.groupValues[1]
