@@ -318,11 +318,7 @@ fun UserInfoSheet(
                         Text(stringResource(R.string.user_info_sheet_category_bio))
                     },
                     contentPreview = {
-                        Text(
-                            text = profile?.content!!,
-                            maxLines = 4,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        RichMarkdown(input = profile?.content!!)
                     }
                 ) {
                     SelectionContainer(modifier = Modifier.verticalScroll(rememberScrollState())) {
