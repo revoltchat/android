@@ -109,7 +109,11 @@ import chat.revolt.components.chat.Message
 import chat.revolt.components.chat.NativeMessageField
 import chat.revolt.components.chat.SystemMessage
 import chat.revolt.components.emoji.EmojiPicker
+import chat.revolt.components.generic.GroupIcon
+import chat.revolt.components.generic.PresenceBadge
+import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
+import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.media.InbuiltMediaPicker
 import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelIcon
@@ -402,12 +406,36 @@ fun ChannelScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         viewModel.channel?.let {
-                            ChannelIcon(
-                                channelType = it.channelType ?: ChannelType.TextChannel,
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .alpha(0.8f)
-                            )
+                            when (it.channelType) {
+                                ChannelType.DirectMessage -> {
+                                    val partner =
+                                        RevoltAPI.userCache[ChannelUtils.resolveDMPartner(it)]
+                                    UserAvatar(
+                                        username = it.name ?: stringResource(R.string.unknown),
+                                        userId = ChannelUtils.resolveDMPartner(it) ?: "",
+                                        size = 24.dp,
+                                        presenceSize = 12.dp,
+                                        avatar = partner?.avatar
+                                    )
+                                }
+
+                                ChannelType.Group -> {
+                                    GroupIcon(
+                                        name = it.name ?: stringResource(R.string.unknown),
+                                        size = 24.dp,
+                                        icon = it.icon
+                                    )
+                                }
+
+                                else -> {
+                                    ChannelIcon(
+                                        channelType = it.channelType ?: ChannelType.TextChannel,
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .alpha(0.8f)
+                                    )
+                                }
+                            }
 
                             CompositionLocalProvider(
                                 LocalTextStyle provides LocalTextStyle.current.copy(
@@ -444,6 +472,18 @@ fun ChannelScreen(
                                         overflow = TextOverflow.Ellipsis
                                     )
                                 }
+                            }
+
+                            if (it.channelType == ChannelType.DirectMessage) {
+                                val partner =
+                                    RevoltAPI.userCache[ChannelUtils.resolveDMPartner(it)]
+                                PresenceBadge(
+                                    presence = presenceFromStatus(
+                                        partner?.status?.presence,
+                                        online = partner?.online == true
+                                    ),
+                                    size = 12.dp
+                                )
                             }
 
                             Icon(
