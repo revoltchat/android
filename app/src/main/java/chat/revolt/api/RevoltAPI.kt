@@ -167,24 +167,32 @@ object RevoltAPI {
                     try {
                         RealtimeSocket.connect(sessionToken)
                     } catch (e: Exception) {
-                        if (e is SocketException) {
-                            Log.d(
-                                "RevoltAPI",
-                                "Socket closed, probably no big deal /// " + e.message
-                            )
-                        } else {
-                            Log.e("RevoltAPI", "WebSocket error", e)
+                        try {
+                            if (e is SocketException) {
+                                Log.d(
+                                    "RevoltAPI",
+                                    "Socket closed, probably no big deal /// " + e.message
+                                )
+                            } else {
+                                Log.e("RevoltAPI", "WebSocket error", e)
+                            }
+                            RealtimeSocket.updateDisconnectionState(DisconnectionState.Disconnected)
+                        } catch (e: Exception) {
+                            Sentry.captureMessage("Error in socket error handling: $e")
                         }
-                        RealtimeSocket.updateDisconnectionState(DisconnectionState.Disconnected)
                     }
                 }
             } catch (e: Exception) {
-                if (e is InterruptedException) {
-                    Log.d("RevoltAPI", "Socket interrupted")
-                } else {
-                    Log.e("RevoltAPI", "WebSocket error", e)
+                try {
+                    if (e is InterruptedException) {
+                        Log.d("RevoltAPI", "Socket interrupted")
+                    } else {
+                        Log.e("RevoltAPI", "WebSocket error", e)
+                    }
+                    RealtimeSocket.updateDisconnectionState(DisconnectionState.Disconnected)
+                } catch (e: Exception) {
+                    Sentry.captureMessage("Error in socket error handling: $e")
                 }
-                RealtimeSocket.updateDisconnectionState(DisconnectionState.Disconnected)
             }
         }
     }
