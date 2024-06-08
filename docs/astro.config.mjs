@@ -3,6 +3,8 @@ import starlight from "@astrojs/starlight"
 
 // https://astro.build/config
 export default defineConfig({
+    site: "https://revoltchat.github.io",
+    base: "/android",
     integrations: [
         starlight({
             title: "Revolt on Android Technical Documentation",
