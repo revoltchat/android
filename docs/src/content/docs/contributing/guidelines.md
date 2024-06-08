@@ -49,4 +49,4 @@ If you are fixing a bug, you must follow these guidelines:
 
 ## If you came this far...
 
-Let's get started! You may continue to the [Development Setup](/contributing/setup) guide to set up your development environment.
+Let's get started! You may continue to the [Development Setup](/android/contributing/setup) guide to set up your development environment.
