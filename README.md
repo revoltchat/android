@@ -1,4 +1,4 @@
-# Revolt for Android
+# Revolt on Android
 
 ## Description
 
@@ -31,14 +31,21 @@ of the art for Android UI development.
 
 ## Resources
 
+### Revolt on Android
+
+- [Revolt on Android Technical Documentation](https://revoltchat.github.io/android/)
+- [Android-specific Contribution Guide](https://revoltchat.github.io/android/contributing/setup/)&mdash;**read carefully before contributing!**
+
 ### Revolt
 
 - [Revolt Project Board](https://github.com/revoltchat/revolt/discussions) (Submit feature requests
   here)
 - [Revolt Testers Server](https://app.revolt.chat/invite/Testers)
-- [Contribution Guide](https://developers.revolt.chat/contributing)
+- [General Revolt Contribution Guide](https://developers.revolt.chat/contributing)
 
 ## Quick Start
 
 Open the project in Android Studio. You can then run the app on an emulator or a physical device by
 running the `app` module.
+
+In-depth setup instructions can be found at [Setting up your Development Environment](https://revoltchat.github.io/android/contributing/setup/)
