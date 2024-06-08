@@ -1,0 +1,35 @@
+name: Build documentation
+on:
+    push:
+        branches: ["dev"]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write # To push a branch
+            pages: write # To push to a GitHub Pages site
+            id-token: write # To update the deployment status
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4.0.0
+              with:
+                  run_install: |
+                      - recursive: true
+                          cwd: docs
+            - name: Build Book
+              run: |
+                  cd docs
+                  pnpm build
+            - name: Setup Pages
+              uses: actions/configure-pages@v4
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: "docs/dist"
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4

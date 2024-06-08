@@ -1,0 +1,135 @@
+---
+title: Setting up your Development Environment
+description: A guide to setting up your development environment for Revolt on Android.
+template: doc
+---
+
+This page contains the guidelines for setting up your development environment for Revolt on Android. These guidelines are important to ensure that your development environment is set up correctly and you can start contributing to the project.
+
+If you want to compile the app for yourself, you can also follow these guidelines, however you may not need Android Studio and it may be possible to build the app using the command line, out of the scope of this guide.
+
+:::danger
+It may be tempting to skip some of these steps, but make sure you follow them to ensure that your development environment is set up correctly.
+:::
+
+import { Tabs, TabItem, Steps } from "@astrojs/starlight/components"
+
+<Steps>
+
+1.  Download the Git version control system.
+
+    <Tabs syncKey="os">
+
+    <TabItem label="Windows" icon="seti:windows">
+
+    ```powershell
+    winget install --id Git.Git -e --source winget
+    ```
+
+    </TabItem>
+
+    <TabItem label="macOS" icon="apple">
+
+    Using [Homebrew](https://brew.sh):
+
+    ```zsh
+    brew install git
+    ```
+
+    </TabItem>
+
+    <TabItem label="Linux" icon="linux">
+
+    Using your package manager. For example, on Ubuntu:
+
+    ```sh
+    sudo apt install git
+    ```
+
+    </TabItem>
+
+    </Tabs>
+
+2.  Download Android Studio.
+
+    <Tabs syncKey="os">
+
+    <TabItem label="Windows" icon="seti:windows">
+
+    ```powershell
+    winget install --id Google.AndroidStudio -e --source winget
+    ```
+
+    </TabItem>
+
+    <TabItem label="macOS" icon="apple">
+
+    From the [official website](https://developer.android.com/studio).
+
+    </TabItem>
+
+    <TabItem label="Linux" icon="linux">
+
+    Look for Android Studio in your package manager.
+
+    Alternatively, from [Flathub](https://flathub.org/apps/com.google.AndroidStudio) or the [official website](https://developer.android.com/studio).
+
+    </TabItem>
+
+    </Tabs>
+
+3.  Clone the repository.
+
+    ```sh
+    git clone https://github.com/revoltchat/android.git
+    ```
+
+4.  Open the project in Android Studio.
+
+5.  Install the required dependencies.
+
+    -   Android SDK, latest version
+    -   Android NDK, latest version
+
+    You can install these from the SDK Manager in Android Studio.
+
+6.  Copy the `revoltbuild.properties.example` file to `revoltbuild.properties` and fill in the required values.
+
+    ```sh
+    cp revoltbuild.properties.example revoltbuild.properties
+    ```
+
+    The `revoltbuild.properties` file contains the following properties:
+
+    | Property                 | Description                                    |
+    | ------------------------ | ---------------------------------------------- |
+    | `sentry.dsn`             | Sentry DSN for error reporting                 |
+    | `sentry.upload_mappings` | Whether to upload obf. maps to Sentry          |
+    | `build.debug.app_name`   | The name of the app in debug builds, arbitrary |
+    | `build.flavour_id`       | Leave as `ZZUU`                                |
+
+7.  Copy the `sentry.properties.example` file to `sentry.properties` and fill in the required values.
+
+    ```sh
+    cp sentry.properties.example sentry.properties
+    ```
+
+    The `sentry.properties` file contains the following properties:
+
+    | Property           | Description                                              |
+    | ------------------ | -------------------------------------------------------- |
+    | `defaults.url`     | The URL of the Sentry instance                           |
+    | `defaults.project` | The project ID in Sentry                                 |
+    | `defaults.org`     | The organization ID in Sentry                            |
+    | `auth.token`       | The authentication token for Sentry, used to upload maps |
+
+    You can get these values from the Sentry dashboard.
+
+8.  Build the project.
+
+    You can build the project by clicking on the 'Run' button in Android Studio.  
+    If asked, build the `:app` module.
+
+9.  **You're all set!** You can now start contributing to Revolt on Android.
+
+</Steps>
