@@ -19,7 +19,7 @@ jobs:
               with:
                   run_install: |
                       - recursive: true
-                          cwd: docs
+                      cwd: docs
             - name: Build Book
               run: |
                   cd docs
