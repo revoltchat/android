@@ -960,9 +960,9 @@ fun ChannelScreen(
                                                             )
 
                                                         try {
-                                                            pickCameraLauncher.launch(
-                                                                capturedPhotoUri.value
-                                                            )
+                                                            capturedPhotoUri.value?.let { uri ->
+                                                                pickCameraLauncher.launch(uri)
+                                                            }
                                                         } catch (e: Exception) {
                                                             Toast.makeText(
                                                                 context,

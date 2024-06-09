@@ -176,7 +176,7 @@ sentry {
 
 dependencies {
     // Android/Kotlin Core
-    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.core:core-ktx:1.13.1'
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.9.22"
 
     // Kotlinx - various first-party extensions for Kotlin
@@ -195,9 +195,9 @@ dependencies {
     implementation 'androidx.compose.material3:material3-window-size-class'
     implementation "androidx.compose.ui:ui-tooling-preview"
     implementation "androidx.compose.runtime:runtime-livedata"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2'
-    implementation 'androidx.activity:activity-compose:1.8.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1'
+    implementation 'androidx.activity:activity-compose:1.9.0'
 
     // Accompanist - Jetpack Compose Extensions
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
@@ -219,7 +219,7 @@ dependencies {
 
     // Hilt - Dependency Injection
     implementation "com.google.dagger:hilt-android:$hilt_version"
-    implementation "androidx.hilt:hilt-navigation-compose:1.1.0"
+    implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
 
     // Glide - Image Loading
@@ -239,14 +239,14 @@ dependencies {
 
     // Other AndroidX libraries - used for various things and never seem to have a consistent version
     implementation 'androidx.documentfile:documentfile:1.0.1'
-    implementation "androidx.browser:browser:1.7.0"
-    implementation "androidx.webkit:webkit:1.9.0"
+    implementation "androidx.browser:browser:1.8.0"
+    implementation "androidx.webkit:webkit:1.11.0"
     implementation "androidx.core:core-splashscreen:1.0.1"
 
     // Libraries used for legacy View-based UI
     implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha13"
-    implementation "androidx.appcompat:appcompat:1.7.0-alpha03"
-    implementation 'com.google.android.material:material:1.11.0'
+    implementation "androidx.appcompat:appcompat:1.7.0"
+    implementation 'com.google.android.material:material:1.12.0'
 
     // hCaptcha - captcha provider
     implementation "com.github.hcaptcha:hcaptcha-android-sdk:3.8.1"
@@ -267,8 +267,8 @@ dependencies {
 
     // Persistence
     implementation "app.cash.sqldelight:android-driver:2.0.1"
-    implementation "androidx.datastore:datastore:1.1.0-beta02"
-    implementation "androidx.datastore:datastore-preferences:1.1.0-beta02"
+    implementation "androidx.datastore:datastore:1.1.1"
+    implementation "androidx.datastore:datastore-preferences:1.1.1"
 
     // Livekit
     implementation "io.livekit:livekit-android:$livekit_version"
