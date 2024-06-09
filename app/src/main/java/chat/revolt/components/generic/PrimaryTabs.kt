@@ -1,17 +1,21 @@
 package chat.revolt.components.generic
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.ui.theme.Theme
 import com.google.android.material.tabs.TabLayout
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrimaryTabs(tabs: List<String>, currentIndex: Int, onTabSelected: (Int) -> Unit) {
     when (GlobalState.theme) {
@@ -45,12 +49,23 @@ fun PrimaryTabs(tabs: List<String>, currentIndex: Int, onTabSelected: (Int) -> U
             modifier = Modifier.fillMaxWidth()
         )
 
-        else -> TabRow(selectedTabIndex = currentIndex) {
+        else -> PrimaryTabRow(selectedTabIndex = currentIndex) {
             tabs.forEachIndexed { index, tab ->
                 Tab(
                     selected = index == currentIndex,
                     onClick = { onTabSelected(index) },
-                    text = { Text(tab) }
+                    text = {
+                        Text(
+                            text = tab,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = if (index == currentIndex) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            }
+                        )
+                    }
                 )
             }
         }
