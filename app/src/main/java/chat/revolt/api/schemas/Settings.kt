@@ -25,4 +25,9 @@ data class AndroidSpecificSettings(
      * Can be one of `{ None, SwipeFromEnd, DoubleTap }`
      */
     var messageReplyStyle: String? = null,
+    /**
+     * Avatar radius.
+     * Must be integer in range 0..50 inclusive.
+     */
+    var avatarRadius: Int? = null
 )

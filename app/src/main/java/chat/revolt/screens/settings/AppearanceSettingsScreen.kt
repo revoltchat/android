@@ -75,6 +75,7 @@ import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.ListHeader
 import chat.revolt.components.screens.settings.appearance.ColourChip
+import chat.revolt.components.screens.settings.appearance.CornerRadiusPicker
 import chat.revolt.ui.theme.ClearRippleTheme
 import chat.revolt.ui.theme.OverridableColourScheme
 import chat.revolt.ui.theme.Theme
@@ -108,6 +109,13 @@ class AppearanceSettingsScreenViewModel @Inject constructor(
         GlobalState.theme = theme
         viewModelScope.launch {
             SyncedSettings.updateAndroid(SyncedSettings.android.copy(theme = theme.name))
+        }
+    }
+
+    fun saveNewAvatarRadius(radius: Int) {
+        GlobalState.avatarRadius = radius
+        viewModelScope.launch {
+            SyncedSettings.updateAndroid(SyncedSettings.android.copy(avatarRadius = radius))
         }
     }
 
@@ -387,6 +395,25 @@ fun AppearanceSettingsScreen(
                             ).show()
                         }
                     }
+                }
+
+                ListHeader {
+                    Text(stringResource(R.string.settings_appearance_avatar_shape))
+                }
+
+                Text(
+                    stringResource(R.string.settings_appearance_avatar_shape_description),
+                    modifier = Modifier
+                        .padding(vertical = 8.dp, horizontal = 16.dp),
+                )
+
+                Box(Modifier.padding(horizontal = 16.dp)) {
+                    CornerRadiusPicker(
+                        percentage = GlobalState.avatarRadius,
+                        onUpdate = {
+                            viewModel.saveNewAvatarRadius(it)
+                        }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))

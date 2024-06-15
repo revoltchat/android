@@ -466,6 +466,14 @@
     <string name="inline_media_picker_no_media_placeholder">Pick media…</string>
     <string name="inline_media_picker_remove">Remove</string>
 
+    <string name="corner_radius_picker_sharp">Sharp</string>
+    <string name="corner_radius_picker_rounded">Rounded</string>
+    <string name="corner_radius_picker_circular">Circular</string>
+    <string name="corner_radius_picker_other">Other</string>
+    <string name="corner_radius_picker_choose_radius">Choose radius</string>
+    <string name="corner_radius_picker_choose_radius_yes">Use</string>
+    <string name="corner_radius_picker_choose_radius_cancel">Cancel</string>
+
     <string name="emoji_picker_close_skin_tone_menu">Close skin tone menu</string>
     <string name="emoji_picker_skin_tone_none">No skin tone</string>
     <string name="emoji_picker_skin_tone_fitzpatrick_1_2">Light skin tone</string>
@@ -515,6 +523,9 @@
     <string name="settings_appearance_theme_m3dynamic">Material You</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported">Material You (unsupported)</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">Material You is not supported on this device.</string>
+
+    <string name="settings_appearance_avatar_shape">Profile Picture Shape</string>
+    <string name="settings_appearance_avatar_shape_description">Choose the rounding grade for profile pictures, including in chat and profiles. This applies to all users.</string>
 
     <string name="settings_appearance_colour_overrides">Colour overrides</string>
     <string name="settings_appearance_colour_overrides_primary">Primary</string>
@@ -597,5 +608,5 @@
     <string name="share_target_invalid_intent">This is not a valid share intent.</string>
     <string name="share_target_attachment_too_large">This attachment is too large for Revolt (max. $1$s).</string>
     <string name="share_target_search_channels">Search channels</string>
-    <string name="share_target_select_channel">Please select a channel to share to.</string>
+    <string name="share_target_select_channel">m select a channel to share to.</string>
 </resources>
