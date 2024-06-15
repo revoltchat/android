@@ -13,8 +13,6 @@ API.
 The API library is part of the `app` module, and is not intended to be used as a standalone library,
 as it makes liberal use of Android-specific APIs for reactivity.
 
-The app is currently in alpha, and is not yet ready for production use.
-
 The app is written in Kotlin, and uses
 the [Jetpack Compose](https://developer.android.com/jetpack/compose) UI toolkit, the current state
 of the art for Android UI development.
