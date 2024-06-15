@@ -34,7 +34,8 @@ of the art for Android UI development.
 ### Revolt on Android
 
 - [Revolt on Android Technical Documentation](https://revoltchat.github.io/android/)
-- [Android-specific Contribution Guide](https://revoltchat.github.io/android/contributing/setup/)&mdash;**read carefully before contributing!**
+- [Android-specific Contribution Guide](https://revoltchat.github.io/android/contributing/guidelines/)
+  &mdash;**read carefully before contributing!**
 
 ### Revolt
 
@@ -48,4 +49,5 @@ of the art for Android UI development.
 Open the project in Android Studio. You can then run the app on an emulator or a physical device by
 running the `app` module.
 
-In-depth setup instructions can be found at [Setting up your Development Environment](https://revoltchat.github.io/android/contributing/setup/)
+In-depth setup instructions can be found
+at [Setting up your Development Environment](https://revoltchat.github.io/android/contributing/setup/)
