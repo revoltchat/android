@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -200,6 +201,8 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltVi
                 FormTextField(
                     value = viewModel.email,
                     label = stringResource(R.string.email),
+                    type = KeyboardType.Email,
+                    action = ImeAction.Next,
                     onChange = viewModel::setEmail,
                     modifier = Modifier.padding(vertical = 25.dp)
                 )
