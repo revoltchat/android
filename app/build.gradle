@@ -271,7 +271,8 @@ dependencies {
     implementation "androidx.datastore:datastore-preferences:1.1.1"
 
     // Livekit
-    implementation "io.livekit:livekit-android:$livekit_version"
+    // FIXME temporarily not included, re-add when realtime media is to be implemented
+    // implementation "io.livekit:livekit-android:$livekit_version"
 }
 
 sqldelight {
