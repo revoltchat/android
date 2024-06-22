@@ -156,6 +156,7 @@ class ChatRouterViewModel @Inject constructor(
     var sidebarSparkDisplayed by mutableStateOf(true)
     var latestChangelogRead by mutableStateOf(true)
     var latestChangelog by mutableStateOf("")
+    var latestChangelogBody by mutableStateOf("")
 
     private val changelogs = Changelogs(context, kvStorage)
 
@@ -170,8 +171,10 @@ class ChatRouterViewModel @Inject constructor(
                 kvStorage.getBoolean("sidebarSpark")!!
             }
 
-            latestChangelogRead = changelogs.hasSeenLatest()
-            latestChangelog = changelogs.index.latest
+            latestChangelogRead = changelogs.hasSeenCurrent()
+            latestChangelog = changelogs.getLatestChangelogCode()
+            latestChangelogBody =
+                changelogs.fetchChangelogByVersionCode(latestChangelog.toLong()).rendered
             if (!latestChangelogRead) {
                 changelogs.markAsSeen()
             }
@@ -423,19 +426,14 @@ fun ChatRouterScreen(
     }
 
     if (!viewModel.latestChangelogRead) {
-        val changelogSheetState = rememberModalBottomSheetState()
-
-        ModalBottomSheet(
-            sheetState = changelogSheetState,
-            onDismissRequest = {
+        ChangelogSheet(
+            versionName = viewModel.latestChangelog,
+            versionIsHistorical = false,
+            renderedContents = viewModel.latestChangelogBody,
+            onDismiss = {
                 viewModel.latestChangelogRead = true
             }
-        ) {
-            ChangelogSheet(
-                version = viewModel.latestChangelog,
-                new = true
-            )
-        }
+        )
     }
 
     if (showSidebarSpark.value) {

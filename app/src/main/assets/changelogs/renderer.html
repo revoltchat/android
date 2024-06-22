@@ -13,6 +13,13 @@
         }
 
         @font-face {
+            font-family: "Inter Display";
+            src: url("/_android_res/font/inter_display_semibold.ttf");
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        @font-face {
             font-family: "Inter";
             src: url("/_android_res/font/inter_bold.ttf");
             font-weight: 700;
@@ -55,29 +62,23 @@
             max-width: 100%;
             height: auto;
         }
+
+        #markdown h2 {
+            font-size: 1.2em;
+            font-family: "Inter Display", sans-serif;
+            font-weight: 600;
+        }
+
+        #markdown p, #markdown li {
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
 <div id="markdown"></div>
-<script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
 <script>
     const renderMarkdown = () => {
-        const markdown = document.querySelector("#markdown")
-
-        const converter = new showdown.Converter()
-
-        converter.setFlavor("github")
-        converter.setOption("tables", true)
-        converter.setOption("emoji", true)
-        converter.setOption("disableForced4SpacesIndentedSublists", true)
-        converter.setOption("noHeaderId", true)
-        converter.setOption("simpleLineBreaks", Bridge.shouldUseSimpleLineBreaks())
-        converter.setOption("strikethrough", true)
-        converter.setOption("tasklists", true)
-
-        const html = converter.makeHtml(Bridge.getMarkdown())
-        markdown.innerHTML = DOMPurify.sanitize(html)
+        markdown.innerHTML = Bridge.getMarkdown()
     }
     window.renderMarkdown = renderMarkdown
 

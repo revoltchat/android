@@ -55,6 +55,7 @@ const val REVOLT_JANUARY = "https://jan.revolt.chat"
 const val REVOLT_APP = "https://app.revolt.chat"
 const val REVOLT_INVITES = "https://rvlt.gg"
 const val REVOLT_WEBSOCKET = "wss://ws.revolt.chat"
+const val REVOLT_KJBOOK = "https://revoltchat.github.io/android"
 
 fun buildUserAgent(accessMethod: String = "Ktor"): String {
     return "$accessMethod RevoltAndroid/${BuildConfig.VERSION_NAME} ${BuildConfig.APPLICATION_ID} (Android ${android.os.Build.VERSION.SDK_INT}; ${android.os.Build.MANUFACTURER} ${android.os.Build.DEVICE}; (Kotlin ${KotlinVersion.CURRENT})"

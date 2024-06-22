@@ -1,9 +1,13 @@
-package chat.revolt.components.generic
+package chat.revolt.fragments
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
-import android.view.ViewGroup.LayoutParams
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
@@ -11,65 +15,52 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.FrameLayout
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.res.ResourcesCompat
 import androidx.webkit.WebViewAssetLoader
+import chat.revolt.R
 import chat.revolt.activities.InviteActivity
 import chat.revolt.api.REVOLT_APP
+import chat.revolt.databinding.SheetChangelogBinding
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.color.MaterialColors
 
-private fun argbAsCssColour(argb: Int): String {
-    val alpha = (argb shr 24 and 0xff) / 255.0f
-    val red = argb shr 16 and 0xff
-    val green = argb shr 8 and 0xff
-    val blue = argb and 0xff
-    return String.format("#%02x%02x%02x%02x", red, green, blue, (alpha * 255).toInt())
-}
 
-/**
- * WebView-backed Markdown renderer that supports all Markdown features
- * including KaTeX
- */
-@SuppressLint("SetJavaScriptEnabled")
-@Composable
-fun WebMarkdown(
-    text: String,
-    modifier: Modifier = Modifier,
-    maskLoading: Boolean = false,
-    simpleLineBreaks: Boolean = true,
-) {
-    val contentColour = LocalContentColor.current
-    val materialColourScheme = MaterialTheme.colorScheme
+class ChangelogBottomSheetFragment(
+    val onDismiss: () -> Unit
+) : BottomSheetDialogFragment() {
+    private lateinit var binding: SheetChangelogBinding
 
-    var finishedLoading by remember { mutableStateOf(false) }
-
-    if (!finishedLoading && maskLoading) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularProgressIndicator()
-        }
+    private fun argbAsCssColour(argb: Int): String {
+        val alpha = (argb shr 24 and 0xff) / 255.0f
+        val red = argb shr 16 and 0xff
+        val green = argb shr 8 and 0xff
+        val blue = argb and 0xff
+        return String.format("#%02x%02x%02x%02x", red, green, blue, (alpha * 255).toInt())
     }
 
-    AndroidView(
-        modifier = modifier,
-        factory = { context ->
-            WebView(context).apply {
+    @SuppressLint("SetJavaScriptEnabled")
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = SheetChangelogBinding.inflate(inflater, container, false)
+        requireArguments().run {
+            binding.tvTitle.apply {
+                text = when {
+                    getBoolean(ARG_HISTORICAL) -> requireContext().getString(
+                        R.string.settings_changelogs_historical_version_header,
+                        getString(ARG_VERSION_NAME)
+                    )
+
+                    else -> requireContext().getString(R.string.settings_changelogs_new_header)
+                }
+                typeface = ResourcesCompat.getFont(requireContext(), R.font.inter_display_semibold)
+            }
+
+            binding.wvChangelog.apply {
                 val assetLoader = WebViewAssetLoader.Builder()
                     .setDomain(Uri.parse(REVOLT_APP).host!!)
                     .addPathHandler(
@@ -119,7 +110,12 @@ fun WebMarkdown(
                             .setShowTitle(true)
                             .setDefaultColorSchemeParams(
                                 CustomTabColorSchemeParams.Builder()
-                                    .setToolbarColor(materialColourScheme.background.toArgb())
+                                    .setToolbarColor(
+                                        MaterialColors.getColor(
+                                            binding.wvChangelog,
+                                            com.google.android.material.R.attr.backgroundColor
+                                        )
+                                    )
                                     .build()
                             )
                             .build()
@@ -131,7 +127,7 @@ fun WebMarkdown(
                 }
 
                 loadUrl(
-                    "$REVOLT_APP/_android_assets/webmarkdown/renderer.html"
+                    "$REVOLT_APP/_android_assets/changelogs/renderer.html"
                 )
 
                 settings.apply {
@@ -146,45 +142,61 @@ fun WebMarkdown(
                 addJavascriptInterface(
                     object {
                         @JavascriptInterface
-                        fun onLoaded() {
-                            finishedLoading = true
-                        }
-
-                        @JavascriptInterface
                         fun getMarkdown(): String {
-                            return text
-                                .replace("&", "&amp;")
-                                .replace("<", "&lt;")
-                                .replace(">", "&gt;")
+                            return getString(ARG_RENDERED_CONTENTS) ?: ""
                         }
 
                         @JavascriptInterface
                         fun getContentColour(): String {
-                            return argbAsCssColour(contentColour.toArgb())
+                            return argbAsCssColour(
+                                MaterialColors.getColor(
+                                    binding.wvChangelog,
+                                    com.google.android.material.R.attr.colorOnSurface
+                                )
+                            )
                         }
 
                         @JavascriptInterface
                         fun getPrimaryColour(): String {
-                            return argbAsCssColour(materialColourScheme.primary.toArgb())
-                        }
-
-                        @JavascriptInterface
-                        fun shouldUseSimpleLineBreaks(): Boolean {
-                            return simpleLineBreaks
+                            return argbAsCssColour(
+                                MaterialColors.getColor(
+                                    binding.wvChangelog,
+                                    com.google.android.material.R.attr.colorPrimary
+                                )
+                            )
                         }
                     },
                     "Bridge"
                 )
 
                 setBackgroundColor(android.graphics.Color.TRANSPARENT)
-                layoutParams = FrameLayout.LayoutParams(
-                    LayoutParams.WRAP_CONTENT,
-                    LayoutParams.WRAP_CONTENT
-                )
             }
-        },
-        update = {
-            it.evaluateJavascript("renderMarkdown()", null)
         }
-    )
+        return binding.root
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        onDismiss()
+    }
+
+    companion object {
+        const val TAG = "ChangelogBottomSheetFragment"
+
+        private const val ARG_VERSION_NAME = "version_name"
+        private const val ARG_HISTORICAL = "historical"
+        private const val ARG_RENDERED_CONTENTS = "rendered_contents"
+
+        fun createArguments(
+            versionName: String,
+            historical: Boolean,
+            renderedContents: String,
+        ): Bundle {
+            return Bundle().apply {
+                putString(ARG_VERSION_NAME, versionName)
+                putBoolean(ARG_HISTORICAL, historical)
+                putString(ARG_RENDERED_CONTENTS, renderedContents)
+            }
+        }
+    }
 }
