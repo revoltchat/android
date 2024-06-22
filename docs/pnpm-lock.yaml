@@ -14,6 +14,9 @@ importers:
       '@astrojs/starlight':
         specifier: ^0.24.0
         version: 0.24.0(astro@4.10.1(typescript@5.4.5))
+      '@astropub/md':
+        specifier: ^0.4.0
+        version: 0.4.0(@astrojs/markdown-remark@5.1.0)
       astro:
         specifier: ^4.8.6
         version: 4.10.1(typescript@5.4.5)
@@ -78,6 +81,11 @@ packages:
   '@astrojs/telemetry@3.1.0':
     resolution: {integrity: sha512-/ca/+D8MIKEC8/A9cSaPUqQNZm+Es/ZinRv0ZAzvu2ios7POQSsVD+VOj7/hypWNsNM3T7RpfgNq7H2TU1KEHA==}
     engines: {node: ^18.17.1 || ^20.3.0 || >=21.0.0}
+
+  '@astropub/md@0.4.0':
+    resolution: {integrity: sha512-f0kJIfywRKLcVqlizqUPModBBuJ7WwBEIWJEt1Eq/ksSYixtOl8HQWMZKJhv9Xtc9OKHhkQf0AQc56EV1xNUnw==}
+    peerDependencies:
+      '@astrojs/markdown-remark': ^4
 
   '@babel/code-frame@7.24.7':
     resolution: {integrity: sha512-BcYH1CVJBO9tvyIZ2jVeXgSIMvGZ2FDRvDdOIVQyuklNKSsx+eppDEBq/g47Ayw+RqNFE+URvOShmf+f/qwAlA==}
@@ -2669,6 +2677,10 @@ snapshots:
       which-pm-runs: 1.1.0
     transitivePeerDependencies:
       - supports-color
+
+  '@astropub/md@0.4.0(@astrojs/markdown-remark@5.1.0)':
+    dependencies:
+      '@astrojs/markdown-remark': 5.1.0
 
   '@babel/code-frame@7.24.7':
     dependencies:
