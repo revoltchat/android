@@ -346,6 +346,7 @@ fun ProfileSettingsScreen(
                             InlineMediaPicker(
                                 currentModel = viewModel.pfpModel,
                                 circular = true,
+                                useAvatarCircularity = true,
                                 onPick = {
                                     viewModel.pfpModel = it.toString()
                                     viewModel.saveNewPfp()

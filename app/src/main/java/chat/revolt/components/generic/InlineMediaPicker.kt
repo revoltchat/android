@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -29,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
+import chat.revolt.api.settings.GlobalState
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -39,6 +41,7 @@ fun InlineMediaPicker(
     modifier: Modifier = Modifier,
     mimeType: String = "image/*",
     circular: Boolean = false,
+    useAvatarCircularity: Boolean = false,
     onPick: (Uri) -> Unit,
     canRemove: Boolean = true,
     onRemove: () -> Unit = {},
@@ -53,6 +56,7 @@ fun InlineMediaPicker(
                 currentModel = currentModel,
                 mimeType = mimeType,
                 circular = true,
+                useAvatarCircularity = useAvatarCircularity,
                 onPick = onPick
             )
 
@@ -114,6 +118,7 @@ fun InlineMediaPickerMediaPicker(
     currentModel: Any?,
     mimeType: String = "image/*",
     circular: Boolean = false,
+    useAvatarCircularity: Boolean = false,
     enabled: Boolean = true,
     onPick: (Uri) -> Unit
 ) {
@@ -132,7 +137,13 @@ fun InlineMediaPickerMediaPicker(
             contentScale = if (circular) ContentScale.Crop else ContentScale.FillWidth,
             modifier = if (circular) {
                 Modifier
-                    .clip(CircleShape)
+                    .then(
+                        if (useAvatarCircularity) {
+                            Modifier.clip(RoundedCornerShape(GlobalState.avatarRadius))
+                        } else {
+                            Modifier.clip(CircleShape)
+                        }
+                    )
                     .width(82.dp)
                     .height(82.dp)
             } else {
@@ -149,7 +160,13 @@ fun InlineMediaPickerMediaPicker(
         Box(
             modifier = if (circular) {
                 Modifier
-                    .clip(CircleShape)
+                    .then(
+                        if (useAvatarCircularity) {
+                            Modifier.clip(RoundedCornerShape(GlobalState.avatarRadius))
+                        } else {
+                            Modifier.clip(CircleShape)
+                        }
+                    )
                     .width(82.dp)
                     .height(82.dp)
             } else {
