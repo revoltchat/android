@@ -18,7 +18,7 @@ suspend fun blockUser(userId: String) {
 
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
-        throw Error(error.type)
+        throw Exception(error.type)
     } catch (e: SerializationException) {
         // Not an error
     }
@@ -30,7 +30,7 @@ suspend fun unblockUser(userId: String) {
 
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
-        throw Error(error.type)
+        throw Exception(error.type)
     } catch (e: SerializationException) {
         // Not an error
     }
@@ -45,7 +45,7 @@ suspend fun friendUser(username: String) {
 
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), body)
-        throw Error(error.type)
+        throw Exception(error.type)
     } catch (e: SerializationException) {
         // Not an error
     }
@@ -57,7 +57,7 @@ suspend fun acceptFriendRequest(userId: String) {
 
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
-        throw Error(error.type)
+        throw Exception(error.type)
     } catch (e: SerializationException) {
         // Not an error
     }
@@ -69,7 +69,7 @@ suspend fun unfriendUser(userId: String) {
 
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
-        throw Error(error.type)
+        throw Exception(error.type)
     } catch (e: SerializationException) {
         // Not an error
     }
