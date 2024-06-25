@@ -67,7 +67,7 @@ suspend fun fetchMember(serverId: String, userId: String, pure: Boolean = false)
 
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), response.bodyAsText())
-        throw Error(error.type)
+        throw Exception(error.type)
     } catch (e: SerializationException) {
         // Not an error
     }
