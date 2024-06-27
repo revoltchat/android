@@ -21,10 +21,16 @@
         android:paddingBottom="8dp"
         tools:text="Changelog for 1.0.0" />
 
-    <WebView
-        android:id="@+id/wv_changelog"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <WebView
+            android:id="@+id/wv_changelog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp" />
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>
