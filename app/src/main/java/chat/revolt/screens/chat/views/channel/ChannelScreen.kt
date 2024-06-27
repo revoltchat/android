@@ -2,7 +2,6 @@ package chat.revolt.screens.chat.views.channel
 
 import android.content.ContentValues
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.DisplayMetrics
@@ -10,6 +9,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -115,7 +115,7 @@ import chat.revolt.components.generic.PresenceBadge
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.components.generic.presenceFromStatus
-import chat.revolt.components.media.InbuiltMediaPicker
+import chat.revolt.components.media.MediaPickerGateway
 import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelIcon
 import chat.revolt.components.screens.chat.ReplyManager
@@ -129,7 +129,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import java.io.File
-import java.io.FileNotFoundException
 import kotlin.math.max
 
 sealed class ChannelScreenItem {
@@ -249,6 +248,16 @@ fun ChannelScreen(
         contract = ActivityResultContracts.OpenMultipleDocuments()
     ) { uriList ->
         uriList.let { list ->
+            list.forEach { uri ->
+                processFileUri(uri, null)
+            }
+        }
+    }
+
+    val pickMediaLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia()
+    ) {
+        it.let { list ->
             list.forEach { uri ->
                 processFileUri(uri, null)
             }
@@ -927,85 +936,76 @@ fun ChannelScreen(
                                                 viewModel.activePane = ChannelScreenActivePane.None
                                             }
 
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                                InbuiltMediaPicker(
-                                                    onOpenDocumentsUi = {
-                                                        pickFileLauncher.launch(arrayOf("*/*"))
-                                                        viewModel.activePane =
-                                                            ChannelScreenActivePane.None
-                                                    },
-                                                    onOpenCamera = {
-                                                        // Create a new content URI to store the captured image.
-                                                        val contentResolver =
-                                                            context.contentResolver
-                                                        val contentValues = ContentValues().apply {
-                                                            put(
-                                                                MediaStore.MediaColumns.DISPLAY_NAME,
-                                                                "RVL_${System.currentTimeMillis()}.jpg"
-                                                            )
-                                                            put(
-                                                                MediaStore.MediaColumns.MIME_TYPE,
-                                                                "image/jpeg"
-                                                            )
-                                                            put(
-                                                                MediaStore.MediaColumns.RELATIVE_PATH,
-                                                                Environment.DIRECTORY_PICTURES
-                                                            )
-                                                        }
+                                            MediaPickerGateway(
+                                                onOpenPhotoPicker = {
+                                                    pickMediaLauncher.launch(
+                                                        PickVisualMediaRequest(
+                                                            mediaType = ActivityResultContracts.PickVisualMedia.ImageAndVideo
+                                                        )
+                                                    )
+                                                    viewModel.activePane =
+                                                        ChannelScreenActivePane.None
+                                                },
+                                                onOpenDocumentPicker = {
+                                                    pickFileLauncher.launch(arrayOf("*/*"))
+                                                    viewModel.activePane =
+                                                        ChannelScreenActivePane.None
+                                                },
+                                                onOpenCamera = {
+                                                    // Create a new content URI to store the captured image.
+                                                    val contentResolver =
+                                                        context.contentResolver
+                                                    val contentValues = ContentValues().apply {
+                                                        put(
+                                                            MediaStore.MediaColumns.DISPLAY_NAME,
+                                                            "RVL_${System.currentTimeMillis()}.jpg"
+                                                        )
+                                                        put(
+                                                            MediaStore.MediaColumns.MIME_TYPE,
+                                                            "image/jpeg"
+                                                        )
+                                                        put(
+                                                            MediaStore.MediaColumns.RELATIVE_PATH,
+                                                            Environment.DIRECTORY_PICTURES
+                                                        )
+                                                    }
 
+                                                    try {
                                                         capturedPhotoUri.value =
                                                             contentResolver.insert(
                                                                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                                                                 contentValues
                                                             )
+                                                    } catch (e: Exception) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            context.getString(
+                                                                R.string.file_picker_chip_camera_failed
+                                                            ),
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
 
-                                                        try {
-                                                            capturedPhotoUri.value?.let { uri ->
-                                                                pickCameraLauncher.launch(uri)
-                                                            }
-                                                        } catch (e: Exception) {
-                                                            Toast.makeText(
-                                                                context,
-                                                                context.getString(
-                                                                    R.string.file_picker_chip_camera_none_installed
-                                                                ),
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-                                                        }
+                                                        return@MediaPickerGateway
+                                                    }
 
-                                                        viewModel.activePane =
-                                                            ChannelScreenActivePane.None
-                                                    },
-                                                    onClose = {
-                                                        viewModel.activePane =
-                                                            ChannelScreenActivePane.None
-                                                    },
-                                                    onMediaSelected = { media ->
-                                                        try {
-                                                            processFileUri(
-                                                                media.uri,
-                                                                media.uri.lastPathSegment
-                                                            )
-                                                        } catch (e: Exception) {
-                                                            if (e is FileNotFoundException) {
-                                                                Toast.makeText(
-                                                                    context,
-                                                                    context.getString(
-                                                                        R.string.file_picker_cannot_attach_file_invalid
-                                                                    ),
-                                                                    Toast.LENGTH_SHORT
-                                                                ).show()
-                                                            }
+                                                    try {
+                                                        capturedPhotoUri.value?.let { uri ->
+                                                            pickCameraLauncher.launch(uri)
                                                         }
-                                                    },
-                                                    pendingMedia = viewModel.draftAttachments
-                                                        .filterNot { it.pickerIdentifier == null }
-                                                        .map { it.pickerIdentifier!! },
-                                                    modifier = Modifier
-                                                        .imePadding()
-                                                        .navigationBarsPadding()
-                                                )
-                                            }
+                                                    } catch (e: Exception) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            context.getString(
+                                                                R.string.file_picker_chip_camera_none_installed
+                                                            ),
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+
+                                                    viewModel.activePane =
+                                                        ChannelScreenActivePane.None
+                                                },
+                                            )
                                         }
 
                                         else -> {
