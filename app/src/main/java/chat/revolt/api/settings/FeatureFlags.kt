@@ -30,6 +30,19 @@ sealed class MediaConversationsVariates {
     data class Restricted(val predicate: () -> Boolean) : MediaConversationsVariates()
 }
 
+@FeatureFlag("VideoViewActivity2")
+sealed class ViewViewActivity2Variates {
+    @Treatment(
+        "Enable the new XML-based video player activity for all users"
+    )
+    object Enabled : ViewViewActivity2Variates()
+
+    @Treatment(
+        "Enable the new XML-based video player activity for users that meet certain or all criteria (implementation-specific)"
+    )
+    data class Restricted(val predicate: () -> Boolean) : ViewViewActivity2Variates()
+}
+
 object FeatureFlags {
     @FeatureFlag("LabsAccessControl")
     var labsAccessControl by mutableStateOf<LabsAccessControlVariates>(
@@ -54,5 +67,18 @@ object FeatureFlags {
         get() = when (mediaConversations) {
             is MediaConversationsVariates.Enabled -> true
             is MediaConversationsVariates.Restricted -> (mediaConversations as MediaConversationsVariates.Restricted).predicate()
+        }
+
+    @FeatureFlag("VideoViewActivity2")
+    var videoViewActivity2 by mutableStateOf<ViewViewActivity2Variates>(
+        ViewViewActivity2Variates.Restricted {
+            RevoltAPI.selfId == SpecialUsers.JENNIFER
+        }
+    )
+
+    val videoViewActivity2Granted: Boolean
+        get() = when (videoViewActivity2) {
+            is ViewViewActivity2Variates.Enabled -> true
+            is ViewViewActivity2Variates.Restricted -> (videoViewActivity2 as ViewViewActivity2Variates.Restricted).predicate()
         }
 }

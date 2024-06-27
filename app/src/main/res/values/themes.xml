@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Theme.Revolt" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Revolt.TitleLarge</item>
     </style>
 
     <style name="Theme.Revolt.Starting" parent="Theme.SplashScreen" tools:targetApi="tiramisu">
@@ -11,5 +12,14 @@
         <item name="android:windowSplashScreenBackground">@color/splashscreen_background</item>
         <item name="android:windowSplashScreenBehavior">icon_preferred</item>
         <item name="postSplashScreenTheme">@style/Theme.Revolt</item>
+    </style>
+
+    <style name="TextAppearance.Revolt.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/inter_display_semibold</item>
+        <item name="android:fontFamily">@font/inter_display_semibold</item>
+    </style>
+
+    <style name="Widget.Revolt.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="titleTextAppearance">@style/TextAppearance.Revolt.TitleLarge</item>
     </style>
 </resources>
