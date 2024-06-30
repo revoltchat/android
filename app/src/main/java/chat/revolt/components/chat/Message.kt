@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.activities.media.ImageViewActivity
 import chat.revolt.activities.media.VideoViewActivity
-import chat.revolt.activities.media.VideoViewActivity2
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.BrushCompat
@@ -67,7 +66,6 @@ import chat.revolt.api.routes.channel.unreact
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.User
-import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.MessageReplyStyle
 import chat.revolt.callbacks.Action
@@ -389,10 +387,7 @@ fun Message(
                                             attachmentView.launch(
                                                 Intent(
                                                     context,
-                                                    when (FeatureFlags.videoViewActivity2Granted) {
-                                                        true -> VideoViewActivity2::class.java
-                                                        else -> VideoViewActivity::class.java
-                                                    }
+                                                    VideoViewActivity::class.java
                                                 ).apply {
                                                     putExtra("autumnResource", attachment)
                                                 }

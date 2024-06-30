@@ -118,11 +118,6 @@
             android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.Revolt" />
 
-        <activity
-            android:name=".activities.media.VideoViewActivity2"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Revolt" />
-
         <!-- Backport photo picker via Google Play Services -->
         <service
             android:name="com.google.android.gms.metadata.ModuleDependencies"
