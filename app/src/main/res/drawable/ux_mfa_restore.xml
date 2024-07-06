@@ -5,47 +5,47 @@
     android:viewportHeight="25.031">
     <path
         android:fillAlpha="0.33"
-        android:fillColor="@color/material_dynamic_neutral_variant60"
+        android:fillColor="?attr/colorSurface"
         android:pathData="M2.216,0L55.521,0A2.216,2.216 0,0 1,57.738 2.216L57.738,13.369A2.216,2.216 0,0 1,55.521 15.585L2.216,15.585A2.216,2.216 0,0 1,0 13.369L0,2.216A2.216,2.216 0,0 1,2.216 0z" />
     <path
         android:fillAlpha="0.33"
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m52.855,13.718h0.606v-11.851h-0.606z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m6.61,9.673h0.878l-1.134,-1.684 1.081,-1.592h-0.839l-0.701,1.042 -0.688,-1.042h-0.878l1.081,1.619 -1.134,1.658h0.852l0.74,-1.101z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m10.811,9.673h0.878l-1.134,-1.684 1.081,-1.592h-0.839l-0.701,1.042 -0.688,-1.042h-0.878l1.081,1.619 -1.134,1.658h0.852l0.74,-1.101z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m15.012,9.673h0.878l-1.134,-1.684 1.081,-1.592h-0.839l-0.701,1.042 -0.688,-1.042h-0.878l1.081,1.619 -1.134,1.658h0.852l0.74,-1.101z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m19.213,9.673h0.878l-1.134,-1.684 1.081,-1.592h-0.839l-0.701,1.042 -0.688,-1.042h-0.878l1.081,1.619 -1.134,1.658h0.852l0.74,-1.101z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m23.415,9.673h0.878l-1.134,-1.684 1.081,-1.592h-0.839l-0.701,1.042 -0.688,-1.042h-0.878l1.081,1.619 -1.134,1.658h0.852l0.74,-1.101z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m25.119,8.316h2.097v-0.695h-2.097z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m30.375,9.673h0.878l-1.134,-1.684 1.081,-1.592h-0.839l-0.701,1.042 -0.688,-1.042h-0.878l1.081,1.619 -1.134,1.658h0.852l0.74,-1.101z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m34.576,9.673h0.878l-1.134,-1.684 1.081,-1.592h-0.839l-0.701,1.042 -0.688,-1.042h-0.878l1.081,1.619 -1.134,1.658h0.852l0.74,-1.101z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m38.778,9.673h0.878l-1.134,-1.684 1.081,-1.592h-0.839l-0.701,1.042 -0.688,-1.042h-0.878l1.081,1.619 -1.134,1.658h0.852l0.74,-1.101z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m42.979,9.673h0.878l-1.134,-1.684 1.081,-1.592h-0.839l-0.701,1.042 -0.688,-1.042h-0.878l1.081,1.619 -1.134,1.658h0.852l0.74,-1.101z" />
     <path
-        android:fillColor="@color/foreground"
+        android:fillColor="?attr/colorOnSurface"
         android:pathData="m47.18,9.673h0.878l-1.134,-1.684 1.081,-1.592h-0.839l-0.701,1.042 -0.688,-1.042h-0.878l1.081,1.619 -1.134,1.658h0.852l0.74,-1.101z" />
     <path
-        android:fillColor="@color/material_dynamic_tertiary60"
+        android:fillColor="?attr/colorPrimaryVariant"
         android:pathData="m52.855,11.198a6.917,6.917 0,0 0,-6.917 6.917h-2.306l3.074,3.074 3.074,-3.074h-2.306a5.38,5.38 0,0 1,5.38 -5.38,5.38 5.38,0 0,1 5.38,5.38 5.38,5.38 0,0 1,-5.38 5.38c-1.153,0 -2.236,-0.384 -3.12,-0.999l-1.107,1.107c1.184,0.891 2.644,1.429 4.227,1.429a6.917,6.917 0,0 0,6.917 -6.917,6.917 6.917,0 0,0 -6.917,-6.917m1.537,6.917a1.537,1.537 0,0 0,-1.537 -1.537,1.537 1.537,0 0,0 -1.537,1.537 1.537,1.537 0,0 0,1.537 1.537,1.537 1.537,0 0,0 1.537,-1.537z"
         android:strokeWidth="0.768531" />
 </vector>
