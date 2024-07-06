@@ -15,11 +15,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -70,6 +73,7 @@ import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.MessageReplyStyle
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
+import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.components.markdown.LocalMarkdownTreeConfig
@@ -409,21 +413,59 @@ fun Message(
 
                         message.embeds?.let {
                             message.embeds.forEach { embed ->
-                                val embedIsEmpty =
-                                    embed.title == null && embed.description == null && embed.iconURL == null && embed.image == null
+                                when (embed.type) {
+                                    "Website", "Text" -> {
+                                        val embedIsEmpty =
+                                            embed.title == null && embed.description == null && embed.iconURL == null && embed.image == null
 
-                                if (embedIsEmpty) {
-                                    // if we do not emit anything, compose will cause an internal error.
-                                    // FIXME if you are doing fixme's anyways then check if this is still an issue
-                                    Box {}
-                                    return@forEach
+                                        if (embedIsEmpty) {
+                                            // if we do not emit anything, compose will cause an internal error.
+                                            // FIXME if you are doing fixme's anyways then check if this is still an issue
+                                            Box {}
+                                            return@forEach
+                                        }
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Embed(embed = embed, onLinkClick = {
+                                            viewUrlInBrowser(context, it)
+                                        })
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+
+                                    "Image" -> {
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        BoxWithConstraints(
+                                            modifier = Modifier
+                                                .clip(MaterialTheme.shapes.medium)
+                                                .clickable {
+                                                    embed.url?.let {
+                                                        viewUrlInBrowser(context, it)
+                                                    }
+                                                }
+                                        ) {
+                                            embed.url?.let { url ->
+                                                RemoteImage(
+                                                    url = asJanuaryProxyUrl(url),
+                                                    contentScale = ContentScale.Fit,
+                                                    modifier = Modifier
+                                                        .width(
+                                                            embed.width?.toInt()?.dp
+                                                                ?: maxWidth
+                                                        )
+                                                        .aspectRatio(
+                                                            embed.width!!.toFloat() / embed.height!!.toFloat()
+                                                        ),
+                                                    description = null
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                    }
+
+                                    else -> {
+                                        // no-op
+                                    }
                                 }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Embed(embed = embed, onLinkClick = {
-                                    viewUrlInBrowser(context, it)
-                                })
-                                Spacer(modifier = Modifier.height(8.dp))
                             }
 
                         }
