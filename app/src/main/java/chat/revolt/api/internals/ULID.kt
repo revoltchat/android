@@ -145,4 +145,29 @@ object ULID {
 
         return timestamp
     }
+
+    /** Like asTimestamp, but for the entire ULID including the entropy, as an integer.
+    Note that the number you receive will not be reversible to the original ULID, because
+    it will overflow the `Int` type! Used for generating Android notification IDs.
+     */
+    fun asInteger(ulid: String): Int {
+        if (ulid.length != len) {
+            throw IllegalArgumentException("ULID must be exactly $len characters")
+        }
+
+        var integer = 0
+
+        for (i in 0 until len) {
+            val char = ulid[i]
+            val value = b32chars.indexOf(char)
+
+            if (value == -1) {
+                throw IllegalArgumentException("Invalid character '$char' at position $i")
+            }
+
+            integer = integer or (value shl (len - i - 1) * 5)
+        }
+
+        return integer
+    }
 }

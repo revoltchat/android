@@ -5,10 +5,16 @@ import android.util.Log
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.serialization.*
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 
 @Serializable
 data class LoginNegotiation(
@@ -132,10 +138,12 @@ suspend fun negotiateAuthentication(email: String, password: String): EmailPassw
         "Success" -> EmailPasswordAssessment(
             firstUserHints = RevoltJson.decodeFromString(UserHints.serializer(), responseContent)
         )
+
         "MFA" -> EmailPasswordAssessment(
             proceedMfa = true,
             mfaSpec = RevoltJson.decodeFromString(MfaLoginSpec.serializer(), responseContent)
         )
+
         else -> throw Exception("Unknown result: ${responseJson.result}")
     }
 }

@@ -11,6 +11,7 @@ plugins {
 
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
+    id 'com.google.gms.google-services'
 }
 
 def property(String fileName, String propertyName, String fallbackEnv = null) {
@@ -273,6 +274,10 @@ dependencies {
     // Livekit
     // FIXME temporarily not included, re-add when realtime media is to be implemented
     // implementation "io.livekit:livekit-android:$livekit_version"
+
+    // Firebase - Cloud Messaging
+    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
+    implementation("com.google.firebase:firebase-messaging")
 }
 
 sqldelight {

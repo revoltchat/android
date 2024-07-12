@@ -491,6 +491,11 @@
     <string name="spark_sidebar_settings_tutorial_description_2">Then long tap your profile picture to open the settings.</string>
     <string name="spark_sidebar_settings_tutorial_acknowledge">Got it</string>
 
+    <string name="spark_notifications_rationale">Stay in the loop</string>
+    <string name="spark_notifications_rationale_description">Enable notifications to be kept up to date with messages and mentions.</string>
+    <string name="spark_notifications_rationale_cta">Enable notifications</string>
+    <string name="spark_notifications_rationale_dismiss">Not now</string>
+
     <string name="notice_platform_mod_dm_title">Important notice regarding your account</string>
     <string name="notice_platform_mod_dm_description">You have received an important notice regarding your account from our moderation team. Please read it carefully.</string>
     <string name="notice_platform_mod_dm_acknowledge">View</string>
@@ -611,4 +616,9 @@
     <string name="share_target_attachment_too_large">This attachment is too large for Revolt (max. $1$s).</string>
     <string name="share_target_search_channels">Search channels</string>
     <string name="share_target_select_channel">m select a channel to share to.</string>
+
+    <string name="notification_channel_group_conversations">Conversations</string>
+    <string name="notification_channel_group_social">Friends and Social</string>
+    <string name="notification_channel_friend_requests">Friend Requests</string>
+    <string name="notification_channel_friend_requests_description">Incoming friend requests, as well as accepted requests you\'ve sent.</string>
 </resources>

@@ -2,6 +2,7 @@ package chat.revolt.api.realtime
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import chat.revolt.RevoltApplication
 import chat.revolt.api.REVOLT_WEBSOCKET
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
@@ -37,6 +38,7 @@ import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
+import chat.revolt.c2dm.ChannelRegistrator
 import chat.revolt.persistence.Database
 import chat.revolt.persistence.SqlStorage
 import io.ktor.client.plugins.websocket.ws
@@ -62,6 +64,8 @@ sealed class RealtimeSocketFrames {
 object RealtimeSocket {
     val database = Database(SqlStorage.driver)
     var socket: WebSocketSession? = null
+
+    private val channelRegistrator = ChannelRegistrator(RevoltApplication.instance)
 
     private var _disconnectionState = mutableStateOf(DisconnectionState.Reconnecting)
     val disconnectionState: DisconnectionState
@@ -200,6 +204,9 @@ object RealtimeSocket {
                 Log.d("RealtimeSocket", "Adding emojis to cache.")
                 val emojiMap = readyFrame.emojis.associateBy { it.id!! }
                 RevoltAPI.emojiCache.putAll(emojiMap)
+
+                Log.d("RealtimeSocket", "Registering push notification channels.")
+                channelRegistrator.register()
 
                 RevoltAPI.closeHydration()
             }

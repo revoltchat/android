@@ -99,7 +99,7 @@ fun UserAvatar(
     ) {
         if (avatar != null) {
             RemoteImage(
-                url = rawUrl ?: "$REVOLT_FILES/avatars/${avatar.id!!}/user.png?max_side=256",
+                url = rawUrl ?: "$REVOLT_FILES/avatars/${avatar.id}/user.png?max_side=256",
                 contentScale = ContentScale.Crop,
                 description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
