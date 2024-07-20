@@ -44,6 +44,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
+import java.lang.reflect.InvocationTargetException
 import java.net.SocketException
 import chat.revolt.api.schemas.Channel as ChannelSchema
 
@@ -169,7 +170,7 @@ object RevoltAPI {
                         RealtimeSocket.connect(sessionToken)
                     } catch (e: Exception) {
                         try {
-                            if (e is SocketException) {
+                            if (e is SocketException || (e is InvocationTargetException && e.targetException is SocketException)) {
                                 Log.d(
                                     "RevoltAPI",
                                     "Socket closed, probably no big deal /// " + e.message
