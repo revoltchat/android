@@ -1,5 +1,6 @@
 package chat.revolt.api.routes.onboard
 
+import chat.revolt.api.RateLimitResponse
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
@@ -27,6 +28,14 @@ suspend fun needsOnboarding(sessionToken: String = RevoltAPI.sessionToken): Bool
     }
 
     val responseContent = response.bodyAsText()
+
+    try {
+        val rateLimitResponse =
+            RevoltJson.decodeFromString(RateLimitResponse.serializer(), responseContent)
+        throw rateLimitResponse.toException()
+    } catch (e: SerializationException) {
+        // good path
+    }
 
     return RevoltJson.decodeFromString(OnboardingResponse.serializer(), responseContent).onboarding
 }

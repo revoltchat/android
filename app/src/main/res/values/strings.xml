@@ -8,6 +8,7 @@
     <string name="share">Share</string>
     <string name="lets_go">Let\'s go</string>
     <string name="loading">Fetching some info, hang in there…</string>
+    <string name="rate_limit_toast">Hold your horses! You\'re doing that too often in a short amount of time.</string>
 
     <string name="terms_of_service">Terms of Service</string>
     <string name="privacy_policy">Privacy Policy</string>

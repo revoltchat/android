@@ -41,6 +41,7 @@ import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
@@ -349,3 +350,13 @@ object RevoltAPI {
 
 @Serializable
 data class RevoltError(val type: String)
+
+@Serializable
+data class RateLimitResponse(@SerialName("retry_after") val retryAfter: Int) {
+    fun toException(): HitRateLimitException {
+        return HitRateLimitException(retryAfter)
+    }
+}
+
+class HitRateLimitException(retryAfter: Int) :
+    Exception("Hit rate limit, retry after ${retryAfter}ms")

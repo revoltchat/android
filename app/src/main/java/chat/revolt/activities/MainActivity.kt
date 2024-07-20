@@ -39,6 +39,7 @@ import androidx.navigation.compose.rememberNavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.RevoltApplication
+import chat.revolt.api.HitRateLimitException
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.routes.onboard.needsOnboarding
@@ -170,6 +171,14 @@ class MainActivityViewModel @Inject constructor(
                         startWithDestination("register/onboarding")
                         return@launch
                     }
+                } catch (e: HitRateLimitException) {
+                    Log.e("MainActivity", "Rate limited while checking onboarding state", e)
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.rate_limit_toast),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@launch startWithoutDestination()
                 } catch (e: Exception) {
                     Log.e("MainActivity", "Failed to check onboarding state, clearing session", e)
                     kvStorage.remove("sessionToken")
