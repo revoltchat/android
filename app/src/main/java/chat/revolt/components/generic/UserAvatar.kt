@@ -119,7 +119,7 @@ fun UserAvatar(
             )
         } else {
             RemoteImage(
-                url = "$REVOLT_BASE/users/$userId/default_avatar",
+                url = "$REVOLT_BASE/users/${userId.ifBlank { "0".repeat(26) }}/default_avatar",
                 description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
                     .clip(RoundedCornerShape(GlobalState.avatarRadius))
