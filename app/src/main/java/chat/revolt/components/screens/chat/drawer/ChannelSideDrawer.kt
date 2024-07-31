@@ -379,10 +379,13 @@ fun ChannelSideDrawer(
                         .clip(CircleShape)
                         .clickable {
                             onShowAddServerSheet()
-                        }) {
+                        }
+                        .size(48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.settings)
+                        contentDescription = stringResource(R.string.server_plus_alt)
                     )
                 }
             }
@@ -394,10 +397,13 @@ fun ChannelSideDrawer(
                         .clip(CircleShape)
                         .clickable {
                             topNav.navigate("discover")
-                        }) {
+                        }
+                        .size(48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_compass_24dp),
-                        contentDescription = stringResource(R.string.settings)
+                        contentDescription = stringResource(R.string.discover_alt)
                     )
                 }
             }
@@ -413,7 +419,10 @@ fun ChannelSideDrawer(
                                 scope.launch {
                                     drawerState?.close()
                                 }
-                            }) {
+                            }
+                            .size(48.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = stringResource(R.string.settings)
