@@ -6,25 +6,15 @@ import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.DismissibleNavigationDrawer
@@ -49,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -57,32 +46,23 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
-import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.internals.DirectMessages
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
-import chat.revolt.api.schemas.ChannelType
-import chat.revolt.api.schemas.User
-import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.chat.DisconnectedNotice
-import chat.revolt.components.generic.GroupIcon
-import chat.revolt.components.generic.UserAvatar
-import chat.revolt.components.generic.presenceFromStatus
-import chat.revolt.components.screens.chat.drawer.channel.ChannelList
-import chat.revolt.components.screens.chat.drawer.server.DrawerServer
-import chat.revolt.components.screens.chat.drawer.server.DrawerServerlikeIcon
-import chat.revolt.components.screens.chat.drawer.server.ServerDrawerSeparator
+import chat.revolt.components.screens.chat.drawer.ChannelSideDrawer
 import chat.revolt.components.screens.voice.VoiceChannelOverlay
 import chat.revolt.internals.Changelogs
+import chat.revolt.internals.extensions.BottomSheetInsets
+import chat.revolt.internals.extensions.zero
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
 import chat.revolt.screens.chat.dialogs.safety.ReportServerDialog
@@ -538,7 +518,8 @@ fun ChatRouterScreen(
             sheetState = serverContextSheetState,
             onDismissRequest = {
                 showServerContextSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             ServerContextSheet(
                 serverId = serverContextSheetTarget,
@@ -718,7 +699,7 @@ fun ChatRouterScreen(
             Row {
                 DismissibleDrawerSheet(
                     drawerContainerColor = Color.Transparent,
-                    windowInsets = WindowInsets.navigationBars
+                    windowInsets = WindowInsets.zero
                 ) {
                     Sidebar(
                         viewModel = viewModel,
@@ -755,7 +736,7 @@ fun ChatRouterScreen(
                 drawerContent = {
                     DismissibleDrawerSheet(
                         drawerContainerColor = Color.Transparent,
-                        windowInsets = WindowInsets.navigationBars
+                        windowInsets = WindowInsets.zero
                     ) {
                         Sidebar(
                             viewModel = viewModel,
@@ -809,192 +790,19 @@ fun Sidebar(
     showSettingsButton: Boolean,
     onOpenSettings: () -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-
-    Column(Modifier.fillMaxWidth()) {
-        Row {
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                UserAvatar(
-                    username = RevoltAPI.userCache[RevoltAPI.selfId]?.let {
-                        User.resolveDefaultName(
-                            it
-                        )
-                    }
-                        ?: "",
-                    presence = presenceFromStatus(
-                        RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence,
-                        RevoltAPI.userCache[RevoltAPI.selfId]?.online ?: false
-                    ),
-                    userId = RevoltAPI.selfId ?: "",
-                    avatar = RevoltAPI.userCache[RevoltAPI.selfId]?.avatar,
-                    size = 48.dp,
-                    presenceSize = 16.dp,
-                    onClick = {
-                        viewModel.setSaveDestination(ChatRouterDestination.defaultForDMList)
-                    },
-                    onLongClick = onShowStatusSheet,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(48.dp)
-                )
-
-                DirectMessages.unreadDMs().forEach {
-                    when (it.channelType) {
-                        ChannelType.Group -> GroupIcon(
-                            name = it.name ?: "?",
-                            size = 48.dp,
-                            onClick = {
-                                it.id?.let { id ->
-                                    viewModel.setSaveDestination(ChatRouterDestination.Channel(id))
-                                }
-                            },
-                            icon = it.icon,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .size(48.dp)
-                        )
-
-                        else -> {
-                            val partner =
-                                if (it.channelType == ChannelType.DirectMessage) {
-                                    RevoltAPI.userCache[
-                                        ChannelUtils.resolveDMPartner(
-                                            it
-                                        )
-                                    ]
-                                } else {
-                                    null
-                                }
-
-                            UserAvatar(
-                                username = partner?.let { p ->
-                                    User.resolveDefaultName(
-                                        p
-                                    )
-                                } ?: it.name ?: "?",
-                                presence = presenceFromStatus(
-                                    partner?.status?.presence,
-                                    partner?.online ?: false
-                                ),
-                                userId = partner?.id ?: it.id ?: "",
-                                avatar = partner?.avatar ?: it.icon,
-                                size = 48.dp,
-                                presenceSize = 16.dp,
-                                onClick = {
-                                    it.id?.let { id ->
-                                        viewModel.setSaveDestination(
-                                            ChatRouterDestination.Channel(
-                                                id
-                                            )
-                                        )
-                                    }
-                                },
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .size(48.dp)
-                            )
-                        }
-                    }
-                }
-
-                ServerDrawerSeparator()
-
-                // This seems to confuse the formatter, here's what it does:
-                // - Take the list of servers and filter them by the ones that are in the ordering.
-                // - Sort the servers that are in the ordering using the ordering.
-                // - Add the servers that aren't in the ordering to the end of the list.
-                // - Sort the servers that aren't in the ordering by their ID (creation order).
-                (
-                        (
-                                RevoltAPI.serverCache.values.filter {
-                                    SyncedSettings.ordering.servers.contains(
-                                        it.id
-                                    )
-                                }
-                                    .sortedBy { SyncedSettings.ordering.servers.indexOf(it.id) }
-                                ) + (
-                                RevoltAPI.serverCache.values.filter {
-                                    !SyncedSettings.ordering.servers.contains(
-                                        it.id
-                                    )
-                                }.sortedBy { it.id }
-                                )
-                        )
-                    .forEach { server ->
-                        if (server.id == null || server.name == null) return@forEach
-
-                        DrawerServer(
-                            iconId = server.icon?.id,
-                            serverName = server.name,
-                            hasUnreads = RevoltAPI.unreads.serverHasUnread(
-                                server.id
-                            ),
-                            onLongClick = {
-                                onShowServerContextSheet(server.id)
-                            }
-                        ) {
-                            viewModel.navigateToServer(server.id)
-                        }
-                    }
-
-                DrawerServerlikeIcon(
-                    onClick = onShowAddServerSheet
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = stringResource(id = R.string.server_plus_alt),
-                        modifier = Modifier.padding(4.dp)
-                    )
-                }
-
-                DrawerServerlikeIcon(
-                    onClick = { topNav.navigate("discover") }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_compass_24dp),
-                        contentDescription = stringResource(id = R.string.discover_alt),
-                        modifier = Modifier.padding(4.dp)
-                    )
-                }
-
-                if (showSettingsButton) {
-                    DrawerServerlikeIcon(
-                        onClick = { onOpenSettings() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = stringResource(id = R.string.settings),
-                            modifier = Modifier.padding(4.dp)
-                        )
-                    }
-                }
-            }
-
-            Crossfade(
-                targetState = currentServer,
-                label = "Channel List"
-            ) {
-                ChannelList(
-                    serverId = it,
-                    currentDestination = viewModel.currentDestination,
-                    onDestinationChange = { destination ->
-                        viewModel.setSaveDestination(destination)
-                        scope.launch {
-                            drawerState?.close()
-                        }
-                    },
-                    onServerSheetOpenFor = { target ->
-                        onShowServerContextSheet(target)
-                    }
-                )
-            }
-        }
-    }
+    ChannelSideDrawer(
+        onDestinationChanged = viewModel::setSaveDestination,
+        currentDestination = viewModel.currentDestination,
+        currentServer = currentServer,
+        drawerState = drawerState,
+        navigateToServer = viewModel::navigateToServer,
+        onLongPressAvatar = onShowStatusSheet,
+        onShowServerContextSheet = onShowServerContextSheet,
+        showSettingsIcon = showSettingsButton,
+        onOpenSettings = onOpenSettings,
+        topNav = topNav,
+        onShowAddServerSheet = onShowAddServerSheet
+    )
 }
 
 @Composable

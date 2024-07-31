@@ -295,6 +295,7 @@
     <string name="message_context_sheet_actions_delete_confirmation_yes">Delete</string>
     <string name="message_context_sheet_actions_delete_confirmation_no">Keep</string>
 
+    <string name="channel_context_sheet_open">Open channel actions</string>
     <string name="channel_context_sheet_actions_copy_id">Copy ID</string>
     <string name="channel_context_sheet_actions_copy_id_copied">Copied channel ID to clipboard</string>
     <string name="channel_context_sheet_actions_mark_read">Mark as read</string>

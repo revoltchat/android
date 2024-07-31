@@ -56,7 +56,7 @@ fun ServerOverview(server: Server) {
                 modifier = Modifier
                     .height(166.dp)
                     .fillMaxWidth(),
-                contentScale = ContentScale.FillWidth
+                contentScale = ContentScale.Crop
             )
 
             Box(

@@ -63,10 +63,10 @@ import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.chat.NativeMessageField
 import chat.revolt.components.emoji.EmojiPicker
-import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.AttachmentManager
-import chat.revolt.components.screens.chat.drawer.server.DrawerChannel
-import chat.revolt.components.screens.chat.drawer.server.DrawerChannelIconType
+import chat.revolt.components.screens.chat.drawer.ChannelItem
+import chat.revolt.components.screens.chat.drawer.ChannelItemIconType
+import chat.revolt.components.screens.chat.drawer.DMOrGroupItem
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.views.channel.ChannelScreenActivePane
 import chat.revolt.ui.theme.RevoltTheme
@@ -342,39 +342,29 @@ fun ShareTargetScreen(
                             items(filteredChannels.count()) {
                                 val channel = filteredChannels.elementAt(it)
 
-                                DrawerChannel(
-                                    iconType = DrawerChannelIconType.Channel(
-                                        channel.channelType ?: ChannelType.TextChannel
-                                    ),
-                                    name = (if (channel.server != null) "${channel.name} (${RevoltAPI.serverCache[channel.server]?.name})" else channel.name)
-                                        ?: ChannelUtils.resolveName(channel)
-                                        ?: stringResource(R.string.unknown),
-                                    selected = selectedChannel == channel.id,
-                                    hasUnread = false,
-                                    onClick = {
-                                        selectedChannel = channel.id
-                                    },
-                                    dmPartnerIcon = ChannelUtils.resolveDMPartner(
-                                        channel
-                                    )?.let { u -> RevoltAPI.userCache[u] }?.avatar,
-                                    dmPartnerName = ChannelUtils.resolveName(
-                                        channel
-                                    ),
-                                    dmPartnerStatus = ChannelUtils.resolveDMPartner(
-                                        channel
-                                    )
-                                        ?.let { u -> RevoltAPI.userCache[u] }?.status?.presence?.let { p ->
-                                            presenceFromStatus(
-                                                p,
-                                                RevoltAPI.userCache[ChannelUtils.resolveDMPartner(
-                                                    channel
-                                                )]?.online ?: false
-                                            )
+                                when (channel.channelType) {
+                                    ChannelType.Group, ChannelType.DirectMessage -> DMOrGroupItem(
+                                        channel = channel,
+                                        partner = ChannelUtils.resolveDMPartner(channel)?.let { u ->
+                                            RevoltAPI.userCache[u]
                                         },
-                                    dmPartnerId = ChannelUtils.resolveDMPartner(
-                                        channel
-                                    ),
-                                )
+                                        isCurrent = selectedChannel == channel.id,
+                                        hasUnread = false,
+                                        onDestinationChanged = { selectedChannel = channel.id },
+                                        onOpenChannelContextSheet = {}
+                                    )
+
+                                    else -> ChannelItem(
+                                        iconType = ChannelItemIconType.Channel(
+                                            channel.channelType ?: ChannelType.TextChannel
+                                        ),
+                                        channel = channel,
+                                        isCurrent = selectedChannel == channel.id,
+                                        onDestinationChanged = { selectedChannel = channel.id },
+                                        onOpenChannelContextSheet = {},
+                                        appendServerName = true
+                                    )
+                                }
 
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
