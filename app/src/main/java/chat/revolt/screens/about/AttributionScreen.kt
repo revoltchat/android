@@ -42,7 +42,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import chat.revolt.R
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.screens.settings.AttributionItem
+import chat.revolt.internals.extensions.BottomSheetInsets
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -126,7 +128,8 @@ fun AttributionScreen(navController: NavController) {
             sheetState = licenceSheetState,
             onDismissRequest = {
                 licenceSheetOpen = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             Column(
                 modifier = Modifier
@@ -149,6 +152,7 @@ fun AttributionScreen(navController: NavController) {
                     }
                 }
             }
+            SheetEnd()
         }
     }
 

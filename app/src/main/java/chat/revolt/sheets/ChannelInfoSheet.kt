@@ -41,6 +41,7 @@ import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.generic.SheetButton
 import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.screens.chat.ChannelSheetHeader
+import chat.revolt.internals.extensions.BottomSheetInsets
 import chat.revolt.internals.extensions.rememberChannelPermissions
 import chat.revolt.screens.chat.dialogs.InviteDialog
 import kotlinx.coroutines.delay
@@ -62,7 +63,8 @@ fun ChannelInfoSheet(channelId: String, onHideSheet: suspend () -> Unit) {
             sheetState = memberListSheetState,
             onDismissRequest = {
                 memberListSheetShown = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             MemberListSheet(
                 channelId = channelId,

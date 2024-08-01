@@ -51,6 +51,7 @@ import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.SheetButton
 import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.Platform
+import chat.revolt.internals.extensions.BottomSheetInsets
 import chat.revolt.ui.theme.ClearRippleTheme
 import kotlinx.coroutines.launch
 
@@ -88,7 +89,8 @@ fun MessageContextSheet(
             sheetState = shareSheetState,
             onDismissRequest = {
                 showShareSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             Column(
                 modifier = Modifier
@@ -250,7 +252,8 @@ fun MessageContextSheet(
             sheetState = reactSheetState,
             onDismissRequest = {
                 showReactSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             ReactSheet(messageId) {
                 if (it == null) return@ReactSheet

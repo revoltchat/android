@@ -482,7 +482,8 @@ fun ChatRouterScreen(
             sheetState = statusSheetState,
             onDismissRequest = {
                 showStatusSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             StatusSheet(
                 onBeforeNavigation = {
@@ -505,7 +506,8 @@ fun ChatRouterScreen(
             sheetState = addServerSheetState,
             onDismissRequest = {
                 showAddServerSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             AddServerSheet()
         }
@@ -542,7 +544,8 @@ fun ChatRouterScreen(
             sheetState = userContextSheetState,
             onDismissRequest = {
                 showUserContextSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             UserInfoSheet(
                 userId = userContextSheetTarget,
@@ -619,7 +622,8 @@ fun ChatRouterScreen(
             sheetState = linkInfoSheetState,
             onDismissRequest = {
                 showLinkInfoSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             LinkInfoSheet(
                 url = linkInfoSheetUrl,
@@ -637,7 +641,8 @@ fun ChatRouterScreen(
             sheetState = emoteInfoSheetState,
             onDismissRequest = {
                 showEmoteInfoSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             EmoteInfoSheet(
                 id = emoteInfoSheetTarget,
@@ -655,7 +660,8 @@ fun ChatRouterScreen(
             sheetState = reactionInfoSheetState,
             onDismissRequest = {
                 showReactionInfoSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             ReactionInfoSheet(
                 messageId = reactionInfoSheetMessageId,

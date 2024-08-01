@@ -74,8 +74,10 @@ import chat.revolt.api.RevoltJson
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.ListHeader
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.screens.settings.appearance.ColourChip
 import chat.revolt.components.screens.settings.appearance.CornerRadiusPicker
+import chat.revolt.internals.extensions.BottomSheetInsets
 import chat.revolt.ui.theme.ClearRippleTheme
 import chat.revolt.ui.theme.OverridableColourScheme
 import chat.revolt.ui.theme.Theme
@@ -252,7 +254,8 @@ fun AppearanceSettingsScreen(
             sheetState = sheetState,
             onDismissRequest = {
                 viewModel.overridePickerSheetVisible = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             ColourSelectorSheet(
                 initialValue = Color(viewModel.selectedOverrideInitialValue ?: 0),
@@ -635,4 +638,5 @@ fun ColourSelectorSheet(
             }
         }
     }
+    SheetEnd()
 }

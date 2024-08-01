@@ -120,6 +120,7 @@ import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelIcon
 import chat.revolt.components.screens.chat.ReplyManager
 import chat.revolt.components.screens.chat.TypingIndicator
+import chat.revolt.internals.extensions.BottomSheetInsets
 import chat.revolt.internals.extensions.rememberChannelPermissions
 import chat.revolt.internals.extensions.zero
 import chat.revolt.sheets.ChannelInfoSheet
@@ -335,7 +336,8 @@ fun ChannelScreen(
             sheetState = channelInfoSheetState,
             onDismissRequest = {
                 channelInfoSheetShown = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             ChannelInfoSheet(
                 channelId = channelId,
@@ -356,7 +358,8 @@ fun ChannelScreen(
             sheetState = messageContextSheetState,
             onDismissRequest = {
                 messageContextSheetShown = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             MessageContextSheet(
                 messageId = messageContextSheetTarget,
@@ -382,7 +385,8 @@ fun ChannelScreen(
             sheetState = reactSheetState,
             onDismissRequest = {
                 reactSheetShown = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             ReactSheet(reactSheetTarget) {
                 if (it == null) return@ReactSheet

@@ -96,9 +96,9 @@ fun AddServerSheet() {
                 ).show()
             }
         )
-
-        SheetEnd()
     }
+
+    SheetEnd()
 }
 
 @Composable

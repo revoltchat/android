@@ -44,8 +44,10 @@ import chat.revolt.api.schemas.User
 import chat.revolt.components.chat.MemberListItem
 import chat.revolt.components.generic.CountableListHeader
 import chat.revolt.components.generic.Presence
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.generic.SheetHeaderPadding
 import chat.revolt.components.generic.presenceFromStatus
+import chat.revolt.internals.extensions.BottomSheetInsets
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -232,7 +234,8 @@ fun MemberListSheet(
             sheetState = userContextSheetState,
             onDismissRequest = {
                 showUserInfoSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             UserInfoSheet(
                 userId = userInfoSheetTarget,
@@ -252,7 +255,8 @@ fun MemberListSheet(
             sheetState = memberContextSheetState,
             onDismissRequest = {
                 showMemberContextSheet = false
-            }
+            },
+            windowInsets = BottomSheetInsets
         ) {
             if (serverId != null) {
                 ServerMemberContextSheet(
@@ -280,6 +284,7 @@ fun MemberListSheet(
                     }
                 )
             }
+            SheetEnd()
         }
     }
 
@@ -291,6 +296,7 @@ fun MemberListSheet(
         ) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
+        SheetEnd()
         return
     }
 
@@ -361,4 +367,5 @@ fun MemberListSheet(
             }
         }
     }
+    SheetEnd()
 }

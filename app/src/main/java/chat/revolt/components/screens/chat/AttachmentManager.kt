@@ -49,15 +49,14 @@ import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.components.generic.RemoteImage
+import chat.revolt.components.generic.SheetEnd
+import chat.revolt.internals.extensions.BottomSheetInsets
 import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
 fun FilePreviewSheet(
-    args: FileArgs,
-    canRemove: Boolean,
-    onRemove: () -> Unit,
-    onDismiss: () -> Unit
+    args: FileArgs, canRemove: Boolean, onRemove: () -> Unit, onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -77,9 +76,7 @@ fun FilePreviewSheet(
             )
         }
         Text(
-            args.filename,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center
+            args.filename, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center
         )
         Text(
             Formatter.formatFileSize(context, args.file.length()),
@@ -108,6 +105,7 @@ fun FilePreviewSheet(
             }
         }
     }
+    SheetEnd()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -126,27 +124,24 @@ fun AttachmentManager(
 
     if (showPreviewSheet) {
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ModalBottomSheet(onDismissRequest = {
-            showPreviewSheet = false
-        }, sheetState = sheetState) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showPreviewSheet = false
+            }, sheetState = sheetState, windowInsets = BottomSheetInsets
+        ) {
             previewingAttachment?.let {
-                FilePreviewSheet(
-                    args = it,
-                    canRemove = canRemove,
-                    onRemove = {
-                        onRemove(it)
-                        scope.launch {
-                            sheetState.hide()
-                            showPreviewSheet = false
-                        }
-                    },
-                    onDismiss = {
-                        scope.launch {
-                            sheetState.hide()
-                            showPreviewSheet = false
-                        }
+                FilePreviewSheet(args = it, canRemove = canRemove, onRemove = {
+                    onRemove(it)
+                    scope.launch {
+                        sheetState.hide()
+                        showPreviewSheet = false
                     }
-                )
+                }, onDismiss = {
+                    scope.launch {
+                        sheetState.hide()
+                        showPreviewSheet = false
+                    }
+                })
             }
         }
     }
@@ -168,22 +163,20 @@ fun AttachmentManager(
                 .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
             attachments.forEach { attachment ->
-                Row(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            if (canPreview) {
-                                previewingAttachment = attachment
-                                showPreviewSheet = true
-                            }
+                Row(modifier = Modifier
+                    .padding(4.dp)
+                    .clip(MaterialTheme.shapes.small)
+                    .clickable {
+                        if (canPreview) {
+                            previewingAttachment = attachment
+                            showPreviewSheet = true
                         }
-                        .background(
-                            color = MaterialTheme.colorScheme.background,
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .padding(8.dp)
-                ) {
+                    }
+                    .background(
+                        color = MaterialTheme.colorScheme.background,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .padding(8.dp)) {
                     Text(attachment.filename, maxLines = 1)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -192,9 +185,7 @@ fun AttachmentManager(
 
         AnimatedVisibility(visible = uploading) {
             LinearProgressIndicator(
-                progress = { animatedProgress },
-                modifier = Modifier
-                    .fillMaxWidth()
+                progress = { animatedProgress }, modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -203,25 +194,13 @@ fun AttachmentManager(
 @Preview
 @Composable
 fun AttachmentManagerPreview() {
-    AttachmentManager(
-        attachments = listOf(
-            FileArgs(
-                filename = "file1.png",
-                contentType = "image/png",
-                file = File("file1.png")
-            ),
-            FileArgs(
-                filename = "file2.png",
-                contentType = "image/png",
-                file = File("file2.png")
-            ),
-            FileArgs(
-                filename = "file3.png",
-                contentType = "image/png",
-                file = File("file3.png")
-            )
-        ),
-        uploading = false,
-        onRemove = {}
-    )
+    AttachmentManager(attachments = listOf(
+        FileArgs(
+            filename = "file1.png", contentType = "image/png", file = File("file1.png")
+        ), FileArgs(
+            filename = "file2.png", contentType = "image/png", file = File("file2.png")
+        ), FileArgs(
+            filename = "file3.png", contentType = "image/png", file = File("file3.png")
+        )
+    ), uploading = false, onRemove = {})
 }

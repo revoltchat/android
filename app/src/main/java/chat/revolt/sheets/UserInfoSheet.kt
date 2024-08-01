@@ -44,6 +44,7 @@ import chat.revolt.components.chat.RoleListEntry
 import chat.revolt.components.chat.UserBadgeList
 import chat.revolt.components.chat.UserBadgeRow
 import chat.revolt.components.generic.NonIdealState
+import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.markdown.RichMarkdown
 import chat.revolt.components.screens.settings.RawUserOverview
@@ -332,4 +333,5 @@ fun UserInfoSheet(
             UserButtons(user, dismissSheet)
         }
     }
+    SheetEnd()
 }
