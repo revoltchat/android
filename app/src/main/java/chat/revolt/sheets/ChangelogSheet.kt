@@ -2,6 +2,10 @@ package chat.revolt.sheets
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import chat.revolt.api.internals.getFragmentActivity
 import chat.revolt.fragments.ChangelogBottomSheetFragment
@@ -15,7 +19,14 @@ fun ChangelogSheet(
 ) {
     val activity = LocalContext.current.getFragmentActivity()
 
+    var lastRenderedContents by remember { mutableStateOf("") }
+
     DisposableEffect(versionName, renderedContents) {
+        if (lastRenderedContents == renderedContents) return@DisposableEffect onDispose {}
+        if (renderedContents.isEmpty()) return@DisposableEffect onDispose {}
+        
+        lastRenderedContents = renderedContents
+
         val sheet = ChangelogBottomSheetFragment(onDismiss)
         sheet.arguments =
             ChangelogBottomSheetFragment.createArguments(
@@ -29,7 +40,11 @@ fun ChangelogSheet(
         }
 
         onDispose {
-            sheet.dismiss()
+            try {
+                sheet.dismissAllowingStateLoss()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }
