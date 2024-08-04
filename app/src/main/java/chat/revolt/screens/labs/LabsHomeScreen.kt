@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -36,6 +37,7 @@ import androidx.navigation.NavController
 enum class LabsHomeScreenTab {
     Home,
     Mockups,
+    Sandboxes,
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,6 +80,19 @@ fun LabsHomeScreen(navController: NavController) {
                     },
                     label = {
                         Text("UI Mockups")
+                    }
+                )
+                NavigationBarItem(
+                    selected = currentTab.value == LabsHomeScreenTab.Sandboxes,
+                    onClick = { currentTab.value = LabsHomeScreenTab.Sandboxes },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                        )
+                    },
+                    label = {
+                        Text("Sandboxes")
                     }
                 )
             }
@@ -123,6 +138,22 @@ fun LabsHomeScreen(navController: NavController) {
                             },
                             modifier = Modifier.clickable {
                                 navController.navigate("mockups/call")
+                            }
+                        )
+                        HorizontalDivider()
+                    }
+                }
+
+                LabsHomeScreenTab.Sandboxes -> {
+                    Column(
+                        modifier = Modifier.verticalScroll(rememberScrollState())
+                    ) {
+                        ListItem(
+                            headlineContent = {
+                                Text("Cryptographic Age Verification")
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("sandboxes/cryptoageverif")
                             }
                         )
                         HorizontalDivider()
