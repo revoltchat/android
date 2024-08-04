@@ -456,15 +456,18 @@
     <string name="colour_picker_mode_sliders">Sliders</string>
     <string name="colour_picker_mode_palette">Palette</string>
     <string name="colour_picker_hue">Hue</string>
+    <string name="colour_picker_hue_value_fmt">%1$d°</string>
     <string name="colour_picker_saturation">Saturation</string>
     <string name="colour_picker_value">Value</string>
     <string name="colour_picker_red">Red</string>
     <string name="colour_picker_green">Green</string>
     <string name="colour_picker_blue">Blue</string>
     <string name="colour_picker_hex">Hex</string>
+    <string name="colour_picker_hex_template" translatable="false">#AARRGGBB</string>
+    <string name="colour_picker_hex_use">Use</string>
     <string name="colour_picker_alpha">Alpha</string>
     <string name="colour_picker_preview">Preview</string>
-    <string name="colour_picker_reset_to_default">Reset to default</string>
+    <string name="colour_picker_use_default">Default</string>
     <string name="colour_picker_cancel">Cancel</string>
     <string name="colour_picker_apply">Apply</string>
 
@@ -581,8 +584,6 @@
     <string name="settings_appearance_colour_overrides_outline">Outline</string>
     <string name="settings_appearance_colour_overrides_outline_variant">Outline Variant</string>
     <string name="settings_appearance_colour_overrides_scrim">Scrim</string>
-    <string name="settings_appearance_colour_overrides_apply">Apply</string>
-    <string name="settings_appearance_colour_overrides_reset">Reset</string>
     <string name="settings_appearance_colour_overrides_export">Export</string>
     <string name="settings_appearance_colour_overrides_import">Import</string>
     <string name="settings_appearance_colour_overrides_import_error">This file is not a valid colour override file.</string>

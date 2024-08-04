@@ -262,7 +262,6 @@ dependencies {
     implementation "androidx.media3:media3-ui:$media3_version"
 
     // Compose libraries
-    implementation "com.github.skydoves:colorpicker-compose:1.0.5"
     implementation "me.saket.telephoto:zoomable-image:1.0.0-alpha02"
     implementation "me.saket.telephoto:zoomable-image-glide:1.0.0-alpha02"
 

@@ -26,11 +26,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,17 +39,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -71,25 +63,17 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltCbor
 import chat.revolt.api.RevoltJson
-import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.ListHeader
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.screens.settings.appearance.ColourChip
 import chat.revolt.components.screens.settings.appearance.CornerRadiusPicker
 import chat.revolt.internals.extensions.BottomSheetInsets
 import chat.revolt.sheets.ColourPickerSheet
-import chat.revolt.ui.theme.ClearRippleTheme
 import chat.revolt.ui.theme.OverridableColourScheme
 import chat.revolt.ui.theme.Theme
 import chat.revolt.ui.theme.getFieldByName
 import chat.revolt.ui.theme.systemSupportsDynamicColors
-import com.github.skydoves.colorpicker.compose.AlphaSlider
-import com.github.skydoves.colorpicker.compose.BrightnessSlider
-import com.github.skydoves.colorpicker.compose.ColorEnvelope
-import com.github.skydoves.colorpicker.compose.HsvColorPicker
-import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -259,8 +243,9 @@ fun AppearanceSettingsScreen(
             },
             windowInsets = BottomSheetInsets
         ) {
-            if (FeatureFlags.builtInColourPickerGranted) {
-                ColourPickerSheet(initialValue = viewModel.selectedOverrideInitialValue ?: 0) {
+            ColourPickerSheet(
+                initialValue = viewModel.selectedOverrideInitialValue ?: 0,
+                onColourSelected = {
                     viewModel.updateColourOverrides(
                         viewModel.selectedOverrideName ?: return@ColourPickerSheet,
                         it
@@ -269,28 +254,24 @@ fun AppearanceSettingsScreen(
                         sheetState.hide()
                         viewModel.overridePickerSheetVisible = false
                     }
-                }
-            } else {
-                ColourSelectorSheet(
-                    initialValue = Color(viewModel.selectedOverrideInitialValue ?: 0),
-                    onConfirm = { color ->
-                        viewModel.updateColourOverrides(
-                            viewModel.selectedOverrideName ?: return@ColourSelectorSheet,
-                            color?.toArgb()
-                        )
-                        scope.launch {
-                            sheetState.hide()
-                            viewModel.overridePickerSheetVisible = false
-                        }
-                    },
-                    onDismiss = {
-                        scope.launch {
-                            sheetState.hide()
-                            viewModel.overridePickerSheetVisible = false
-                        }
+                },
+                onUseDefaultColour = {
+                    viewModel.updateColourOverrides(
+                        viewModel.selectedOverrideName ?: return@ColourPickerSheet,
+                        null
+                    )
+                    scope.launch {
+                        sheetState.hide()
+                        viewModel.overridePickerSheetVisible = false
                     }
-                )
-            }
+                },
+                onDismiss = {
+                    scope.launch {
+                        sheetState.hide()
+                        viewModel.overridePickerSheetVisible = false
+                    }
+                }
+            )
         }
     }
 
@@ -535,123 +516,4 @@ fun AppearanceSettingsScreen(
             }
         }
     }
-}
-
-@Composable
-fun ColourSelectorSheet(
-    initialValue: Color,
-    onConfirm: (Color?) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val controller = rememberColorPickerController()
-    val colour = remember { mutableStateOf(initialValue) }
-
-    Column(
-        modifier = Modifier
-            .padding(20.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        HsvColorPicker(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(450.dp)
-                .padding(10.dp),
-            controller = controller,
-            onColorChanged = { colorEnvelope: ColorEnvelope ->
-                colour.value = colorEnvelope.color
-            },
-        )
-
-        AlphaSlider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            controller = controller,
-        )
-
-        BrightnessSlider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            controller = controller,
-        )
-
-        CompositionLocalProvider(
-            LocalRippleTheme provides ClearRippleTheme
-        ) {
-            ColourChip(
-                color = colour.value,
-                text = "#${
-                    (0xFFFFFF and colour.value.toArgb()).toString(16).padStart(6, '0').uppercase()
-                }",
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth()
-            ) {}
-        }
-
-        Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            TextButton(
-                onClick = {
-                    onConfirm(null)
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = stringResource(id = R.string.settings_appearance_colour_overrides_reset)
-                )
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                TextButton(
-                    onClick = {
-                        onDismiss()
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = null
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(
-                        text = stringResource(id = R.string.cancel)
-                    )
-                }
-
-                Button(
-                    onClick = {
-                        onConfirm(colour.value)
-                    },
-                    enabled = colour.value != initialValue,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(
-                        text = stringResource(id = R.string.settings_appearance_colour_overrides_apply)
-                    )
-                }
-            }
-        }
-    }
-    SheetEnd()
 }
