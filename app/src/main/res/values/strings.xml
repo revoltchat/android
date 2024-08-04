@@ -453,6 +453,21 @@
     <string name="media_viewer_share_video">Share video</string>
     <string name="media_viewer_share_image">Share image</string>
 
+    <string name="colour_picker_mode_sliders">Sliders</string>
+    <string name="colour_picker_mode_palette">Palette</string>
+    <string name="colour_picker_hue">Hue</string>
+    <string name="colour_picker_saturation">Saturation</string>
+    <string name="colour_picker_value">Value</string>
+    <string name="colour_picker_red">Red</string>
+    <string name="colour_picker_green">Green</string>
+    <string name="colour_picker_blue">Blue</string>
+    <string name="colour_picker_hex">Hex</string>
+    <string name="colour_picker_alpha">Alpha</string>
+    <string name="colour_picker_preview">Preview</string>
+    <string name="colour_picker_reset_to_default">Reset to default</string>
+    <string name="colour_picker_cancel">Cancel</string>
+    <string name="colour_picker_apply">Apply</string>
+
     <string name="file_picker_cannot_attach_file_invalid">This file is invalid and cannot be attached.</string>
     <string name="file_picker_permission_request_header">We need your permission to access photos and videos</string>
     <string name="file_picker_permission_request_body">You will be able to attach photos and videos to your messages afterwards.</string>

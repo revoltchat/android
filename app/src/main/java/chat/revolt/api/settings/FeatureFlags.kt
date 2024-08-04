@@ -17,6 +17,24 @@ sealed class LabsAccessControlVariates {
     data class Restricted(val predicate: () -> Boolean) : LabsAccessControlVariates()
 }
 
+@FeatureFlag("BuiltInColourPicker")
+sealed class BuiltInColourPickerVariates {
+    @Treatment(
+        "Use the built-in colour picker"
+    )
+    object Enabled : BuiltInColourPickerVariates()
+
+    @Treatment(
+        "Use the built-in colour picker for users that meet certain or all criteria (implementation-specific)"
+    )
+    data class Restricted(val predicate: () -> Boolean) : BuiltInColourPickerVariates()
+
+    @Treatment(
+        "Use the colour picker from the external library"
+    )
+    object Disabled : BuiltInColourPickerVariates()
+}
+
 @FeatureFlag("MediaConversations")
 sealed class MediaConversationsVariates {
     @Treatment(
@@ -41,6 +59,20 @@ object FeatureFlags {
     val labsAccessControlGranted: Boolean
         get() = when (labsAccessControl) {
             is LabsAccessControlVariates.Restricted -> (labsAccessControl as LabsAccessControlVariates.Restricted).predicate()
+        }
+
+    @FeatureFlag("BuiltInColourPicker")
+    var builtInColourPicker by mutableStateOf<BuiltInColourPickerVariates>(
+        BuiltInColourPickerVariates.Restricted {
+            RevoltAPI.selfId == SpecialUsers.JENNIFER
+        }
+    )
+
+    val builtInColourPickerGranted: Boolean
+        get() = when (builtInColourPicker) {
+            is BuiltInColourPickerVariates.Enabled -> true
+            is BuiltInColourPickerVariates.Restricted -> (builtInColourPicker as BuiltInColourPickerVariates.Restricted).predicate()
+            is BuiltInColourPickerVariates.Disabled -> false
         }
 
     @FeatureFlag("MediaConversations")

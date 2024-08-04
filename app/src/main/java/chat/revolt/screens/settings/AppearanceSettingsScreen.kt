@@ -71,6 +71,7 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltCbor
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.ListHeader
@@ -78,6 +79,7 @@ import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.screens.settings.appearance.ColourChip
 import chat.revolt.components.screens.settings.appearance.CornerRadiusPicker
 import chat.revolt.internals.extensions.BottomSheetInsets
+import chat.revolt.sheets.ColourPickerSheet
 import chat.revolt.ui.theme.ClearRippleTheme
 import chat.revolt.ui.theme.OverridableColourScheme
 import chat.revolt.ui.theme.Theme
@@ -257,25 +259,38 @@ fun AppearanceSettingsScreen(
             },
             windowInsets = BottomSheetInsets
         ) {
-            ColourSelectorSheet(
-                initialValue = Color(viewModel.selectedOverrideInitialValue ?: 0),
-                onConfirm = { color ->
+            if (FeatureFlags.builtInColourPickerGranted) {
+                ColourPickerSheet(initialValue = viewModel.selectedOverrideInitialValue ?: 0) {
                     viewModel.updateColourOverrides(
-                        viewModel.selectedOverrideName ?: return@ColourSelectorSheet,
-                        color?.toArgb()
+                        viewModel.selectedOverrideName ?: return@ColourPickerSheet,
+                        it
                     )
                     scope.launch {
                         sheetState.hide()
                         viewModel.overridePickerSheetVisible = false
                     }
-                },
-                onDismiss = {
-                    scope.launch {
-                        sheetState.hide()
-                        viewModel.overridePickerSheetVisible = false
-                    }
                 }
-            )
+            } else {
+                ColourSelectorSheet(
+                    initialValue = Color(viewModel.selectedOverrideInitialValue ?: 0),
+                    onConfirm = { color ->
+                        viewModel.updateColourOverrides(
+                            viewModel.selectedOverrideName ?: return@ColourSelectorSheet,
+                            color?.toArgb()
+                        )
+                        scope.launch {
+                            sheetState.hide()
+                            viewModel.overridePickerSheetVisible = false
+                        }
+                    },
+                    onDismiss = {
+                        scope.launch {
+                            sheetState.hide()
+                            viewModel.overridePickerSheetVisible = false
+                        }
+                    }
+                )
+            }
         }
     }
 
