@@ -157,6 +157,15 @@ fun LabsHomeScreen(navController: NavController) {
                             }
                         )
                         HorizontalDivider()
+                        ListItem(
+                            headlineContent = {
+                                Text("Settings DSL")
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("sandboxes/settingsdsl")
+                            }
+                        )
+                        HorizontalDivider()
                     }
                 }
             }
