@@ -49,6 +49,7 @@ import chat.revolt.callbacks.UiCallback
 import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.ChatRouterDestination
+import chat.revolt.settings.providers.AgeGateUnlockedStorageProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.ContentType
 import kotlinx.coroutines.Dispatchers
@@ -113,6 +114,11 @@ class ChannelScreenViewModel @Inject constructor(
         this.denyMessageFieldReasonResource = R.string.typing_blank
         this.editingMessage = null
         this.ageGateUnlocked = channel?.nsfw != true
+        viewModelScope.launch {
+            if (ageGateUnlocked != true) {
+                ageGateUnlocked = AgeGateUnlockedStorageProvider.getAgeGateUnlocked()
+            }
+        }
 
         viewModelScope.launch {
             draftContent = kvStorage.get("draftContent/$id") ?: ""
@@ -127,6 +133,11 @@ class ChannelScreenViewModel @Inject constructor(
         }
 
         this.loadMessages(50)
+    }
+
+    suspend fun unlockAgeGate() {
+        AgeGateUnlockedStorageProvider.setAgeGateUnlocked(true)
+        ageGateUnlocked = true
     }
 
     private suspend fun ensureSelfHasMember() {

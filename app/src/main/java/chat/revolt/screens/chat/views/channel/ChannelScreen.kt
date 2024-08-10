@@ -531,7 +531,9 @@ fun ChannelScreen(
             if (ageGateUnlocked == false) {
                 ChannelScreenAgeGate(
                     onAccept = {
-                        viewModel.ageGateUnlocked = true
+                        scope.launch {
+                            viewModel.unlockAgeGate()
+                        }
                     },
                     onDeny = {
                         onToggleDrawer()
