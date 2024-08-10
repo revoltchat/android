@@ -20,7 +20,7 @@ import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.databinding.ActivityVideoplayerBinding
-import chat.revolt.provider.getAttachmentContentUri
+import chat.revolt.providers.getAttachmentContentUri
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
 import io.ktor.client.request.get

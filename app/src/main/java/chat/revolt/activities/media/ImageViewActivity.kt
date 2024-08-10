@@ -48,7 +48,7 @@ import chat.revolt.api.RevoltHttp
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
-import chat.revolt.provider.getAttachmentContentUri
+import chat.revolt.providers.getAttachmentContentUri
 import chat.revolt.ui.theme.RevoltTheme
 import io.ktor.client.request.get
 import io.ktor.client.statement.readBytes

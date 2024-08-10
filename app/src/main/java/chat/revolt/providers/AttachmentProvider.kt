@@ -1,4 +1,4 @@
-package chat.revolt.provider
+package chat.revolt.providers
 
 import android.content.Context
 import android.net.Uri
