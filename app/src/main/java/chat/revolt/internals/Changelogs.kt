@@ -55,15 +55,40 @@ class Changelogs(val context: Context, val kvStorage: KVStorage? = null) {
             return cachedIndex as ChangelogIndex
         }
 
-        val response = RevoltHttp.get("$REVOLT_KJBOOK/changelogs.json")
-        cachedIndex =
-            RevoltJson.decodeFromString(ChangelogIndex.serializer(), response.bodyAsText())
-        return cachedIndex as ChangelogIndex
+        try {
+            val response = RevoltHttp.get("$REVOLT_KJBOOK/changelogs.json")
+            cachedIndex =
+                RevoltJson.decodeFromString(ChangelogIndex.serializer(), response.bodyAsText())
+            return cachedIndex as ChangelogIndex
+        } catch (e: Error) {
+            return ChangelogIndex()
+        }
     }
 
     suspend fun fetchChangelogByVersionCode(versionCode: Long): Changelog {
-        val response = RevoltHttp.get("$REVOLT_KJBOOK/changelogs/$versionCode.json")
-        return RevoltJson.decodeFromString(Changelog.serializer(), response.bodyAsText())
+        try {
+            val response = RevoltHttp.get("$REVOLT_KJBOOK/changelogs/$versionCode.json")
+            return RevoltJson.decodeFromString(Changelog.serializer(), response.bodyAsText())
+        } catch (e: Error) {
+            return Changelog(
+                id = "",
+                slug = "",
+                body = e.localizedMessage ?: "",
+                collection = "",
+                data = ChangelogData(
+                    version = ChangelogVersion(
+                        code = 0L,
+                        name = "",
+                        title = e.localizedMessage ?: "",
+                    ),
+                    date = ChangelogDate(
+                        publish = "1970-01-01T00:00:00.000Z"
+                    ),
+                    summary = e.localizedMessage ?: ""
+                ),
+                rendered = e.localizedMessage ?: ""
+            )
+        }
     }
 
     suspend fun getLatestChangelog(): ChangelogData {
