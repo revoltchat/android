@@ -28,7 +28,8 @@ import chat.revolt.ndk.AstNode
 
 data class MarkdownTreeConfig(
     val linksClickable: Boolean = true,
-    val currentServer: String? = null
+    val currentServer: String? = null,
+    val fontSizeMultiplier: Float = 1f
 )
 
 val LocalMarkdownTreeConfig =
@@ -47,12 +48,12 @@ fun MarkdownTree(node: AstNode) {
                 LocalTextStyle provides LocalTextStyle.current.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = when (node.level) {
-                        1 -> 32.sp
-                        2 -> 24.sp
-                        3 -> 20.sp
-                        4 -> 16.sp
-                        5 -> 14.sp
-                        else -> 12.sp
+                        1 -> 32.sp * LocalMarkdownTreeConfig.current.fontSizeMultiplier
+                        2 -> 24.sp * LocalMarkdownTreeConfig.current.fontSizeMultiplier
+                        3 -> 20.sp * LocalMarkdownTreeConfig.current.fontSizeMultiplier
+                        4 -> 16.sp * LocalMarkdownTreeConfig.current.fontSizeMultiplier
+                        5 -> 14.sp * LocalMarkdownTreeConfig.current.fontSizeMultiplier
+                        else -> 12.sp * LocalMarkdownTreeConfig.current.fontSizeMultiplier
                     }
                 )
             ) {
@@ -67,17 +68,23 @@ fun MarkdownTree(node: AstNode) {
         }
 
         "paragraph" -> {
-            MarkdownText(
-                node,
-                modifier = Modifier
-                    .then(
-                        if (node.startLine != 1) {
-                            Modifier.padding(top = 8.dp)
-                        } else {
-                            Modifier
-                        }
-                    )
-            )
+            CompositionLocalProvider(
+                LocalTextStyle provides LocalTextStyle.current.copy(
+                    fontSize = LocalTextStyle.current.fontSize * LocalMarkdownTreeConfig.current.fontSizeMultiplier
+                )
+            ) {
+                MarkdownText(
+                    node,
+                    modifier = Modifier
+                        .then(
+                            if (node.startLine != 1) {
+                                Modifier.padding(top = 8.dp)
+                            } else {
+                                Modifier
+                            }
+                        )
+                )
+            }
         }
 
         "document" -> {

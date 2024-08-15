@@ -279,6 +279,16 @@ class EmojiImpl {
         }
     }
 
+    fun codepointIsEmoji(codepoint: Int): Boolean {
+        return metadata.any { group ->
+            group.emoji.any { emoji ->
+                emoji.base.contains(codepoint.toLong()) || emoji.alternates.any { alternate ->
+                    alternate.contains(codepoint.toLong())
+                }
+            }
+        }
+    }
+
     init {
         metadata = initMetadata(RevoltApplication.instance.applicationContext)
     }

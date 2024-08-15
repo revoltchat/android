@@ -78,6 +78,7 @@ import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.components.markdown.LocalMarkdownTreeConfig
 import chat.revolt.components.markdown.RichMarkdown
+import chat.revolt.internals.text.Gigamoji
 import kotlinx.coroutines.launch
 import chat.revolt.api.schemas.Message as MessageSchema
 
@@ -362,7 +363,11 @@ fun Message(
 
                                 CompositionLocalProvider(
                                     LocalMarkdownTreeConfig provides LocalMarkdownTreeConfig.current.copy(
-                                        currentServer = RevoltAPI.channelCache[message.channel]?.server
+                                        currentServer = RevoltAPI.channelCache[message.channel]?.server,
+                                        fontSizeMultiplier = Gigamoji.useGigamojiForMessage(message.content)
+                                            .let {
+                                                if (it) 2f else 1f
+                                            }
                                     )
                                 ) {
                                     Spacer(modifier = Modifier.height(2.dp))
