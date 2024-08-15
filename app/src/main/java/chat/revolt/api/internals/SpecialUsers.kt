@@ -94,7 +94,8 @@ object SpecialUsers {
 
             is TeamMemberFlair.AGSLShader -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val shader = RuntimeShader(flair.shader)
-                shader.setFloatUniform("value", (0..1000).random().toFloat())
+                val valueUniform = (System.currentTimeMillis() % 2000) / 2000f
+                shader.setFloatUniform("value", valueUniform)
                 ShaderBrush(shader)
             } else {
                 flair.fallback
