@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
-import chat.revolt.api.internals.MessageProcessor
+import chat.revolt.internals.text.MessageProcessor
 import chat.revolt.api.internals.isUlid
 import chat.revolt.api.routes.custom.fetchEmoji
 import chat.revolt.api.routes.user.fetchUser

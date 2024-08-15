@@ -1,4 +1,4 @@
-package chat.revolt.api.internals
+package chat.revolt.internals.text
 
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.schemas.ChannelType
@@ -7,7 +7,7 @@ import chat.revolt.internals.EmojiImpl
 object MessageProcessor {
     private val MentionRegex = Regex("@((?:\\p{L}|[\\d_.-])+)#([0-9]{4})", RegexOption.IGNORE_CASE)
     private val ChannelRegex = Regex("(?:\\s|^)#(.+?)(?:\\s|\$)", RegexOption.IGNORE_CASE)
-    private val EmojiRegex = Regex(":([a-zA-Z0-9_+-]+):", RegexOption.IGNORE_CASE)
+    private val EmoteRegex = Regex(":([a-zA-Z0-9_+-]+):", RegexOption.IGNORE_CASE)
 
     val emoji = EmojiImpl()
 
@@ -46,13 +46,13 @@ object MessageProcessor {
             fetchedChannel.name?.let { acc.replace("#${it}", "<#${fetchedChannel.id}>") } ?: acc
         }
 
-        val emojis = EmojiRegex.findAll(returnable).map { it.value }.toList()
+        val emojis = EmoteRegex.findAll(returnable).map { it.value }.toList()
 
         returnable = emojis.fold(returnable) { acc, emoji ->
-            val emojiName = EmojiRegex.matchEntire(emoji)?.destructured?.component1()
+            val emojiName = EmoteRegex.matchEntire(emoji)?.destructured?.component1()
                 ?: return@fold acc
 
-            val byShortcode = this.emoji.unicodeByShortcode(emojiName)
+            val byShortcode = MessageProcessor.emoji.unicodeByShortcode(emojiName)
                 ?: return@fold acc
 
             acc.replace(":$emojiName:", byShortcode)

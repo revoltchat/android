@@ -13,7 +13,7 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ChannelUtils
-import chat.revolt.api.internals.MessageProcessor
+import chat.revolt.internals.text.MessageProcessor
 import chat.revolt.api.internals.PermissionBit
 import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.SpecialUsers
