@@ -17,3 +17,4 @@
 local.properties
 revoltbuild.properties
 sentry.properties
+/.kotlin/sessions
