@@ -24,6 +24,10 @@ selectAll:
 SELECT *
 FROM Channel;
 
+selectAllIds:
+SELECT id
+FROM Channel;
+
 upsert:
 INSERT OR REPLACE
 INTO Channel (id, channelType, userId, name, owner, description, dmPartner, iconId, lastMessageId, active, nsfw, server)

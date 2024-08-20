@@ -15,6 +15,10 @@ selectAll:
 SELECT *
 FROM Server;
 
+selectAllIds:
+SELECT id
+FROM Server;
+
 upsert:
 INSERT OR REPLACE
 INTO Server (id, owner, name, description, iconId, bannerId, flags)

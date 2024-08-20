@@ -175,6 +175,21 @@ object RealtimeSocket {
                     )
                 }
 
+                // Remove servers that are not in the ready frame
+                val serversThatExist = readyFrame.servers.mapNotNull { it.id }
+                val serversInDatabase = database.serverQueries.selectAllIds().executeAsList()
+                val serversToDelete = serversInDatabase.filter { it !in serversThatExist }
+
+                serversToDelete.forEach {
+                    database.serverQueries.delete(it)
+                    Log.d(
+                        "RealtimeSocket",
+                        "Deleted server $it from local database due to not being in ready frame."
+                    )
+                    // Conversely, remove the server from the API state
+                    RevoltAPI.serverCache.remove(it)
+                }
+
                 Log.d("RealtimeSocket", "Adding channels to cache.")
                 val channelMap = readyFrame.channels.associateBy { it.id!! }
                 RevoltAPI.channelCache.putAll(channelMap)
@@ -199,6 +214,21 @@ object RealtimeSocket {
                         if (it.nsfw == true) 1L else 0L,
                         it.server
                     )
+                }
+
+                // Remove channels that are not in the ready frame
+                val channelsThatExist = readyFrame.channels.mapNotNull { it.id }
+                val channelsInDatabase = database.channelQueries.selectAllIds().executeAsList()
+                val channelsToDelete = channelsInDatabase.filter { it !in channelsThatExist }
+
+                channelsToDelete.forEach {
+                    database.channelQueries.delete(it)
+                    Log.d(
+                        "RealtimeSocket",
+                        "Deleted channel $it from local database due to not being in ready frame."
+                    )
+                    // Conversely, remove the channel from the API state
+                    RevoltAPI.channelCache.remove(it)
                 }
 
                 Log.d("RealtimeSocket", "Adding emojis to cache.")
