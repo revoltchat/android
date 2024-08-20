@@ -2,13 +2,13 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'org.jetbrains.kotlin.plugin.compose'
     id 'com.mikepenz.aboutlibraries.plugin'
     id 'com.google.dagger.hilt.android'
     id 'com.google.devtools.ksp'
     id 'org.jmailen.kotlinter'
     id "io.sentry.android.gradle" version "3.4.2"
     id "app.cash.sqldelight" version "2.0.1"
-
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
     id 'com.google.gms.google-services'
@@ -150,9 +150,6 @@ android {
         compose true
         buildConfig true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion compose_compiler_version
-    }
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
@@ -178,11 +175,11 @@ sentry {
 dependencies {
     // Android/Kotlin Core
     implementation 'androidx.core:core-ktx:1.13.1'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.9.22"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:2.0.10"
 
     // Kotlinx - various first-party extensions for Kotlin
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.6.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.6.1"
     implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
 
     // Compose BOM

@@ -51,7 +51,7 @@ suspend fun uploadToAutumn(
             )
         )
         onUpload { bytesSentTotal, contentLength ->
-            onProgress(bytesSentTotal, contentLength)
+            contentLength?.let { onProgress(bytesSentTotal, it) }
         }
     }
 

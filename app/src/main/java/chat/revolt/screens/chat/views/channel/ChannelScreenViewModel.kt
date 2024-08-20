@@ -13,7 +13,6 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.internals.ChannelUtils
-import chat.revolt.internals.text.MessageProcessor
 import chat.revolt.api.internals.PermissionBit
 import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.SpecialUsers
@@ -47,6 +46,7 @@ import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.callbacks.UiCallback
 import chat.revolt.callbacks.UiCallbacks
+import chat.revolt.internals.text.MessageProcessor
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.ChatRouterDestination
 import chat.revolt.settings.providers.AgeGateUnlockedStorageProvider
@@ -144,7 +144,11 @@ class ChannelScreenViewModel @Inject constructor(
         channel?.server?.let { serverId ->
             RevoltAPI.selfId?.let { selfId ->
                 if (!RevoltAPI.members.hasMember(serverId, selfId)) {
-                    fetchMember(serverId, selfId)
+                    try {
+                        fetchMember(serverId, selfId)
+                    } catch (e: Exception) {
+                        Log.e("ChannelScreenViewModel", "Failed to fetch member", e)
+                    }
                 }
 
                 ensuredSelfMember = true
