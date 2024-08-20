@@ -164,10 +164,15 @@ class ChannelScreenViewModel @Inject constructor(
             null
         } else {
             channel?.server?.let { serverId ->
-                RevoltAPI.members.getMember(serverId, selfUser.id!!) ?: fetchMember(
-                    serverId,
-                    selfUser.id
-                )
+                try {
+                    RevoltAPI.members.getMember(serverId, selfUser.id!!) ?: fetchMember(
+                        serverId,
+                        selfUser.id
+                    )
+                } catch (e: Exception) {
+                    Log.e("ChannelScreenViewModel", "Failed to fetch member", e)
+                    null
+                }
             }
         }
 
