@@ -24,7 +24,16 @@ export default defineConfig({
                         {
                             label: "Setup",
                             link: "/contributing/setup",
-                        },
+                        }
+                    ],
+                },
+                {
+                    label: "Beta Test",
+                    items: [
+                        {
+                            label: "Geographic Availability",
+                            link: "/beta/availability-regions",
+                        }
                     ],
                 },
                 /* {
