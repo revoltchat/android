@@ -166,6 +166,15 @@ fun LabsHomeScreen(navController: NavController) {
                             }
                         )
                         HorizontalDivider()
+                        ListItem(
+                            headlineContent = {
+                                Text("JB Markdown")
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("sandboxes/jbm")
+                            }
+                        )
+                        HorizontalDivider()
                     }
                 }
             }

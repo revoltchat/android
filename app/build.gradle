@@ -267,6 +267,9 @@ dependencies {
     implementation "androidx.datastore:datastore:1.1.1"
     implementation "androidx.datastore:datastore-preferences:1.1.1"
 
+    // Markup
+    implementation "org.jetbrains:markdown:0.7.3"
+
     // Livekit
     // FIXME temporarily not included, re-add when realtime media is to be implemented
     // implementation "io.livekit:livekit-android:$livekit_version"
