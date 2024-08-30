@@ -5,6 +5,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.api
 import chat.revolt.api.schemas.RsResult
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -23,7 +24,7 @@ data class OnboardingResponse(
 )
 
 suspend fun needsOnboarding(sessionToken: String = RevoltAPI.sessionToken): Boolean {
-    val response = RevoltHttp.get("/onboard/hello") {
+    val response = RevoltHttp.get("/onboard/hello".api()) {
         header(RevoltAPI.TOKEN_HEADER_NAME, sessionToken)
     }
 
@@ -49,7 +50,7 @@ suspend fun completeOnboarding(
     body: OnboardingCompletionBody,
     sessionToken: String = RevoltAPI.sessionToken
 ): RsResult<Unit, RevoltError> {
-    val response = RevoltHttp.post("/onboard/complete") {
+    val response = RevoltHttp.post("/onboard/complete".api()) {
         setBody(body)
         contentType(ContentType.Application.Json)
         header(RevoltAPI.TOKEN_HEADER_NAME, sessionToken)

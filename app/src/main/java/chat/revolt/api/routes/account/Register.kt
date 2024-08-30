@@ -4,6 +4,7 @@ import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.schemas.RsResult
+import chat.revolt.api.api
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -21,7 +22,7 @@ data class RegistrationBody(
 )
 
 suspend fun register(body: RegistrationBody): RsResult<Unit, RevoltError> {
-    val response = RevoltHttp.post("/auth/account/create") {
+    val response = RevoltHttp.post("/auth/account/create".api()) {
         setBody(body)
         contentType(ContentType.Application.Json)
     }

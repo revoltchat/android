@@ -4,6 +4,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.api
 import chat.revolt.api.internals.ULID
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Message
@@ -36,7 +37,7 @@ suspend fun fetchMessagesFromChannel(
     nearby: String? = null,
     sort: String? = null
 ): MessagesInChannel {
-    val response = RevoltHttp.get("/channels/$channelId/messages") {
+    val response = RevoltHttp.get("/channels/$channelId/messages".api()) {
         parameter("limit", limit)
         parameter("include_users", includeUsers)
 
@@ -103,7 +104,7 @@ suspend fun sendMessage(
     attachments: List<String>? = null,
     idempotencyKey: String = ULID.makeNext()
 ): String {
-    val response = RevoltHttp.post("/channels/$channelId/messages") {
+    val response = RevoltHttp.post("/channels/$channelId/messages".api()) {
         contentType(ContentType.Application.Json)
         setBody(
             SendMessageBody(
@@ -121,7 +122,7 @@ suspend fun sendMessage(
 }
 
 suspend fun editMessage(channelId: String, messageId: String, newContent: String? = null) {
-    val response = RevoltHttp.patch("/channels/$channelId/messages/$messageId") {
+    val response = RevoltHttp.patch("/channels/$channelId/messages/$messageId".api()) {
         contentType(ContentType.Application.Json)
         setBody(
             EditMessageBody(
@@ -140,15 +141,15 @@ suspend fun editMessage(channelId: String, messageId: String, newContent: String
 }
 
 suspend fun deleteMessage(channelId: String, messageId: String) {
-    RevoltHttp.delete("/channels/$channelId/messages/$messageId")
+    RevoltHttp.delete("/channels/$channelId/messages/$messageId".api())
 }
 
 suspend fun ackChannel(channelId: String, messageId: String = ULID.makeNext()) {
-    RevoltHttp.put("/channels/$channelId/ack/$messageId")
+    RevoltHttp.put("/channels/$channelId/ack/$messageId".api())
 }
 
 suspend fun fetchSingleChannel(channelId: String): Channel {
-    val response = RevoltHttp.get("/channels/$channelId")
+    val response = RevoltHttp.get("/channels/$channelId".api())
         .bodyAsText()
 
     return RevoltJson.decodeFromString(
@@ -158,7 +159,7 @@ suspend fun fetchSingleChannel(channelId: String): Channel {
 }
 
 suspend fun fetchGroupParticipants(channelId: String): List<User> {
-    val response = RevoltHttp.get("/channels/$channelId/members")
+    val response = RevoltHttp.get("/channels/$channelId/members".api())
         .bodyAsText()
 
     return RevoltJson.decodeFromString(
@@ -168,7 +169,7 @@ suspend fun fetchGroupParticipants(channelId: String): List<User> {
 }
 
 suspend fun createInvite(channelId: String): CreateInviteResponse {
-    val response = RevoltHttp.post("/channels/$channelId/invites")
+    val response = RevoltHttp.post("/channels/$channelId/invites".api())
         .bodyAsText()
 
     val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
@@ -178,7 +179,7 @@ suspend fun createInvite(channelId: String): CreateInviteResponse {
 }
 
 suspend fun fetchSingleMessage(channelId: String, messageId: String): Message {
-    val response = RevoltHttp.get("/channels/$channelId/messages/$messageId")
+    val response = RevoltHttp.get("/channels/$channelId/messages/$messageId".api())
         .bodyAsText()
 
     return RevoltJson.decodeFromString(
@@ -188,7 +189,7 @@ suspend fun fetchSingleMessage(channelId: String, messageId: String): Message {
 }
 
 suspend fun leaveDeleteOrCloseChannel(channelId: String, leaveSilently: Boolean = false) {
-    RevoltHttp.delete("/channels/$channelId") {
+    RevoltHttp.delete("/channels/$channelId".api()) {
         parameter("leave_silently", leaveSilently)
     }
 }
@@ -229,7 +230,7 @@ suspend fun patchChannel(
         body["nsfw"] = RevoltJson.encodeToJsonElement(Boolean.serializer(), nsfw)
     }
 
-    val response = RevoltHttp.patch("/channels/$channelId") {
+    val response = RevoltHttp.patch("/channels/$channelId".api()) {
         contentType(ContentType.Application.Json)
         setBody(
             RevoltJson.encodeToString(

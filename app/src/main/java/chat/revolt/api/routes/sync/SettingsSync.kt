@@ -3,6 +3,7 @@ package chat.revolt.api.routes.sync
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.api
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -17,7 +18,7 @@ import kotlinx.serialization.json.JsonArray
 data class SyncedSetting(val timestamp: Long, val value: String)
 
 suspend fun getKeys(vararg keys: String, revoltToken: String): Map<String, SyncedSetting> {
-    val response = RevoltHttp.post("/sync/settings/fetch") {
+    val response = RevoltHttp.post("/sync/settings/fetch".api()) {
         headers.append(RevoltAPI.TOKEN_HEADER_NAME, revoltToken)
 
         // format: {"keys": ["key1", "key2"]}
@@ -55,7 +56,7 @@ suspend fun getKeys(vararg keys: String): Map<String, SyncedSetting> {
 }
 
 suspend fun setKey(key: String, value: String) {
-    RevoltHttp.post("/sync/settings/set") {
+    RevoltHttp.post("/sync/settings/set".api()) {
         parameter("timestamp", System.currentTimeMillis())
 
         // format: {"key": "value"}

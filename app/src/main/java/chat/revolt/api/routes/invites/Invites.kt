@@ -3,6 +3,7 @@ package chat.revolt.api.routes.invites
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.api
 import chat.revolt.api.schemas.Invite
 import chat.revolt.api.schemas.InviteJoined
 import chat.revolt.api.schemas.RsResult
@@ -12,7 +13,7 @@ import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.SerializationException
 
 suspend fun fetchInviteByCode(code: String): RsResult<Invite, RevoltError> {
-    val response = RevoltHttp.get("/invites/$code")
+    val response = RevoltHttp.get("/invites/$code".api())
         .bodyAsText()
 
     try {
@@ -27,7 +28,7 @@ suspend fun fetchInviteByCode(code: String): RsResult<Invite, RevoltError> {
 }
 
 suspend fun joinInviteByCode(code: String): RsResult<InviteJoined, RevoltError> {
-    val response = RevoltHttp.post("/invites/$code")
+    val response = RevoltHttp.post("/invites/$code".api())
         .bodyAsText()
 
     try {

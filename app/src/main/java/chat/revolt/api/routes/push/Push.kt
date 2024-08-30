@@ -2,6 +2,7 @@ package chat.revolt.api.routes.push
 
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.routes.account.WebPushData
+import chat.revolt.api.api
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -18,7 +19,7 @@ suspend fun subscribePush(
         auth = auth
     )
 
-    RevoltHttp.post("/push/subscribe") {
+    RevoltHttp.post("/push/subscribe".api()) {
         setBody(data)
         contentType(ContentType.Application.Json)
     }

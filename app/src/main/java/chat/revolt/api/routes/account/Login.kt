@@ -5,6 +5,7 @@ import android.util.Log
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.api
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -109,7 +110,7 @@ data class EmailPasswordAssessment(
 suspend fun negotiateAuthentication(email: String, password: String): EmailPasswordAssessment {
     val sessionName = friendlySessionName()
 
-    val response: HttpResponse = RevoltHttp.post("/auth/session/login") {
+    val response: HttpResponse = RevoltHttp.post("/auth/session/login".api()) {
         contentType(ContentType.Application.Json)
         setBody(LoginNegotiation(email, password, sessionName, null))
     }
@@ -152,7 +153,7 @@ suspend fun authenticateWithMfaTotpCode(
     mfaTicket: String,
     mfaResponse: MfaResponseTotpCode
 ): EmailPasswordAssessment {
-    val response: HttpResponse = RevoltHttp.post("/auth/session/login") {
+    val response: HttpResponse = RevoltHttp.post("/auth/session/login".api()) {
         contentType(ContentType.Application.Json)
         setBody(LoginMfaAmendmentTotpCode(mfaTicket, mfaResponse, friendlySessionName()))
     }
@@ -176,7 +177,7 @@ suspend fun authenticateWithMfaRecoveryCode(
     mfaTicket: String,
     mfaResponse: MfaResponseRecoveryCode
 ): EmailPasswordAssessment {
-    val response: HttpResponse = RevoltHttp.post("/auth/session/login") {
+    val response: HttpResponse = RevoltHttp.post("/auth/session/login".api()) {
         contentType(ContentType.Application.Json)
         setBody(LoginMfaAmendmentRecoveryCode(mfaTicket, mfaResponse, friendlySessionName()))
     }

@@ -3,6 +3,7 @@ package chat.revolt.api.routes.user
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.api
 import io.ktor.client.request.delete
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -13,7 +14,7 @@ import io.ktor.http.contentType
 import kotlinx.serialization.SerializationException
 
 suspend fun blockUser(userId: String) {
-    val response = RevoltHttp.put("/users/$userId/block")
+    val response = RevoltHttp.put("/users/$userId/block".api())
         .bodyAsText()
 
     try {
@@ -25,7 +26,7 @@ suspend fun blockUser(userId: String) {
 }
 
 suspend fun unblockUser(userId: String) {
-    val response = RevoltHttp.delete("/users/$userId/block")
+    val response = RevoltHttp.delete("/users/$userId/block".api())
         .bodyAsText()
 
     try {
@@ -37,7 +38,7 @@ suspend fun unblockUser(userId: String) {
 }
 
 suspend fun friendUser(username: String) {
-    val response = RevoltHttp.post("/users/friend") {
+    val response = RevoltHttp.post("/users/friend".api()) {
         contentType(ContentType.Application.Json)
         setBody(mapOf("username" to username))
     }
@@ -52,7 +53,7 @@ suspend fun friendUser(username: String) {
 }
 
 suspend fun acceptFriendRequest(userId: String) {
-    val response = RevoltHttp.put("/users/$userId/friend")
+    val response = RevoltHttp.put("/users/$userId/friend".api())
         .bodyAsText()
 
     try {
@@ -64,7 +65,7 @@ suspend fun acceptFriendRequest(userId: String) {
 }
 
 suspend fun unfriendUser(userId: String) {
-    val response = RevoltHttp.delete("/users/$userId/friend")
+    val response = RevoltHttp.delete("/users/$userId/friend".api())
         .bodyAsText()
 
     try {

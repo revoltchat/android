@@ -45,6 +45,7 @@ import chat.revolt.api.RevoltHttp
 import chat.revolt.api.routes.onboard.needsOnboarding
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
+import chat.revolt.api.api
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.DefaultDestinationScreen
@@ -111,7 +112,7 @@ class MainActivityViewModel @Inject constructor(
     }
 
     private suspend fun canReachRevolt(): Boolean {
-        val res = RevoltHttp.get("/")
+        val res = RevoltHttp.get("/".api())
         return res.status.value == 200
     }
 

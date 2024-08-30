@@ -33,6 +33,7 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
+import chat.revolt.api.api
 import chat.revolt.api.routes.onboard.needsOnboarding
 import chat.revolt.components.screens.splash.DisconnectedScreen
 import chat.revolt.persistence.KVStorage
@@ -82,7 +83,7 @@ class SplashScreenViewModel @Inject constructor(
     }
 
     private suspend fun canReachRevolt(): Boolean {
-        val res = RevoltHttp.get("/")
+        val res = RevoltHttp.get("/".api())
         return res.status.value == 200
     }
 

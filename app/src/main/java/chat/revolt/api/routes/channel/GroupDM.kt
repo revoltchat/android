@@ -3,6 +3,7 @@ package chat.revolt.api.routes.channel
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.api
 import chat.revolt.api.schemas.Channel
 import chat.revolt.screens.create.MAX_ADDABLE_PEOPLE_IN_GROUP
 import io.ktor.client.request.delete
@@ -27,7 +28,7 @@ suspend fun createGroupDM(name: String, members: List<String>): Channel {
         throw Exception("Too many members, maximum is $MAX_ADDABLE_PEOPLE_IN_GROUP")
     }
 
-    val response = RevoltHttp.post("/channels/create") {
+    val response = RevoltHttp.post("/channels/create".api()) {
         contentType(ContentType.Application.Json)
         setBody(CreateGroupDMBody(name, members))
     }.bodyAsText()
@@ -43,7 +44,7 @@ suspend fun createGroupDM(name: String, members: List<String>): Channel {
 }
 
 suspend fun removeMember(channelId: String, userId: String) {
-    val response = RevoltHttp.delete("/channels/$channelId/recipients/$userId")
+    val response = RevoltHttp.delete("/channels/$channelId/recipients/$userId".api())
 
     if (!response.status.isSuccess()) {
         throw Error(response.status.toString())
@@ -51,7 +52,7 @@ suspend fun removeMember(channelId: String, userId: String) {
 }
 
 suspend fun addMember(channelId: String, userId: String) {
-    val response = RevoltHttp.put("/channels/$channelId/recipients/$userId")
+    val response = RevoltHttp.put("/channels/$channelId/recipients/$userId".api())
 
     if (!response.status.isSuccess()) {
         throw Error(response.status.toString())

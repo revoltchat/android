@@ -1,8 +1,9 @@
 package chat.revolt.api.routes.misc
 
 import chat.revolt.api.RevoltHttp
-import io.ktor.client.call.*
-import io.ktor.client.request.*
+import chat.revolt.api.api
+import io.ktor.client.call.body
+import io.ktor.client.request.get
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -48,5 +49,5 @@ data class Voso(
 )
 
 suspend fun getRootRoute(): Root {
-    return RevoltHttp.get("/").body()
+    return RevoltHttp.get("/".api()).body()
 }

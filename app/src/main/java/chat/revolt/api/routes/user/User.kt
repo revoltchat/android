@@ -4,6 +4,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.api
 import chat.revolt.api.schemas.Profile
 import chat.revolt.api.schemas.Status
 import chat.revolt.api.schemas.User
@@ -20,7 +21,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
 
 suspend fun fetchSelf(): User {
-    val response = RevoltHttp.get("/users/@me")
+    val response = RevoltHttp.get("/users/@me".api())
         .bodyAsText()
 
     try {
@@ -83,7 +84,7 @@ suspend fun patchSelf(
         body["remove"] = RevoltJson.encodeToJsonElement(ListSerializer(String.serializer()), remove)
     }
 
-    val response = RevoltHttp.patch("/users/@me") {
+    val response = RevoltHttp.patch("/users/@me".api()) {
         contentType(ContentType.Application.Json)
         setBody(
             RevoltJson.encodeToString(
@@ -111,7 +112,7 @@ suspend fun patchSelf(
 }
 
 suspend fun fetchUser(id: String): User {
-    val res = RevoltHttp.get("/users/$id")
+    val res = RevoltHttp.get("/users/$id".api())
 
     if (res.status.value == 404) {
         return User.getPlaceholder(id)
@@ -146,7 +147,7 @@ suspend fun addUserIfUnknown(id: String) {
 }
 
 suspend fun fetchUserProfile(id: String): Profile {
-    val res = RevoltHttp.get("/users/$id/profile")
+    val res = RevoltHttp.get("/users/$id/profile".api())
 
     val response = res.bodyAsText()
 

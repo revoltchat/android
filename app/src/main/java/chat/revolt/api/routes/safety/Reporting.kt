@@ -11,6 +11,7 @@ import chat.revolt.api.schemas.MessageReport
 import chat.revolt.api.schemas.ServerReport
 import chat.revolt.api.schemas.UserReport
 import chat.revolt.api.schemas.UserReportReason
+import chat.revolt.api.api
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -30,7 +31,7 @@ suspend fun putMessageReport(
         additional_context = additionalContext
     )
 
-    val response = RevoltHttp.post("/safety/report") {
+    val response = RevoltHttp.post("/safety/report".api()) {
         setBody(
             RevoltJson.encodeToString(
                 FullMessageReport.serializer(),
@@ -62,7 +63,7 @@ suspend fun putServerReport(
         additional_context = additionalContext
     )
 
-    val response = RevoltHttp.post("/safety/report") {
+    val response = RevoltHttp.post("/safety/report".api()) {
         setBody(
             RevoltJson.encodeToString(
                 FullServerReport.serializer(),
@@ -94,7 +95,7 @@ suspend fun putUserReport(
         additional_context = additionalContext
     )
 
-    val response = RevoltHttp.post("/safety/report") {
+    val response = RevoltHttp.post("/safety/report".api()) {
         setBody(
             RevoltJson.encodeToString(
                 FullUserReport.serializer(),

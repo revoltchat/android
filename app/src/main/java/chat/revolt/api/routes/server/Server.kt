@@ -4,6 +4,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltError
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.api.api
 import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
 import io.ktor.client.request.delete
@@ -21,7 +22,7 @@ data class FetchMembersResponse(
 )
 
 suspend fun ackServer(serverId: String) {
-    RevoltHttp.put("/servers/$serverId/ack")
+    RevoltHttp.put("/servers/$serverId/ack".api())
 }
 
 suspend fun fetchMembers(
@@ -29,7 +30,7 @@ suspend fun fetchMembers(
     includeOffline: Boolean = false,
     pure: Boolean = false
 ): FetchMembersResponse {
-    val response = RevoltHttp.get("/servers/$serverId/members") {
+    val response = RevoltHttp.get("/servers/$serverId/members".api()) {
         parameter("exclude_offline", !includeOffline)
     }
 
@@ -63,7 +64,7 @@ suspend fun fetchMembers(
 }
 
 suspend fun fetchMember(serverId: String, userId: String, pure: Boolean = false): Member {
-    val response = RevoltHttp.get("/servers/$serverId/members/$userId")
+    val response = RevoltHttp.get("/servers/$serverId/members/$userId".api())
 
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), response.bodyAsText())
@@ -86,7 +87,7 @@ suspend fun fetchMember(serverId: String, userId: String, pure: Boolean = false)
 }
 
 suspend fun leaveOrDeleteServer(serverId: String, leaveSilently: Boolean = false) {
-    RevoltHttp.delete("/servers/$serverId") {
+    RevoltHttp.delete("/servers/$serverId".api()) {
         parameter("leave_silently", leaveSilently)
     }
 }
