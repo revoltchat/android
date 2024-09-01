@@ -52,3 +52,8 @@ findByServer:
 SELECT *
 FROM Channel
 WHERE server = ?;
+
+findById:
+SELECT *
+FROM Channel
+WHERE id = ?;
