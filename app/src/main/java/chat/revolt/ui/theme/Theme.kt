@@ -172,3 +172,14 @@ object ClearRippleTheme : RippleTheme {
         pressedAlpha = 0.0f,
     )
 }
+
+fun isThemeDark(theme: Theme, systemIsDark: Boolean): Boolean {
+    return when (theme) {
+        Theme.Revolt, Theme.Amoled -> true
+        Theme.Light -> false
+        Theme.M3Dynamic, Theme.None -> systemIsDark
+    }
+}
+
+@Composable
+fun isThemeDark(theme: Theme) = isThemeDark(theme, isSystemInDarkTheme())

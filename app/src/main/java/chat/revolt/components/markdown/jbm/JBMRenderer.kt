@@ -1,10 +1,18 @@
 package chat.revolt.components.markdown.jbm
 
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.LocalTextStyle
@@ -20,12 +28,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
@@ -39,8 +49,17 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import chat.revolt.api.settings.GlobalState
 import chat.revolt.components.markdown.Annotations
 import chat.revolt.components.utils.detectTapGesturesConditionalConsume
+import chat.revolt.ui.theme.FragmentMono
+import chat.revolt.ui.theme.isThemeDark
+import dev.snipme.highlights.Highlights
+import dev.snipme.highlights.model.BoldHighlight
+import dev.snipme.highlights.model.CodeHighlight
+import dev.snipme.highlights.model.ColorHighlight
+import dev.snipme.highlights.model.SyntaxLanguage
+import dev.snipme.highlights.model.SyntaxThemes
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
@@ -50,10 +69,11 @@ import org.intellij.markdown.flavours.gfm.GFMTokenTypes
 
 data class JBMarkdownTreeState(
     val sourceText: String = "",
-    val ignoreLineBreaks: Boolean = false,
     val listDepth: Int = 0,
     val fontSizeMultiplier: Float = 1f,
-    val linksClickable: Boolean = true
+    val linksClickable: Boolean = true,
+    val currentServer: String? = null,
+    val embedded: Boolean = false,
 )
 
 val LocalJBMarkdownTreeState =
@@ -66,15 +86,21 @@ fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
 
     LaunchedEffect(content) {
         tree = JBMApi.parse(content)
-
-        Log.d("JBMRenderer", "Parsed tree: ${tree.children.map { it.type.name }}")
     }
 
     CompositionLocalProvider(
-        LocalJBMarkdownTreeState provides JBMarkdownTreeState(content)
+        LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
+            sourceText = content
+        )
     ) {
-        tree.children.map {
-            JBMBlock(it, modifier)
+        if (LocalJBMarkdownTreeState.current.embedded) {
+            tree.children.getOrNull(0)?.let {
+                JBMBlock(it, modifier)
+            }
+        } else {
+            tree.children.map {
+                JBMBlock(it, modifier)
+            }
         }
     }
 }
@@ -89,12 +115,34 @@ private fun annotateText(
         buildAnnotatedString {
             when (node.type) {
                 MarkdownTokenTypes.TEXT -> {
-                    append(node.getTextInNode(sourceText))
+                    val source = if (state.embedded) {
+                        node.getTextInNode(sourceText).toString().replace("\n", " ")
+                    } else {
+                        node.getTextInNode(sourceText)
+                    }
+                    append(source)
+                }
+
+                MarkdownTokenTypes.ATX_HEADER -> {
+                    // Do not need to do anything
+                }
+
+                MarkdownElementTypes.ATX_1,
+                MarkdownElementTypes.ATX_2,
+                MarkdownElementTypes.ATX_3,
+                MarkdownElementTypes.ATX_4,
+                MarkdownElementTypes.ATX_5,
+                MarkdownElementTypes.ATX_6 -> {
+                    for (child in node.children) {
+                        append(annotateText(state, child))
+                    }
                 }
 
                 MarkdownElementTypes.EMPH -> {
                     withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                        for (child in node.children) {
+                        // Skip the first child and the last child
+                        // because they are the asterisk characters
+                        for (child in node.children.subList(1, node.children.size - 1)) {
                             append(annotateText(state, child))
                         }
                     }
@@ -102,7 +150,9 @@ private fun annotateText(
 
                 MarkdownElementTypes.STRONG -> {
                     withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                        for (child in node.children) {
+                        // Skip the first two children and the last two children
+                        // because they are the asterisk characters
+                        for (child in node.children.subList(2, node.children.size - 2)) {
                             append(annotateText(state, child))
                         }
                     }
@@ -118,8 +168,24 @@ private fun annotateText(
                     }
                 }
 
+                MarkdownElementTypes.CODE_SPAN -> {
+                    withStyle(SpanStyle(fontFamily = FragmentMono)) {
+                        val startsWithTwoBackticks =
+                            node.children.getOrNull(1)?.type == MarkdownTokenTypes.BACKTICK
+                        val removeItemCount = if (startsWithTwoBackticks) 2 else 1
+                        // Skip the first and last 1 or 2 children
+                        // because they are the backtick characters
+                        for (child in node.children.subList(
+                            removeItemCount,
+                            node.children.size - removeItemCount
+                        )) {
+                            append(annotateText(state, child))
+                        }
+                    }
+                }
+
                 MarkdownTokenTypes.LIST_BULLET -> {
-                    append(" ".repeat(state.listDepth) + " " + if (state.listDepth % 2 == 0) "•" else "◦" + " ")
+                    append(" ".repeat(state.listDepth) + " • ")
                 }
 
                 MarkdownTokenTypes.LIST_NUMBER -> {
@@ -145,7 +211,9 @@ private fun annotateText(
                     append(" ")
                 }
 
-                MarkdownElementTypes.PARAGRAPH, MarkdownElementTypes.HTML_BLOCK -> {
+                MarkdownElementTypes.PARAGRAPH,
+                MarkdownElementTypes.HTML_BLOCK,
+                MarkdownTokenTypes.ATX_CONTENT -> {
                     for (child in node.children) {
                         append(annotateText(state, child))
                     }
@@ -167,13 +235,9 @@ private fun annotateText(
                 MarkdownTokenTypes.EOL,
                 MarkdownTokenTypes.WHITE_SPACE,
                 MarkdownTokenTypes.COLON,
+                MarkdownTokenTypes.EMPH,
                 GFMTokenTypes.TILDE -> {
                     append(node.getTextInNode(sourceText))
-                }
-
-                // no-op types
-                // for example, the special characters that are used to denote the markup are here
-                MarkdownTokenTypes.EMPH -> {
                 }
 
                 else -> {
@@ -292,14 +356,132 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
     )
 }
 
+private fun annotateHighlights(
+    source: String,
+    highlights: List<CodeHighlight>
+): AnnotatedString {
+    val highlightStyles = highlights.map {
+        when (it) {
+            is BoldHighlight -> AnnotatedString.Range(
+                SpanStyle(fontWeight = FontWeight.Bold),
+                it.location.start,
+                it.location.end
+            )
+
+            is ColorHighlight -> {
+                AnnotatedString.Range(
+                    SpanStyle(color = Color(0xFF000000 or it.rgb.toLong())),
+                    it.location.start,
+                    it.location.end
+                )
+            }
+
+            else -> null
+        }
+    }.filterNotNull()
+
+    return AnnotatedString(source, spanStyles = highlightStyles)
+}
+
+// ======== TODO ========
+// - Add aliases for languages. For example, "js" should be an alias for "javascript" and "ts" should be an alias for "typescript", etc.
+// - Better looking language name display. Ideally a dictionary of language names to display names with proper brand casing.
+@Composable
+private fun JBMCodeBlockContent(node: ASTNode, modifier: Modifier) {
+    val state = LocalJBMarkdownTreeState.current
+
+    /*val colours = MaterialTheme.colorScheme
+    val contentColour = LocalContentColor.current
+    val syntaxTheme = remember {
+        SyntaxTheme(
+            key = "chat.revolt.M3Dynamic",
+            code = contentColour.toArgb() and 0xFFFFFF,
+            comment = colours.outline.toArgb() and 0xFFFFFF,
+            multilineComment = colours.outline.toArgb() and 0xFFFFFF,
+            keyword = colours.primary.toArgb() and 0xFFFFFF,
+            string = colours.secondary.toArgb() and 0xFFFFFF,
+            literal = colours.tertiary.toArgb() and 0xFFFFFF,
+            mark = colours.error.toArgb() and 0xFFFFFF,
+            punctuation = colours.inversePrimary.toArgb() and 0xFFFFFF,
+            metadata = colours.inverseSurface.toArgb() and 0xFFFFFF,
+        )
+    }*/
+
+    val uiMode = LocalConfiguration.current.uiMode
+    val systemIsDark =
+        (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+    val themeIsDark = remember(GlobalState.theme) { isThemeDark(GlobalState.theme, systemIsDark) }
+
+    val codeFenceLanguage = remember(node) {
+        node.children.firstOrNull { it.type == MarkdownTokenTypes.FENCE_LANG }
+            ?.getTextInNode(state.sourceText)?.toString()
+    }
+    val codeFenceContent = remember(node) {
+        node.children
+            .filter { it.type == MarkdownTokenTypes.CODE_FENCE_CONTENT || it.type == MarkdownTokenTypes.EOL }
+            .joinToString("") {
+                it.getTextInNode(state.sourceText).toString()
+            }
+            .trim()
+    }
+    val annotatedContent = remember(codeFenceLanguage, codeFenceContent) {
+        val canAnnotate = codeFenceLanguage != null
+        val language = codeFenceLanguage?.let { SyntaxLanguage.getByName(it) }
+        val shouldAnnotate = language != null
+
+        if (canAnnotate && shouldAnnotate) {
+            buildAnnotatedString {
+                val highlights = Highlights.Builder().apply {
+                    code(codeFenceContent)
+                    language(language ?: SyntaxLanguage.DEFAULT)
+                    theme(SyntaxThemes.notepad(themeIsDark))
+                    //theme(syntaxTheme)
+                }.build()
+                append(annotateHighlights(codeFenceContent, highlights.getHighlights()))
+            }
+        } else {
+            buildAnnotatedString {
+                append(codeFenceContent)
+            }
+        }
+    }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(8.dp)
+    ) {
+        if (codeFenceLanguage != null) {
+            Text(
+                text = codeFenceLanguage,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+        }
+        Box(
+            modifier = Modifier.horizontalScroll(rememberScrollState())
+        ) {
+            Text(
+                text = annotatedContent,
+                fontFamily = FragmentMono,
+                modifier = Modifier
+            )
+        }
+    }
+}
+
 @Composable
 private fun JBMBlock(node: ASTNode, modifier: Modifier) {
+    val state = LocalJBMarkdownTreeState.current
+
     when (node.type) {
         MarkdownElementTypes.PARAGRAPH,
         MarkdownElementTypes.HTML_BLOCK -> {
             CompositionLocalProvider(
                 LocalTextStyle provides LocalTextStyle.current.copy(
-                    fontSize = LocalTextStyle.current.fontSize * LocalJBMarkdownTreeState.current.fontSizeMultiplier
+                    fontSize = LocalTextStyle.current.fontSize * state.fontSizeMultiplier
                 )
             ) {
                 JBMText(node, modifier)
@@ -315,40 +497,42 @@ private fun JBMBlock(node: ASTNode, modifier: Modifier) {
             CompositionLocalProvider(
                 LocalTextStyle provides LocalTextStyle.current.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = when (node.type) {
-                        MarkdownElementTypes.ATX_1 -> 32.sp * LocalJBMarkdownTreeState.current.fontSizeMultiplier
-                        MarkdownElementTypes.ATX_2 -> 24.sp * LocalJBMarkdownTreeState.current.fontSizeMultiplier
-                        MarkdownElementTypes.ATX_3 -> 20.sp * LocalJBMarkdownTreeState.current.fontSizeMultiplier
-                        MarkdownElementTypes.ATX_4 -> 16.sp * LocalJBMarkdownTreeState.current.fontSizeMultiplier
-                        MarkdownElementTypes.ATX_5 -> 14.sp * LocalJBMarkdownTreeState.current.fontSizeMultiplier
-                        else -> 12.sp * LocalJBMarkdownTreeState.current.fontSizeMultiplier
-                    },
-                    color = when (node.type) {
-                        MarkdownElementTypes.ATX_1 -> Color(0xFFFF0000)
-                        MarkdownElementTypes.ATX_2 -> Color(0xFF00FF00)
-                        MarkdownElementTypes.ATX_3 -> Color(0xFF0000FF)
-                        MarkdownElementTypes.ATX_4 -> Color(0xFFFF00FF)
-                        MarkdownElementTypes.ATX_5 -> Color(0xFF00FFFF)
-                        else -> Color(0xFFFFFF00)
+                    fontSize = if (state.embedded) LocalTextStyle.current.fontSize
+                    else when (node.type) {
+                        MarkdownElementTypes.ATX_1 -> 32.sp * state.fontSizeMultiplier
+                        MarkdownElementTypes.ATX_2 -> 24.sp * state.fontSizeMultiplier
+                        MarkdownElementTypes.ATX_3 -> 20.sp * state.fontSizeMultiplier
+                        MarkdownElementTypes.ATX_4 -> 16.sp * state.fontSizeMultiplier
+                        MarkdownElementTypes.ATX_5 -> 14.sp * state.fontSizeMultiplier
+                        else -> 12.sp * state.fontSizeMultiplier
                     }
                 )
             ) {
                 if (node.startOffset != 0) {
-                    Box(Modifier.padding(top = 8.dp))
+                    Spacer(Modifier.height(8.dp))
                 }
                 JBMText(node, modifier)
+                Spacer(Modifier.height(4.dp))
             }
         }
 
         MarkdownElementTypes.ORDERED_LIST,
         MarkdownElementTypes.UNORDERED_LIST -> {
             CompositionLocalProvider(
-                LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
-                    listDepth = LocalJBMarkdownTreeState.current.listDepth + 1
+                LocalJBMarkdownTreeState provides state.copy(
+                    listDepth = state.listDepth + 1
                 )
             ) {
                 JBMText(node, modifier)
             }
+        }
+
+        MarkdownTokenTypes.EOL -> {
+            Spacer(Modifier.height(4.dp))
+        }
+
+        MarkdownElementTypes.CODE_FENCE -> {
+            JBMCodeBlockContent(node, modifier)
         }
 
         else -> {
