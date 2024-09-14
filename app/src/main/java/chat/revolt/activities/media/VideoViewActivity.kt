@@ -35,12 +35,14 @@ class VideoViewActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val autumnResource = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("autumnResource", AutumnResource::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra("autumnResource")
-        }
+        val autumnResource =
+            // due to a bug in Android 13 we still use the deprecated method on Android 13, despite the new method being available
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra("autumnResource", AutumnResource::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra("autumnResource")
+            }
 
         if (autumnResource?.id == null) {
             Log.e("VideoViewActivity", "No AutumnResource provided")

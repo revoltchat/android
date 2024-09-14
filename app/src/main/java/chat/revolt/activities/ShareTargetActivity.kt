@@ -96,7 +96,8 @@ class ShareTargetActivity : ComponentActivity() {
                     else -> {
                         listOf(
                             when {
-                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                                // due to a bug in Android 13 we still use the deprecated method on Android 13, despite the new method being available
+                                Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU -> {
                                     intent.getParcelableExtra(
                                         Intent.EXTRA_STREAM,
                                         Parcelable::class.java

@@ -62,7 +62,8 @@ class ImageViewActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val autumnResource = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // due to a bug in Android 13 we still use the deprecated method on Android 13, despite the new method being available
+        val autumnResource = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("autumnResource", AutumnResource::class.java)
         } else {
             @Suppress("DEPRECATION")
