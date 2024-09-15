@@ -390,23 +390,6 @@ private fun annotateHighlights(
 private fun JBMCodeBlockContent(node: ASTNode, modifier: Modifier) {
     val state = LocalJBMarkdownTreeState.current
 
-    /*val colours = MaterialTheme.colorScheme
-    val contentColour = LocalContentColor.current
-    val syntaxTheme = remember {
-        SyntaxTheme(
-            key = "chat.revolt.M3Dynamic",
-            code = contentColour.toArgb() and 0xFFFFFF,
-            comment = colours.outline.toArgb() and 0xFFFFFF,
-            multilineComment = colours.outline.toArgb() and 0xFFFFFF,
-            keyword = colours.primary.toArgb() and 0xFFFFFF,
-            string = colours.secondary.toArgb() and 0xFFFFFF,
-            literal = colours.tertiary.toArgb() and 0xFFFFFF,
-            mark = colours.error.toArgb() and 0xFFFFFF,
-            punctuation = colours.inversePrimary.toArgb() and 0xFFFFFF,
-            metadata = colours.inverseSurface.toArgb() and 0xFFFFFF,
-        )
-    }*/
-
     val uiMode = LocalConfiguration.current.uiMode
     val systemIsDark =
         (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
@@ -434,8 +417,7 @@ private fun JBMCodeBlockContent(node: ASTNode, modifier: Modifier) {
                 val highlights = Highlights.Builder().apply {
                     code(codeFenceContent)
                     language(language ?: SyntaxLanguage.DEFAULT)
-                    theme(SyntaxThemes.notepad(themeIsDark))
-                    //theme(syntaxTheme)
+                    theme(SyntaxThemes.atom(themeIsDark))
                 }.build()
                 append(annotateHighlights(codeFenceContent, highlights.getHighlights()))
             }
