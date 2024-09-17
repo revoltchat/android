@@ -251,6 +251,26 @@
     <string name="copy">Copy</string>
     <string name="copied">Copied to clipboard</string>
 
+    <!-- See dev.snipme.highlights.model.SyntaxLanguage -->
+    <string name="programming_language_default">Plain Text</string>
+    <string name="programming_language_c" translatable="false">C</string>
+    <string name="programming_language_cpp" translatable="false">C++</string>
+    <string name="programming_language_dart" translatable="false">Dart</string>
+    <string name="programming_language_java" translatable="false">Java</string>
+    <string name="programming_language_kotlin" translatable="false">Kotlin</string>
+    <string name="programming_language_rust" translatable="false">Rust</string>
+    <string name="programming_language_csharp" translatable="false">C#</string>
+    <string name="programming_language_coffeescript" translatable="false">CoffeeScript</string>
+    <string name="programming_language_javascript" translatable="false">ECMAScript / JS</string>
+    <string name="programming_language_perl" translatable="false">Perl</string>
+    <string name="programming_language_python" translatable="false">Python</string>
+    <string name="programming_language_ruby" translatable="false">Ruby</string>
+    <string name="programming_language_shell" translatable="false">Shell</string>
+    <string name="programming_language_swift" translatable="false">Swift</string>
+    <string name="programming_language_typescript" translatable="false">TypeScript</string>
+    <string name="programming_language_go" translatable="false">Go</string>
+    <string name="programming_language_php" translatable="false">PHP</string>
+
     <string name="server_flag_official">Official Server</string>
     <string name="server_flag_verified">Verified Server</string>
 

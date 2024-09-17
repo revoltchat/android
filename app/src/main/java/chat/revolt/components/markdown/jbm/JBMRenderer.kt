@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import chat.revolt.R
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.components.markdown.Annotations
 import chat.revolt.components.utils.detectTapGesturesConditionalConsume
@@ -383,9 +385,41 @@ private fun annotateHighlights(
     return AnnotatedString(source, spanStyles = highlightStyles)
 }
 
-// ======== TODO ========
-// - Add aliases for languages. For example, "js" should be an alias for "javascript" and "ts" should be an alias for "typescript", etc.
-// - Better looking language name display. Ideally a dictionary of language names to display names with proper brand casing.
+val languageAliases = mapOf(
+    "js" to SyntaxLanguage.JAVASCRIPT,
+    "ts" to SyntaxLanguage.TYPESCRIPT,
+    "rs" to SyntaxLanguage.RUST,
+    "cs" to SyntaxLanguage.CSHARP,
+    "py" to SyntaxLanguage.PYTHON,
+    "pl" to SyntaxLanguage.PERL,
+    "bash" to SyntaxLanguage.SHELL,
+    "sh" to SyntaxLanguage.SHELL,
+    "py" to SyntaxLanguage.PYTHON,
+    "coffee" to SyntaxLanguage.COFFEESCRIPT,
+    "bad" to SyntaxLanguage.PHP // had to
+)
+
+val languageDisplayNamedResource = mapOf(
+    SyntaxLanguage.DEFAULT to R.string.programming_language_default,
+    SyntaxLanguage.C to R.string.programming_language_c,
+    SyntaxLanguage.CPP to R.string.programming_language_cpp,
+    SyntaxLanguage.DART to R.string.programming_language_dart,
+    SyntaxLanguage.JAVA to R.string.programming_language_java,
+    SyntaxLanguage.KOTLIN to R.string.programming_language_kotlin,
+    SyntaxLanguage.RUST to R.string.programming_language_rust,
+    SyntaxLanguage.CSHARP to R.string.programming_language_csharp,
+    SyntaxLanguage.COFFEESCRIPT to R.string.programming_language_coffeescript,
+    SyntaxLanguage.JAVASCRIPT to R.string.programming_language_javascript,
+    SyntaxLanguage.PERL to R.string.programming_language_perl,
+    SyntaxLanguage.PYTHON to R.string.programming_language_python,
+    SyntaxLanguage.RUBY to R.string.programming_language_ruby,
+    SyntaxLanguage.SHELL to R.string.programming_language_shell,
+    SyntaxLanguage.SWIFT to R.string.programming_language_swift,
+    SyntaxLanguage.TYPESCRIPT to R.string.programming_language_typescript,
+    SyntaxLanguage.GO to R.string.programming_language_go,
+    SyntaxLanguage.PHP to R.string.programming_language_php,
+)
+
 @Composable
 private fun JBMCodeBlockContent(node: ASTNode, modifier: Modifier) {
     val state = LocalJBMarkdownTreeState.current
@@ -409,7 +443,9 @@ private fun JBMCodeBlockContent(node: ASTNode, modifier: Modifier) {
     }
     val annotatedContent = remember(codeFenceLanguage, codeFenceContent) {
         val canAnnotate = codeFenceLanguage != null
-        val language = codeFenceLanguage?.let { SyntaxLanguage.getByName(it) }
+        val language = codeFenceLanguage?.let {
+            languageAliases[it] ?: SyntaxLanguage.getByName(it)
+        }
         val shouldAnnotate = language != null
 
         if (canAnnotate && shouldAnnotate) {
@@ -435,13 +471,16 @@ private fun JBMCodeBlockContent(node: ASTNode, modifier: Modifier) {
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(8.dp)
     ) {
-        if (codeFenceLanguage != null) {
-            Text(
-                text = codeFenceLanguage,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
-        }
+        Text(
+            text = languageDisplayNamedResource[
+                languageAliases[codeFenceLanguage]
+                    ?: SyntaxLanguage.getByName(codeFenceLanguage ?: "")
+            ]?.let {
+                stringResource(it)
+            } ?: stringResource(R.string.programming_language_default),
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
         Box(
             modifier = Modifier.horizontalScroll(rememberScrollState())
         ) {
