@@ -17,6 +17,7 @@ object GlobalState {
     var theme by mutableStateOf(getDefaultTheme())
     var messageReplyStyle by mutableStateOf(MessageReplyStyle.SwipeFromEnd)
     var avatarRadius by mutableIntStateOf(50)
+    var experimentsEnabled by mutableStateOf(false)
 
     fun hydrateWithSettings(settings: SyncedSettings) {
         this.theme = settings.android.theme?.let { Theme.valueOf(it) } ?: getDefaultTheme()

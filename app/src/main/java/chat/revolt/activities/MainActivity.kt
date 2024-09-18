@@ -42,10 +42,11 @@ import chat.revolt.RevoltApplication
 import chat.revolt.api.HitRateLimitException
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
+import chat.revolt.api.api
 import chat.revolt.api.routes.onboard.needsOnboarding
+import chat.revolt.api.settings.Experiments
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.SyncedSettings
-import chat.revolt.api.api
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.DefaultDestinationScreen
@@ -67,6 +68,7 @@ import chat.revolt.screens.settings.AppearanceSettingsScreen
 import chat.revolt.screens.settings.ChangelogsSettingsScreen
 import chat.revolt.screens.settings.ChatSettingsScreen
 import chat.revolt.screens.settings.DebugSettingsScreen
+import chat.revolt.screens.settings.ExperimentsSettingsScreen
 import chat.revolt.screens.settings.ProfileSettingsScreen
 import chat.revolt.screens.settings.SessionSettingsScreen
 import chat.revolt.screens.settings.SettingsScreen
@@ -123,6 +125,14 @@ class MainActivityViewModel @Inject constructor(
 
     private suspend fun startWithoutDestination() {
         isReady.emit(true)
+    }
+
+    private fun doPreStartupTasks() {
+        Log.d("MainActivity", "Performing pre-startup tasks")
+        viewModelScope.launch {
+            Log.d("MainActivity", "Hydrating Experiments from KV")
+            Experiments.hydrateWithKv()
+        }
     }
 
     fun checkLoggedInState() {
@@ -211,6 +221,7 @@ class MainActivityViewModel @Inject constructor(
 
     init {
         Log.d("MainActivity", "Starting up")
+        doPreStartupTasks()
         checkLoggedInState()
     }
 }
@@ -400,6 +411,7 @@ fun AppEntrypoint(
                 composable("settings/appearance") { AppearanceSettingsScreen(navController) }
                 composable("settings/chat") { ChatSettingsScreen(navController) }
                 composable("settings/debug") { DebugSettingsScreen(navController) }
+                composable("settings/experiments") { ExperimentsSettingsScreen(navController) }
                 composable("settings/changelogs") { ChangelogsSettingsScreen(navController) }
 
                 composable("settings/channel/{channelId}") { backStackEntry ->

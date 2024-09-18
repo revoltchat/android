@@ -34,17 +34,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,6 +69,7 @@ import chat.revolt.api.routes.channel.unreact
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.User
+import chat.revolt.api.settings.Experiments
 import chat.revolt.api.settings.GlobalState
 import chat.revolt.api.settings.MessageReplyStyle
 import chat.revolt.callbacks.Action
@@ -198,8 +195,6 @@ fun Message(
     )
 
     val authorIsBlocked = remember(author) { author.relationship == "Blocked" }
-
-    var __TEMPORARY_useJbm by remember { mutableStateOf(false) }
 
     Column(Modifier.animateContentSize()) {
         if (message.tail == false) {
@@ -370,12 +365,21 @@ fun Message(
                             message.content?.let {
                                 if (message.content.isBlank()) return@let // if only an attachment is sent
 
-                                Switch(
-                                    checked = __TEMPORARY_useJbm,
-                                    onCheckedChange = { __TEMPORARY_useJbm = it },
-                                )
-
-                                if (__TEMPORARY_useJbm == false) {
+                                if (Experiments.useKotlinBasedMarkdownRenderer.isEnabled) {
+                                    CompositionLocalProvider(
+                                        LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
+                                            fontSizeMultiplier = Gigamoji.useGigamojiForMessage(
+                                                message.content
+                                            )
+                                                .let {
+                                                    if (it) 2f else 1f
+                                                }
+                                        )
+                                    ) {
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        JBMRenderer(message.content)
+                                    }
+                                } else {
                                     CompositionLocalProvider(
                                         LocalMarkdownTreeConfig provides LocalMarkdownTreeConfig.current.copy(
                                             currentServer = RevoltAPI.channelCache[message.channel]?.server,
@@ -389,20 +393,6 @@ fun Message(
                                     ) {
                                         Spacer(modifier = Modifier.height(2.dp))
                                         RichMarkdown(input = message.content)
-                                    }
-                                } else {
-                                    CompositionLocalProvider(
-                                        LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
-                                            fontSizeMultiplier = Gigamoji.useGigamojiForMessage(
-                                                message.content
-                                            )
-                                                .let {
-                                                    if (it) 2f else 1f
-                                                }
-                                        )
-                                    ) {
-                                        Spacer(modifier = Modifier.height(2.dp))
-                                        JBMRenderer(message.content)
                                     }
                                 }
                             }

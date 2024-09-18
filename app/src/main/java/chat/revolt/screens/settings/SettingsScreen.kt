@@ -261,6 +261,27 @@ fun SettingsScreen(
                         )
                     }
 
+                    if (GlobalState.experimentsEnabled) {
+                        ListItem(
+                            headlineContent = {
+                                Text(
+                                    text = "Experiments"
+                                )
+                            },
+                            leadingContent = {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_flask_24dp),
+                                    contentDescription = null,
+                                )
+                            },
+                            modifier = Modifier
+                                .testTag("settings_view_experiments")
+                                .clickable {
+                                    navController.navigate("settings/experiments")
+                                }
+                        )
+                    }
+
                     ListHeader {
                         Text(
                             stringResource(
