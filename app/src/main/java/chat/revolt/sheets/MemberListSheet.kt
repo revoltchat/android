@@ -3,6 +3,7 @@ package chat.revolt.sheets
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -288,19 +289,19 @@ fun MemberListSheet(
         }
     }
 
-    if (viewModel.fullItemList.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        ) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+    Column(Modifier.animateContentSize()) {
+        if (viewModel.fullItemList.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            ) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+            SheetEnd()
+            return@Column
         }
-        SheetEnd()
-        return
-    }
 
-    Column {
         SheetHeaderPadding {
             Text(
                 text = stringResource(R.string.channel_info_sheet_options_members),
