@@ -3,6 +3,7 @@ package chat.revolt.api.settings
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import chat.revolt.BuildConfig
 import chat.revolt.RevoltApplication
 import chat.revolt.persistence.KVStorage
 
@@ -30,7 +31,11 @@ object Experiments {
     suspend fun hydrateWithKv() {
         val kvStorage = KVStorage(RevoltApplication.instance)
 
-        GlobalState.experimentsEnabled = kvStorage.getBoolean("experimentsEnabled") ?: false
+        if (BuildConfig.DEBUG) {
+            GlobalState.experimentsEnabled = true
+        } else {
+            GlobalState.experimentsEnabled = kvStorage.getBoolean("experimentsEnabled") ?: false
+        }
 
         useKotlinBasedMarkdownRenderer.setEnabled(
             kvStorage.getBoolean("exp/useKotlinBasedMarkdownRenderer") ?: false
