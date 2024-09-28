@@ -120,12 +120,17 @@ import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelIcon
 import chat.revolt.components.screens.chat.ReplyManager
 import chat.revolt.components.screens.chat.TypingIndicator
+import chat.revolt.components.skeletons.MessageSkeleton
+import chat.revolt.components.skeletons.MessageSkeletonVariant
 import chat.revolt.internals.extensions.BottomSheetInsets
 import chat.revolt.internals.extensions.rememberChannelPermissions
 import chat.revolt.internals.extensions.zero
 import chat.revolt.sheets.ChannelInfoSheet
 import chat.revolt.sheets.MessageContextSheet
 import chat.revolt.sheets.ReactSheet
+import com.valentinilk.shimmer.ShimmerBounds
+import com.valentinilk.shimmer.rememberShimmer
+import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -699,14 +704,16 @@ fun ChannelScreen(
                                     }
 
                                     is ChannelScreenItem.Loading -> {
-                                        Box(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            contentAlignment = Alignment.Center
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .shimmer(rememberShimmer(ShimmerBounds.Window)),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
                                         ) {
-                                            CircularProgressIndicator(
-                                                modifier = Modifier
-                                                    .padding(16.dp)
-                                            )
+                                            MessageSkeleton(MessageSkeletonVariant.One)
+                                            MessageSkeleton(MessageSkeletonVariant.Two)
+                                            MessageSkeleton(MessageSkeletonVariant.Three)
                                         }
                                     }
                                 }
