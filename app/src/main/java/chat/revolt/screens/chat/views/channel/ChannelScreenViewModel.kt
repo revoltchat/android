@@ -101,8 +101,11 @@ class ChannelScreenViewModel @Inject constructor(
         }
     }
 
+    private var loadMessagesJob: Job? = null
+
     fun switchChannel(id: String) {
         // Reset state
+        this.loadMessagesJob?.cancel()
         this.channel = RevoltAPI.channelCache[id]
         this.items = mutableStateListOf(ChannelScreenItem.Loading)
         this.activePane = ChannelScreenActivePane.None
@@ -395,7 +398,7 @@ class ChannelScreenViewModel @Inject constructor(
         ignoreExisting: Boolean = false
     ) {
         channel?.id?.let { channelId ->
-            viewModelScope.launch {
+            loadMessagesJob = viewModelScope.launch {
                 try {
                     val messages = arrayListOf<Message>()
 
