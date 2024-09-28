@@ -390,6 +390,15 @@ class ChannelScreenViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Load messages from the channel. If the channel is switched, the job will be cancelled.
+     *
+     * @param amount The amount of messages to load.
+     * @param before Load [amount] messages before this message ID. Do not use with [around] or [after].
+     * @param after Load [amount] messages after this message ID. Do not use with [around] or [before].
+     * @param around Load [amount] messages around this message ID. Do not use with [before] or [after].
+     * @param ignoreExisting If true, messages that are already in the list will not be added again. Possible performance degradation.
+     */
     fun loadMessages(
         amount: Int,
         before: String? = null,
