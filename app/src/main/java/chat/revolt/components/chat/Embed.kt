@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
@@ -28,6 +28,7 @@ import chat.revolt.api.internals.BrushCompat
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.Embed
+import chat.revolt.components.chat.specialembeds.SpecialEmbedSwitch
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.markdown.RichMarkdown
 import chat.revolt.api.schemas.Embed as EmbedSchema
@@ -42,7 +43,7 @@ fun RegularEmbed(
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
-            .fillMaxWidth()
+            .wrapContentWidth(Alignment.Start)
             .height(IntrinsicSize.Min)
     ) {
         // Stripe at the left side of the embed
@@ -58,7 +59,6 @@ fun RegularEmbed(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(8.dp)
         ) {
             Column {
@@ -74,8 +74,7 @@ fun RegularEmbed(
                             } else {
                                 Modifier
                             }
-                        )
-                        .fillMaxWidth(),
+                        ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     embed.iconURL?.let {
@@ -132,6 +131,11 @@ fun RegularEmbed(
                         contentScale = ContentScale.Crop,
                         description = null // decorative
                     )
+                }
+
+                // Special
+                embed.special?.let {
+                    SpecialEmbedSwitch(it)
                 }
             }
         }

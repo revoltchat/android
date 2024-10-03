@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
@@ -91,6 +91,25 @@ fun ImageAttachment(attachment: AutumnResource) {
 }
 
 @Composable
+fun VideoPlayButton() {
+    Box(
+        modifier = Modifier
+            .width(48.dp)
+            .aspectRatio(1f)
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+    )
+
+    Icon(
+        imageVector = Icons.Default.PlayArrow,
+        contentDescription = stringResource(id = R.string.media_viewer_play),
+        modifier = Modifier
+            .width(32.dp)
+            .aspectRatio(1f)
+    )
+}
+
+@Composable
 fun VideoAttachment(attachment: AutumnResource) {
     val url = "$REVOLT_FILES/attachments/${attachment.id}/${attachment.filename}"
 
@@ -114,22 +133,8 @@ fun VideoAttachment(attachment: AutumnResource) {
                     ),
                 description = attachment.filename ?: "Video"
             )
-
-            Box(
-                modifier = Modifier
-                    .width(48.dp)
-                    .aspectRatio(1f)
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
-            )
-
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = stringResource(id = R.string.media_viewer_play),
-                modifier = Modifier
-                    .width(32.dp)
-                    .aspectRatio(1f)
-            )
+            
+            VideoPlayButton()
         }
     }
 }

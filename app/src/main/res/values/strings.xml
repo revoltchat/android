@@ -197,6 +197,8 @@
     <string name="message_blocked">Blocked message</string>
     <string name="message_failed_to_send">Failed to send, long press for options</string>
 
+    <string name="message_embed_special_youtube_switch_alt">Tap to play video from YouTube</string>
+
     <string name="system_message_ownership_changed_alt">Ownership changed</string>
     <string name="system_message_channel_icon_changed_alt">Channel icon changed</string>
     <string name="system_message_channel_description_changed_alt">Channel description changed</string>

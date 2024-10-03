@@ -82,7 +82,15 @@ data class Image(
 
 @Serializable
 data class Special(
-    val type: String? = null
+    val type: String? = null,
+    val id: String? = null,
+    val timestamp: String? = null,
+    @SerialName("content_type")
+    val contentType: String? = null,
+    @SerialName("album_id")
+    val albumID: String? = null,
+    @SerialName("track_id")
+    val trackID: String? = null,
 )
 
 @Serializable
