@@ -615,6 +615,10 @@
     <string name="settings_chat_quick_reply_none">Long press to reply</string>
     <string name="settings_chat_quick_reply_swipe_from_end">Swipe to reply</string>
     <string name="settings_chat_quick_reply_double_tap">Double tap to reply</string>
+    <string name="settings_chat_interactive_embeds">Interactive Embeds</string>
+    <string name="settings_chat_interactive_embeds_description">Interactive Embeds allow you to interact with some types of links directly inside chat. For example, you can play YouTube videos or preview albums from Apple Music.</string>
+    <string name="settings_chat_interactive_embeds_youtube">YouTube</string>
+    <string name="settings_chat_interactive_embeds_apple_music">Apple Music</string>
 
     <string name="settings_feedback">Feedback</string>
     <string name="settings_feedback_description">Join the Revolt server to give feedback or suggestions and report bugs.</string>
