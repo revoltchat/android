@@ -3,6 +3,7 @@ package chat.revolt.settings.dsl
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
@@ -109,6 +110,7 @@ fun SettingsPage(
         Column(
             Modifier
                 .padding(pv)
+                .imePadding()
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
