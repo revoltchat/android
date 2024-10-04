@@ -30,7 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -139,7 +139,7 @@ fun InlineMediaPickerMediaPicker(
                 Modifier
                     .then(
                         if (useAvatarCircularity) {
-                            Modifier.clip(RoundedCornerShape(GlobalState.avatarRadius))
+                            Modifier.clip(RoundedCornerShape(LoadedSettings.avatarRadius))
                         } else {
                             Modifier.clip(CircleShape)
                         }
@@ -162,7 +162,7 @@ fun InlineMediaPickerMediaPicker(
                 Modifier
                     .then(
                         if (useAvatarCircularity) {
-                            Modifier.clip(RoundedCornerShape(GlobalState.avatarRadius))
+                            Modifier.clip(RoundedCornerShape(LoadedSettings.avatarRadius))
                         } else {
                             Modifier.clip(CircleShape)
                         }

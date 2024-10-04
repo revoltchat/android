@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 
 enum class MessageSkeletonVariant {
     One,
@@ -35,7 +35,7 @@ fun MessageSkeleton(variant: MessageSkeletonVariant, modifier: Modifier = Modifi
             Spacer(modifier = Modifier.height(4.dp))
             Box(
                 Modifier
-                    .clip(RoundedCornerShape(GlobalState.avatarRadius))
+                    .clip(RoundedCornerShape(LoadedSettings.avatarRadius))
                     .size(40.dp)
                     .background(skeletonColourOnBackground())
             )

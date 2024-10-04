@@ -59,7 +59,7 @@ import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.routes.microservices.autumn.MAX_ATTACHMENTS_PER_MESSAGE
 import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
 import chat.revolt.api.schemas.ChannelType
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.chat.NativeMessageField
 import chat.revolt.components.emoji.EmojiPicker
@@ -279,7 +279,7 @@ fun ShareTargetScreen(
     var selectedChannel by rememberSaveable { mutableStateOf<String?>(null) }
 
     RevoltTheme(
-        requestedTheme = GlobalState.theme,
+        requestedTheme = LoadedSettings.theme,
         colourOverrides = SyncedSettings.android.colourOverrides
     ) {
         Scaffold(

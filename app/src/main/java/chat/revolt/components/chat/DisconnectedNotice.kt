@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.realtime.DisconnectionState
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.ui.theme.Theme
 
 private val NON_MATERIAL_COLOURS = mapOf(
@@ -108,7 +108,7 @@ fun DisconnectedNotice(state: DisconnectionState, onReconnect: () -> Unit) {
         DisconnectionState.Connected to (MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary)
     )
 
-    val (background, foreground) = when (GlobalState.theme) {
+    val (background, foreground) = when (LoadedSettings.theme) {
         Theme.M3Dynamic -> materialColours[state] ?: (Color.Unspecified to Color.Unspecified)
         else -> NON_MATERIAL_COLOURS[state] ?: (Color.Unspecified to Color.Unspecified)
     }

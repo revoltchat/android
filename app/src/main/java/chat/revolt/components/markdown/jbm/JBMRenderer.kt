@@ -51,7 +51,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.components.markdown.Annotations
 import chat.revolt.components.utils.detectTapGesturesConditionalConsume
 import chat.revolt.ui.theme.FragmentMono
@@ -427,7 +427,8 @@ private fun JBMCodeBlockContent(node: ASTNode, modifier: Modifier) {
     val uiMode = LocalConfiguration.current.uiMode
     val systemIsDark =
         (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-    val themeIsDark = remember(GlobalState.theme) { isThemeDark(GlobalState.theme, systemIsDark) }
+    val themeIsDark =
+        remember(LoadedSettings.theme) { isThemeDark(LoadedSettings.theme, systemIsDark) }
 
     val codeFenceLanguage = remember(node) {
         node.children.firstOrNull { it.type == MarkdownTokenTypes.FENCE_LANG }

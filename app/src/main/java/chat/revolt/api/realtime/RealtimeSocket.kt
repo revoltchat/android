@@ -36,7 +36,7 @@ import chat.revolt.api.realtime.frames.sendable.PingFrame
 import chat.revolt.api.routes.server.fetchMember
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.ChannelType
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.c2dm.ChannelRegistrator
 import chat.revolt.persistence.Database
@@ -731,7 +731,7 @@ object RealtimeSocket {
 
             "Authenticated" -> {
                 SyncedSettings.fetch()
-                GlobalState.hydrateWithSettings(SyncedSettings)
+                LoadedSettings.hydrateWithSettings(SyncedSettings)
             }
 
             else -> {

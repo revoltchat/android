@@ -44,7 +44,7 @@ import chat.revolt.R
 import chat.revolt.activities.InviteActivity
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.settings.FeatureFlags
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.components.generic.ListHeader
 import chat.revolt.components.screens.settings.SelfUserOverview
 import chat.revolt.persistence.KVStorage
@@ -59,7 +59,7 @@ class SettingsScreenViewModel @Inject constructor(
     fun logout() {
         runBlocking {
             kvStorage.remove("sessionToken")
-            GlobalState.reset()
+            LoadedSettings.reset()
             RevoltAPI.logout()
         }
     }
@@ -261,7 +261,7 @@ fun SettingsScreen(
                         )
                     }
 
-                    if (GlobalState.experimentsEnabled) {
+                    if (LoadedSettings.experimentsEnabled) {
                         ListItem(
                             headlineContent = {
                                 Text(

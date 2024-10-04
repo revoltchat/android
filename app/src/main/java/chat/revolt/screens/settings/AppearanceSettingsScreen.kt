@@ -63,7 +63,7 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.RevoltCbor
 import chat.revolt.api.RevoltJson
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.ListHeader
 import chat.revolt.components.screens.settings.appearance.ColourChip
@@ -94,14 +94,14 @@ class AppearanceSettingsScreenViewModel @Inject constructor(
     var overridePickerSheetVisible by mutableStateOf(false)
 
     fun saveNewTheme(theme: Theme) {
-        GlobalState.theme = theme
+        LoadedSettings.theme = theme
         viewModelScope.launch {
             SyncedSettings.updateAndroid(SyncedSettings.android.copy(theme = theme.name))
         }
     }
 
     fun saveNewAvatarRadius(radius: Int) {
-        GlobalState.avatarRadius = radius
+        LoadedSettings.avatarRadius = radius
         viewModelScope.launch {
             SyncedSettings.updateAndroid(SyncedSettings.android.copy(avatarRadius = radius))
         }
@@ -322,7 +322,7 @@ fun AppearanceSettingsScreen(
                     ColourChip(
                         color = Color(0xff191919),
                         text = stringResource(id = R.string.settings_appearance_theme_revolt),
-                        selected = GlobalState.theme == Theme.Revolt,
+                        selected = LoadedSettings.theme == Theme.Revolt,
                         modifier = Modifier
                             .weight(1f)
                             .testTag("set_theme_revolt")
@@ -333,7 +333,7 @@ fun AppearanceSettingsScreen(
                     ColourChip(
                         color = Color(0xfff7f7f7),
                         text = stringResource(id = R.string.settings_appearance_theme_light),
-                        selected = GlobalState.theme == Theme.Light,
+                        selected = LoadedSettings.theme == Theme.Light,
                         modifier = Modifier
                             .weight(1f)
                             .testTag("set_theme_light")
@@ -344,7 +344,7 @@ fun AppearanceSettingsScreen(
                     ColourChip(
                         color = Color(0xff000000),
                         text = stringResource(id = R.string.settings_appearance_theme_amoled),
-                        selected = GlobalState.theme == Theme.Amoled,
+                        selected = LoadedSettings.theme == Theme.Amoled,
                         modifier = Modifier
                             .weight(1f)
                             .testTag("set_theme_amoled")
@@ -355,7 +355,7 @@ fun AppearanceSettingsScreen(
                     ColourChip(
                         color = if (isSystemInDarkTheme()) Color(0xff191919) else Color(0xfff7f7f7),
                         text = stringResource(id = R.string.settings_appearance_theme_none),
-                        selected = GlobalState.theme == Theme.None,
+                        selected = LoadedSettings.theme == Theme.None,
                         modifier = Modifier
                             .weight(1f)
                             .testTag("set_theme_none")
@@ -367,7 +367,7 @@ fun AppearanceSettingsScreen(
                         ColourChip(
                             color = dynamicDarkColorScheme(LocalContext.current).primary,
                             text = stringResource(id = R.string.settings_appearance_theme_m3dynamic),
-                            selected = GlobalState.theme == Theme.M3Dynamic,
+                            selected = LoadedSettings.theme == Theme.M3Dynamic,
                             modifier = Modifier
                                 .weight(1f)
                                 .testTag("set_theme_m3dynamic")
@@ -408,7 +408,7 @@ fun AppearanceSettingsScreen(
 
                 Box(Modifier.padding(horizontal = 16.dp)) {
                     CornerRadiusPicker(
-                        percentage = GlobalState.avatarRadius,
+                        percentage = LoadedSettings.avatarRadius,
                         onUpdate = {
                             viewModel.saveNewAvatarRadius(it)
                         }

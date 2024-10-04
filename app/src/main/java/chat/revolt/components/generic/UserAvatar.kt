@@ -25,7 +25,7 @@ import chat.revolt.R
 import chat.revolt.api.REVOLT_BASE
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.schemas.AutumnResource
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 
 enum class Presence {
     Online,
@@ -103,7 +103,7 @@ fun UserAvatar(
                 contentScale = ContentScale.Crop,
                 description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
-                    .clip(RoundedCornerShape(GlobalState.avatarRadius))
+                    .clip(RoundedCornerShape(LoadedSettings.avatarRadius))
                     .size(size)
                     .then(
                         if (onLongClick != null || onClick != null) {
@@ -122,7 +122,7 @@ fun UserAvatar(
                 url = "$REVOLT_BASE/users/${userId.ifBlank { "0".repeat(26) }}/default_avatar",
                 description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
-                    .clip(RoundedCornerShape(GlobalState.avatarRadius))
+                    .clip(RoundedCornerShape(LoadedSettings.avatarRadius))
                     .size(size)
                     .then(
                         if (onLongClick != null || onClick != null) {

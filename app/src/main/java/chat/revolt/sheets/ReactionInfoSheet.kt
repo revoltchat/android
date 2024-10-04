@@ -50,7 +50,7 @@ import chat.revolt.api.routes.custom.fetchEmoji
 import chat.revolt.api.routes.user.fetchUser
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.User
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.components.chat.MemberListItem
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.SheetEnd
@@ -151,7 +151,7 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
                             tapCount++
                             if (tapCount > 9) {
                                 tapCount = 0
-                                if (GlobalState.experimentsEnabled) {
+                                if (LoadedSettings.experimentsEnabled) {
                                     showEnabledAlreadyAlert = true
                                 } else {
                                     showEnabledConfirmAlert = true
@@ -182,7 +182,7 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
                         confirmButton = {
                             TextButton(onClick = {
                                 showEnabledConfirmAlert = false
-                                GlobalState.experimentsEnabled = true
+                                LoadedSettings.experimentsEnabled = true
                                 scope.launch {
                                     KVStorage(context).set("experimentsEnabled", true)
                                 }

@@ -26,7 +26,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.revolt.R
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.MessageReplyStyle
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.ListHeader
@@ -37,7 +37,7 @@ class ChatSettingsScreenViewModel : ViewModel() {
     fun updateMessageReplyStyle(next: MessageReplyStyle) {
         viewModelScope.launch {
             SyncedSettings.updateAndroid(SyncedSettings.android.copy(messageReplyStyle = next.name))
-            GlobalState.messageReplyStyle = next
+            LoadedSettings.messageReplyStyle = next
         }
     }
 }
@@ -91,17 +91,17 @@ fun ChatSettingsScreen(
 
             Column(Modifier.selectableGroup()) {
                 RadioItem(
-                    selected = GlobalState.messageReplyStyle == MessageReplyStyle.None,
+                    selected = LoadedSettings.messageReplyStyle == MessageReplyStyle.None,
                     onClick = { viewModel.updateMessageReplyStyle(MessageReplyStyle.None) },
                     label = { Text(text = stringResource(R.string.settings_chat_quick_reply_none)) }
                 )
                 RadioItem(
-                    selected = GlobalState.messageReplyStyle == MessageReplyStyle.SwipeFromEnd,
+                    selected = LoadedSettings.messageReplyStyle == MessageReplyStyle.SwipeFromEnd,
                     onClick = { viewModel.updateMessageReplyStyle(MessageReplyStyle.SwipeFromEnd) },
                     label = { Text(text = stringResource(R.string.settings_chat_quick_reply_swipe_from_end)) }
                 )
                 RadioItem(
-                    selected = GlobalState.messageReplyStyle == MessageReplyStyle.DoubleTap,
+                    selected = LoadedSettings.messageReplyStyle == MessageReplyStyle.DoubleTap,
                     onClick = { viewModel.updateMessageReplyStyle(MessageReplyStyle.DoubleTap) },
                     label = { Text(text = stringResource(R.string.settings_chat_quick_reply_double_tap)) }
                 )

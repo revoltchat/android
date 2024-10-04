@@ -17,7 +17,7 @@ import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.RevoltApplication
 import chat.revolt.api.settings.Experiments
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.persistence.KVStorage
 import chat.revolt.settings.dsl.SettingsPage
 import chat.revolt.settings.dsl.SubcategoryContentInsets
@@ -29,7 +29,7 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
     fun disableExperiments(then: () -> Unit = {}) {
         viewModelScope.launch {
             kv.remove("experimentsEnabled")
-            GlobalState.experimentsEnabled = false
+            LoadedSettings.experimentsEnabled = false
             then()
         }
     }

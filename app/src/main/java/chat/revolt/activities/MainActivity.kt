@@ -45,7 +45,7 @@ import chat.revolt.api.RevoltHttp
 import chat.revolt.api.api
 import chat.revolt.api.routes.onboard.needsOnboarding
 import chat.revolt.api.settings.Experiments
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.persistence.KVStorage
@@ -305,7 +305,7 @@ fun AppEntrypoint(
     val navController = rememberNavController()
 
     RevoltTheme(
-        requestedTheme = GlobalState.theme,
+        requestedTheme = LoadedSettings.theme,
         colourOverrides = SyncedSettings.android.colourOverrides
     ) {
         Surface(

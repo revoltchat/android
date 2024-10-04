@@ -70,7 +70,7 @@ import chat.revolt.api.routes.microservices.january.asJanuaryProxyUrl
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.api.schemas.User
 import chat.revolt.api.settings.Experiments
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.MessageReplyStyle
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
@@ -275,7 +275,7 @@ fun Message(
                         .combinedClickable(
                             onClick = {},
                             onDoubleClick = {
-                                if (canReply && GlobalState.messageReplyStyle == MessageReplyStyle.DoubleTap) {
+                                if (canReply && LoadedSettings.messageReplyStyle == MessageReplyStyle.DoubleTap) {
                                     onReply()
                                 }
                             },

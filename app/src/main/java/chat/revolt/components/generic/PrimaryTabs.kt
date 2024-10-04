@@ -11,14 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.ui.theme.Theme
 import com.google.android.material.tabs.TabLayout
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrimaryTabs(tabs: List<String>, currentIndex: Int, onTabSelected: (Int) -> Unit) {
-    when (GlobalState.theme) {
+    when (LoadedSettings.theme) {
         Theme.M3Dynamic -> AndroidView(
             factory = {
                 TabLayout(it).apply {

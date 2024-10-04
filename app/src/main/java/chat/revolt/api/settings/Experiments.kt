@@ -10,7 +10,7 @@ import chat.revolt.persistence.KVStorage
 class ExperimentInstance(default: Boolean) {
     private var _isEnabled by mutableStateOf(default)
     val isEnabled: Boolean
-        get() = GlobalState.experimentsEnabled && _isEnabled
+        get() = LoadedSettings.experimentsEnabled && _isEnabled
 
     fun setEnabled(enabled: Boolean) {
         _isEnabled = enabled
@@ -32,9 +32,9 @@ object Experiments {
         val kvStorage = KVStorage(RevoltApplication.instance)
 
         if (BuildConfig.DEBUG) {
-            GlobalState.experimentsEnabled = true
+            LoadedSettings.experimentsEnabled = true
         } else {
-            GlobalState.experimentsEnabled = kvStorage.getBoolean("experimentsEnabled") ?: false
+            LoadedSettings.experimentsEnabled = kvStorage.getBoolean("experimentsEnabled") ?: false
         }
 
         useKotlinBasedMarkdownRenderer.setEnabled(

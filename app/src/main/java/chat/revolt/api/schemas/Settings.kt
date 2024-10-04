@@ -9,6 +9,20 @@ data class OrderingSettings(
 )
 
 @Serializable
+data class AndroidSpecificSettingsSpecialEmbedSettings(
+    /**
+     * Whether to embed YouTube videos interactively.
+     * Boolean.
+     */
+    val embedYouTube: Boolean = true,
+    /**
+     * Whether to embed Apple Music albums and tracks interactively.
+     * Boolean.
+     */
+    val embedAppleMusic: Boolean = true
+)
+
+@Serializable
 data class AndroidSpecificSettings(
     /**
      * The theme to use for the app.
@@ -29,5 +43,10 @@ data class AndroidSpecificSettings(
      * Avatar radius.
      * Must be integer in range 0..50 inclusive.
      */
-    var avatarRadius: Int? = null
+    var avatarRadius: Int? = null,
+    /**
+     * Controls preferences for special embeds.
+     * Object; See [AndroidSpecificSettingsSpecialEmbedSettings] for format.
+     */
+    var specialEmbedSettings: AndroidSpecificSettingsSpecialEmbedSettings? = null
 )

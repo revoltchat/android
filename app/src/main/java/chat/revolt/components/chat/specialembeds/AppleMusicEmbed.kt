@@ -12,13 +12,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import chat.revolt.api.schemas.Special
-import chat.revolt.api.settings.GlobalState
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.ui.theme.isThemeDark
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun AppleMusicEmbed(special: Special, modifier: Modifier = Modifier) {
-    val useDarkTheme = isThemeDark(GlobalState.theme)
+    val useDarkTheme = isThemeDark(LoadedSettings.theme)
 
     AndroidView(
         factory = { ctx ->
