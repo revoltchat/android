@@ -8,6 +8,7 @@ import chat.revolt.api.schemas.Special
 fun SpecialEmbedSwitch(special: Special, modifier: Modifier = Modifier) {
     when (special.type) {
         "YouTube" -> YoutubeEmbedSwitch(special, modifier)
+        "AppleMusic" -> AppleMusicEmbed(special, modifier)
         else -> {}
     }
 }
