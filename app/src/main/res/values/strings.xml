@@ -25,6 +25,11 @@
     <string name="resend">Resend</string>
     <string name="send_email">Send email</string>
 
+    <string name="service_health_alert">Currently ongoing</string>
+    <string name="service_health_alert_body_default">We are currently experiencing issues with our services. Please check our status page for more information.</string>
+    <string name="service_health_alert_actions_default">Learn more</string>
+    <string name="service_health_alert_actions_dismiss">Dismiss</string>
+
     <string name="login_heading">Let\'s log you in</string>
     <string name="password_forgot">Forgot password?</string>
     <string name="resend_verification">Resend a verification email</string>

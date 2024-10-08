@@ -43,10 +43,13 @@ import chat.revolt.api.HitRateLimitException
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.api
+import chat.revolt.api.routes.microservices.health.healthCheck
 import chat.revolt.api.routes.onboard.needsOnboarding
+import chat.revolt.api.schemas.HealthNotice
 import chat.revolt.api.settings.Experiments
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
+import chat.revolt.components.generic.HealthAlert
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.DefaultDestinationScreen
@@ -132,6 +135,8 @@ class MainActivityViewModel @Inject constructor(
         viewModelScope.launch {
             Log.d("MainActivity", "Hydrating Experiments from KV")
             Experiments.hydrateWithKv()
+            Log.d("MainActivity", "Performing health check")
+            doHealthCheck()
         }
     }
 
@@ -219,6 +224,30 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+    val activeAlert = MutableStateFlow<HealthNotice?>(null)
+    val isAlertActive = MutableStateFlow(false)
+
+    private fun doHealthCheck() {
+        viewModelScope.launch {
+            try {
+                val health = healthCheck()
+                if (health.alert != null) {
+                    activeAlert.emit(health)
+                    isAlertActive.emit(true)
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Failed to perform health check", e)
+            }
+        }
+    }
+
+    fun onDismissHealthAlert() {
+        viewModelScope.launch {
+            activeAlert.emit(null)
+            isAlertActive.emit(false)
+        }
+    }
+
     init {
         Log.d("MainActivity", "Starting up")
         doPreStartupTasks()
@@ -273,6 +302,9 @@ class MainActivity : FragmentActivity() {
                 windowSizeClass,
                 viewModel.nextDestination.collectAsState().value,
                 viewModel.isConnected.collectAsState().value,
+                viewModel.activeAlert.collectAsState().value,
+                viewModel.isAlertActive.collectAsState().value,
+                viewModel::onDismissHealthAlert,
                 viewModel::checkLoggedInState,
                 viewModel::updateNextDestination
             )
@@ -299,6 +331,9 @@ fun AppEntrypoint(
     windowSizeClass: WindowSizeClass,
     nextDestination: String?,
     isConnected: Boolean,
+    healthNotice: HealthNotice?,
+    isHealthAlertActive: Boolean,
+    onDismissHealthAlert: () -> Unit = {},
     onRetryConnection: () -> Unit,
     onUpdateNextDestination: (String) -> Unit = {}
 ) {
@@ -313,6 +348,12 @@ fun AppEntrypoint(
                 .fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
+            if (isHealthAlertActive) {
+                healthNotice?.let {
+                    HealthAlert(notice = healthNotice, onDismiss = onDismissHealthAlert)
+                }
+            }
+
             NavHost(
                 navController = navController,
                 startDestination = "default",
