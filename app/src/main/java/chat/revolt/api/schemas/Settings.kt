@@ -19,7 +19,7 @@ data class AndroidSpecificSettingsSpecialEmbedSettings(
      * Whether to embed Apple Music albums and tracks interactively.
      * Boolean.
      */
-    val embedAppleMusic: Boolean = true
+    val embedAppleMusic: Boolean = false
 )
 
 @Serializable
