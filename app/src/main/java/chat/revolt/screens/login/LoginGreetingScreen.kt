@@ -42,7 +42,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.REVOLT_MARKETING
 import chat.revolt.components.generic.Weblink
@@ -93,7 +92,8 @@ fun LoginGreetingScreen(navController: NavController) {
                         interactionSource = remember(::MutableInteractionSource),
                         indication = null
                     ) {
-                        if ((catTaps >= (9 * 2)) && BuildConfig.DEBUG) {
+                        // FIXME: This should also check for DEBUG mode in next version
+                        if ((catTaps >= (9 * 2))) {
                             showDebugPrep = true
                         } else if (catTaps == 9) {
                             Toast
