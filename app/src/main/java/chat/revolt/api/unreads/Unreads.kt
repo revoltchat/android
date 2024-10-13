@@ -1,5 +1,6 @@
 package chat.revolt.api.unreads
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import chat.revolt.api.RevoltAPI
@@ -17,12 +18,17 @@ class Unreads {
     suspend fun sync() {
         channels.clear()
         channels.putAll(
-            syncUnreads().associate {
-                it.id.channel to ChannelUnread(
-                    id = it.id.channel,
-                    last_id = it.last_id,
-                    mentions = it.mentions
-                )
+            try {
+                syncUnreads().associate {
+                    it.id.channel to ChannelUnread(
+                        id = it.id.channel,
+                        last_id = it.last_id,
+                        mentions = it.mentions
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("Unreads", "Failed to sync unreads", e)
+                emptyMap()
             }
         )
         hasLoaded.value = true
