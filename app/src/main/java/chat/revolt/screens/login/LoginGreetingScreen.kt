@@ -15,18 +15,14 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,26 +41,11 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.REVOLT_MARKETING
 import chat.revolt.components.generic.Weblink
-import chat.revolt.internals.extensions.BottomSheetInsets
-import chat.revolt.sheets.DebugPrepSheet
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginGreetingScreen(navController: NavController) {
     val context = LocalContext.current
     var catTaps by remember { mutableIntStateOf(0) }
-    var showDebugPrep by remember { mutableStateOf(false) }
-
-    if (showDebugPrep) {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ModalBottomSheet(
-            onDismissRequest = { showDebugPrep = false },
-            sheetState = sheetState,
-            windowInsets = BottomSheetInsets
-        ) {
-            DebugPrepSheet()
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -92,10 +73,9 @@ fun LoginGreetingScreen(navController: NavController) {
                         interactionSource = remember(::MutableInteractionSource),
                         indication = null
                     ) {
-                        // FIXME: This should also check for DEBUG mode in next version
-                        if ((catTaps >= (9 * 2))) {
-                            showDebugPrep = true
-                        } else if (catTaps == 9) {
+                        if (catTaps < 9) {
+                            catTaps++
+                        } else {
                             Toast
                                 .makeText(
                                     context,
@@ -103,8 +83,8 @@ fun LoginGreetingScreen(navController: NavController) {
                                     Toast.LENGTH_SHORT
                                 )
                                 .show()
+                            catTaps = 0
                         }
-                        catTaps++
                     }
             )
 

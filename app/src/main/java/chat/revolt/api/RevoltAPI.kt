@@ -49,8 +49,7 @@ import java.lang.reflect.InvocationTargetException
 import java.net.SocketException
 import chat.revolt.api.schemas.Channel as ChannelSchema
 
-// The reason this is a var is because in debug builds we have the ability to swap the base URL.
-var REVOLT_BASE = "https://revolt.chat/api"
+const val REVOLT_BASE = "https://revolt.chat/api"
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
 const val REVOLT_MARKETING = "https://revolt.chat"
 const val REVOLT_FILES = "https://autumn.revolt.chat"
