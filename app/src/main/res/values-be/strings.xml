@@ -2,14 +2,14 @@
 <resources>
     <string name="next">Наперад →</string>
     <string name="ok">Ок</string>
-    <string name="cancel">Адмяніць</string>
-    <string name="share">Падзяліцца</string>
+    <string name="cancel">Скасаваць</string>
+    <string name="share">Абагуліць</string>
     <string name="terms_of_service">Умовы выкарыстання</string>
     <string name="privacy_policy">Палітыка прыватнасці</string>
     <string name="community_guidelines">Правілы супольнасці</string>
-    <string name="email">Электроная пошта</string>
+    <string name="email">Электронны адрас</string>
     <string name="password">Пароль</string>
-    <string name="resend">Адаслаць яшчэ раз</string>
+    <string name="resend">Адаслаць паўторна</string>
     <string name="send_email">Адаслаць электронны ліст</string>
     <string name="password_forgot">Забылі пароль\?</string>
     <string name="resend_verification">Адаслаць ліст пацверджання паўторна</string>
@@ -18,8 +18,8 @@
     <string name="register_form_heading">Давайце створым акаўнт.</string>
     <string name="back">← Назад</string>
     <string name="loading">Атрымліваем інфармацыю, пачакайце…</string>
-    <string name="login_onboarding_heading">Знайді сабе супольнасць, злучыся са светам.</string>
-    <string name="login_onboarding_body">Revolt - гэта адын з найлепшых шляхоў заставацца на сувязі з сябрамі і супольнасцю, усюды, заўсёды.</string>
+    <string name="login_onboarding_heading">Знайдзіце сабе супольнасць, злучыцеся са светам.</string>
+    <string name="login_onboarding_body">Revolt – гэта адын з найлепшых шляхоў заставацца на сувязі з сябрамі і супольнасцю, усюды, заўсёды.</string>
     <string name="login">Увайсці</string>
     <string name="signup">Зарэгістравацца</string>
     <string name="login_heading">Увайдзём ў аккаунт</string>
@@ -381,7 +381,6 @@
     <string name="settings_appearance_colour_overrides_outline">Контур</string>
     <string name="settings_appearance_colour_overrides_outline_variant">Варыянт контуру</string>
     <string name="settings_appearance_colour_overrides_scrim">Скрым</string>
-    <string name="settings_appearance_colour_overrides_reset">Аднавіць</string>
     <string name="settings_appearance_colour_overrides_export">Экспартаваць</string>
     <string name="settings_appearance_colour_overrides_import">Імпартаваць</string>
     <string name="settings_changelogs_new_header">Што новага ✨</string>
@@ -390,7 +389,6 @@
     <string name="settings_appearance_colour_overrides_secondary_container">Другасны кантэйнер</string>
     <string name="settings_appearance_colour_overrides_on_background">На фоне</string>
     <string name="settings_appearance_colour_overrides_inverse_surface">Зваротная паверхня</string>
-    <string name="settings_appearance_colour_overrides_apply">Ужыць</string>
     <string name="settings_appearance_colour_overrides_import_error">Гэты файл не з\'яўляецца дапусцімым колерам прадвызначэння колераў.</string>
     <string name="settings_changelogs">Спіс змен</string>
     <string name="settings_changelogs_historical_version_header_placeholder">гэта версія</string>
@@ -490,4 +488,5 @@
     <string name="channel_settings_overview_nsfw_undo_confirm_description">Карыстачы больш ня будуць павінны пацвярджаць свой узрост, каб далучыцца да гэтага каналу. Калі ласка, пераканайцеся, што кантэнт гэтага каналу падыходзіць для ўсіх узросаў.</string>
     <string name="channel_settings_delete_confirm">Вы сапраўды хочаце выдаліць гэты канал\?</string>
     <string name="channel_settings_delete_confirm_description">Усі паведамленні ды налады гэтага канала знікнуць назаўжды (на вялікі час!)</string>
+    <string name="rate_limit_toast">Павольней! Ты занадта часта так робіш, за такі малы час.</string>
 </resources>
